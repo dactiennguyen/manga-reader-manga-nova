@@ -80,6 +80,14 @@ Thêm deep link cho intent `.manganova` và `.mangaka`. Không có deep link nà
 - Tách khối `ops` (dòng 224–430) thành controller.
 - Bỏ các `setTimeout` 250ms chờ Sheet đóng. Dùng callback `onClosed` của `Sheet`.
 
+### Canvas
+
+- Nút thước trên thanh công cụ bật đối xứng, phối cảnh 1 điểm hoặc 2 điểm. Bấm lại đúng loại đó để tắt. Thước chỉ tồn tại trong lần mở Canvas, không lưu vào truyện.
+- Với phối cảnh, nét đi theo một đường: về điểm tụ, nằm ngang hoặc thẳng đứng (2 điểm thì về một trong hai điểm hoặc thẳng đứng). Nét chọn đường sau khi bút đi được một đoạn ngắn. Tẩy, lasso và hình khép kín không bị ràng buộc.
+- Đối xứng ghi hai nét trong một thay đổi, nên một lần Undo gỡ cả cặp.
+- Menu có Materials và Character reference. Vật liệu là mực đen trên nền trong suốt, chép vào `images/` để file xuất mang theo được. Nền đặt dưới cùng và giữ nguyên layer đang vẽ, hoa văn đặt trên cùng rồi chuyển sang công cụ Move.
+- Character reference ghim ảnh nhân vật cùng ghi chú ngoại hình vào cửa sổ nổi. Nhân vật có nhiều ảnh thì bấm mũi tên để chuyển.
+
 ### Home
 
 - Thẻ Continue đi theo `lastOpened` qua `resumeTarget`.

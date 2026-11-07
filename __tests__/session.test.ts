@@ -347,6 +347,118 @@ describe('drawing', () => {
   });
 });
 
+describe('rulers', () => {
+  const onePoint = { kind: 'onePoint' as const, a: { x: 300, y: 100 } };
+
+  it('keeps a stroke on the line to the vanishing point', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 300, 400);
+    r.move(1, 302, 380);
+    r.move(1, 310, 300);
+    r.time += 500;
+    r.up(1);
+    const { points } = r.find('strokeCommit').stroke;
+    expect(points.filter((_, i) => i % 2 === 0).every(x => x === 300)).toBe(true);
+    expect(points[points.length - 1]).toBe(300);
+  });
+
+  it('settles on one line and stays on it', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 200, 300);
+    r.move(1, 230, 301);
+    r.move(1, 280, 360);
+    r.time += 500;
+    r.up(1);
+    const { points } = r.find('strokeCommit').stroke;
+    expect(points.filter((_, i) => i % 2 === 1).every(y => y === 300)).toBe(true);
+  });
+
+  it('leaves the eraser free', () => {
+    const r = rig({ tool: 'eraser' });
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 200, 300);
+    r.move(1, 230, 340);
+    r.time += 500;
+    r.up(1);
+    expect(r.find('strokeCommit').stroke.points).toEqual([200, 300, 230, 340]);
+  });
+
+  it('drags a dot instead of drawing, even on a locked layer', () => {
+    const r = rig({ layer: { id: 'layer', locked: true, visible: true, bounds: null } });
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 305, 104);
+    expect(r.state.mode).toBe('guide');
+    r.move(1, 350, 160);
+    r.time += 500;
+    r.up(1);
+    expect(r.state.guide).toEqual({ kind: 'onePoint', a: { x: 345, y: 156 } });
+    expect(r.has('strokeBegin')).toBe(false);
+  });
+
+  it('leaves a dot where it was for a tap with a little jitter', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 315, 100);
+    r.move(1, 317, 101);
+    r.time += 100;
+    r.up(1);
+    expect(r.state.guide).toEqual(onePoint);
+  });
+
+  it('draws when the touch starts just outside a dot', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 300, 126);
+    expect(r.state.mode).toBe('draw');
+  });
+
+  it('ignores a palm landing while the pen drags a dot', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 300, 100, 'stylus');
+    r.down(2, 600, 600, 'touch');
+    expect(r.state.mode).toBe('guide');
+    expect(r.state.ids).toEqual([1]);
+  });
+
+  it('waits for real travel before choosing a line', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: onePoint });
+    r.down(1, 200, 300);
+    r.move(1, 190, 290);
+    expect(r.state.snap).toBeNull();
+    r.move(1, 200, 340);
+    r.move(1, 200, 400);
+    r.time += 500;
+    r.up(1);
+    const { points } = r.find('strokeCommit').stroke;
+    expect(points.filter((_, i) => i % 2 === 0).every(x => x === 200)).toBe(true);
+  });
+
+  it('marks a symmetric stroke with its axis', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: { kind: 'symmetry', x: 300 } });
+    r.down(1, 200, 300);
+    r.move(1, 230, 340);
+    r.time += 500;
+    r.up(1);
+    expect(r.find('strokeCommit').mirror).toBe(300);
+  });
+
+  it('commits a plain stroke once the ruler is off', () => {
+    const r = rig();
+    r.send({ type: 'setGuide', guide: { kind: 'symmetry', x: 300 } });
+    r.send({ type: 'setGuide', guide: null });
+    r.down(1, 200, 300);
+    r.move(1, 230, 340);
+    r.time += 500;
+    r.up(1);
+    expect(r.find('strokeCommit').mirror).toBeNull();
+  });
+});
+
 describe('stylus', () => {
   it('announces the stylus on its first touch', () => {
     const r = rig();

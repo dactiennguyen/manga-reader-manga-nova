@@ -1,4 +1,4 @@
-import { AddImageIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon } from '../../ui/icons';
+import { AddImageIcon, CharactersIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon, MaterialsIcon } from '../../ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, View, type LayoutChangeEvent } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -6,23 +6,34 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScopedTheme } from 'uniwind';
 
 import type { Box } from '../../core/art/artMath';
+import { GUIDES, defaultGuide, type GuideKind } from '../../core/art/guides';
 import type { SessionEnv } from '../../core/art/session';
 import { DEFAULT_OPACITY, DEFAULT_SIZES, GRAYS } from '../../core/art/tools';
 import type { PanelShape } from '../../core/layout/layout';
-import type { ID } from '../../core/model/types';
+import type { Character, ID } from '../../core/model/types';
 import { setKeepAwake } from '../../native/screen';
 import type { PageContext } from '../../render/drawPage';
 import { usePageContext } from '../../render/PageView';
-import { useLastOpened } from '../../state/hooks';
+import { useCharacters, useLastOpened } from '../../state/hooks';
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
-import { EmptyState, Menu, MOTION, Screen } from '../../ui';
+import { EmptyState, Menu, MOTION, Screen, toast } from '../../ui';
 import { CanvasRail } from './CanvasRail';
 import { CanvasStage } from './CanvasStage';
 import { CanvasToolPanel } from './CanvasToolPanel';
 import { ArtRevWatcher, CanvasTopBar } from './CanvasTopBar';
-import { BrushPreview, DescriptionBanner, ReferenceWindow, TipsOverlay, ZoomBadge } from './CanvasOverlays';
+import {
+  BrushPreview,
+  DescriptionBanner,
+  ReferenceWindow,
+  TipsOverlay,
+  ZoomBadge,
+  type CanvasReference,
+} from './CanvasOverlays';
+import { CharacterRefSheet, characterReference } from './CharacterRefSheet';
 import { LayerPanel } from './LayerPanel';
+import type { Material } from './materials';
+import { MaterialsSheet } from './MaterialsSheet';
 import { useCanvasDoc } from './useCanvasDoc';
 import { useCanvasEngine, type EngineHandlers } from './useCanvasEngine';
 import { useCanvasEnv, useCanvasHandlers } from './useCanvasHandlers';
@@ -74,7 +85,9 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
   const [grid, setGrid] = useState(false);
   const [flip, setFlip] = useState(false);
   const [sizing, setSizing] = useState(false);
-  const [refPath, setRefPath] = useState<string | null>(null);
+  const [reference, setReference] = useState<CanvasReference | null>(null);
+  const [guide, setGuide] = useState<GuideKind | null>(null);
+  const [sheet, setSheet] = useState<'characters' | 'materials' | null>(null);
   const [opacityPreview, setOpacityPreview] = useState<{ id: ID; value: number } | null>(null);
   const [banner, setBanner] = useState(false);
 
@@ -168,9 +181,32 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
     opacity: withTiming(faded.value ? FADED_OPACITY : 1, { duration: MOTION.fast }),
   }));
 
-  const { importImage, clearActive, addReference } = useLayerActions(panelId, active, shape, setRefPath);
+  const { importImage, clearActive, addReference, placeMaterial } = useLayerActions(panelId, active, shape, setReference);
+  const characters = useCharacters(ctx.project.id);
 
-  const closeReference = useCallback(() => setRefPath(null), []);
+  const closeReference = useCallback(() => setReference(null), []);
+
+  const chooseGuide = (kind: GuideKind) => {
+    const next = kind === guide ? null : kind;
+    setGuide(next);
+    send({ type: 'setGuide', guide: next ? defaultGuide(next, shape.bbox) : null });
+    toast(next ? GUIDES.find(item => item.id === next)?.hint ?? '' : 'Ruler off');
+  };
+
+  const showCharacter = (character: Character) => {
+    setSheet(null);
+    setReference(characterReference(character));
+  };
+
+  const addMaterial = async (material: Material) => {
+    setSheet(null);
+    if (await placeMaterial(material)) {
+      if (material.kind === 'pattern') {
+        tools.chooseTool('move');
+      }
+      toast(material.kind === 'pattern' ? 'Drag to place it, pinch to resize' : 'Background added under your drawing');
+    }
+  };
   const closeLayers = useCallback(() => setLayersOpen(false), []);
   const railTop = insets.top + TOP_BAR_HEIGHT + 8;
   const suffix = `${tools.picking ? ' · Tap to pick a color' : ''}${stylusMode ? ' · Stylus' : ''}`;
@@ -186,16 +222,17 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
         activeId={active?.id}
         opacityPreview={opacityPreview}
         grid={grid}
+        mirrored={guide === 'symmetry'}
         engine={engine}
         onLayout={onStageLayout}
       />
       {sizing ? <BrushPreview size={tools.size} view={view} /> : null}
       {banner && panel?.description ? <DescriptionBanner text={panel.description} top={railTop} /> : null}
-      {refPath ? (
+      {reference ? (
         <ReferenceWindow
-          key={refPath}
-          path={refPath}
-          initialX={side === 'left' ? Math.max(0, area.w - 140) : 8}
+          key={reference.id}
+          reference={reference}
+          initialX={side === 'left' ? Math.max(0, area.w - 164) : 8}
           initialY={railTop}
           onClose={closeReference}
         />
@@ -207,6 +244,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
             tool={tools.tool}
             shape={tools.shapeTool}
             picking={tools.picking}
+            guide={guide}
             collapsed={collapsed}
             side={side}
             top={railTop}
@@ -214,6 +252,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
             fade={fade}
             onTool={tools.chooseTool}
             onPick={() => tools.setPicking(value => !value)}
+            onGuide={chooseGuide}
             onToggle={() => setCollapsed(value => !value)}
             onLayout={trackers.rail}
           />
@@ -251,6 +290,8 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
         onClose={() => setMenuOpen(false)}
         title={`Panel ${shape.index + 1}`}
         items={[
+          { label: 'Materials', icon: MaterialsIcon, onPress: () => setSheet('materials') },
+          { label: 'Character reference', icon: CharactersIcon, onPress: () => setSheet('characters') },
           { label: 'Flip view horizontally', icon: FlipIcon, onPress: () => setFlip(value => !value) },
           { label: grid ? 'Hide grid' : 'Show grid', icon: GridIcon, onPress: () => setGrid(value => !value) },
           stylusMode && { label: 'Draw with a finger again', icon: EditIcon, onPress: () => setStylusMode(false) },
@@ -259,6 +300,13 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
           { label: 'Clear current layer', icon: DeleteIcon, destructive: true, onPress: clearActive },
         ]}
       />
+      <CharacterRefSheet
+        visible={sheet === 'characters'}
+        characters={characters}
+        onClose={() => setSheet(null)}
+        onPick={showCharacter}
+      />
+      <MaterialsSheet visible={sheet === 'materials'} onClose={() => setSheet(null)} onPick={addMaterial} />
       {tipsSeen ? null : <TipsOverlay onClose={() => useSettings.getState().set({ canvasTipsSeen: true })} />}
     </View>
   );

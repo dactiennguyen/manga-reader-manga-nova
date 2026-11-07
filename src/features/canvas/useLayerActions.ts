@@ -1,18 +1,22 @@
 import { useCallback } from 'react';
 
-import { fitImageRect } from '../../core/art/strokes';
+import { coverImageRect, fitImageRect } from '../../core/art/strokes';
+import { LIMITS } from '../../core/model/constants';
 import type { PanelShape } from '../../core/layout/layout';
 import type { ArtLayer, ID } from '../../core/model/types';
 import { pickImage } from '../../native/files';
 import { loadImage } from '../../render/images';
-import { editLayer, loadArt, rewriteLayer } from '../../state/artStore';
+import { addLayer, editLayer, loadArt, rewriteLayer, setActiveLayer } from '../../state/artStore';
 import { confirm, toast } from '../../ui';
+import type { CanvasReference } from './CanvasOverlays';
+import { importBundledImage } from './materialFile';
+import type { Material } from './materials';
 
 export function useLayerActions(
   panelId: ID,
   active: ArtLayer | undefined,
   shape: PanelShape,
-  setRefPath: (path: string | null) => void,
+  showReference: (reference: CanvasReference) => void,
 ) {
   const importImage = useCallback(async () => {
     if (!active) {
@@ -55,9 +59,37 @@ export function useLayerActions(
   const addReference = useCallback(async () => {
     const path = await pickImage();
     if (path) {
-      setRefPath(path);
+      showReference({ id: path, images: [path] });
     }
-  }, [setRefPath]);
+  }, [showReference]);
 
-  return { importImage, clearActive, addReference };
+  /** A background goes under the drawing and leaves the current layer active. A pattern goes on top. */
+  const placeMaterial = useCallback(
+    async (material: Material): Promise<boolean> => {
+      const background = material.kind === 'background';
+      if ((loadArt(panelId)?.layers.length ?? 0) >= LIMITS.layers) {
+        toast(`A panel can hold ${LIMITS.layers} layers. Merge or delete one first`);
+        return false;
+      }
+      try {
+        const file = await importBundledImage(material.source);
+        if (!file) {
+          throw new Error('Unreadable material');
+        }
+        const place = background ? coverImageRect : fitImageRect;
+        const rect = place(file.width, file.height, shape.bbox);
+        addLayer(panelId, material.label, { image: { uri: file.uri, ...rect } }, background ? 0 : undefined);
+        if (background && active) {
+          setActiveLayer(panelId, active.id);
+        }
+        return true;
+      } catch {
+        toast('Could not add this material');
+        return false;
+      }
+    },
+    [active, panelId, shape],
+  );
+
+  return { importImage, clearActive, addReference, placeMaterial };
 }

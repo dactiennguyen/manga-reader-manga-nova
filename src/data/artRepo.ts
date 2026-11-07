@@ -150,14 +150,15 @@ export function createArtRepo(db: Db, now: () => number = Date.now): ArtRepo {
       });
     },
 
-    appendStroke(layerId, stroke) {
+    appendStrokes(layerId, strokes) {
       return db.transaction(() => {
         const { gen, head } = layerState(layerId);
         // Drawing after an undo overwrites the redo tail.
         db.run('DELETE FROM strokes WHERE layer_id = ? AND gen = ? AND seq >= ?', [layerId, gen, head]);
-        insertStroke(db, layerId, gen, head, stroke);
-        db.run('UPDATE art_layers SET head = ? WHERE id = ?', [head + 1, layerId]);
-        return { gen, head: head + 1 };
+        strokes.forEach((stroke, i) => insertStroke(db, layerId, gen, head + i, stroke));
+        const next = head + strokes.length;
+        db.run('UPDATE art_layers SET head = ? WHERE id = ?', [next, layerId]);
+        return { gen, head: next };
       });
     },
 

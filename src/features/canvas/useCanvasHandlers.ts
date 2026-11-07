@@ -117,8 +117,8 @@ export function useCanvasHandlers({
   };
 
   handlers.current = {
-    onStroke: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number) => {
-      doc.commit(layerId, meta, points, seq);
+    onStroke: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number, mirror: number | null) => {
+      doc.commit(layerId, meta, points, seq, mirror);
       if (meta.tool !== 'eraser') {
         tools.rememberColor(meta.color);
       }

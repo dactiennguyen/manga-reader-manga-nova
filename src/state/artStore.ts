@@ -148,13 +148,15 @@ function currentRow(panelId: ID, layerId: ID): LayerRow {
 }
 
 /** Goes to disk before returning, so a stroke survives the app dying right after the pen lifts. */
-export function commitStroke(panelId: ID, layerId: ID, stroke: Stroke): void {
+export function commitStroke(panelId: ID, layerId: ID, ...strokes: Stroke[]): void {
   const before = currentRow(panelId, layerId);
-  const state = repo ? repo.appendStroke(layerId, stroke) : { gen: before.gen, head: before.head + 1 };
+  const state = repo
+    ? repo.appendStrokes(layerId, strokes)
+    : { gen: before.gen, head: before.head + strokes.length };
   update(panelId, art => ({
     ...art,
     layers: art.layers.map(layer =>
-      layer.id === layerId ? { ...layer, strokes: [...layer.strokes, stroke], ...state } : layer,
+      layer.id === layerId ? { ...layer, strokes: [...layer.strokes, ...strokes], ...state } : layer,
     ),
   }));
   record(panelId, [{ before, after: { ...before, ...state } }]);

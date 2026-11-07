@@ -1,6 +1,7 @@
 import {
   PaintStyle,
   Skia,
+  type SkCanvas,
   type SkPaint,
   type SkPath,
   type SkPathBuilder,
@@ -8,6 +9,7 @@ import {
 } from '@shopify/react-native-skia';
 
 import { boxCorners, isFillTool, isShapeTool, type Box } from '../core/art/artMath';
+import { guideHandles, type Guide, type Point } from '../core/art/guides';
 import type { Vec2 } from '../core/art/freehand';
 import {
   addLivePoint,
@@ -339,6 +341,70 @@ export function recordTransformFrame(box: Box, unit: number, color: string): SkP
     const rect = Skia.XYWHRect(corners[i].x - half, corners[i].y - half, half * 2, half * 2);
     canvas.drawRect(rect, fill);
     canvas.drawRect(rect, edge);
+  }
+  return recorder.finishRecordingAsPicture();
+}
+
+const GUIDE_RAYS = 36;
+
+function guideLine(color: string, unit: number): SkPaint {
+  'worklet';
+  const paint = Skia.Paint();
+  paint.setAntiAlias(true);
+  paint.setStyle(PaintStyle.Stroke);
+  paint.setStrokeWidth(unit);
+  paint.setColor(Skia.Color(color));
+  paint.setAlphaf(0.5);
+  return paint;
+}
+
+function drawRays(canvas: SkCanvas, from: Point, reach: number, paint: SkPaint): void {
+  'worklet';
+  for (let i = 0; i < GUIDE_RAYS; i++) {
+    const angle = (i / GUIDE_RAYS) * Math.PI * 2;
+    canvas.drawLine(from.x, from.y, from.x + Math.cos(angle) * reach, from.y + Math.sin(angle) * reach, paint);
+  }
+}
+
+/** The ruler's lines, clipped to the panel with the art. */
+export function recordGuideLines(guide: Guide | null, bbox: Box, unit: number, color: string): SkPicture {
+  'worklet';
+  const recorder = Skia.PictureRecorder();
+  const canvas = recorder.beginRecording(recordBounds());
+  if (guide) {
+    const paint = guideLine(color, unit);
+    const reach = Math.hypot(bbox.w, bbox.h) * 3;
+    if (guide.kind === 'symmetry') {
+      canvas.drawLine(guide.x, bbox.y, guide.x, bbox.y + bbox.h, paint);
+    } else {
+      drawRays(canvas, guide.a, reach, paint);
+    }
+    if (guide.kind === 'twoPoint') {
+      drawRays(canvas, guide.b, reach, paint);
+    }
+  }
+  return recorder.finishRecordingAsPicture();
+}
+
+/** The ruler's dots sit above the panel edge, so a point outside the panel can still be grabbed. */
+export function recordGuideHandles(guide: Guide | null, bbox: Box, unit: number, color: string): SkPicture {
+  'worklet';
+  const recorder = Skia.PictureRecorder();
+  const canvas = recorder.beginRecording(recordBounds());
+  if (guide) {
+    const fill = Skia.Paint();
+    fill.setAntiAlias(true);
+    fill.setColor(Skia.Color(color));
+    const edge = Skia.Paint();
+    edge.setAntiAlias(true);
+    edge.setStyle(PaintStyle.Stroke);
+    edge.setStrokeWidth(2 * unit);
+    edge.setColor(Skia.Color(PAPER));
+    const handles = guideHandles(guide, bbox);
+    for (let i = 0; i < handles.length; i++) {
+      canvas.drawCircle(handles[i].x, handles[i].y, 9 * unit, fill);
+      canvas.drawCircle(handles[i].x, handles[i].y, 9 * unit, edge);
+    }
   }
   return recorder.finishRecordingAsPicture();
 }

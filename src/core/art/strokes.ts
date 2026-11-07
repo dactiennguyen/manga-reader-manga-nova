@@ -84,6 +84,23 @@ export function fitImageRect(
   };
 }
 
+/** Fills the box and overflows it. The panel clips what is left over. */
+export function coverImageRect(
+  imageW: number,
+  imageH: number,
+  box: { x: number; y: number; w: number; h: number },
+): { x: number; y: number; w: number; h: number } {
+  const scale = Math.max(box.w / Math.max(1, imageW), box.h / Math.max(1, imageH));
+  const w = Math.round(imageW * scale * 10) / 10;
+  const h = Math.round(imageH * scale * 10) / 10;
+  return {
+    x: Math.round((box.x + (box.w - w) / 2) * 10) / 10,
+    y: Math.round((box.y + (box.h - h) / 2) * 10) / 10,
+    w,
+    h,
+  };
+}
+
 export function artImageUris(art: PanelArt | null): string[] {
   return art ? art.layers.flatMap(layer => (layer.image ? [layer.image.uri] : [])) : [];
 }

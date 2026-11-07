@@ -21,6 +21,7 @@ import {
   type SessionEvent,
   type SessionState,
 } from '../../core/art/session';
+import type { Guide } from '../../core/art/guides';
 import type { ViewState } from '../../core/art/tools';
 import type { ID, Stroke } from '../../core/model/types';
 import {
@@ -38,12 +39,12 @@ export type StrokeMeta = Omit<Stroke, 'points'>;
 /** Effects the UI thread hands to JS. Everything that touches the UI thread stays in the engine. */
 export type JsEffect = Exclude<
   SessionEffect,
-  | { kind: 'strokeBegin' | 'strokeExtend' | 'strokeCancel' | 'strokeCommit' | 'view' }
+  | { kind: 'strokeBegin' | 'strokeExtend' | 'strokeCancel' | 'strokeCommit' | 'view' | 'guide' }
   | { kind: 'transform' | 'transformCancel' | 'transformCommit' }
 >;
 
 export type EngineHandlers = {
-  onStroke: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number) => void;
+  onStroke: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number, mirror: number | null) => void;
   onTransform: (layerId: ID, t: LayerTransform) => void;
   onEffect: (effect: JsEffect) => void;
 };
@@ -54,6 +55,7 @@ export type CanvasEngine = {
   gesture: ReturnType<typeof useSimultaneousGestures>;
   env: SharedValue<SessionEnv>;
   view: SharedValue<ViewState>;
+  guide: SharedValue<Guide | null>;
   xform: SharedValue<LayerTransform>;
   frameBox: SharedValue<Box | null>;
   contents: SharedValue<ScenePictures>;
@@ -75,6 +77,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   const session = useSharedValue<SessionState>(createSession(NO_VIEW));
   const env = useSharedValue<SessionEnv>(initialEnv);
   const view = useSharedValue<ViewState>(NO_VIEW);
+  const guide = useSharedValue<Guide | null>(null);
   const xform = useSharedValue<LayerTransform>(IDENTITY_TRANSFORM);
   const frameBox = useSharedValue<Box | null>(null);
   const contents = useSharedValue<ScenePictures>({});
@@ -90,8 +93,8 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
 
   const js = useMemo(
     () => ({
-      stroke: (layerId: ID, meta: StrokeMeta, points: Float32Array, id: number) =>
-        handlers.current.onStroke(layerId, meta, points, id),
+      stroke: (layerId: ID, meta: StrokeMeta, points: Float32Array, id: number, mirror: number | null) =>
+        handlers.current.onStroke(layerId, meta, points, id, mirror),
       transform: (layerId: ID, t: LayerTransform) => handlers.current.onTransform(layerId, t),
       effect: (effect: JsEffect) => handlers.current.onEffect(effect),
     }),
@@ -107,7 +110,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
       live.value = null;
       livePicture.value = blank;
     };
-    const commit = (stroke: Stroke, layerId: ID) => {
+    const commit = (stroke: Stroke, layerId: ID, mirror: number | null) => {
       'worklet';
       const id = seq.value + 1;
       seq.value = id;
@@ -125,7 +128,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         pressure: stroke.pressure,
         tone: stroke.tone,
       };
-      scheduleOnRN(toJsStroke, layerId, meta, new Float32Array(stroke.points), id);
+      scheduleOnRN(toJsStroke, layerId, meta, new Float32Array(stroke.points), id, mirror);
     };
     return (event: SessionEvent) => {
       'worklet';
@@ -147,10 +150,13 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
             clearLive();
             break;
           case 'strokeCommit':
-            commit(effect.stroke, effect.layerId);
+            commit(effect.stroke, effect.layerId, effect.mirror);
             break;
           case 'view':
             view.value = out.state.view;
+            break;
+          case 'guide':
+            guide.value = out.state.guide;
             break;
           case 'transform':
             xform.value = effect.t;
@@ -169,6 +175,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   }, [
     blank,
     env,
+    guide,
     live,
     livePicture,
     pending,
@@ -284,6 +291,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
     gesture,
     env,
     view,
+    guide,
     xform,
     frameBox,
     contents,

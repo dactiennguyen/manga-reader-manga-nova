@@ -27,8 +27,8 @@ import { RootNavigator } from './navigation';
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
-function onTabs(state: NavigationState | undefined): boolean {
-  return state?.routes[state.index]?.name === 'Tabs';
+function rootRoute(state: NavigationState | undefined): string | undefined {
+  return state?.routes[state.index]?.name;
 }
 
 async function openArchive(url: string | null | undefined): Promise<void> {
@@ -79,7 +79,10 @@ function useThemeMode() {
 function Shell() {
   const { theme } = useUniwind();
   const dark = theme === 'dark';
-  const [dockShown, setDockShown] = useState(false);
+  const [route, setRoute] = useState<string | undefined>();
+  const dockShown = route === 'Tabs';
+  // The canvas stays dark in both themes, so the system bars have to follow it.
+  const darkBars = dark || route === 'Canvas';
   const bg = useColor('bg');
   const surface = useColor('surface');
   const text = useColor('text');
@@ -112,24 +115,24 @@ function Shell() {
   }, []);
 
   useEffect(() => {
-    setSystemBarsDarkIcons(!dark);
-  }, [dark]);
+    setSystemBarsDarkIcons(!darkBars);
+  }, [darkBars]);
 
   return (
     <>
-      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={darkBars ? 'light-content' : 'dark-content'} />
       <NavigationContainer
         ref={navigationRef}
         theme={navigationTheme}
         onReady={() => {
-          setDockShown(onTabs(navigationRef.getRootState()));
+          setRoute(rootRoute(navigationRef.getRootState()));
           hideSplash();
         }}
-        onStateChange={state => setDockShown(onTabs(state))}
+        onStateChange={state => setRoute(rootRoute(state))}
       >
         <RootNavigator />
       </NavigationContainer>
-      <NavBarBacking />
+      {route === 'Canvas' ? null : <NavBarBacking />}
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
       <ConfirmHost />
     </>

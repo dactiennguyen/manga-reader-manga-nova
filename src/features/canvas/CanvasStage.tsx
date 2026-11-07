@@ -11,7 +11,7 @@ import { PANEL_BORDER, polyPath, recordPage, type PageContext } from '../../rend
 import { useEngineFonts } from '../../render/fonts';
 import { useImageCacheRev } from '../../render/images';
 import { INK } from '../../render/ink';
-import { recordTransformFrame } from '../../render/liveStroke';
+import { recordGuideHandles, recordGuideLines, recordTransformFrame } from '../../render/liveStroke';
 import { useColor } from '../../ui';
 import type { CanvasEngine } from './useCanvasEngine';
 
@@ -21,15 +21,20 @@ type LayerNodeProps = {
   id: ID;
   opacity: number;
   active: boolean;
+  mirrored: boolean;
   engine: CanvasEngine;
 };
 
-const LayerNode = memo(function LayerNodeInner({ id, opacity, active, engine }: LayerNodeProps) {
-  const { contents, blank, xform, pendingPicture, livePicture } = engine;
+const LayerNode = memo(function LayerNodeInner({ id, opacity, active, mirrored, engine }: LayerNodeProps) {
+  const { contents, blank, xform, pendingPicture, livePicture, guide } = engine;
   const picture = useDerivedValue<SkPicture>(() => contents.value[id] ?? blank);
   const transform = useDerivedValue(() => {
     const t = xform.value;
     return active ? [{ translateX: t.tx }, { translateY: t.ty }, { scale: t.s }] : [];
+  });
+  const mirror = useDerivedValue(() => {
+    const g = guide.value;
+    return [{ translateX: g?.kind === 'symmetry' ? g.x * 2 : 0 }, { scaleX: -1 }];
   });
   const paint = useMemo(() => {
     const p = Skia.Paint();
@@ -43,6 +48,12 @@ const LayerNode = memo(function LayerNodeInner({ id, opacity, active, engine }: 
       </Group>
       {active ? <Picture picture={pendingPicture} /> : null}
       {active ? <Picture picture={livePicture} /> : null}
+      {active && mirrored ? (
+        <Group transform={mirror}>
+          <Picture picture={pendingPicture} />
+          <Picture picture={livePicture} />
+        </Group>
+      ) : null}
     </Group>
   );
 });
@@ -55,6 +66,7 @@ export function CanvasStage({
   activeId,
   opacityPreview,
   grid,
+  mirrored,
   engine,
   onLayout,
 }: {
@@ -65,10 +77,11 @@ export function CanvasStage({
   activeId: ID | undefined;
   opacityPreview: { id: ID; value: number } | null;
   grid: boolean;
+  mirrored: boolean;
   engine: CanvasEngine;
   onLayout: (event: LayoutChangeEvent) => void;
 }) {
-  const { view, xform, frameBox, blank, gesture } = engine;
+  const { view, xform, frameBox, blank, gesture, guide } = engine;
   const fonts = useEngineFonts();
   const imageRev = useImageCacheRev();
   const workspace = useColor('bg');
@@ -113,6 +126,15 @@ export function CanvasStage({
     return recordTransformFrame(transformBox(box, xform.value), 1 / Math.max(0.0001, view.value.scale), accent);
   });
 
+  const bbox = shape.bbox;
+  const unit = useDerivedValue(() => 1 / Math.max(0.0001, view.value.scale));
+  const guideLines = useDerivedValue<SkPicture>(() =>
+    guide.value ? recordGuideLines(guide.value, bbox, unit.value, accent) : blank,
+  );
+  const guideDots = useDerivedValue<SkPicture>(() =>
+    guide.value ? recordGuideHandles(guide.value, bbox, unit.value, accent) : blank,
+  );
+
   return (
     <GestureDetector gesture={gesture}>
       <View style={StyleSheet.absoluteFill} collapsable={false} onLayout={onLayout}>
@@ -128,16 +150,19 @@ export function CanvasStage({
                     id={layer.id}
                     opacity={opacityPreview?.id === layer.id ? opacityPreview.value : layer.opacity}
                     active={layer.id === activeId}
+                    mirrored={mirrored}
                     engine={engine}
                   />
                 ) : null,
               )}
               {grid ? <Path path={gridPath} style="stroke" strokeWidth={1} color={accent} opacity={0.4} /> : null}
+              <Picture picture={guideLines} />
             </Group>
             {panel?.borderless ? null : (
               <Path path={clip} style="stroke" strokeWidth={PANEL_BORDER} strokeJoin="miter" color={INK} />
             )}
             <Picture picture={frame} />
+            <Picture picture={guideDots} />
           </Group>
         </Canvas>
       </View>

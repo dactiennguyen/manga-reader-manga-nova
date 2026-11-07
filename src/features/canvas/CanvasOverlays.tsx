@@ -1,4 +1,4 @@
-import { CloseIcon, MaximizeIcon, MinimizeIcon } from '../../ui/icons';
+import { CaretRightIcon, CloseIcon, MaximizeIcon, MinimizeIcon } from '../../ui/icons';
 import { useState } from 'react';
 import { Image, StyleSheet, TextInput, View } from 'react-native';
 import { GestureDetector, usePanGesture, useSimultaneousGestures, useTapGesture } from 'react-native-gesture-handler';
@@ -10,13 +10,17 @@ import type { ViewState } from '../../core/art/tools';
 import { fileUri } from '../../core/util/paths';
 import { ICON, IconButton, Pressable, Text } from '../../ui';
 
-const REF_SIZES = [128, 208];
+const REF_SIZES = [152, 224];
+
+/** A picture to draw from, or a character with their sheet and appearance notes. */
+export type CanvasReference = { id: string; images: string[]; title?: string; note?: string };
 
 const TIPS = [
   ['One finger', 'Draw. Press and hold to pick a color.'],
   ['Two fingers', 'Drag to pan, pinch to zoom, twist to rotate the view.'],
   ['Two-finger tap', 'Undo. Double-tap with two fingers to fit the screen.'],
   ['Three-finger tap', 'Redo.'],
+  ['Rulers', 'The ruler button adds symmetry or perspective. Tap the same one again to turn it off.'],
   ['Shapes and tone', 'Tap the shapes tool twice to choose a shape. Brush and lasso fill can paint screentone.'],
   ['Stylus', 'Pressure is recorded and one finger pans the view.'],
   ['Double-tap outside the panel', 'Hide or show the tools.'],
@@ -25,12 +29,12 @@ const TIPS = [
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
 
 export function ReferenceWindow({
-  path,
+  reference,
   initialX,
   initialY,
   onClose,
 }: {
-  path: string;
+  reference: CanvasReference;
   initialX: number;
   initialY: number;
   onClose: () => void;
@@ -38,7 +42,10 @@ export function ReferenceWindow({
   const x = useSharedValue(initialX);
   const y = useSharedValue(initialY);
   const [big, setBig] = useState(false);
+  const [shown, setShown] = useState(0);
   const size = REF_SIZES[big ? 1 : 0];
+  const { images, title, note } = reference;
+  const path = images[shown];
   const pan = usePanGesture({
     onUpdate: e => {
       'worklet';
@@ -58,12 +65,28 @@ export function ReferenceWindow({
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View className="absolute overflow-hidden rounded-sm border-2 border-raised bg-raised" style={[{ width: size }, place]}>
-        <Image
-          source={{ uri: fileUri(path) }}
-          style={{ width: size - 4, height: size - 4 }}
-          resizeMode="contain"
-          accessibilityLabel="Reference image"
-        />
+        {path ? (
+          <Image
+            source={{ uri: fileUri(path) }}
+            style={{ width: size - 4, height: size - 4 }}
+            resizeMode="contain"
+            accessibilityLabel={title ? `${title} reference` : 'Reference image'}
+          />
+        ) : null}
+        {title || note ? (
+          <View className="gap-0.5 px-2 pt-1">
+            {title ? (
+              <Text variant="label" numberOfLines={1}>
+                {title}
+              </Text>
+            ) : null}
+            {note ? (
+              <Text variant="caption" tone="secondary" numberOfLines={big ? 8 : 4}>
+                {note}
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
         <View className="flex-row justify-between">
           <IconButton
             icon={big ? MinimizeIcon : MaximizeIcon}
@@ -71,6 +94,14 @@ export function ReferenceWindow({
             onPress={() => setBig(value => !value)}
             accessibilityLabel={big ? 'Shrink reference image' : 'Enlarge reference image'}
           />
+          {images.length > 1 ? (
+            <IconButton
+              icon={CaretRightIcon}
+              size={ICON.sm}
+              onPress={() => setShown(value => (value + 1) % images.length)}
+              accessibilityLabel="Next reference image"
+            />
+          ) : null}
           <IconButton icon={CloseIcon} size={ICON.sm} onPress={onClose} accessibilityLabel="Hide reference image" />
         </View>
       </Animated.View>

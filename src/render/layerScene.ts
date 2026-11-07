@@ -51,12 +51,20 @@ export function syncLayerScene(layer: ArtLayer, prev: LayerScene | undefined, im
   return { gen, count, image: layer.image, imageRev, sealed, tail, picture: compose(layer.image, sealed, tail) };
 }
 
-export function appendToScene(scene: LayerScene, stroke: Stroke): LayerScene {
+export function appendToScene(scene: LayerScene, ...strokes: Stroke[]): LayerScene {
   let { sealed, tail } = scene;
-  tail = [...tail, stroke];
-  if (tail.length === SEAL_SIZE) {
-    sealed = [...sealed, sealStrokes(tail)];
-    tail = [];
+  for (const stroke of strokes) {
+    tail = [...tail, stroke];
+    if (tail.length === SEAL_SIZE) {
+      sealed = [...sealed, sealStrokes(tail)];
+      tail = [];
+    }
   }
-  return { ...scene, count: scene.count + 1, sealed, tail, picture: compose(scene.image, sealed, tail) };
+  return {
+    ...scene,
+    count: scene.count + strokes.length,
+    sealed,
+    tail,
+    picture: compose(scene.image, sealed, tail),
+  };
 }

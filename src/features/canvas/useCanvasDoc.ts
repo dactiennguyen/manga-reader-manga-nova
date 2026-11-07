@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { transformLayer, type LayerTransform } from '../../core/art/artMath';
+import { mirrorStroke } from '../../core/art/guides';
 import { activeLayerOf } from '../../core/art/tools';
 import type { ArtLayer, ID, PanelArt, Stroke } from '../../core/model/types';
 import { useImageCacheRev } from '../../render/images';
@@ -15,7 +16,7 @@ export type CanvasDoc = {
   active: ArtLayer | undefined;
   /** True when the panel already had art when it opened. */
   hadArt: boolean;
-  commit: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number) => void;
+  commit: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number, mirror: number | null) => void;
   applyTransform: (layerId: ID, t: LayerTransform) => void;
   /** The art store moved. Strokes this hook wrote itself are recognised and skipped. */
   onArtRev: () => void;
@@ -84,19 +85,21 @@ export function useCanvasDoc(panelId: ID, pageId: ID, engine: CanvasEngine): Can
   }, [panelId, refresh]);
 
   const commit = useCallback(
-    (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number) => {
+    (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number, mirror: number | null) => {
       const stroke: Stroke = { ...meta, points: Array.from(points) };
+      // Both halves go in as one change, so one undo takes back the pair.
+      const strokes = mirror === null ? [stroke] : [stroke, mirrorStroke(stroke, mirror)];
       try {
         // Another change may still be on its way to onArtRev. It must not be marked as handled here.
         const caughtUp = artRev(panelId) === handledRev.current;
-        commitStroke(panelId, layerId, stroke);
+        commitStroke(panelId, layerId, ...strokes);
         if (caughtUp) {
           handledRev.current = artRev(panelId);
         }
         dirty.current = true;
         const scene = scenes.current.get(layerId);
         if (scene) {
-          scenes.current.set(layerId, appendToScene(scene, stroke));
+          scenes.current.set(layerId, appendToScene(scene, ...strokes));
         }
       } catch {
         toast("Couldn't save that stroke.");

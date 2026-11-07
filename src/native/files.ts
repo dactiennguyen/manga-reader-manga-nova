@@ -90,6 +90,13 @@ export async function pickImage(): Promise<string | null> {
   return toRelative(dest);
 }
 
+export async function saveImageData(base64: string, extension: string): Promise<string> {
+  await ensureDirs();
+  const dest = `${DIRS.images}/${uid()}.${extension}`;
+  await RNFS.writeFile(dest, base64, 'base64');
+  return toRelative(dest);
+}
+
 export async function copyIntoImages(sourcePath: string): Promise<string> {
   await ensureDirs();
   const dest = `${DIRS.images}/${uid()}.${extensionOf(sourcePath)}`;

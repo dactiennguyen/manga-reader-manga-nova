@@ -13,6 +13,18 @@ import {
   type Box,
   type LayerTransform,
 } from './artMath';
+import {
+  guideHandles,
+  hitHandle,
+  mirrorAxis,
+  moveHandle,
+  pickDirection,
+  projectOnLine,
+  snapDirections,
+  snaps,
+  type Guide,
+  type Point,
+} from './guides';
 import { STROKE_POINT_LIMIT, appendPoint } from './strokes';
 import { screenToPage, type CanvasTool, type ViewState } from './tools';
 
@@ -38,6 +50,10 @@ const MOVE_SLOP = 6;
 const PINCH_SLOP = 8;
 const VIEW_SLOP = 10;
 const HANDLE_REACH = 28;
+/** A finger-sized target. Any wider and strokes started beside a vanishing point would drag it instead. */
+const GUIDE_REACH = 24;
+/** How far the pen travels before a ruler line is chosen. The first few pixels are mostly jitter. */
+const SNAP_SETTLE = 20;
 
 export type Touch = { id: number; x: number; y: number };
 
@@ -65,7 +81,7 @@ type Pair = { a: number; b: number; cx: number; cy: number; dist: number; angle:
 
 type PagePair = { a: number; b: number; cx: number; cy: number; dist: number };
 
-export type SessionMode = 'idle' | 'draw' | 'view' | 'pick' | 'blocked' | 'move' | 'pan';
+export type SessionMode = 'idle' | 'draw' | 'view' | 'pick' | 'blocked' | 'move' | 'pan' | 'guide';
 
 export type SessionState = {
   ids: number[];
@@ -95,6 +111,12 @@ export type SessionState = {
   holdArmed: boolean;
   tapPending: boolean;
   lastEmptyTap: number;
+  guide: Guide | null;
+  /** The ruler dot under the finger, and how far it sits from the touch. */
+  handle: number;
+  guideGrab: Point;
+  /** The line the current stroke settled on. */
+  snap: Point | null;
 };
 
 export type SessionEvent =
@@ -106,7 +128,8 @@ export type SessionEvent =
   | { type: 'holdPicked'; token: number }
   | { type: 'tapTimeout' }
   | { type: 'setView'; view: ViewState }
-  | { type: 'fit'; flip: boolean };
+  | { type: 'fit'; flip: boolean }
+  | { type: 'setGuide'; guide: Guide | null };
 
 export type SessionEffect =
   | { kind: 'toast'; message: string }
@@ -119,14 +142,15 @@ export type SessionEffect =
   | { kind: 'strokeBegin' }
   | { kind: 'strokeExtend' }
   | { kind: 'strokeCancel' }
-  | { kind: 'strokeCommit'; stroke: Stroke; layerId: ID }
+  | { kind: 'strokeCommit'; stroke: Stroke; layerId: ID; mirror: number | null }
   | { kind: 'transform'; t: LayerTransform }
   | { kind: 'transformCancel' }
   | { kind: 'transformCommit'; layerId: ID; t: LayerTransform }
   | { kind: 'undo' }
   | { kind: 'redo' }
   | { kind: 'toggleChrome' }
-  | { kind: 'view' };
+  | { kind: 'view' }
+  | { kind: 'guide' };
 
 export type SessionResult = { state: SessionState; effects: SessionEffect[] };
 
@@ -169,6 +193,10 @@ export function createSession(view: ViewState): SessionState {
     holdArmed: false,
     tapPending: false,
     lastEmptyTap: 0,
+    guide: null,
+    handle: -1,
+    guideGrab: { x: 0, y: 0 },
+    snap: null,
   };
 }
 
@@ -264,6 +292,18 @@ function pinchedView(base: Pair & { view: ViewState }, cur: Pair, turn: number, 
 
 function startDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv, effects: SessionEffect[]): void {
   'worklet';
+  s.snap = null;
+  if (s.guide) {
+    const q = screenToPage(s.view, env.pageW, t.x, t.y);
+    const handle = hitHandle(s.guide, env.bbox, q.x, q.y, GUIDE_REACH / s.view.scale);
+    if (handle >= 0) {
+      const dot = guideHandles(s.guide, env.bbox)[handle];
+      s.mode = 'guide';
+      s.handle = handle;
+      s.guideGrab = { x: dot.x - q.x, y: dot.y - q.y };
+      return;
+    }
+  }
   const layer = env.layer;
   if (!layer || layer.locked || !layer.visible) {
     s.mode = 'blocked';
@@ -376,7 +416,7 @@ function onDown(
     return s;
   }
   // A palm landing beside the pen: the pen keeps drawing and the palm never existed.
-  if (s.mode === 'draw' && s.pen && e.pointer === 'touch') {
+  if ((s.mode === 'draw' || s.mode === 'guide') && s.pen && e.pointer === 'touch') {
     s.ids = ids.filter(id => !e.changed.some(t => t.id === id));
     return s;
   }
@@ -412,10 +452,26 @@ function finishStroke(s: SessionState, effects: SessionEffect[]): void {
     ? s.moved && stroke.points.length >= 4
     : !isFillTool(stroke.tool) || (s.moved && stroke.points.length >= 6);
   if (valid && layerId) {
-    effects.push({ kind: 'strokeCommit', stroke, layerId });
+    effects.push({ kind: 'strokeCommit', stroke, layerId, mirror: mirrorAxis(s.guide) });
   } else {
     effects.push({ kind: 'strokeCancel' });
   }
+}
+
+/** Settles on a ruler line once the pen has shown its direction, then keeps the stroke on that line. */
+function ruled(s: SessionState, stroke: Stroke, p: Point): Point {
+  'worklet';
+  if (!s.guide || !s.moved || !snaps(s.guide, stroke.tool)) {
+    return p;
+  }
+  const from = { x: stroke.points[0], y: stroke.points[1] };
+  if (!s.snap) {
+    if (Math.hypot(p.x - from.x, p.y - from.y) * s.view.scale < SNAP_SETTLE) {
+      return p;
+    }
+    s.snap = pickDirection(snapDirections(s.guide, from), p.x - from.x, p.y - from.y);
+  }
+  return s.snap ? projectOnLine(from, s.snap, p) : p;
 }
 
 function moveDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv, effects: SessionEffect[]): void {
@@ -425,13 +481,16 @@ function moveDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv, 
     s.moved = true;
     clearHold(s, effects);
   }
-  const p = screenToPage(s.view, env.pageW, t.x, t.y);
+  const p = ruled(s, stroke, screenToPage(s.view, env.pageW, t.x, t.y));
   const gap = Math.max(0.3, 1.5 / s.view.scale);
   if (isShapeTool(stroke.tool)) {
     const x0 = stroke.points[0];
     const y0 = stroke.points[1];
     s.stroke = { ...stroke, points: [x0, y0, Math.round(p.x * 10) / 10, Math.round(p.y * 10) / 10] };
     effects.push({ kind: 'strokeExtend' });
+    return;
+  }
+  if (snaps(s.guide, stroke.tool) && !s.snap) {
     return;
   }
   const added = stroke.pressure
@@ -521,6 +580,16 @@ function onMove(
     const s = { ...state };
     moveLayer(s, touches, env, effects);
     return s;
+  }
+  if (state.mode === 'guide' && state.guide && touches.length === 1) {
+    const t = touches[0];
+    if (!state.moved && Math.hypot(t.x - state.startX, t.y - state.startY) <= MOVE_SLOP) {
+      return state;
+    }
+    const p = screenToPage(state.view, env.pageW, t.x, t.y);
+    const dot = { x: p.x + state.guideGrab.x, y: p.y + state.guideGrab.y };
+    effects.push({ kind: 'guide' });
+    return { ...state, moved: true, guide: moveHandle(state.guide, state.handle, dot, env.bbox) };
   }
   if (state.mode === 'pan' && state.pan && touches.length === 1) {
     const { pan } = state;
@@ -706,6 +775,10 @@ export function reduceSession(state: SessionState, event: SessionEvent, env: Ses
     case 'fit':
       next = { ...state, view: fitView(env.area, env.bbox, env.pageW, event.flip) };
       effects.push({ kind: 'view' });
+      break;
+    case 'setGuide':
+      next = { ...state, guide: event.guide };
+      effects.push({ kind: 'guide' });
       break;
   }
   return { state: next, effects };

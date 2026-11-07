@@ -56,7 +56,8 @@ export interface ArtRepo {
   loadPanel(panelId: ID): PanelArt | null;
   /** Replaces the whole panel with new layer ids. Layer ids repeat across panels in old files. */
   savePanel(panelId: ID, art: PanelArt): PanelArt;
-  appendStroke(layerId: ID, stroke: Stroke): { gen: number; head: number };
+  /** One transaction, so a mirrored pair is saved together or not at all. */
+  appendStrokes(layerId: ID, strokes: Stroke[]): { gen: number; head: number };
   /** Writes a new generation, used by moving or clearing a layer. */
   writeGeneration(layerId: ID, strokes: Stroke[]): { gen: number; head: number };
   loadStrokes(layerId: ID, gen: number, head: number): Stroke[];

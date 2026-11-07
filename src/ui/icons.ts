@@ -120,3 +120,8 @@ export { UserIcon as UserIcon } from 'phosphor-react-native/src/icons/User';
 export { ChatTeardropTextIcon as VoiceIcon } from 'phosphor-react-native/src/icons/ChatTeardropText';
 export { WarningIcon as WarningIcon } from 'phosphor-react-native/src/icons/Warning';
 export { GlobeHemisphereWestIcon as WorldIcon } from 'phosphor-react-native/src/icons/GlobeHemisphereWest';
+export { RulerIcon as RulerIcon } from 'phosphor-react-native/src/icons/Ruler';
+export { FlipHorizontalIcon as SymmetryIcon } from 'phosphor-react-native/src/icons/FlipHorizontal';
+export { PerspectiveIcon as PerspectiveIcon } from 'phosphor-react-native/src/icons/Perspective';
+export { CubeTransparentIcon as TwoPointIcon } from 'phosphor-react-native/src/icons/CubeTransparent';
+export { ImagesSquareIcon as MaterialsIcon } from 'phosphor-react-native/src/icons/ImagesSquare';

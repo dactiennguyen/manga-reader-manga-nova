@@ -3,6 +3,7 @@ import { exportArt, newLayer, saveArt } from '../src/state/artStore';
 import { collectPanelIds, computePanels, isRtl, pageSize, panelOrder, type Rect } from '../src/core/layout/layout';
 import { buildProjectBundle } from '../src/core/archive/bundle';
 import { paginate } from '../src/core/model/paginate';
+import { coverImageRect } from '../src/core/art/strokes';
 import { chapterIdsOf } from '../src/core/model/selectors';
 import type { Block, Bubble, Effect, ID, Page, Stroke } from '../src/core/model/types';
 import { useStory } from '../src/state/useStory';
@@ -19,7 +20,11 @@ declare const require: (name: string) => {
 };
 
 const OUT = process.env.SEED_OUT ?? '';
+/** A folder of inked panels and a panels.json, for store screenshots. Without it the art is drawn by code. */
+const INKS = process.env.SEED_INKS ?? '';
 const fs = OUT ? require('fs') : null;
+type Inks = { panels: Record<string, { file: string; w: number; h: number }>; faces: Record<string, string> };
+const inks: Inks | null = INKS && fs ? JSON.parse(fs.readFileSync(`${INKS}/panels.json`, 'utf8')) : null;
 const INK = '#16161A';
 const story = () => useStory.getState();
 
@@ -659,6 +664,11 @@ function lanternCourier() {
   const allBlocks: Record<ID, Block> = {};
   scenes.forEach(scene => scene.blocks.forEach(b => (allBlocks[b.id] = b)));
   const faceOf: Record<ID, Face> = { [hana]: 'hana', [ren]: 'ren', [kuro]: 'kuro', [sato]: 'sato' };
+  if (inks) {
+    Object.entries(faceOf).forEach(([id, face]) => {
+      story().updateCharacter(id, { sheet: { face: `images/${inks.faces[face]}`, expressions: {} } });
+    });
+  }
   const rtl = isRtl(story().projects[projectId]);
   const random = rng(7);
 
@@ -677,12 +687,19 @@ function lanternCourier() {
       }
       const blocks = panel.blockIds.map(id => allBlocks[id]).filter(Boolean);
       const who = [...new Set(blocks.map(b => b.characterId && faceOf[b.characterId]).filter(Boolean))] as Face[];
-      const drawIt = pageIndex < 2 || (pageIndex === 2 && panelIndex === 0);
+      const inked = inks?.panels[panel.description];
+      const drawIt = !!inked || (!inks && (pageIndex < 2 || (pageIndex === 2 && panelIndex === 0)));
       if (drawIt) {
-        const art = drawPanel(shapeOf.bbox, panelIndex, who, panel.shot, random);
-        const sketchLayer = { ...newLayer('Sketch'), strokes: art.sketch };
-        const inkLayer = { ...newLayer('Ink'), strokes: art.ink };
-        saveArt(panelId, { layers: [sketchLayer, inkLayer], activeLayerId: inkLayer.id });
+        if (inked) {
+          const rect = coverImageRect(inked.w, inked.h, shapeOf.bbox);
+          const inkLayer = { ...newLayer('Ink'), image: { uri: `images/${inked.file}`, ...rect } };
+          saveArt(panelId, { layers: [inkLayer, newLayer('Touch-ups')], activeLayerId: inkLayer.id });
+        } else {
+          const art = drawPanel(shapeOf.bbox, panelIndex, who, panel.shot, random);
+          const sketchLayer = { ...newLayer('Sketch'), strokes: art.sketch };
+          const inkLayer = { ...newLayer('Ink'), strokes: art.ink };
+          saveArt(panelId, { layers: [sketchLayer, inkLayer], activeLayerId: inkLayer.id });
+        }
         if (blocks.some(b => b.type === 'sfx')) {
           effects.push({
             id: `fx-${panelId}`,

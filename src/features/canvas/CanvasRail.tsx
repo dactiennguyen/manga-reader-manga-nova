@@ -1,11 +1,12 @@
-import { CaretLeftIcon, CaretRightIcon, EyedropperIcon } from '../../ui/icons';
+import { CaretLeftIcon, CaretRightIcon, EyedropperIcon, RulerIcon } from '../../ui/icons';
 import { useState } from 'react';
 import { ScrollView, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { type AnimatedStyle } from 'react-native-reanimated';
 
+import { GUIDES, type GuideKind } from '../../core/art/guides';
 import { SHAPE_TOOLS, TOOLS, isShapeId, type CanvasTool, type ShapeTool } from '../../core/art/tools';
 import { IconButton } from '../../ui';
-import { SHAPES_ICON, SHAPE_ICONS, TOOL_ICONS } from './canvasIcons';
+import { GUIDE_ICONS, SHAPES_ICON, SHAPE_ICONS, TOOL_ICONS } from './canvasIcons';
 
 function iconOf(tool: CanvasTool) {
   return isShapeId(tool) ? SHAPE_ICONS[tool] : TOOL_ICONS[tool];
@@ -15,6 +16,7 @@ export function CanvasRail({
   tool,
   shape,
   picking,
+  guide,
   collapsed,
   side,
   top,
@@ -22,12 +24,14 @@ export function CanvasRail({
   fade,
   onTool,
   onPick,
+  onGuide,
   onToggle,
   onLayout,
 }: {
   tool: CanvasTool;
   shape: ShapeTool;
   picking: boolean;
+  guide: GuideKind | null;
   collapsed: boolean;
   side: 'left' | 'right';
   top: number;
@@ -35,10 +39,12 @@ export function CanvasRail({
   fade: StyleProp<AnimatedStyle<ViewStyle>>;
   onTool: (tool: CanvasTool) => void;
   onPick: () => void;
+  onGuide: (kind: GuideKind) => void;
   onToggle: () => void;
   onLayout: (event: LayoutChangeEvent) => void;
 }) {
   const [shapesOpen, setShapesOpen] = useState(false);
+  const [guidesOpen, setGuidesOpen] = useState(false);
   const shapeActive = isShapeId(tool) && !picking;
   const shapeDef = SHAPE_TOOLS.find(item => item.id === (isShapeId(tool) ? tool : shape)) ?? SHAPE_TOOLS[0];
   const current = isShapeId(tool) ? shapeDef : TOOLS.find(item => item.id === tool) ?? TOOLS[0];
@@ -52,6 +58,7 @@ export function CanvasRail({
       accessibilityLabel={item.label}
       onPress={() => {
         setShapesOpen(false);
+        setGuidesOpen(false);
         if (collapsed) {
           onToggle();
         } else {
@@ -80,6 +87,7 @@ export function CanvasRail({
                 active={shapeActive}
                 accessibilityLabel={`Shapes, ${shapeDef.label}`}
                 onPress={() => {
+                  setGuidesOpen(false);
                   if (shapeActive) {
                     setShapesOpen(open => !open);
                   } else {
@@ -93,11 +101,21 @@ export function CanvasRail({
               />
               {TOOLS.slice(4).map(button)}
               <IconButton
+                icon={guide ? GUIDE_ICONS[guide] : RulerIcon}
+                active={!!guide}
+                accessibilityLabel={guide ? `Rulers, ${GUIDES.find(item => item.id === guide)?.label}` : 'Rulers'}
+                onPress={() => {
+                  setShapesOpen(false);
+                  setGuidesOpen(open => !open);
+                }}
+              />
+              <IconButton
                 icon={EyedropperIcon}
                 active={picking}
                 accessibilityLabel="Eyedropper"
                 onPress={() => {
                   setShapesOpen(false);
+                  setGuidesOpen(false);
                   onPick();
                 }}
               />
@@ -107,6 +125,7 @@ export function CanvasRail({
                 accessibilityLabel="Collapse toolbar"
                 onPress={() => {
                   setShapesOpen(false);
+                  setGuidesOpen(false);
                   onToggle();
                 }}
               />
@@ -125,6 +144,22 @@ export function CanvasRail({
               onPress={() => {
                 onTool(item.id);
                 setShapesOpen(false);
+              }}
+            />
+          ))}
+        </View>
+      ) : null}
+      {guidesOpen && !collapsed ? (
+        <View className="gap-1 self-end rounded-lg bg-raised p-1">
+          {GUIDES.map(item => (
+            <IconButton
+              key={item.id}
+              icon={GUIDE_ICONS[item.id]}
+              active={item.id === guide}
+              accessibilityLabel={item.label}
+              onPress={() => {
+                onGuide(item.id);
+                setGuidesOpen(false);
               }}
             />
           ))}

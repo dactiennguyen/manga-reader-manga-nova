@@ -272,6 +272,18 @@ describe('art', () => {
     expect(panelHasArt(panelId)).toBe(true);
   });
 
+  it('takes back a mirrored pair in one undo', () => {
+    const db = connectTestStorage();
+    const { panelId, layerId } = drawablePanel();
+    commitStroke(panelId, layerId, stroke(), { ...stroke(), points: [9, 9, 8, 8] });
+    expect(loadArt(panelId)?.layers[0].strokes).toHaveLength(2);
+    restart(db);
+    expect(loadArt(panelId)?.layers[0].strokes).toHaveLength(2);
+    commitStroke(panelId, layerId, stroke(), stroke());
+    undoArt(panelId);
+    expect(loadArt(panelId)?.layers[0].strokes).toHaveLength(2);
+  });
+
   it('keeps pressure and tone through the blob format', () => {
     const db = connectTestStorage();
     const { panelId, layerId } = drawablePanel();
