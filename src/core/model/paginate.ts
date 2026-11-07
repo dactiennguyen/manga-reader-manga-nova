@@ -1,7 +1,7 @@
 import { LIMITS } from './constants';
 import type { Block, ID, Scene, Shot } from './types';
 
-export type PanelPlan = { description: string; shot?: Shot; blockIds: ID[] };
+type PanelPlan = { description: string; shot?: Shot; blockIds: ID[] };
 
 export type PagePlan = { panels: PanelPlan[] };
 

@@ -14,7 +14,7 @@ export type PlanAct = { id: ID; chapters: PlanChapter[] };
 
 export type PlotApplyMode = 'append' | 'replace';
 
-export type PlannedChapter = { actId: ID; index: number; title: string; summary: string };
+type PlannedChapter = { actId: ID; index: number; title: string; summary: string };
 
 export type PlotPlan = { remove: ID[]; create: PlannedChapter[] };
 

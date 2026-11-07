@@ -8,7 +8,7 @@ export type History = Partial<Record<UndoScope, HistoryStack>>;
 
 const EMPTY_STACK: HistoryStack = { past: [], future: [] };
 
-export function limitOf(scope: UndoScope): number {
+function limitOf(scope: UndoScope): number {
   return scope.startsWith('project:') ? 20 : 50;
 }
 

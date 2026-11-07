@@ -16,7 +16,7 @@ export function chapterIdsOf(project: Project | undefined): ID[] {
   return project ? project.acts.flatMap(act => act.chapterIds) : [];
 }
 
-export function chaptersOf(state: StoryData, projectId: ID): Chapter[] {
+function chaptersOf(state: StoryData, projectId: ID): Chapter[] {
   return chapterIdsOf(state.projects[projectId])
     .map(id => state.chapters[id])
     .filter(Boolean);
@@ -61,7 +61,7 @@ export function chapterProgress(state: StoryData, chapterId: ID): { done: number
   return { done: pages.filter(page => page.done).length, total: pages.length };
 }
 
-export function chapterHasScript(state: StoryData, chapter: Chapter): boolean {
+function chapterHasScript(state: StoryData, chapter: Chapter): boolean {
   return chapter.sceneIds.some(id => state.scenes[id]?.blocks.some(block => block.text.trim()));
 }
 
@@ -138,16 +138,6 @@ export function worldOf(state: StoryData, projectId: ID): WorldEntry[] {
   return Object.values(state.world)
     .filter(entry => entry.projectId === projectId)
     .sort((a, b) => a.order - b.order);
-}
-
-export function projectOfChapter(state: StoryData, chapterId: ID | undefined): Project | undefined {
-  const chapter = chapterId ? state.chapters[chapterId] : undefined;
-  return chapter ? state.projects[chapter.projectId] : undefined;
-}
-
-export function projectOfPage(state: StoryData, pageId: ID | undefined): Project | undefined {
-  const page = pageId ? state.pages[pageId] : undefined;
-  return page ? projectOfChapter(state, page.chapterId) : undefined;
 }
 
 export function pageNumber(state: StoryData, pageId: ID): { index: number; total: number } {

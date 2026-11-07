@@ -15,7 +15,7 @@ export type Conversation = {
 
 export const MAX_CONVERSATIONS = 20;
 export const TITLE_MAX = 48;
-export const NO_STORY_KEY = 'none';
+const NO_STORY_KEY = 'none';
 
 export function projectKeyOf(projectId: ID | undefined | null): string {
   return projectId || NO_STORY_KEY;

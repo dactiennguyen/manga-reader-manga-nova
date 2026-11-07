@@ -10,7 +10,7 @@ export type TabParamList = {
   Profile: undefined;
 };
 
-export type StoryDraft = { title: string; genres: string[]; logline: string };
+type StoryDraft = { title: string; genres: string[]; logline: string };
 
 export type RootStackParamList = {
   Welcome: undefined;

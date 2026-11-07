@@ -13,12 +13,6 @@ export function formatBytes(bytes: number): string {
   return `${value.toFixed(digits)} ${units[unit]}`;
 }
 
-export function formatCount(value: number): string {
-  const n = Math.round(value);
-  const sign = n < 0 ? '-' : '';
-  return sign + String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
 export function plural(count: number, noun: string, pluralNoun = `${noun}s`): string {
   return `${count} ${count === 1 ? noun : pluralNoun}`;
 }

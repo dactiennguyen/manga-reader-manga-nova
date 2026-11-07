@@ -8,7 +8,7 @@ export function cleanLanguageName(name: string): string {
   return name.replace(/\s+/g, ' ').trim().slice(0, LANGUAGE_NAME_MAX).trim();
 }
 
-export function sameLanguage(a: string, b: string): boolean {
+function sameLanguage(a: string, b: string): boolean {
   return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 

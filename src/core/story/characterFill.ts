@@ -6,7 +6,7 @@ export type FillMode = 'empty' | 'all';
 
 export type FillKey = keyof CharacterDraft;
 
-export const FILL_KEYS: readonly FillKey[] = [
+const FILL_KEYS: readonly FillKey[] = [
   'name',
   'role',
   'age',
@@ -19,7 +19,7 @@ export const FILL_KEYS: readonly FillKey[] = [
   'appearance',
 ];
 
-export const FILL_LABEL: Record<FillKey, string> = {
+const FILL_LABEL: Record<FillKey, string> = {
   name: 'Name',
   role: 'Role',
   age: 'Age',

@@ -3,7 +3,7 @@ import { AiError, chat, extractJson, type AiMessage } from './port';
 
 export type StoryIdea = { title: string; genres: string[]; logline: string };
 
-export type PlotChapter = { title: string; summary: string };
+type PlotChapter = { title: string; summary: string };
 
 export type PlotDirection = { tone: string; title: string; summary: string; acts: PlotChapter[][] };
 
@@ -104,7 +104,7 @@ function describe(story: StoryContext): string {
     .join('\n');
 }
 
-export function storyIdeaMessages(idea: string): AiMessage[] {
+function storyIdeaMessages(idea: string): AiMessage[] {
   return [
     { role: 'system', content: EDITOR },
     {
@@ -118,7 +118,7 @@ export function storyIdeaMessages(idea: string): AiMessage[] {
   ];
 }
 
-export function plotMessages(story: StoryContext, actTitles: string[]): AiMessage[] {
+function plotMessages(story: StoryContext, actTitles: string[]): AiMessage[] {
   const acts = actTitles.map((title, index) => `${index + 1}. ${title}`).join('\n');
   return [
     { role: 'system', content: EDITOR },
@@ -135,7 +135,7 @@ export function plotMessages(story: StoryContext, actTitles: string[]): AiMessag
   ];
 }
 
-export function sceneMessages(
+function sceneMessages(
   story: StoryContext,
   chapter: { title: string; summary: string; goal: string },
 ): AiMessage[] {

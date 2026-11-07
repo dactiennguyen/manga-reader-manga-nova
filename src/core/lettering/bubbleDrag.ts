@@ -5,7 +5,7 @@ import { bubbleCenter, hitTestBubble, rotatePoint, toBubbleLocal } from './bubbl
 
 export type Guide = { axis: 'x' | 'y'; at: number };
 
-export type DragMode = 'move' | 'resize' | 'rotate' | 'tail' | 'center' | 'view';
+type DragMode = 'move' | 'resize' | 'rotate' | 'tail' | 'center' | 'view';
 
 export type DragPick = { mode: DragMode; start: Bubble | null; corner: number };
 

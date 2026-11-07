@@ -5,8 +5,6 @@ import { fitBubbleText, type TextMeasure } from './fit';
 
 export type PageBlock = { block: Block; panelId: ID; panelIndex: number; placed: boolean };
 
-export type Snapshot = Pick<Page, 'bubbles' | 'effects'>;
-
 const LETTERED: Block['type'][] = ['dialogue', 'narration', 'sfx'];
 
 export function blockMapOf(scenes: (Scene | undefined)[]): Record<ID, Block> {

@@ -18,7 +18,7 @@ export const STORYBOARD_SIZES = {
   listMaxHeight: 160,
 } as const;
 
-export const WIDE_FROM = 600;
+const WIDE_FROM = 600;
 
 const WIDE_CELL = 140;
 const WEBTOON_WIDE_CELL = 200;

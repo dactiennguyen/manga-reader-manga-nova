@@ -6,7 +6,7 @@ export type ScriptMatch = { sceneId: ID; blockId: ID; start: number; end: number
 
 export type SceneChange = { sceneId: ID; blocks: Block[] };
 
-export type SpeakerStat = { characterId: ID | null; name: string; lines: number; words: number };
+type SpeakerStat = { characterId: ID | null; name: string; lines: number; words: number };
 
 export type ScriptStats = {
   words: number;
@@ -19,9 +19,9 @@ export type ScriptStats = {
   speakers: SpeakerStat[];
 };
 
-export const WORDS_PER_MINUTE = 200;
-export const SECONDS_PER_PAGE = 6;
-export const UNASSIGNED_SPEAKER = 'Unassigned';
+const WORDS_PER_MINUTE = 200;
+const SECONDS_PER_PAGE = 6;
+const UNASSIGNED_SPEAKER = 'Unassigned';
 
 function matcher(query: string, matchCase: boolean): RegExp {
   return new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), matchCase ? 'g' : 'gi');

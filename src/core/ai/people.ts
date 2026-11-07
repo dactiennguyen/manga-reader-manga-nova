@@ -1,4 +1,4 @@
-import { GENRES, LIMITS } from '../model/constants';
+import { LIMITS } from '../model/constants';
 import type { Character, CharacterRole, WorldType } from '../model/types';
 import { AiError, type AiMessage } from './port';
 import { askJson } from './story';
@@ -59,7 +59,7 @@ export function parseCharacterDraft(value: unknown): CharacterDraft {
   };
 }
 
-export function characterMessages(brief: string, keywords: string): AiMessage[] {
+function characterMessages(brief: string, keywords: string): AiMessage[] {
   return [
     { role: 'system', content: EDITOR },
     {
@@ -69,7 +69,7 @@ export function characterMessages(brief: string, keywords: string): AiMessage[] 
   ];
 }
 
-export function worldMessages(brief: string, type: WorldType, title: string, existing: string): AiMessage[] {
+function worldMessages(brief: string, type: WorldType, title: string, existing: string): AiMessage[] {
   return [
     { role: 'system', content: EDITOR },
     {
@@ -89,7 +89,7 @@ export function parseWorldBody(value: unknown): string {
   return body;
 }
 
-export function plotHoleMessages(brief: string): AiMessage[] {
+function plotHoleMessages(brief: string): AiMessage[] {
   return [
     { role: 'system', content: EDITOR },
     {
@@ -117,8 +117,6 @@ export function parsePlotHoles(value: unknown): PlotHole[] {
   }
   return issues.slice(0, 6);
 }
-
-export const GENRE_NAMES = GENRES;
 
 export async function suggestCharacter(brief: string, keywords: string, signal?: AbortSignal) {
   return askJson(characterMessages(brief, keywords), parseCharacterDraft, signal);

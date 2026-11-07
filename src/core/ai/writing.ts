@@ -76,7 +76,7 @@ function blockSchema(): string {
   return '{"blocks": [{"type": "setting" | "action" | "dialogue" | "narration" | "sfx", "text": string, "character": name (dialogue only), "kind": "speak" | "think" | "shout" | "whisper" (dialogue only)}]}';
 }
 
-export function continueMessages(brief: string, script: string, characters: Character[]): AiMessage[] {
+function continueMessages(brief: string, script: string, characters: Character[]): AiMessage[] {
   const names = characters.map(item => item.name).filter(Boolean);
   return [
     { role: 'system', content: WRITER },
@@ -93,7 +93,7 @@ export function continueMessages(brief: string, script: string, characters: Char
   ];
 }
 
-export function rewriteMessages(
+function rewriteMessages(
   brief: string,
   blocks: Block[],
   characters: Record<ID, Character | undefined>,
@@ -116,7 +116,7 @@ export function rewriteMessages(
   ];
 }
 
-export function voiceMessages(brief: string, line: string, character: Character): AiMessage[] {
+function voiceMessages(brief: string, line: string, character: Character): AiMessage[] {
   const profile = [
     `Name: ${character.name}`,
     character.traits.length && `Traits: ${character.traits.join(', ')}`,
@@ -135,7 +135,7 @@ export function voiceMessages(brief: string, line: string, character: Character)
   ];
 }
 
-export function shortenMessages(line: string): AiMessage[] {
+function shortenMessages(line: string): AiMessage[] {
   return [
     { role: 'system', content: WRITER },
     {
@@ -147,7 +147,7 @@ export function shortenMessages(line: string): AiMessage[] {
   ];
 }
 
-export function sfxMessages(action: string): AiMessage[] {
+function sfxMessages(action: string): AiMessage[] {
   return [
     { role: 'system', content: WRITER },
     {

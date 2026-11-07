@@ -3,7 +3,7 @@ import type { Character, ID, StoryData } from '../model/types';
 
 export type StoryBrief = { title: string; genres: string[]; logline: string; text: string };
 
-export function characterLine(character: Character): string {
+function characterLine(character: Character): string {
   const bits = [
     character.name,
     character.role,

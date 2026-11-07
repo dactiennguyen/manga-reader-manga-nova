@@ -55,7 +55,7 @@ export function aiErrorMessage(error: unknown): string {
   return 'Something went wrong. Try again.';
 }
 
-export function repairJson(source: string): string {
+function repairJson(source: string): string {
   const text = source.replace(/[“”]/g, '"');
   const stack: string[] = [];
   let out = '';

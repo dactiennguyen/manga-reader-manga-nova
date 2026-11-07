@@ -14,7 +14,7 @@ export const WORLD_TYPE_ICON: Record<WorldType, IconGlyph> = {
   note: NoteIcon,
 };
 
-export function EntryThumb({ entry, size = 48 }: { entry: WorldEntry; size?: number }) {
+function EntryThumb({ entry, size = 48 }: { entry: WorldEntry; size?: number }) {
   const image = entry.images[0];
   return (
     <View className="items-center justify-center overflow-hidden rounded-sm bg-overlay" style={{ width: size, height: size }}>

@@ -8,7 +8,7 @@ function field(value: unknown, key: string): unknown {
   return value !== null && typeof value === 'object' ? (value as Record<string, unknown>)[key] : undefined;
 }
 
-export function translateMessages(lines: string[], language: string, brief: string): AiMessage[] {
+function translateMessages(lines: string[], language: string, brief: string): AiMessage[] {
   return [
     { role: 'system', content: TRANSLATOR },
     {
@@ -35,7 +35,7 @@ export function parseTranslations(value: unknown, count: number): string[] {
   return lines;
 }
 
-export const TRANSLATE_BATCH = 25;
+const TRANSLATE_BATCH = 25;
 
 export async function translateLines(
   lines: string[],

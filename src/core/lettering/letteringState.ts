@@ -2,14 +2,14 @@ import type { Pt, Size } from '../layout/layout';
 import type { Bubble, BubbleType, EffectType, ID } from '../model/types';
 import type { Guide } from './bubbleDrag';
 
-export type LetteringSelection = { kind: 'bubble' | 'effect'; id: ID } | null;
+type LetteringSelection = { kind: 'bubble' | 'effect'; id: ID } | null;
 
-export type LetteringPending = { kind: 'bubble'; type: BubbleType } | { kind: 'effect'; type: EffectType } | null;
+type LetteringPending = { kind: 'bubble'; type: BubbleType } | { kind: 'effect'; type: EffectType } | null;
 
 export type LetteringView = { z: number; tx: number; ty: number };
 
 /** One overlay at a time: each opens from the screen or from a menu that has already closed. */
-export type LetteringSheet = 'editor' | 'menu' | 'item' | 'list' | 'effects' | 'speaker' | 'language' | 'manage' | 'translate';
+type LetteringSheet = 'editor' | 'menu' | 'item' | 'list' | 'effects' | 'speaker' | 'language' | 'manage' | 'translate';
 
 export type LetteringState = {
   box: Size;

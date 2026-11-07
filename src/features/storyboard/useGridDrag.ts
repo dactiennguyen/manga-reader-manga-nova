@@ -28,7 +28,7 @@ const RELEASE_GUARD_MS = 200;
 
 export type GridRow = { key: string; pageIds: ID[] };
 
-export type Lifted = { index: number; id: ID; left: number; top: number };
+type Lifted = { index: number; id: ID; left: number; top: number };
 
 export type GridDrag = {
   drag: DragState;

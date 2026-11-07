@@ -13,9 +13,9 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { MOTION } from '../../ui';
 
-export const ZOOM_MIN = 1;
-export const ZOOM_MAX = 4;
-export const ZOOM_DOUBLE_TAP = 2.5;
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 4;
+const ZOOM_DOUBLE_TAP = 2.5;
 
 const ZOOMED_AT = 1.01;
 const SNAP_BACK_BELOW = 1.05;
