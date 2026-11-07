@@ -78,3 +78,7 @@ Notes for the Play Console
 --------------------------
 - Suggested category: Art & Design (or Comics). Content rating: fill in the IARC questionnaire; the app has no user-generated content shared online.
 - Screenshots and graphics are in screenshots/ and graphics/ next to this file; README.md there lists the required sizes.
+- Website: https://manganova.pages.dev
+- Privacy policy: https://manganova.pages.dev/privacy
+- Terms of use: https://manganova.pages.dev/terms
+- Step-by-step guide in Vietnamese: huong-dan-dien.html

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Điền Play Console cho Manganova</title>
+<style>
+:root{--paper:#f6efe3;--card:#fffaf0;--tint:#fbdcc9;--ink:#1c1712;--ink2:#4b4338;--muted:#645a4c;--coral:#bf3419;--line:#e4d9c6}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow-wrap:anywhere}
+a{color:var(--coral)}
+h1,h2,h3,p,ul,ol,pre{margin:0}
+.layout{display:grid;gap:24px;width:min(1120px,100%);margin-inline:auto;padding:20px 16px 64px}
+header h1{font-size:30px;line-height:1.2;font-weight:800}
+header p{margin-top:6px;color:var(--ink2)}
+aside{background:var(--card);border:2px solid var(--ink);padding:14px 16px}
+.progress{font-weight:700}
+.bar{height:8px;margin-top:6px;background:var(--line)}
+.bar i{display:block;height:100%;width:0;background:var(--coral);transition:width .2s}
+aside ol{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:10px;padding:0;list-style:none}
+aside a{display:flex;align-items:center;gap:8px;min-height:36px;color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
+aside a:hover{color:var(--coral)}
+.tick{width:14px;height:14px;flex:none;border:2px solid var(--ink)}
+.is-done .tick{background:var(--coral);border-color:var(--coral)}
+.is-done{color:var(--muted)}
+main{min-width:0;display:grid;gap:20px}
+section,.quick{background:var(--card);border:2px solid var(--ink);padding:20px 16px}
+section h2,.quick h2{font-size:24px;line-height:1.25;font-weight:800}
+section>p,section>ul,section>ol,details>p{margin-top:10px;color:var(--ink2)}
+section ul,section ol{padding-left:22px}
+section li{padding-block:3px}
+h3{margin-top:24px;font-size:18px;font-weight:700}
+code{font:500 .92em ui-monospace,SFMono-Regular,Menlo,monospace}
+kbd{padding:1px 6px;background:var(--card);border:1px solid var(--ink);font:600 .85em ui-monospace,Menlo,monospace}
+.rows{margin-top:12px;border-top:1px solid var(--line)}
+.row{display:grid;gap:6px;padding-block:10px;border-bottom:1px solid var(--line)}
+.k{font-weight:600}
+.hint{margin-top:4px;color:var(--muted);font-size:14px;font-weight:400;line-height:1.45}
+section>.hint{margin-top:12px}
+.v{display:flex;align-items:center;gap:10px;min-width:0}
+.v img{width:52px;height:52px;object-fit:contain;background:var(--paper);border:1px solid var(--line);flex:none}
+.val{flex:1;min-width:0}
+code.val{display:block;padding:9px 11px;background:var(--paper);border:1px solid var(--line);line-height:1.4;user-select:all}
+code.val.empty{color:var(--muted);font-family:inherit;font-style:italic;user-select:none}
+.pick{font-weight:600}
+.cp{flex:none;min-height:44px;min-width:76px;padding:6px 14px;background:var(--card);border:2px solid var(--ink);color:var(--ink);font:700 14px/1.2 inherit;font-family:inherit;cursor:pointer}
+.cp:hover:not(:disabled){background:var(--ink);color:var(--card)}
+.cp.ok,.cp.ok:hover{background:var(--coral);border-color:var(--coral);color:#fffaf0}
+.cp:disabled{border-color:var(--line);color:var(--muted);cursor:not-allowed}
+.cp.big{background:var(--coral);border-color:var(--coral);color:#fffaf0;min-width:96px}
+.cp.big:hover{background:var(--ink);border-color:var(--ink)}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.block{margin-top:14px}
+.block-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.count{color:var(--muted);font-size:14px}
+pre.val{max-height:300px;overflow:auto;padding:12px;background:var(--paper);border:1px solid var(--line);font:400 14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
+.tip{padding:10px 12px;background:var(--tint)}
+.email-box{display:grid;gap:8px;margin-top:12px;padding:12px;background:var(--tint)}
+.email-box label .hint{display:block}
+.email-box input{width:100%;min-height:46px;padding:8px 12px;background:var(--card);border:2px solid var(--ink);color:var(--ink);font:inherit}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;color:var(--ink2);cursor:pointer}
+.check input,.done input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--coral)}
+.done{display:inline-flex;gap:10px;align-items:center;min-height:44px;margin-top:18px;padding:6px 14px 6px 10px;background:var(--paper);border:2px solid var(--ink);font-weight:700;cursor:pointer}
+.done input{margin:0}
+table{width:100%;margin-top:12px;border-collapse:collapse;font-size:15px}
+th,td{padding:8px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--paper)}
+details{margin-top:14px;padding:10px 12px;border:1px solid var(--line)}
+summary{min-height:32px;font-weight:700;cursor:pointer}
+.shot .k{display:flex;align-items:center;gap:10px}
+.shot .k img{width:34px;height:60px;object-fit:cover;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,16px);padding:10px 16px;background:var(--ink);color:#fffaf0;font-weight:700;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(min-width:720px){.row{grid-template-columns:230px 1fr;gap:16px;align-items:center}.shot{grid-template-columns:90px 1fr}section,.quick{padding:24px}}
+@media(min-width:1000px){.layout{grid-template-columns:230px 1fr;align-items:start}header{grid-column:1/-1}aside{position:sticky;top:16px}aside ol{display:block}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast,.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <header>
+    <h1>Điền Play Console cho Manganova</h1>
+    <p>Mở trang này cạnh tab Play Console và điền từ trên xuống. Ô có nút Copy thì bấm rồi dán. Ô không có nút là chọn trong form.</p>
+  </header>
+  <aside>
+    <div class="progress" id="count">0 bước</div>
+    <div class="bar"><i id="fill"></i></div>
+    <nav aria-label="Các bước"><ol><li><a href="#s2" data-nav="s2"><span class="tick" aria-hidden="true"></span>Tạo app</a></li><li><a href="#s3" data-nav="s3"><span class="tick" aria-hidden="true"></span>Store listing</a></li><li><a href="#s4" data-nav="s4"><span class="tick" aria-hidden="true"></span>Store settings</a></li><li><a href="#s5" data-nav="s5"><span class="tick" aria-hidden="true"></span>App content</a></li><li><a href="#s6" data-nav="s6"><span class="tick" aria-hidden="true"></span>Data safety</a></li><li><a href="#s7" data-nav="s7"><span class="tick" aria-hidden="true"></span>Content rating</a></li><li><a href="#s8" data-nav="s8"><span class="tick" aria-hidden="true"></span>Bản phát hành</a></li></ol></nav>
+  </aside>
+  <main>
+    <div class="quick"><h2>Hay dùng</h2><div class="email-box"><label for="email"><strong>Email liên hệ</strong><span class="hint">Nhập một lần, mọi ô email bên dưới sẽ tự điền.</span></label><input id="email" type="email" inputmode="email" autocomplete="off" placeholder="ban@gmail.com" /></div><div class="rows"><div class="row"><div class="k">Tên app</div><div class="v"><code class="val">Manganova: Manga Maker</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Package</div><div class="v"><code class="val">com.manganova.manga.reader.org</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Website</div><div class="v"><code class="val">https://manganova.pages.dev</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Chính sách quyền riêng tư</div><div class="v"><code class="val">https://manganova.pages.dev/privacy</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Điều khoản sử dụng</div><div class="v"><code class="val">https://manganova.pages.dev/terms</code><button type="button" class="cp" data-copy>Copy</button></div></div></div><p class="hint">Google có thể đổi tên menu. Nếu không thấy mục nào, mở Dashboard của app: ở đó có danh sách việc cần làm, bấm vào từng việc là tới đúng chỗ.</p></div>
+    <section id="s2"><h2>Bước 1. Tạo app</h2>
+<p>Bấm <b>Create app</b>.</p>
+<div class="rows"><div class="row"><div class="k">App name</div><div class="v"><code class="val">Manganova: Manga Maker</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Default language</div><div class="v"><span class="pick">English (United States) – en-US</span></div></div><div class="row"><div class="k">App or game</div><div class="v"><span class="pick">App</span></div></div><div class="row"><div class="k">Free or paid<p class="hint">Đã chọn Free thì không đổi sang Paid được.</p></div><div class="v"><span class="pick">Free</span></div></div><div class="row"><div class="k">Declarations</div><div class="v"><span class="pick">Tick các ô đồng ý</span></div></div></div>
+<label class="done"><input type="checkbox" data-step="s2" /><span>Xong bước này</span></label></section><section id="s3"><h2>Bước 2. Main store listing</h2>
+<p>Vào <b>Store presence → Main store listing</b>.</p>
+<div class="rows"><div class="row"><div class="k">App name</div><div class="v"><code class="val">Manganova: Manga Maker</code><button type="button" class="cp" data-copy>Copy</button></div></div></div>
+<div class="block"><div class="block-head"><div><strong>Short description</strong> <span class="count">80/80 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">Draw, lay out and letter your own manga. Pens, panels, rulers, tones and export.</pre></div>
+<div class="block"><div class="block-head"><div><strong>Full description</strong> <span class="count">3571/4000 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">Manganova is a manga studio that fits in your pocket. Open a blank page and start drawing, split a page into panels, or plan your story first. Then letter it, read it like a real book and export it. There is no account to make and no subscription to manage, and your work stays on your phone.
+
+START THE WAY YOU LIKE
+• Draw now: go straight to a blank page and sketch.
+• Lay out a page: pick a panel template, then fill each panel.
+• Write first: plan scenes and dialogue, then turn them into pages.
+• Choose manga pages (B5 or A5, read right to left) or a vertical webtoon strip.
+
+DRAW ON YOUR PHONE
+• G-pen, pencil, brush, eraser, shapes, lasso fill and a colour picker.
+• Screentone fills at 10, 25, 40 and 60% density.
+• Up to 8 layers per panel with opacity and lock, and 50 undo steps.
+• Two fingers zoom and rotate. Two-finger tap undoes, three-finger tap redoes.
+• Stylus pressure, plus a stylus mode that keeps your palm off the page.
+• Import a photo or sketch onto a layer and ink over it.
+
+RULERS THAT KEEP YOUR LINES TRUE
+• One-point and two-point perspective with vanishing points you can drag.
+• Strokes settle on the line to the point, or on level and upright lines, so rooms and streets stay in shape.
+• Symmetry repeats every stroke across a line you can move. One undo takes back both sides.
+
+MATERIALS READY TO USE
+• Line-art backgrounds: classroom, street, rooftop, bedroom, forest path and city.
+• Patterns and effects: sparkles, falling petals, rain, impact burst, clouds and leaves.
+• Drop one into a panel and draw on top. Backgrounds slide under your drawing on their own layer.
+
+KEEP YOUR CHARACTERS ON MODEL
+• Pin a character on the canvas with their face, sheet and appearance notes while you draw.
+• Keep profiles with role, traits, goal, voice and appearance.
+• Store face and body drawings, six expressions and relationships between characters.
+
+LAY OUT YOUR PAGES
+• 31 panel templates: grids, diagonal cuts, full bleeds and 4-koma strips.
+• Drag panel borders, cut a panel with a line, merge panels, tilt corners and set gutters.
+• See every page on the storyboard, drag to reorder and track what is finished.
+
+LETTER AND POLISH
+• Speech, thought, shout, whisper and machine bubbles, plus narration boxes and SFX text.
+• Four lettering fonts. Drag, resize and rotate anything on the page.
+• Speed lines, focus lines, tones, gradients and sparkles.
+• Add language versions of every bubble for translated editions.
+
+PLAN YOUR STORY
+• Outline acts and chapters on a drag-and-drop board.
+• Write scene by scene with setting, action, dialogue, narration and sound-effect blocks.
+• Auto-paginate a chapter: your script becomes pages and panels in one tap.
+• Keep a world wiki of places, factions, terms and events, with a timeline.
+
+READ AND SHARE
+• Read your chapter like a real manga, with page spreads in landscape.
+• Export PDF, PNG pages in a ZIP, CBZ for comic readers, or one long webtoon image.
+• Back up a whole story as one .manganova file and open it on another device.
+
+OPTIONAL WRITING HELP
+Connect your own OpenAI-compatible server for help with the words: shape a story from an idea, plan chapters, find plot holes or ask about your story. This is optional and off by default. It helps with text only and never draws for you.
+
+PRIVATE BY DESIGN
+Your stories, drawings and characters stay on your device. There are no ads, no analytics and no sign-in. Nothing is uploaded unless you set up a server yourself.
+
+Made for anyone who wants to make comics: first-time creators, webtoon artists, doujinshi circles and students of manga.</pre></div>
+<h3>Ảnh</h3>
+<p class="tip"><b>Mẹo trên Mac:</b> trong hộp chọn file, bấm <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>, dán đường dẫn rồi Enter. Với thư mục ảnh, chọn 7 file từ 01 tới 07.</p>
+<div class="rows"><div class="row"><div class="k">App icon</div><div class="v"><img src="graphics/app-icon-512.png" alt="" loading="lazy" /><code class="val" data-rel="graphics/app-icon-512.png">graphics/app-icon-512.png</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">Feature graphic</div><div class="v"><img src="graphics/feature-graphic-1024x500.png" alt="" loading="lazy" /><code class="val" data-rel="graphics/feature-graphic-1024x500.png">graphics/feature-graphic-1024x500.png</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">Phone screenshots<p class="hint">Tải 7 ảnh, đúng thứ tự 01 tới 07.</p></div><div class="v"><code class="val" data-rel="screenshots/phone/">screenshots/phone/</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">7-inch tablet<p class="hint">Tải 7 ảnh.</p></div><div class="v"><code class="val" data-rel="screenshots/tablet-10/">screenshots/tablet-10/</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">10-inch tablet<p class="hint">Tải 7 ảnh.</p></div><div class="v"><code class="val" data-rel="screenshots/tablet-10/">screenshots/tablet-10/</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">Video</div><div class="v"><span class="pick">Bỏ trống</span></div></div></div>
+<p class="hint">Không tải thư mục <code>extra/</code>. Đó là ảnh thay thế, dùng khi muốn đổi một ảnh chính.</p>
+<h3>Alt text, nếu Play có ô này</h3>
+<div class="rows"><div class="row shot"><div class="k"><img src="screenshots/phone/01-home.png" alt="" loading="lazy" /><span>01</span></div><div class="v"><code class="val">Home screen with ways to start a comic</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row shot"><div class="k"><img src="screenshots/phone/02-canvas.png" alt="" loading="lazy" /><span>02</span></div><div class="v"><code class="val">Canvas with a character pinned as a reference</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row shot"><div class="k"><img src="screenshots/phone/03-storyboard.png" alt="" loading="lazy" /><span>03</span></div><div class="v"><code class="val">Storyboard of manga pages</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row shot"><div class="k"><img src="screenshots/phone/04-lettering.png" alt="" loading="lazy" /><span>04</span></div><div class="v"><code class="val">Lettering with speech bubbles</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row shot"><div class="k"><img src="screenshots/phone/05-preview.png" alt="" loading="lazy" /><span>05</span></div><div class="v"><code class="val">Reading a finished page</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row shot"><div class="k"><img src="screenshots/phone/06-rulers.png" alt="" loading="lazy" /><span>06</span></div><div class="v"><code class="val">Two-point perspective ruler on the canvas</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row shot"><div class="k"><img src="screenshots/phone/07-materials.png" alt="" loading="lazy" /><span>07</span></div><div class="v"><code class="val">Materials library of line-art backgrounds</code><button type="button" class="cp" data-copy>Copy</button></div></div></div>
+<label class="done"><input type="checkbox" data-step="s3" /><span>Xong bước này</span></label></section><section id="s4"><h2>Bước 3. Store settings</h2>
+<p>Vào <b>Store presence → Store settings</b>.</p>
+<div class="rows"><div class="row"><div class="k">App category</div><div class="v"><span class="pick">Art &amp; Design</span></div></div><div class="row"><div class="k">Tags</div><div class="v"><span class="pick">Chọn trong danh sách của Google những tag gần với Comics, Drawing, Creativity</span></div></div><div class="row"><div class="k">Email</div><div class="v"><code class="val" data-email>Chưa nhập email ở trên</code><button type="button" class="cp" data-copy data-needs-email>Copy</button></div></div><div class="row"><div class="k">Phone</div><div class="v"><span class="pick">Bỏ trống</span></div></div><div class="row"><div class="k">Website</div><div class="v"><code class="val">https://manganova.pages.dev</code><button type="button" class="cp" data-copy>Copy</button></div></div></div>
+<label class="done"><input type="checkbox" data-step="s4" /><span>Xong bước này</span></label></section><section id="s5"><h2>Bước 4. App content</h2>
+<p>Vào <b>Policy and programs → App content</b>. Phải khai hết các mục ở đây mới nộp được.</p>
+<div class="rows"><div class="row"><div class="k">Privacy policy</div><div class="v"><code class="val">https://manganova.pages.dev/privacy</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">App access</div><div class="v"><span class="pick">All functionality is available without special access</span></div></div><div class="row"><div class="k">Ads</div><div class="v"><span class="pick">No, my app does not contain ads</span></div></div><div class="row"><div class="k">Content rating</div><div class="v"><span class="pick"><a href="#s7">Xem bước 6</a></span></div></div><div class="row"><div class="k">Target audience<p class="hint">Đề xuất của mình, bạn là người quyết định. Không chọn nhóm dưới 13, vì trang chính sách ghi app không hướng tới trẻ dưới 13. Nhóm dưới 18 có thể khiến Google hỏi thêm.</p></div><div class="v"><span class="pick">13–15, 16–17 và 18 trở lên</span></div></div><div class="row"><div class="k">Data safety</div><div class="v"><span class="pick"><a href="#s6">Xem bước 5</a></span></div></div><div class="row"><div class="k">News apps</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">COVID-19 apps</div><div class="v"><span class="pick">No, hoặc không áp dụng</span></div></div><div class="row"><div class="k">Government apps</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Financial features</div><div class="v"><span class="pick">My app doesn't provide any financial features</span></div></div><div class="row"><div class="k">Health apps</div><div class="v"><span class="pick">My app does not have any health features</span></div></div><div class="row"><div class="k">Advertising ID</div><div class="v"><span class="pick">No</span></div></div></div>
+<label class="done"><input type="checkbox" data-step="s5" /><span>Xong bước này</span></label></section><section id="s6"><h2>Bước 5. Data safety</h2>
+<p>Bản khai này là cam kết của bạn với Google, nên đọc kỹ trước khi gửi.</p>
+<ul>
+<li>Không có tài khoản, quảng cáo, analytics hay báo lỗi tự động.</li>
+<li>Truyện và tranh nằm trên máy. Bạn không nhận được dữ liệu nào của người dùng.</li>
+<li>Tính năng AI tắt sẵn. Nó chỉ chạy khi người dùng tự nhập server của họ, và chỉ gửi chữ khi họ bấm nút AI.</li>
+<li>Bản release chặn kết nối không mã hóa, nên chỉ dùng được server <code>https://</code>.</li>
+</ul>
+<h3>Đề xuất: chọn No</h3>
+<p>Google tính "collect" là dữ liệu rời khỏi máy, nhưng loại trừ việc chuyển dữ liệu cho bên thứ ba theo một thao tác cụ thể của người dùng, khi họ biết trước dữ liệu sẽ được gửi đi. Tính năng AI của Manganova khớp với ngoại lệ này. Đây là cách mình đọc trang trợ giúp, không phải kết luận của Google.</p>
+<div class="rows"><div class="row"><div class="k">Does your app collect or share any of the required user data types?</div><div class="v"><span class="pick">No</span></div></div></div>
+<details><summary>Nếu muốn khai chặt hơn, chọn Yes</summary>
+<p>Cách này không sai, chỉ làm trang app có thêm một dòng thu thập dữ liệu.</p>
+<div class="rows"><div class="row"><div class="k">Does your app collect or share any of the required user data types?</div><div class="v"><span class="pick">Yes</span></div></div><div class="row"><div class="k">Is all of the user data encrypted in transit?</div><div class="v"><span class="pick">Yes</span></div></div><div class="row"><div class="k">Do you provide a way for users to request deletion?</div><div class="v"><span class="pick">Chọn đáp án phù hợp nhất, và giải thích rằng dữ liệu nằm trên máy người dùng, họ tự xóa được</span></div></div><div class="row"><div class="k">Data types</div><div class="v"><span class="pick">App activity → Other user-generated content</span></div></div><div class="row"><div class="k">Collected or shared</div><div class="v"><span class="pick">Collected</span></div></div><div class="row"><div class="k">Processed ephemerally</div><div class="v"><span class="pick">No, vì bạn không kiểm soát server của người dùng</span></div></div><div class="row"><div class="k">Required or optional</div><div class="v"><span class="pick">Optional</span></div></div><div class="row"><div class="k">Purpose</div><div class="v"><span class="pick">App functionality</span></div></div></div>
+</details>
+<p class="hint"><b>Quyền của app:</b> bản release khai <code>INTERNET</code>, <code>VIBRATE</code>, <code>READ_EXTERNAL_STORAGE</code>, <code>WRITE_EXTERNAL_STORAGE</code>. Hai quyền bộ nhớ do thư viện <code>react-native-fs</code> tự thêm, code app không dùng tới. App đọc và lưu file qua trình chọn file của Android.</p>
+<p class="hint">Nếu sau này thêm đăng nhập, analytics, quảng cáo hay server AI mặc định thì phải khai lại, và sửa cả trang chính sách. Chi tiết của Google ở <a href="https://support.google.com/googleplay/android-developer/answer/10787469?hl=en">trang Data safety</a>.</p>
+<label class="done"><input type="checkbox" data-step="s6" /><span>Xong bước này</span></label></section><section id="s7"><h2>Bước 6. Content rating</h2>
+<p>Bấm <b>Start questionnaire</b>, rồi đọc từng câu và trả lời theo nội dung thật của app.</p>
+<div class="rows"><div class="row"><div class="k">Email</div><div class="v"><code class="val" data-email>Chưa nhập email ở trên</code><button type="button" class="cp" data-copy data-needs-email>Copy</button></div></div><div class="row"><div class="k">Loại app</div><div class="v"><span class="pick">All Other App Types</span></div></div><div class="row"><div class="k">Bạo lực, máu, tình dục, ngôn ngữ thô tục<p class="hint">App không kèm nội dung kiểu này.</p></div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Cờ bạc, ma túy, rượu, thuốc lá</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Người dùng tương tác, trao đổi nội dung với nhau trong app<p class="hint">App không có mạng xã hội hay khu chia sẻ.</p></div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Chia sẻ vị trí</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Mua hàng số</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Duyệt web không giới hạn</div><div class="v"><span class="pick">No</span></div></div></div>
+<p class="hint">Kết quả xếp hạng do hệ thống tính, không tự chọn được. App thay đổi tính năng thì phải làm lại bảng này.</p>
+<label class="done"><input type="checkbox" data-step="s7" /><span>Xong bước này</span></label></section><section id="s8"><h2>Bước 7. Bản phát hành</h2>
+<p>Dùng mỗi khi <b>Create new release</b> ở Internal testing, Closed testing hoặc Production.</p>
+<div class="rows"><div class="row"><div class="k">File AAB</div><div class="v"><code class="val" data-root="android/app/build/outputs/bundle/release/app-release.aab">android/app/build/outputs/bundle/release/app-release.aab</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div></div>
+<div class="block"><div class="block-head"><div><strong>Release notes</strong> <span class="count">322/500 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">&lt;en-US&gt;
+First release of Manganova.
+• Draw with G-pen, pencil, brush, screentone and layers
+• Perspective rulers and symmetry
+• Ready-made backgrounds and patterns to drop into panels
+• Pin a character on the canvas while you draw
+• Letter with bubbles, narration and SFX
+• Export PDF, PNG, CBZ or a webtoon image
+&lt;/en-US&gt;</pre></div>
+<label class="done"><input type="checkbox" data-step="s8" /><span>Xong bước này</span></label></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+var KEY='manganova-play-guide',state={};
+try{state=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+var dir=decodeURI(location.pathname).replace(/[^/]*$/,''),isFile=location.protocol==='file:';
+var root=isFile?dir.replace(/docs\/google-play\/$/,'').replace(/\/$/,''):'.';
+document.querySelectorAll('[data-rel]').forEach(function(n){if(isFile)n.dataset.full=dir+n.dataset.rel});
+document.querySelectorAll('[data-root]').forEach(function(n){if(isFile)n.dataset.full=root+'/'+n.dataset.root});
+document.querySelectorAll('code.val').forEach(function(n){if(n.textContent.indexOf('{ROOT}')>=0)n.textContent=n.textContent.replace('{ROOT}',root)});
+var toast=document.getElementById('toast'),timer;
+function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(timer);timer=setTimeout(function(){toast.classList.remove('on')},1400)}
+function fallback(text){var a=document.createElement('textarea');a.value=text;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();return ok}
+function write(text){if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(text).then(function(){return true},function(){return fallback(text)})}return Promise.resolve(fallback(text))}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-copy]');if(!b)return;
+  var v=b.parentElement.querySelector('.val')||b.closest('.block').querySelector('.val');
+  var text=v.dataset.full||v.textContent,label=b.dataset.label||(b.dataset.label=b.textContent);
+  write(text).then(function(ok){
+    if(!ok){say('Không copy được, hãy bôi đen rồi copy tay');return}
+    b.textContent='Đã copy ✓';b.classList.add('ok');say('Đã copy');
+    setTimeout(function(){b.textContent=label;b.classList.remove('ok')},1400);
+  });
+});
+var input=document.getElementById('email');
+function email(){
+  var m=input.value.trim(),ok=/^\S+@\S+\.\S+$/.test(m);
+  document.querySelectorAll('[data-email]').forEach(function(n){n.textContent=ok?m:'Chưa nhập email ở trên';n.classList.toggle('empty',!ok)});
+  document.querySelectorAll('[data-needs-email]').forEach(function(n){n.disabled=!ok});
+}
+input.value=state.email||'';email();
+input.addEventListener('input',function(){state.email=input.value.trim();save();email()});
+document.querySelectorAll('[data-save]').forEach(function(c){c.checked=!!state[c.dataset.save];c.addEventListener('change',function(){state[c.dataset.save]=c.checked;save()})});
+var steps=[].slice.call(document.querySelectorAll('[data-step]'));
+function progress(){
+  var n=steps.filter(function(c){return c.checked}).length;
+  document.getElementById('count').textContent=n+'/'+steps.length+' bước';
+  document.getElementById('fill').style.width=(n*100/steps.length)+'%';
+  steps.forEach(function(c){document.querySelector('[data-nav="'+c.dataset.step+'"]').classList.toggle('is-done',c.checked)});
+}
+steps.forEach(function(c){c.checked=!!state['step-'+c.dataset.step];c.addEventListener('change',function(){state['step-'+c.dataset.step]=c.checked;save();progress()})});
+progress();
+})();
+</script>
+</body>
+</html>

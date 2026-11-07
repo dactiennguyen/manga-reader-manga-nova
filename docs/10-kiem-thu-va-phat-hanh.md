@@ -80,9 +80,4 @@ Trên CI, lưu keystore dạng base64 trong Secrets rồi giải ra lúc build. 
 
 ## Google Play
 
-Làm theo `docs/google-play/README.md` của repo cũ, với các thay đổi:
-
-- Dùng khóa ký mới.
-- Chụp lại toàn bộ ảnh điện thoại và máy tính bảng, làm lại feature graphic theo Studio. Nếu vẫn giữ `FLAG_SECURE` thì phải chụp trên bản debug.
-- Đọc lại chính sách quyền riêng tư. Nội dung hiện tại vẫn đúng nếu không thêm đăng nhập, quảng cáo, analytics hay server AI mặc định.
-- Tài khoản cá nhân tạo sau 13/11/2023 phải qua thử nghiệm kín: 12 người liên tục 14 ngày.
+Tài sản nộp store nằm ở [google-play/](google-play/README.md). Làm theo từng ô ở [huong-dan-dien.html](google-play/huong-dan-dien.html). Website và chính sách quyền riêng tư ở [13-website.md](13-website.md).

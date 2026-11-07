@@ -2,21 +2,29 @@
 
 Trang tĩnh bằng HTML và CSS, không cần build. Nó cung cấp các link mà Play Console cần:
 
-| Trang | File | Điền vào đâu trong Play Console |
-| --- | --- | --- |
-| Giới thiệu | `index.html` | Store settings → Website |
-| Chính sách quyền riêng tư | `privacy.html` | App content → Privacy policy (bắt buộc) |
-| Điều khoản sử dụng | `terms.html` | Không bắt buộc, trang giới thiệu đã có link |
+| Trang | Link | File | Điền vào đâu trong Play Console |
+| --- | --- | --- | --- |
+| Giới thiệu | https://manganova.pages.dev | `index.html` | Store settings → Website |
+| Chính sách quyền riêng tư | https://manganova.pages.dev/privacy | `privacy.html` | App content → Privacy policy (bắt buộc) |
+| Điều khoản sử dụng | https://manganova.pages.dev/terms | `terms.html` | Không bắt buộc, trang giới thiệu đã có link |
 
 ## Deploy
 
-Trang chạy trên Cloudflare Pages, project `manganova`:
+Trang chạy trên Cloudflare Pages, project `manganova`. Project đã tạo xong, mỗi lần sửa trang chỉ chạy:
 
 ```sh
 npx wrangler pages deploy website --project-name manganova --branch main --commit-dirty=true
 ```
 
+Nếu phải tạo lại project, wrangler 4 cần `--force`, nếu không nó tạo Worker thay vì Pages:
+
+```sh
+npx wrangler pages project create manganova --production-branch main --force
+```
+
 Pages tự bỏ đuôi `.html`, nên link dùng dạng `/privacy` và `/terms`. Sau khi app lên store, không đổi các link này.
+
+Trang chưa có `404.html`, nên đường dẫn sai sẽ hiện trang chủ thay vì báo lỗi.
 
 ## Việc cần sửa trước khi nộp
 

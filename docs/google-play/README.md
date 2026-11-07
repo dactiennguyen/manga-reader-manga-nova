@@ -1,6 +1,12 @@
 # Đưa Manganova lên Google Play
 
-Thư mục này chứa mọi thứ cần dán vào Play Console, cùng danh sách từng mục phải điền. Làm theo thứ tự từ trên xuống.
+Thư mục này chứa mọi thứ cần đưa lên Play Console. Từng ô phải điền nằm ở [huong-dan-dien.html](huong-dan-dien.html): mở file bằng trình duyệt, mỗi ô có nút Copy.
+
+| Link | |
+| --- | --- |
+| Website | https://manganova.pages.dev |
+| Chính sách quyền riêng tư | https://manganova.pages.dev/privacy |
+| Điều khoản sử dụng | https://manganova.pages.dev/terms |
 
 ## 1. Tài sản có sẵn
 
@@ -17,7 +23,7 @@ Không tải cả thư mục `extra/` cùng 7 ảnh chính. Đó chỉ là ảnh
 
 ## 2. Việc bắt buộc trước khi nộp
 
-Ba việc đầu chưa xong, và thiếu việc nào cũng không nộp được.
+Hai việc đầu chưa xong, và thiếu việc nào cũng không nộp được.
 
 1. **Tạo upload key.** Bản release hiện ký bằng debug key, Google sẽ từ chối. Tạo khóa rồi cất ngoài repo:
 
@@ -38,9 +44,9 @@ Ba việc đầu chưa xong, và thiếu việc nào cũng không nộp được
 
    Mất khóa thì phải xin Google đặt lại, nên hãy sao lưu nó và mật khẩu.
 
-2. **Trang chính sách quyền riêng tư.** Play bắt buộc có link này. Trang đã nằm ở `website/privacy.html`, ghi đúng tên Manganova và package. Cách deploy ở `docs/13-website.md`.
+2. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào `website/privacy.html` và `website/terms.html`, rồi deploy lại theo [13-website.md](../13-website.md).
 
-3. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào `website/privacy.html` và `website/terms.html`.
+3. **Trang chính sách quyền riêng tư.** Đã xong, ghi đúng tên Manganova và package. Link ở đầu file này.
 
 4. **Build file nộp.** Play nhận AAB, không nhận APK:
 
@@ -57,82 +63,15 @@ Ba việc đầu chưa xong, và thiếu việc nào cũng không nộp được
 
 7. **Server AI phải là `https://`.** Bản release chặn kết nối không mã hóa.
 
-## 3. Tài khoản Play Console
+## 3. Điền Play Console
 
-- Đăng ký tại https://play.google.com/console, phí một lần 25 USD.
-- Tài khoản **cá nhân** tạo sau 13/11/2023 phải qua **thử nghiệm kín**: tối thiểu 12 người thử liên tục 14 ngày, rồi mới xin được Production access. Kiểm tra lại con số này trong Play Console trước khi lên kế hoạch.
+Từng ô phải điền nằm ở [huong-dan-dien.html](huong-dan-dien.html).
 
-## 4. Tạo app
+Tài khoản cá nhân tạo sau 13/11/2023 phải có ít nhất 12 người thử kín liên tục 14 ngày rồi mới xin được Production access. Quy định này tra ngày 7/11/2026 trên [trang của Google](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en). App mới phải target API 36 trở lên, và Manganova đang target 36.
 
-| Mục | Điền |
-| --- | --- |
-| App name | `Manganova: Manga Maker` |
-| Default language | English (United States) – en-US |
-| App or game | App |
-| Free or paid | Free (chọn Free rồi không đổi sang Paid được) |
-| Declarations | Tick cả hai ô đồng ý |
+Khi app đã lên store, đổi nút "Coming soon" trên website theo [13-website.md](../13-website.md).
 
-## 5. Store listing
-
-| Mục | Điền |
-| --- | --- |
-| Short description | Dòng "Short description" trong `descriptions.txt` |
-| Full description | Khối "Full description" trong `descriptions.txt` |
-| App icon | `graphics/app-icon-512.png` |
-| Feature graphic | `graphics/feature-graphic-1024x500.png` |
-| Phone screenshots | `screenshots/phone/01` tới `07`, đúng thứ tự |
-| 7-inch và 10-inch tablet | `screenshots/tablet-10/01` tới `07` |
-| Video | Bỏ trống |
-
-Alt text gợi ý, theo thứ tự ảnh: `Home screen with ways to start a comic`; `Canvas with a character pinned as a reference`; `Storyboard of manga pages`; `Lettering with speech bubbles`; `Reading a finished page`; `Two-point perspective ruler on the canvas`; `Materials library of line-art backgrounds`.
-
-## 6. Store settings
-
-| Mục | Điền |
-| --- | --- |
-| App category | Art & Design (hoặc Comics) |
-| Tags | Comics, Drawing, Creativity |
-| Contact email | Email ở mục 2 |
-| Website | Trang chủ của `website/` |
-
-## 7. App content
-
-| Mục | Trả lời |
-| --- | --- |
-| Privacy policy | Link ở mục 2 |
-| App access | All functionality is available without special access |
-| Ads | No |
-| Content ratings | Hoàn tất bảng IARC theo đúng nội dung thật, không đoán trước kết quả |
-| Target audience | Chọn đúng nhóm tuổi app hướng tới. Nhóm dưới 18 có thể kéo theo Families Policy |
-| News, COVID-19, Government, Financial, Health | No |
-| Advertising ID | No, app không có SDK quảng cáo hay analytics |
-| Data safety | Xem mục 8 |
-
-## 8. Data safety
-
-App không có tài khoản, analytics, crash report hay quảng cáo. Dữ liệu ở trên máy, trừ khi người dùng tự cấu hình server AI: khi đó nội dung truyện và câu hỏi được gửi tới server đó sau khi họ bấm nút. Vì Google tính việc truyền dữ liệu ra khỏi máy là "collect", hãy đọc kỹ định nghĩa hiện tại rồi khai theo đúng bản phát hành. Mình không tự kết luận phần này thay bạn. Manifest chỉ xin `INTERNET` và `VIBRATE`, bản khai phải khớp.
-
-## 9. Thử nghiệm và phát hành
-
-1. **Internal testing:** tải `app-release.aab`, thêm email tester, cài và chạy thử bản thật.
-2. **Closed testing:** nếu tài khoản thuộc diện bắt buộc.
-3. **Production:** chọn AAB, chọn quốc gia, gửi duyệt. Lần đầu có thể mất vài ngày tới một tuần.
-
-Release notes mẫu:
-
-```
-<en-US>
-First release of Manganova.
-• Draw with G-pen, pencil, brush, screentone and layers
-• Perspective rulers and symmetry
-• Ready-made backgrounds and patterns to drop into panels
-• Pin a character on the canvas while you draw
-• Letter with bubbles, narration and SFX
-• Export PDF, PNG, CBZ or a webtoon image
-</en-US>
-```
-
-## 10. Những gì Google hay từ chối
+## 4. Những gì Google hay từ chối
 
 - Ảnh có chữ "debug", thanh thông báo lộn xộn, hoặc không phải ảnh thật của app.
 - Mô tả hứa làm được điều app không làm. App không tự vẽ tranh, và mô tả đã ghi rõ AI chỉ hỗ trợ chữ.
@@ -141,7 +80,7 @@ First release of Manganova.
 
 **Về tranh trong ảnh chụp:** truyện mẫu "Lantern Courier" dùng tranh do AI vẽ rồi đưa vào app dưới dạng layer ảnh, không phải vẽ bằng bút trong app. Giao diện trong ảnh là thật. Nếu muốn ảnh quảng cáo phản ánh sát nhất, hãy thay bằng tranh thật của một họa sĩ khi có.
 
-## 11. Cách chụp lại bộ ảnh
+## 5. Cách chụp lại bộ ảnh
 
 Truyện mẫu sinh bằng `__tests__/sampleStory.test.ts`, bỏ qua khi chạy test thường. File đã đóng gói nằm ở `sample/lantern.manganova`.
 
