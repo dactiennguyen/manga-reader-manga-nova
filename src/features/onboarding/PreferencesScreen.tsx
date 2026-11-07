@@ -14,8 +14,8 @@ const STEP_COUNT = 3;
 const STEP_OFFSET = 2;
 
 const ROLES: { id: CreatorRole; label: string; hint: string; icon: IconGlyph }[] = [
-  { id: 'write', label: 'Write stories', hint: 'I have ideas and want to turn them into a script', icon: PenLineIcon },
   { id: 'draw', label: 'Draw', hint: 'I want to open a canvas and start drawing', icon: BrushIcon },
+  { id: 'write', label: 'Write stories', hint: 'I have ideas and want to turn them into a script', icon: PenLineIcon },
   { id: 'both', label: 'Both', hint: 'I write and draw my own stories', icon: StarIcon },
 ];
 

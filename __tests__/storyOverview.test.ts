@@ -11,6 +11,7 @@ import { pickIdeas, tipOfDay } from '../src/core/story/ideas';
 import { libraryCounts, libraryGrid, libraryRows, visibleRows } from '../src/core/story/library';
 import { genresFavoritesFirst, knownGenres, titleTaken } from '../src/core/story/newProject';
 import { nextStepOf } from '../src/core/story/nextStep';
+import { QUICK_START_TITLE, unusedQuickStart } from '../src/core/story/quickStart';
 import { resumeTarget } from '../src/core/story/resume';
 import { storyStats, trashCountdown, trashDaysLeft } from '../src/core/story/stats';
 import { DAY_MS } from '../src/core/util/time';
@@ -216,6 +217,44 @@ describe('chapter order', () => {
   it('adds to the last act in use', () => {
     expect(actForNewChapter(acts)?.id).toBe('b');
     expect(actForNewChapter([{ id: 'x', title: '', chapterIds: [] }])?.id).toBe('x');
+  });
+});
+
+describe('quick start', () => {
+  const blank = () => {
+    const projectId = story().createProject({
+      title: QUICK_START_TITLE,
+      genres: [],
+      logline: '',
+      format: 'manga',
+      pageSize: 'B5',
+      style: 'shounen',
+      color: false,
+    });
+    const chapterId = projectOf(projectId).acts[0].chapterIds[0];
+    return { projectId, chapterId, pageId: story().addPage(chapterId, { templateId: 'g1' }) };
+  };
+  const noArt = () => false;
+
+  it('reuses a blank start instead of making another story', () => {
+    const { pageId } = blank();
+    expect(unusedQuickStart(story(), noArt)?.id).toBe(pageId);
+  });
+
+  it('leaves a start alone once it has been used', () => {
+    const { chapterId } = blank();
+    expect(unusedQuickStart(story(), () => true)).toBeUndefined();
+    story().addPage(chapterId, { templateId: 'g1' });
+    expect(unusedQuickStart(story(), noArt)).toBeUndefined();
+  });
+
+  it('ignores a named story and a trashed one', () => {
+    const { projectId } = blank();
+    story().updateProject(projectId, { title: 'My comic' });
+    expect(unusedQuickStart(story(), noArt)).toBeUndefined();
+    story().updateProject(projectId, { title: QUICK_START_TITLE });
+    story().trashProject(projectId);
+    expect(unusedQuickStart(story(), noArt)).toBeUndefined();
   });
 });
 

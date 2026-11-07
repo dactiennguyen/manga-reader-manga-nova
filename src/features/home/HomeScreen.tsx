@@ -1,25 +1,24 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { BrushIcon, CloseIcon, IdeaIcon } from '../../ui/icons';
+import { CaretDownIcon, CaretRightIcon, CloseIcon, IdeaIcon } from '../../ui/icons';
 
 import { activeProjects, projectProgress } from '../../core/model/selectors';
 import { tipOfDay } from '../../core/story/ideas';
 import { resumeTarget } from '../../core/story/resume';
 import { dayKey } from '../../core/util/time';
 import { useStoryData } from '../../state/hooks';
-import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
-import { ART, ArtBanner, Button, Card, ICON, Icon, IconButton, Screen, SectionHeader, Text, useDockInset } from '../../ui';
-import { openBlankCanvas } from './blankCanvas';
+import { ART, ArtBanner, Card, ICON, Icon, IconButton, ListItem, Screen, SectionHeader, Text, useDockInset } from '../../ui';
 import { ContinueCard } from './ContinueCard';
 import { IdeaCard } from './IdeaCard';
 import { RecentStories } from './RecentStories';
+import { StartTiles } from './StartTiles';
 
 export function HomeScreen() {
-  const navigation = useAppNavigation();
   const dockInset = useDockInset();
   const penName = useSettings(s => s.penName).trim();
-  const role = useSettings(s => s.role);
+  const writer = useSettings(s => s.role) === 'write';
+  const [ideaOpen, setIdeaOpen] = useState(writer);
   const tipDismissedDay = useSettings(s => s.tipDismissedDay);
   const state = useStoryData();
 
@@ -36,7 +35,7 @@ export function HomeScreen() {
             {penName ? `Hi ${penName}` : 'Hi there'}
           </Text>
           <Text variant="bodySmall" tone="onPaper" numberOfLines={2}>
-            {empty ? 'Start a new story today.' : 'What are we drawing today?'}
+            {empty ? 'Start your first comic.' : 'What are we drawing today?'}
           </Text>
         </View>
       </ArtBanner>
@@ -52,19 +51,20 @@ export function HomeScreen() {
         </View>
       )}
 
-      <View className="gap-3">
-        <SectionHeader>Start from one line</SectionHeader>
-        <IdeaCard empty={empty} />
-        {empty && <Button title="Blank story" variant="secondary" onPress={() => navigation.navigate('NewProject')} />}
-        {role === 'draw' && (
-          <Button
-            title="Open blank canvas"
-            variant="secondary"
-            icon={BrushIcon}
-            onPress={() => openBlankCanvas(navigation, useSettings.getState().defaultStyle)}
-          />
-        )}
+      <View className="gap-2">
+        <SectionHeader>Start creating</SectionHeader>
+        <StartTiles />
       </View>
+
+      <Card>
+        <ListItem
+          title="Start from an idea"
+          icon={IdeaIcon}
+          right={<Icon icon={ideaOpen ? CaretDownIcon : CaretRightIcon} size={ICON.md} color="text-secondary" />}
+          onPress={() => setIdeaOpen(open => !open)}
+        />
+      </Card>
+      {ideaOpen && <IdeaCard empty={empty} />}
 
       {!empty && <RecentStories projects={projects.slice(0, 6)} />}
 

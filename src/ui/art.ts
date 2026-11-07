@@ -14,6 +14,7 @@ export const ART = {
   emptyCharacters: require('../assets/art/empty-characters.webp'),
   emptyWorld: require('../assets/art/empty-world.webp'),
   emptyTrash: require('../assets/art/empty-trash.webp'),
+  tileDraw: require('../assets/art/tile-draw.webp'),
   tileScript: require('../assets/art/tile-script.webp'),
   tileStoryboard: require('../assets/art/tile-storyboard.webp'),
   tileCharacters: require('../assets/art/tile-characters.webp'),

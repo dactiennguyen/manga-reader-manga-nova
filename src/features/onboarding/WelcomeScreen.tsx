@@ -14,19 +14,19 @@ import { WelcomeArt, type WelcomeArtKind } from './WelcomeArt';
 
 const SLIDES: { kind: WelcomeArtKind; title: string; text: string }[] = [
   {
-    kind: 'write',
-    title: 'Write your story',
-    text: 'Start from a one-line idea, then build the plot and dialogue for each chapter.',
+    kind: 'draw',
+    title: 'Draw your manga',
+    text: 'Sketch and ink on your phone with pens, layers and panels made for comics.',
   },
   {
-    kind: 'draw',
-    title: 'Draw on your phone',
-    text: 'Sketch, then ink on the canvas, staying true to your characters.',
+    kind: 'write',
+    title: 'Plan it your way',
+    text: 'Start with a sketch or a script, then map out your pages on the storyboard.',
   },
   {
     kind: 'finish',
     title: 'Finish a full chapter',
-    text: 'Lay out panels, add dialogue, and export a file to share.',
+    text: 'Lay out panels, letter your dialogue, and export a file to share.',
   },
 ];
 

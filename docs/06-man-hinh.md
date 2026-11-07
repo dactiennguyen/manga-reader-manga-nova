@@ -83,6 +83,9 @@ Thêm deep link cho intent `.manganova` và `.mangaka`. Không có deep link nà
 ### Home
 
 - Thẻ Continue đi theo `lastOpened` qua `resumeTarget`.
+- Ba lối vào sáng tác là Draw now, Lay out page, Write script. Người chọn vai trò viết sẽ thấy Write script trước.
+- Draw now và Lay out page dùng lại truyện trống chưa đụng tới, nên bấm nhiều lần không sinh thêm truyện rỗng.
+- Ô nhập ý tưởng thu gọn thành một dòng, chỉ mở sẵn với người chọn vai trò viết.
 
 ## Tổ chức một tính năng
 

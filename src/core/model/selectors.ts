@@ -16,7 +16,7 @@ export function chapterIdsOf(project: Project | undefined): ID[] {
   return project ? project.acts.flatMap(act => act.chapterIds) : [];
 }
 
-function chaptersOf(state: StoryData, projectId: ID): Chapter[] {
+export function chaptersOf(state: StoryData, projectId: ID): Chapter[] {
   return chapterIdsOf(state.projects[projectId])
     .map(id => state.chapters[id])
     .filter(Boolean);
