@@ -33,6 +33,7 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+!android/app/manganova-upload.keystore
 *.jks
 keystore.properties
 .kotlin/

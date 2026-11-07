@@ -74,7 +74,7 @@ Vào **Settings → Secrets and variables → Actions** của repo và thêm:
 
 ## Ký app
 
-Không commit keystore hay mật khẩu. Repo cũ làm việc này có chủ đích, và đó là lý do phải tạo khóa mới.
+Keystore `android/app/manganova-upload.keystore` nằm trong repo public theo quyết định của chủ dự án. Mật khẩu thì không bao giờ commit: nó chỉ nằm ở GitHub Secrets và trên máy phát triển. Ai có cả file lẫn mật khẩu là ký được bản nộp, nên lộ mật khẩu thì phải đổi khóa ngay.
 
 ```sh
 keytool -genkeypair -v -storetype PKCS12 \
@@ -82,9 +82,9 @@ keytool -genkeypair -v -storetype PKCS12 \
   -alias manganova-upload -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Cất keystore ở nơi an toàn ngoài repo. Mất upload key thì phải xin Google đặt lại, còn lộ thì phải đổi.
+Mất upload key thì phải xin Google đặt lại, còn lộ thì phải đổi.
 
-`.gitignore` phải có `*.keystore`, `*.jks`, `keystore.properties`.
+`.gitignore` phải có `*.keystore`, `*.jks`, `keystore.properties`, chỉ trừ hai file keystore của `android/app/`.
 
 `android/app/build.gradle` đọc từ biến môi trường `MANGANOVA_KEYSTORE`, `MANGANOVA_KEYSTORE_PASSWORD`, `MANGANOVA_KEY_ALIAS`, `MANGANOVA_KEY_PASSWORD`, hoặc từ `android/keystore.properties` khi build tại máy. Khi chưa có khóa, bản release ký bằng debug key, và Play sẽ từ chối bản đó.
 

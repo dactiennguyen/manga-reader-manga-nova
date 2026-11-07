@@ -25,7 +25,7 @@ Không tải cả thư mục `extra/` cùng 7 ảnh chính. Đó chỉ là ảnh
 
 Việc 2 chưa xong, thiếu thì không nộp được.
 
-1. **Upload key đã tạo.** Alias `manganova-upload`. Keystore và mật khẩu nằm ở `~/keys/` trên máy phát triển, không nằm trong repo. GitHub Actions lấy khóa từ Secrets, build trên máy lấy từ `android/keystore.properties`. Hãy sao lưu keystore và mật khẩu ra nơi an toàn: Secrets không đọc lại được, và mất khóa thì phải xin Google đặt lại.
+1. **Upload key đã tạo.** Alias `manganova-upload`, file `android/app/manganova-upload.keystore`. Mật khẩu không nằm trong repo: GitHub Actions lấy từ Secrets, build trên máy lấy từ `android/keystore.properties`, và bản lưu ở `~/keys/`. Hãy sao lưu mật khẩu ra nơi an toàn, vì Secrets không đọc lại được.
 
 2. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào `website/privacy.html` và `website/terms.html`, rồi deploy lại theo [13-website.md](../13-website.md).
 
