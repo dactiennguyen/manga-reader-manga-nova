@@ -14,6 +14,7 @@ import {
   Banner,
   Button,
   EmptyState,
+  ICON,
   Icon,
   IconButton,
   ListItem,
@@ -127,7 +128,7 @@ function CharacterBody({ character }: { character: Character }) {
             <Avatar character={character} size={88} square />
             {character.locked && (
               <View className="absolute -bottom-1.5 -right-1.5 h-6.5 w-6.5 items-center justify-center rounded-full bg-overlay">
-                <Icon icon={LockIcon} size={12} color="text-secondary" />
+                <Icon icon={LockIcon} size={ICON.xs} color="text-secondary" />
               </View>
             )}
           </View>
@@ -156,7 +157,7 @@ function CharacterBody({ character }: { character: Character }) {
                 <Text variant="label" tone="secondary">
                   {ROLE_LABEL[character.role]}
                 </Text>
-                <Icon icon={CaretDownIcon} size={14} color="text-muted" />
+                <Icon icon={CaretDownIcon} size={ICON.xs} color="text-muted" />
               </Pressable>
               <Text variant="label" tone="muted">
                 ·

@@ -8,7 +8,7 @@ import { STORYBOARD_SIZES, pageLabel } from '../../core/reorder/storyboardGrid';
 import { useThumb } from '../../render/thumbs';
 import { panelHasArt } from '../../state/artStore';
 import { usePage } from '../../state/hooks';
-import { Icon, Pressable, Skeleton, Text, type ColorToken, type IconGlyph } from '../../ui';
+import { ICON, Icon, Pressable, Skeleton, Text, type ColorToken, type IconGlyph } from '../../ui';
 
 const STATUS_ICON: Record<PageStatus, IconGlyph> = {
   empty: CircleIcon,
@@ -88,14 +88,14 @@ export function PageThumb({
               selected ? 'border-accent bg-accent' : 'border-control-border bg-surface'
             }`}
           >
-            {selected && <Icon icon={CheckIcon} size={16} color="on-accent" />}
+            {selected && <Icon icon={CheckIcon} size={ICON.sm} color="on-accent" />}
           </View>
         )}
       </View>
       <View className="flex-row items-center justify-center gap-1" style={{ height: STORYBOARD_SIZES.metaHeight }}>
         <Text variant="label">{number}</Text>
-        <Icon icon={STATUS_ICON[status]} size={14} color={STATUS_COLOR[status]} />
-        {!!page.flag && <Icon icon={FlagIcon} size={14} color="warning" />}
+        <Icon icon={STATUS_ICON[status]} size={ICON.xs} color={STATUS_COLOR[status]} />
+        {!!page.flag && <Icon icon={FlagIcon} size={ICON.xs} color="warning" />}
       </View>
     </Pressable>
   );

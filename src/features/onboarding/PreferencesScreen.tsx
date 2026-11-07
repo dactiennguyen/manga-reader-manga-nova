@@ -6,7 +6,7 @@ import { BrushIcon, PenLineIcon, StarIcon } from '../../ui/icons';
 import { GENRES, LIMITS } from '../../core/model/constants';
 import type { ScreenProps } from '../../state/navigation';
 import { DEFAULT_SETTINGS, useSettings, type CreatorRole } from '../../state/useSettings';
-import { AppBar, Button, Chip, ChipGroup, Icon, ProgressBar, Screen, Text, toast, type IconGlyph } from '../../ui';
+import { AppBar, Button, Chip, ChipGroup, ICON, Icon, ProgressBar, Screen, Text, toast, type IconGlyph } from '../../ui';
 import { OptionCard } from './OptionCard';
 import { StylePicker } from './StylePicker';
 
@@ -156,7 +156,7 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
                 hint={item.hint}
                 selected={role === item.id}
                 onPress={() => useSettings.getState().set({ role: item.id })}
-                left={<Icon icon={item.icon} size={26} color={role === item.id ? 'accent' : 'text'} />}
+                left={<Icon icon={item.icon} size={ICON.lg} color={role === item.id ? 'accent' : 'text'} />}
               />
             ))}
           </View>

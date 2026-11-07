@@ -12,7 +12,7 @@ import { useAppNavigation } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { undoable, useStory } from '../../state/useStory';
-import { Banner, Button, Icon, Sheet, Text } from '../../ui';
+import { Banner, Button, ICON, Icon, Sheet, Text } from '../../ui';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from './AiParts';
 
 function sceneBlocks(idea: SceneIdea): Block[] {
@@ -81,7 +81,7 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
       return (
         <>
           <View className="items-center gap-3 p-6">
-            <Icon icon={DoneIcon} size={32} color="success" />
+            <Icon icon={DoneIcon} size={ICON.xl} color="success" />
             <Text variant="heading" className="text-center">
               {plural(added, 'scene')} added to the script
             </Text>
@@ -132,7 +132,7 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
                 </Text>
                 {!!idea.setting && (
                   <View className="flex-row items-center gap-1">
-                    <Icon icon={PlaceIcon} size={14} color="text-muted" />
+                    <Icon icon={PlaceIcon} size={ICON.xs} color="text-muted" />
                     <Text variant="label" className="flex-1">
                       {idea.setting}
                     </Text>

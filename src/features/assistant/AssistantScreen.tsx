@@ -5,7 +5,7 @@ import { HistoryIcon, SendIcon, StopIcon } from '../../ui/icons';
 
 import { useAppNavigation } from '../../state/navigation';
 import { useAiConfigured } from '../../state/useSettings';
-import { AiErrorBox, AiLoading, AppBar, IconButton, Screen, TextField, useDockInset } from '../../ui';
+import { AiErrorBox, AiLoading, AppBar, ICON, IconButton, Screen, TextField, useDockInset } from '../../ui';
 import {
   AssistantBubble,
   ConversationsSheet,
@@ -86,7 +86,7 @@ export function AssistantScreen() {
         {loading ? (
           <IconButton
             icon={StopIcon}
-            size={22}
+            size={ICON.lg}
             color="danger"
             onPress={chat.cancel}
             accessibilityLabel="Stop"
@@ -95,7 +95,7 @@ export function AssistantScreen() {
         ) : (
           <IconButton
             icon={SendIcon}
-            size={20}
+            size={ICON.md}
             color="on-ai"
             disabled={!canSend}
             onPress={() => chat.send(input)}

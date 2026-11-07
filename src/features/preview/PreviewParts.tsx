@@ -19,7 +19,7 @@ import { PageView } from '../../render/PageView';
 import type { PageDrawOptions } from '../../render/drawPage';
 import { usePage } from '../../state/hooks';
 import { useStory } from '../../state/useStory';
-import { Button, Card, Icon, Text } from '../../ui';
+import { Button, Card, ICON, Icon, Text } from '../../ui';
 import { useZoom } from './useZoom';
 
 const BADGE_ZONE = 52;
@@ -46,7 +46,7 @@ function PageSlot({ pageId, width, options }: { pageId: ID; width: number; optio
       )}
       {page?.flag && (
         <View className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-accent">
-          <Icon icon={FlagIcon} size={16} color="on-accent" />
+          <Icon icon={FlagIcon} size={ICON.sm} color="on-accent" />
         </View>
       )}
     </View>

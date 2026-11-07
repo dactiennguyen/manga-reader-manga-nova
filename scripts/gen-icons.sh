@@ -10,6 +10,7 @@ for spec in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
   d=${spec%%:*}; s=${spec##*:}
   fg=$((s * 9 / 4))
   rsvg-convert -w "$fg" -h "$fg" "$SRC/foreground.svg" -o "$RES/mipmap-$d/ic_launcher_foreground.png"
+  rsvg-convert -w "$fg" -h "$fg" "$SRC/monochrome.svg" -o "$RES/mipmap-$d/ic_launcher_monochrome.png"
   # Legacy icons (API 24-25): crop the 108dp art to the visible 72dp area.
   rsvg-convert -w "$((s * 3 / 2))" -h "$((s * 3 / 2))" -b "$BG" "$SRC/foreground.svg" -o "$TMP/full.png"
   magick "$TMP/full.png" -gravity center -crop "${s}x${s}+0+0" +repage "$TMP/sq.png"

@@ -23,7 +23,7 @@ export function useColor(token: ColorToken): string {
   return String(useCSSVariable(`--color-${token}`) ?? '#000000');
 }
 
-export const ICON = { sm: 16, md: 20, lg: 24 } as const;
+export const ICON = { xs: 14, sm: 16, md: 20, lg: 24, xl: 32, xxl: 40 } as const;
 
 export const MOTION = { instant: 100, fast: 160, base: 220, slow: 300 } as const;
 

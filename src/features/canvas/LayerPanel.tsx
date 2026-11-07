@@ -15,7 +15,7 @@ import {
   setActiveLayer,
   useArtRev,
 } from '../../state/artStore';
-import { IconButton, Pressable, PromptDialog, Slider, Text, confirm, toast } from '../../ui';
+import { ICON, IconButton, Pressable, PromptDialog, Slider, Text, confirm, toast } from '../../ui';
 
 export function LayerPanel({
   panelId,
@@ -114,9 +114,9 @@ export function LayerPanel({
           <Text variant="label" tone="secondary" className="flex-1 pl-1">
             Layers {art.layers.length}/{LIMITS.layers}
           </Text>
-          <IconButton icon={ImageIcon} size={20} onPress={onImportImage} accessibilityLabel="Import image into layer" />
-          <IconButton icon={PlusIcon} size={20} onPress={add} disabled={full} accessibilityLabel="Add layer" />
-          <IconButton icon={CloseIcon} size={20} onPress={onClose} accessibilityLabel="Close" />
+          <IconButton icon={ImageIcon} size={ICON.md} onPress={onImportImage} accessibilityLabel="Import image into layer" />
+          <IconButton icon={PlusIcon} size={ICON.md} onPress={add} disabled={full} accessibilityLabel="Add layer" />
+          <IconButton icon={CloseIcon} size={ICON.md} onPress={onClose} accessibilityLabel="Close" />
         </View>
         <ScrollView contentContainerClassName="gap-2 pb-4">
           {art.layers
@@ -132,7 +132,7 @@ export function LayerPanel({
                   <View className="flex-row items-center gap-1">
                     <IconButton
                       icon={layer.visible ? PreviewIcon : HiddenIcon}
-                      size={20}
+                      size={ICON.md}
                       accessibilityLabel={layer.visible ? 'Hide layer' : 'Show layer'}
                       onPress={() => editLayer(panelId, layer.id, { visible: !layer.visible })}
                     />
@@ -152,7 +152,7 @@ export function LayerPanel({
                     </Pressable>
                     <IconButton
                       icon={layer.locked ? LockIcon : UnlockIcon}
-                      size={20}
+                      size={ICON.md}
                       accessibilityLabel={layer.locked ? 'Unlock layer' : 'Lock layer'}
                       onPress={() => editLayer(panelId, layer.id, { locked: !layer.locked })}
                     />
@@ -175,32 +175,32 @@ export function LayerPanel({
                       <View className="flex-row justify-between">
                         <IconButton
                           icon={ArrowUpIcon}
-                          size={20}
+                          size={ICON.md}
                           accessibilityLabel="Move layer up"
                           onPress={() => move(index, 1)}
                           disabled={index >= art.layers.length - 1}
                         />
                         <IconButton
                           icon={ArrowDownIcon}
-                          size={20}
+                          size={ICON.md}
                           accessibilityLabel="Move layer down"
                           onPress={() => move(index, -1)}
                           disabled={index === 0}
                         />
                         <IconButton
                           icon={MergeIcon}
-                          size={20}
+                          size={ICON.md}
                           accessibilityLabel="Merge down"
                           onPress={() => mergeDown(index)}
                           disabled={index === 0}
                         />
                         <IconButton
                           icon={EditIcon}
-                          size={20}
+                          size={ICON.md}
                           accessibilityLabel="Rename layer"
                           onPress={() => setRenameId(layer.id)}
                         />
-                        <IconButton icon={DeleteIcon} size={20} accessibilityLabel="Delete layer" onPress={() => remove(layer)} />
+                        <IconButton icon={DeleteIcon} size={ICON.md} accessibilityLabel="Delete layer" onPress={() => remove(layer)} />
                       </View>
                     </>
                   ) : null}

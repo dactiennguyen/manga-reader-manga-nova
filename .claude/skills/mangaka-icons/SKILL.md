@@ -35,11 +35,11 @@ Always import from `src/icons/<Name>`. The package index pulls all 1,512 icons i
 
 The shared components already switch weight. Pass `selected` or `active` and do not set `weight` by hand. Items at the same level use the same weight, so a selected item is the only one that differs. State never rests on colour alone.
 
-Do not use `thin` or `light`: they fall below 3:1 at small sizes on `surface`.
+Do not use `thin` or `light`: their strokes look weak next to Inter at 16 to 24dp, and the set stops feeling like one family.
 
 ## Size
 
-Use `ICON` from `src/ui/tokens.ts`: `sm` 16, `md` 20, `lg` 24. A Dock tab is 22 and an `EmptyState` icon is 32. Older code still has raw numbers, so move them to tokens when you touch that line.
+Use `ICON` from `src/ui/tokens.ts`: `xs` 14, `sm` 16, `md` 20, `lg` 24, `xl` 32, `xxl` 40. Never write a raw number.
 
 ## Accessibility
 

@@ -8,7 +8,7 @@ import type { ID, StoryData, WorldType } from '../../core/model/types';
 import { formatRelative } from '../../core/util/time';
 import { useAppNavigation } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
-import { Avatar, Button, EmptyState, Icon, ListItem, Menu, Pressable, Section, Text } from '../../ui';
+import { Avatar, Button, EmptyState, ICON, Icon, ListItem, Menu, Pressable, Section, Text } from '../../ui';
 
 type TabProps = { state: StoryData; projectId: ID };
 
@@ -53,7 +53,7 @@ export function CharactersTab({ state, projectId }: TabProps) {
                 <Avatar character={character} size={72} />
                 {character.locked && (
                   <View className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] items-center justify-center rounded-full bg-raised">
-                    <Icon icon={LockIcon} size={12} color="text-secondary" />
+                    <Icon icon={LockIcon} size={ICON.xs} color="text-secondary" />
                   </View>
                 )}
               </View>

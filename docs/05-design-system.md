@@ -1,5 +1,7 @@
 # Design system "Studio"
 
+Bản giới thiệu có hình ảnh ở [12-phong-cach-studio.md](12-phong-cach-studio.md). Tài liệu này là bảng tra token.
+
 Studio thay cho "Mực và Giấy" của app cũ. Hướng thiết kế: một công cụ vẽ chuyên nghiệp, nền than chì, panel nổi bo mềm, một màu nhấn. Tranh đen trắng là thứ sáng nhất trên màn hình, giao diện lùi về phía sau.
 
 ## Nguyên tắc
@@ -86,7 +88,7 @@ Phông **trong trang truyện** giữ nguyên, vì đó là dữ liệu tranh: P
 | Khoảng cách | `xs` 4 · `sm` 8 · `md` 12 · `lg` 16 · `xl` 24 · `xxl` 32 · `xxxl` 48 |
 | Bo góc | `sm` 8 (chip, ô nhập) · `md` 12 (nút) · `lg` 16 (thẻ) · `xl` 24 (sheet, dock) · `full` |
 | Viền | `hairline` (`StyleSheet.hairlineWidth`) · `thin` 1 · `focus` 2 |
-| Icon | `sm` 16 · `md` 20 · `lg` 24 |
+| Icon | `xs` 14 · `sm` 16 · `md` 20 · `lg` 24 · `xl` 32 · `xxl` 40 |
 
 Độ nổi có hai mức: `panel` (dock, thanh công cụ) và `modal` (sheet, dialog, menu). Trên nền tối bóng gần như không thấy, nên phân tầng chủ yếu nhờ đổi `surface` sang `raised`. Khai báo bằng `boxShadow`, không dùng `elevation`.
 

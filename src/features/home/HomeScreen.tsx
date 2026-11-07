@@ -9,7 +9,7 @@ import { dayKey } from '../../core/util/time';
 import { useStoryData } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
-import { Button, Card, Icon, IconButton, Screen, SectionHeader, Text, useDockInset } from '../../ui';
+import { Button, Card, ICON, Icon, IconButton, Screen, SectionHeader, Text, useDockInset } from '../../ui';
 import { openBlankCanvas } from './blankCanvas';
 import { ContinueCard } from './ContinueCard';
 import { IdeaCard } from './IdeaCard';
@@ -72,7 +72,7 @@ export function HomeScreen() {
             right={
               <IconButton
                 icon={CloseIcon}
-                size={18}
+                size={ICON.md}
                 accessibilityLabel="Hide today's tip"
                 onPress={() => useSettings.getState().set({ tipDismissedDay: today })}
               />
@@ -81,7 +81,7 @@ export function HomeScreen() {
             Tip of the day
           </SectionHeader>
           <Card className="flex-row items-start gap-2 p-3">
-            <Icon icon={IdeaIcon} size={18} color="accent" />
+            <Icon icon={IdeaIcon} size={ICON.md} color="accent" />
             <Text variant="bodySmall" className="flex-1">
               {tipOfDay(today)}
             </Text>

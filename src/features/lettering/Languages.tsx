@@ -5,7 +5,7 @@ import { DeleteIcon, EditIcon, PlusIcon, TranslateIcon } from '../../ui/icons';
 import { LANGUAGE_NAME_MAX, MAX_LANGUAGES, languageNameError, translationProgress } from '../../core/lettering/translation';
 import type { Bubble, Project } from '../../core/model/types';
 import { useStory } from '../../state/useStory';
-import { Button, IconButton, ListItem, PromptDialog, Sheet, Text, confirm, toast } from '../../ui';
+import { Button, ICON, IconButton, ListItem, PromptDialog, Sheet, Text, confirm, toast } from '../../ui';
 
 export function progressLabel(bubbles: Bubble[], lang: string): string {
   const { done, total } = translationProgress(bubbles, lang);
@@ -74,10 +74,10 @@ export function ManageLanguagesSheet({
             icon={TranslateIcon}
             right={
               <View className="flex-row items-center">
-                <IconButton icon={EditIcon} size={18} onPress={() => setRenaming(name)} accessibilityLabel={`Rename ${name}`} />
+                <IconButton icon={EditIcon} size={ICON.md} onPress={() => setRenaming(name)} accessibilityLabel={`Rename ${name}`} />
                 <IconButton
                   icon={DeleteIcon}
-                  size={18}
+                  size={ICON.md}
                   color="danger"
                   onPress={() => remove(name)}
                   accessibilityLabel={`Remove ${name}`}

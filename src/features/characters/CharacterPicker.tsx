@@ -6,7 +6,7 @@ import { ROLE_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
 import { useCharacters } from '../../state/hooks';
 import { useStory } from '../../state/useStory';
-import { Avatar, Button, Icon, ListItem, SearchField, Sheet, Text, TextField } from '../../ui';
+import { Avatar, Button, ICON, Icon, ListItem, SearchField, Sheet, Text, TextField } from '../../ui';
 
 const NAME_MAX = 30;
 const SEARCH_FROM = 5;
@@ -96,7 +96,7 @@ export function CharacterPicker({
           subtitle={ROLE_LABEL[character.role]}
           left={<Avatar character={character} size={40} />}
           selected={selectedIds.includes(character.id)}
-          right={character.locked ? <Icon icon={LockIcon} size={16} color="text-muted" /> : undefined}
+          right={character.locked ? <Icon icon={LockIcon} size={ICON.sm} color="text-muted" /> : undefined}
           onPress={() => choose(character.id)}
         />
       ))}

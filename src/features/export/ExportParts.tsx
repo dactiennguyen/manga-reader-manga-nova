@@ -8,7 +8,7 @@ import type { ID } from '../../core/model/types';
 import { formatBytes } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
 import { useThumb } from '../../render/thumbs';
-import { Divider, Icon, IconButton, ListItem, Pressable, Text, type IconGlyph } from '../../ui';
+import { Divider, ICON, Icon, IconButton, ListItem, Pressable, Text, type IconGlyph } from '../../ui';
 
 export const FORMAT_LABEL: Record<ExportFormat, string> = { png: 'PNG', pdf: 'PDF', cbz: 'CBZ', long: 'Long image' };
 
@@ -36,11 +36,11 @@ export function FormatCard({
       }`}
     >
       <View className="flex-row items-center gap-2">
-        <Icon icon={icon} size={18} color={selected ? 'accent' : 'text'} />
+        <Icon icon={icon} size={ICON.md} color={selected ? 'accent' : 'text'} />
         <Text variant="label" tone={selected ? 'accent' : 'text'} className="flex-1">
           {title}
         </Text>
-        {selected && <Icon icon={CheckIcon} size={16} color="accent" />}
+        {selected && <Icon icon={CheckIcon} size={ICON.sm} color="accent" />}
       </View>
       <Text variant="caption" tone="secondary">
         {description}
@@ -130,7 +130,7 @@ export function HistoryList({
               </View>
               <IconButton
                 icon={DeleteIcon}
-                size={20}
+                size={ICON.md}
                 color="text-muted"
                 onPress={() => onDelete(item)}
                 accessibilityLabel={`Delete ${item.fileName}`}

@@ -35,7 +35,7 @@ export function Dock({ items, onCreate }: { items: DockItem[]; onCreate: () => v
         item.selected ? 'bg-accent/15' : ''
       }`}
     >
-      <Icon icon={item.icon} size={22} color={item.selected ? 'accent' : 'text-muted'} weight={item.selected ? 'fill' : 'regular'} />
+      <Icon icon={item.icon} size={ICON.lg} color={item.selected ? 'accent' : 'text-muted'} weight={item.selected ? 'fill' : 'regular'} />
       <Text variant="caption" tone={item.selected ? 'accent' : 'muted'} numberOfLines={1} maxFontSizeMultiplier={1.3}>
         {item.label}
       </Text>
@@ -49,7 +49,7 @@ export function Dock({ items, onCreate }: { items: DockItem[]; onCreate: () => v
       onPress={onCreate}
       className="h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-accent"
     >
-      <Icon icon={PlusIcon} size={24} color="on-accent" weight="bold" />
+      <Icon icon={PlusIcon} size={ICON.lg} color="on-accent" weight="bold" />
     </Pressable>
   );
   if (rail) {

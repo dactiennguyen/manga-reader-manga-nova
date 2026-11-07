@@ -6,7 +6,7 @@ import { ART_STYLE_LABEL } from '../../core/model/constants';
 import type { Project } from '../../core/model/types';
 import type { NextStep } from '../../core/story/nextStep';
 import { useAppNavigation } from '../../state/navigation';
-import { Badge, Button, Card, Cover, IconButton, Pressable, ProgressBar, Tag, Text } from '../../ui';
+import { Badge, Button, Card, Cover, ICON, IconButton, Pressable, ProgressBar, Tag, Text } from '../../ui';
 import { changeProjectCover, openRoute } from './projectActions';
 
 export function ProjectSummary({
@@ -68,7 +68,7 @@ export function NextStepCard({ step, onHide }: { step: NextStep; onHide: () => v
         <Text variant="label" tone="accent" className="flex-1">
           Next step
         </Text>
-        <IconButton icon={CloseIcon} size={18} accessibilityLabel="Hide suggestion" onPress={onHide} />
+        <IconButton icon={CloseIcon} size={ICON.md} accessibilityLabel="Hide suggestion" onPress={onHide} />
       </View>
       <Text>{step.text}</Text>
       <View className="flex-row flex-wrap gap-2">

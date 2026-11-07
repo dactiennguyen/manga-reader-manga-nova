@@ -5,7 +5,7 @@ description: Build or restyle any screen or component in Mangaka AI in the Studi
 
 # Studio style for Mangaka AI
 
-`docs/05-design-system.md` is the source of truth for tokens and components. This skill is how to apply it. For icons, also use the `mangaka-icons` skill.
+`docs/12-phong-cach-studio.md` shows the style and why it looks this way. `docs/05-design-system.md` is the source of truth for tokens and components. This skill is how to apply them. For icons, also use the `mangaka-icons` skill.
 
 ## Direction
 

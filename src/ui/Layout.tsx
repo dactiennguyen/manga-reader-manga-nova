@@ -11,7 +11,7 @@ import { Icon, type IconGlyph } from './Icon';
 import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
-import { useColor, type ColorToken } from './tokens';
+import { ICON, type ColorToken, useColor } from './tokens';
 
 export function Screen({
   children,
@@ -154,7 +154,7 @@ export function Badge({ text, tone = 'accent' }: { text: string; tone?: 'accent'
 export function Tag({ label, icon, className }: { label: string; icon?: IconGlyph; className?: string }) {
   return (
     <View className={`flex-row items-center gap-1 self-start rounded-sm bg-overlay px-2 py-1 ${className ?? ''}`}>
-      {!!icon && <Icon icon={icon} size={14} color="text-secondary" />}
+      {!!icon && <Icon icon={icon} size={ICON.xs} color="text-secondary" />}
       <Text variant="caption" tone="secondary">
         {label}
       </Text>
@@ -181,7 +181,7 @@ export function Banner({
   } as const;
   return (
     <View className={`flex-row items-center gap-2 rounded-md p-3 ${look[tone].box}`}>
-      {!!icon && <Icon icon={icon} size={18} color={look[tone].icon} />}
+      {!!icon && <Icon icon={icon} size={ICON.md} color={look[tone].icon} />}
       <Text variant="bodySmall" tone={look[tone].text} className="flex-1">
         {text}
       </Text>
@@ -269,7 +269,7 @@ export function ListItem({
         )}
       </View>
       {right}
-      {chevron && <Icon icon={CaretRightIcon} color="text-muted" size={18} />}
+      {chevron && <Icon icon={CaretRightIcon} color="text-muted" size={ICON.md} />}
     </>
   );
   const box = `min-h-14 flex-row items-center gap-3 px-4 py-2 ${selected ? 'bg-accent/15' : ''}`;
@@ -305,7 +305,7 @@ export function EmptyState({
     <View className="items-center gap-3 px-6 py-12">
       {!!icon && (
         <View className="mb-1 h-16 w-16 items-center justify-center rounded-full bg-accent/15">
-          <Icon icon={icon} size={32} color="accent" weight="duotone" />
+          <Icon icon={icon} size={ICON.xl} color="accent" weight="duotone" />
         </View>
       )}
       <Text variant="heading" className="text-center">
@@ -387,7 +387,7 @@ function TitleCover({ title, width }: { title: string; width: number }) {
   const name = title.trim() || 'Untitled';
   const small = width < COVER_SMALL;
   return (
-    <View className={`absolute inset-0 justify-between ${small ? 'p-2' : 'p-3'}`}>
+    <View className={`absolute inset-0 justify-between ${small ? 'p-2 pb-3' : 'p-3 pb-5'}`}>
       <View className={`rounded-full bg-accent ${small ? 'h-1 w-4' : 'h-1 w-6'}`} />
       <Text variant={small ? 'caption' : 'heading'} numberOfLines={small ? 3 : 4} maxFontSizeMultiplier={1.2}>
         {name}

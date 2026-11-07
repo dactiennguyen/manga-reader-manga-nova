@@ -60,7 +60,7 @@ export function TextField({ ref, icon, onClear, className, inputClassName, multi
         focused ? 'border-accent' : 'border-control-border'
       } ${multiline ? 'py-2' : 'h-12'} ${className ?? ''}`}
     >
-      {!!icon && <Icon icon={icon} size={18} color="text-muted" />}
+      {!!icon && <Icon icon={icon} size={ICON.md} color="text-muted" />}
       <TextInput
         ref={input}
         multiline={multiline}
@@ -79,7 +79,7 @@ export function TextField({ ref, icon, onClear, className, inputClassName, multi
         }}
         className={`flex-1 p-0 text-body font-inter text-text ${inputClassName ?? ''}`}
       />
-      {!!onClear && !!props.value && <IconButton icon={CloseIcon} size={18} onPress={onClear} accessibilityLabel="Clear" color="text-muted" />}
+      {!!onClear && !!props.value && <IconButton icon={CloseIcon} size={ICON.md} onPress={onClear} accessibilityLabel="Clear" color="text-muted" />}
     </View>
   );
 }
@@ -247,7 +247,7 @@ export function Checkbox({ checked, onChange, label }: { checked: boolean; onCha
           checked ? 'border-accent bg-accent' : 'border-control-border'
         }`}
       >
-        {checked && <Icon icon={CheckIcon} size={16} color="on-accent" />}
+        {checked && <Icon icon={CheckIcon} size={ICON.sm} color="on-accent" />}
       </View>
       {!!label && <Text className="flex-1">{label}</Text>}
     </Pressable>
@@ -366,11 +366,11 @@ export function Stepper({
 }) {
   return (
     <View className="flex-row items-center gap-1">
-      <IconButton icon={MinusIcon} size={18} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} accessibilityLabel={`Decrease ${label}`} />
+      <IconButton icon={MinusIcon} size={ICON.md} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} accessibilityLabel={`Decrease ${label}`} />
       <Text variant="mono" className="min-w-10 text-center">
         {format ? format(value) : value}
       </Text>
-      <IconButton icon={PlusIcon} size={18} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} accessibilityLabel={`Increase ${label}`} />
+      <IconButton icon={PlusIcon} size={ICON.md} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} accessibilityLabel={`Increase ${label}`} />
     </View>
   );
 }

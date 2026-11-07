@@ -10,7 +10,7 @@ import { ICON, useColor } from './tokens';
 export function AiNote({ text, className }: { text: string; className?: string }) {
   return (
     <View className={`flex-row items-center gap-2 rounded-sm bg-ai/15 px-3 py-2 ${className ?? ''}`}>
-      <Icon icon={AiIcon} size={14} color="ai" weight="fill" />
+      <Icon icon={AiIcon} size={ICON.xs} color="ai" weight="fill" />
       <Text variant="caption" tone="ai" className="flex-1">
         {text}
       </Text>

@@ -5,14 +5,14 @@ import { PROJECT_STATUS_LABEL } from '../../core/model/constants';
 import type { LibraryRow } from '../../core/story/library';
 import { plural } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
-import { Cover, Icon, Pressable, ProgressBar, Text } from '../../ui';
+import { Cover, ICON, Icon, Pressable, ProgressBar, Text } from '../../ui';
 
 type CardProps = { row: LibraryRow; highlighted: boolean; onPress: () => void; onLongPress: () => void };
 
 function DoneMark() {
   return (
     <View className="absolute right-1 top-1 h-6 w-6 items-center justify-center rounded-sm bg-raised">
-      <Icon icon={CheckIcon} size={16} color="success" />
+      <Icon icon={CheckIcon} size={ICON.sm} color="success" />
     </View>
   );
 }

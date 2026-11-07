@@ -15,7 +15,7 @@ import { useAppNavigation } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { undoable, useStory } from '../../state/useStory';
-import { AiErrorBox, AiLoading, AiNote, AiPanel, Button, Card, Icon, Segmented, Sheet, Text, TextField, toast } from '../../ui';
+import { AiErrorBox, AiLoading, AiNote, AiPanel, Button, Card, ICON, Icon, Segmented, Sheet, Text, TextField, toast } from '../../ui';
 import { progressLabel } from './Languages';
 
 type Section = { pageId: ID; number: number; bubbles: Bubble[] };
@@ -226,7 +226,7 @@ export function TranslationSheet({
                   <View className="flex-row items-center gap-2">
                     <Icon
                       icon={hasTranslation(bubble, lang) ? DoneIcon : CircleIcon}
-                      size={14}
+                      size={ICON.xs}
                       color={hasTranslation(bubble, lang) ? 'success' : 'warning'}
                     />
                     <Text variant="caption" tone="secondary">

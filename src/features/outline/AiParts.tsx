@@ -2,7 +2,7 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { AiIcon, SettingsIcon } from '../../ui/icons';
 
-import { AiErrorBox, AiLoading, Button, Icon, Text } from '../../ui';
+import { AiErrorBox, AiLoading, Button, ICON, Icon, Text } from '../../ui';
 
 /**
  * For sheets that mount when needed. The parent's onClose runs after the closing animation,
@@ -28,7 +28,7 @@ export function useSheetClose(onClose: () => void) {
 export function AiMark({ label = 'AI suggestion' }: { label?: string }) {
   return (
     <View className="flex-row items-center gap-1 self-start rounded-sm bg-ai/15 px-2 py-1">
-      <Icon icon={AiIcon} size={14} color="ai" />
+      <Icon icon={AiIcon} size={ICON.xs} color="ai" />
       <Text variant="caption" tone="ai">
         {label}
       </Text>
@@ -39,7 +39,7 @@ export function AiMark({ label = 'AI suggestion' }: { label?: string }) {
 export function AiSetupNotice({ onOpenProfile }: { onOpenProfile: () => void }) {
   return (
     <View className="items-center gap-3 p-6">
-      <Icon icon={AiIcon} size={32} color="ai" />
+      <Icon icon={AiIcon} size={ICON.xl} color="ai" />
       <Text variant="heading" className="text-center">
         AI is not set up yet
       </Text>

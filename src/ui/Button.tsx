@@ -3,7 +3,7 @@ import { ActivityIndicator, View, type StyleProp, type ViewStyle } from 'react-n
 import { Icon, type IconGlyph } from './Icon';
 import { Pressable } from './Pressable';
 import { Text, type TextTone } from './Text';
-import { useColor, type ColorToken } from './tokens';
+import { ICON, type ColorToken, useColor } from './tokens';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'ai';
 
@@ -50,7 +50,7 @@ export function Button({
         small ? 'h-9' : 'h-12'
       } ${look.box} ${className ?? ''}`}
     >
-      {loading ? <ActivityIndicator size="small" color={spinner} /> : icon ? <Icon icon={icon} color={look.icon} size={18} /> : null}
+      {loading ? <ActivityIndicator size="small" color={spinner} /> : icon ? <Icon icon={icon} color={look.icon} size={ICON.md} /> : null}
       <View className="shrink">
         <Text variant="label" tone={look.tone} numberOfLines={1}>
           {title}

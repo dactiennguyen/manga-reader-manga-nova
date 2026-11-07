@@ -19,6 +19,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 9 | [Lộ trình](09-lo-trinh.md) | Các giai đoạn và điều kiện hoàn thành |
 | 10 | [Kiểm thử và phát hành](10-kiem-thu-va-phat-hanh.md) | Test, CI, ký app, đưa lên Google Play |
 | 11 | [Hướng dẫn chuyển màn hình](11-huong-dan-chuyen-man.md) | Bảng tra import và thành phần khi chuyển một màn |
+| 12 | [Phong cách Studio](12-phong-cach-studio.md) | Giới thiệu style bằng hình ảnh: logo, màu, chữ, icon, màn hình thật |
 
 Quy tắc nghiệp vụ không chép lại ở đây. Mô tả tính năng F-xx nằm trong `docs/features.md`, mô tả chi tiết 20 màn nằm trong `docs/screens/` của repo cũ. Giai đoạn 1 chép hai phần đó sang `docs/product/` của repo này.
 

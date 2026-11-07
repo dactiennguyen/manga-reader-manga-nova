@@ -8,7 +8,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { fitView, type SessionEnv } from '../../core/art/session';
 import type { ViewState } from '../../core/art/tools';
 import { fileUri } from '../../core/util/paths';
-import { IconButton, Pressable, Text } from '../../ui';
+import { ICON, IconButton, Pressable, Text } from '../../ui';
 
 const REF_SIZES = [128, 208];
 
@@ -67,11 +67,11 @@ export function ReferenceWindow({
         <View className="flex-row justify-between">
           <IconButton
             icon={big ? MinimizeIcon : MaximizeIcon}
-            size={16}
+            size={ICON.sm}
             onPress={() => setBig(value => !value)}
             accessibilityLabel={big ? 'Shrink reference image' : 'Enlarge reference image'}
           />
-          <IconButton icon={CloseIcon} size={16} onPress={onClose} accessibilityLabel="Hide reference image" />
+          <IconButton icon={CloseIcon} size={ICON.sm} onPress={onClose} accessibilityLabel="Hide reference image" />
         </View>
       </Animated.View>
     </GestureDetector>

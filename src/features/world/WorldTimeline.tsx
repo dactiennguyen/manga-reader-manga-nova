@@ -5,7 +5,7 @@ import { ArrowDownIcon, ArrowUpIcon } from '../../ui/icons';
 import type { Chapter, ID, WorldEntry } from '../../core/model/types';
 import { UNTITLED, firstLine, timelineGroups, timelineSwap } from '../../core/world/worldTools';
 import { undoable, useStory } from '../../state/useStory';
-import { IconButton, Pressable, Text } from '../../ui';
+import { ICON, IconButton, Pressable, Text } from '../../ui';
 
 function move(items: WorldEntry[], index: number, delta: -1 | 1) {
   const changes = timelineSwap(items, index, delta);
@@ -64,14 +64,14 @@ export function WorldTimeline({
                   </Pressable>
                   <IconButton
                     icon={ArrowUpIcon}
-                    size={18}
+                    size={ICON.md}
                     disabled={index === 0}
                     onPress={() => move(group.items, index, -1)}
                     accessibilityLabel="Move up"
                   />
                   <IconButton
                     icon={ArrowDownIcon}
-                    size={18}
+                    size={ICON.md}
                     disabled={index === group.items.length - 1}
                     onPress={() => move(group.items, index, 1)}
                     accessibilityLabel="Move down"

@@ -20,7 +20,7 @@ import { ModalShownContext, TextField } from './Inputs';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { haptic } from './haptics';
-import { DOCK_GAP, MOTION } from './tokens';
+import { DOCK_GAP, ICON, MOTION } from './tokens';
 
 /**
  * Tells fields inside a Modal when its window can open the keyboard. See ModalShownContext. `onShow`
@@ -395,7 +395,7 @@ export function Dropdown<T extends string>({
         className="h-12 flex-row items-center gap-1 rounded-sm px-2"
       >
         <Text variant="label">{current?.label}</Text>
-        <Icon icon={CaretDownIcon} size={16} color="text-secondary" />
+        <Icon icon={CaretDownIcon} size={ICON.sm} color="text-secondary" />
       </Pressable>
       <Modal visible={!!menu} transparent animationType="fade" onRequestClose={() => setMenu(null)} statusBarTranslucent>
         <RNPressable accessibilityLabel="Close" className="flex-1" onPress={() => setMenu(null)}>
@@ -416,7 +416,7 @@ export function Dropdown<T extends string>({
                 className="h-12 flex-row items-center justify-between gap-3 px-4"
               >
                 <Text variant="label">{option.label}</Text>
-                {option.value === value && <Icon icon={CheckIcon} size={16} color="accent" />}
+                {option.value === value && <Icon icon={CheckIcon} size={ICON.sm} color="accent" />}
               </Pressable>
             ))}
           </View>

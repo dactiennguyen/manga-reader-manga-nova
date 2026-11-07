@@ -13,6 +13,7 @@ import {
   Button,
   Card,
   EmptyState,
+  ICON,
   Icon,
   Menu,
   ProgressBar,
@@ -70,7 +71,7 @@ function ChapterRow({
       </View>
       {scriptOutdated(chapter) && (
         <View className="flex-row items-center gap-1">
-          <Icon icon={WarningIcon} size={14} color="warning" />
+          <Icon icon={WarningIcon} size={ICON.xs} color="warning" />
           <Text variant="caption" tone="warning">
             Script changed
           </Text>

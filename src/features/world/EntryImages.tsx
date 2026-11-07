@@ -7,7 +7,7 @@ import type { WorldEntry } from '../../core/model/types';
 import { fileUri } from '../../core/util/paths';
 import { pickImage } from '../../native/files';
 import { useStory } from '../../state/useStory';
-import { Icon, Menu, Pressable, Text, confirm, toast } from '../../ui';
+import { ICON, Icon, Menu, Pressable, Text, confirm, toast } from '../../ui';
 import { ImageViewer } from '../characters/fields';
 
 const IMAGE_SIZE = 168;
@@ -51,7 +51,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
           onPress={addImage}
           className="mx-4 mt-3 h-13 flex-row items-center justify-center gap-2 overflow-hidden rounded-md bg-surface"
         >
-          <Icon icon={AddImageIcon} size={18} color="text-secondary" />
+          <Icon icon={AddImageIcon} size={ICON.md} color="text-secondary" />
           <Text variant="label" tone="secondary">
             Add image
           </Text>
@@ -82,7 +82,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
               className="items-center justify-center gap-1 overflow-hidden rounded-md bg-surface"
               style={FRAME}
             >
-              <Icon icon={PlusIcon} size={28} color="text-muted" />
+              <Icon icon={PlusIcon} size={ICON.xl} color="text-muted" />
               <Text variant="caption" tone="muted">
                 {entry.images.length}/{LIMITS.worldImages}
               </Text>

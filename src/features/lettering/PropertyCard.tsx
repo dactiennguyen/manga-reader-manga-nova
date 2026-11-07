@@ -8,7 +8,7 @@ import { hasTranslation, translationOf } from '../../core/lettering/translation'
 import { BUBBLE_TYPE_LABEL, EFFECT_LABEL } from '../../core/model/constants';
 import type { Bubble, BubbleFont, BubbleType, Effect, EffectType } from '../../core/model/types';
 import { FONT_LABEL } from '../../render/fonts';
-import { Chip, Icon, IconButton, Pressable, Segmented, Slider, Stepper, Text, ToolPanel } from '../../ui';
+import { Chip, ICON, Icon, IconButton, Pressable, Segmented, Slider, Stepper, Text, ToolPanel } from '../../ui';
 
 const SPEECH_TYPES: BubbleType[] = ['speak', 'think', 'shout', 'whisper', 'machine'];
 const FONTS = Object.keys(FONT_LABEL) as BubbleFont[];
@@ -110,14 +110,14 @@ export function BubbleCard({
         {!sfx && (
           <IconButton
             icon={BoldIcon}
-            size={18}
+            size={ICON.md}
             active={bubble.bold}
             onPress={() => onChange({ bold: !bubble.bold })}
             accessibilityLabel="Bold"
           />
         )}
-        <IconButton icon={PenLineIcon} size={18} onPress={onEdit} accessibilityLabel="Edit text" />
-        <IconButton icon={DeleteIcon} size={18} color="danger" onPress={onDelete} accessibilityLabel="Delete" />
+        <IconButton icon={PenLineIcon} size={ICON.md} onPress={onEdit} accessibilityLabel="Edit text" />
+        <IconButton icon={DeleteIcon} size={ICON.md} color="danger" onPress={onDelete} accessibilityLabel="Delete" />
       </View>
       {!!lang && (
         <Pressable
@@ -125,7 +125,7 @@ export function BubbleCard({
           onPress={onEdit}
           className="min-h-12 flex-row items-center gap-2"
         >
-          <Icon icon={translated ? DoneIcon : CircleIcon} size={14} color={translated ? 'success' : 'warning'} />
+          <Icon icon={translated ? DoneIcon : CircleIcon} size={ICON.xs} color={translated ? 'success' : 'warning'} />
           <Text variant="caption" tone="secondary" numberOfLines={1} className="flex-1">
             {translated ? `${lang}: ${translationOf(bubble, lang)}` : `No ${lang} text yet · showing the original`}
           </Text>
@@ -235,7 +235,7 @@ export function EffectCard({
     <ToolPanel className="gap-0 py-1">
       <View className="flex-row items-center gap-1">
         <Text variant="label" className="flex-1">{`Effect · Panel ${panelNumber}`}</Text>
-        <IconButton icon={DeleteIcon} size={18} color="danger" onPress={onDelete} accessibilityLabel="Delete effect" />
+        <IconButton icon={DeleteIcon} size={ICON.md} color="danger" onPress={onDelete} accessibilityLabel="Delete effect" />
       </View>
       <Row label="Type">
         {EFFECT_TYPES.map(type => (

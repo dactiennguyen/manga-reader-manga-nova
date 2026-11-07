@@ -3,7 +3,7 @@ import { AiIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, MoreIcon, PlusIcon } fr
 
 import { BLOCK_LABEL, BLOCK_TYPES } from '../../core/model/constants';
 import type { BlockType } from '../../core/model/types';
-import { Chip, Icon, IconButton, Pressable, Text } from '../../ui';
+import { Chip, ICON, Icon, IconButton, Pressable, Text } from '../../ui';
 
 /** Height of the bar, so the editor can keep the caret clear of it. */
 export const TOOLBAR_HEIGHT = 64;
@@ -45,7 +45,7 @@ export function ScriptToolbar({
           onPress={onAi}
           className="h-9 flex-row items-center gap-1.5 overflow-hidden rounded-sm bg-ai/15 px-3"
         >
-          <Icon icon={AiIcon} size={16} color="ai" />
+          <Icon icon={AiIcon} size={ICON.sm} color="ai" />
           <Text variant="label" tone="ai">
             AI
           </Text>

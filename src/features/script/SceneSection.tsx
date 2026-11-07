@@ -6,7 +6,7 @@ import { estimateScenePages } from '../../core/model/paginate';
 import type { Character, ID, Scene } from '../../core/model/types';
 import { pagesText, type PanelRef } from '../../core/script/blockOps';
 import { plural } from '../../core/util/format';
-import { Icon, IconButton, Pressable, Text, useColor } from '../../ui';
+import { ICON, Icon, IconButton, Pressable, Text, useColor } from '../../ui';
 import { BlockRow } from './BlockRow';
 import type { BlockApi, SceneApi } from './useScriptController';
 
@@ -44,7 +44,7 @@ export const SceneSection = memo(function SceneSectionBase({
           onPress={() => sceneApi.toggle(scene.id)}
           className="min-h-12 flex-1 flex-row items-center gap-2"
         >
-          <Icon icon={scene.collapsed ? CaretRightIcon : CaretDownIcon} size={18} />
+          <Icon icon={scene.collapsed ? CaretRightIcon : CaretDownIcon} size={ICON.md} />
           <Text variant="heading">Scene {number}</Text>
           <Text variant="caption" tone="muted" className="shrink" numberOfLines={1}>
             {pagesText(estimateScenePages(scene))} · {plural(scene.blocks.length, 'block')}
@@ -52,7 +52,7 @@ export const SceneSection = memo(function SceneSectionBase({
         </Pressable>
         <IconButton
           icon={MoreIcon}
-          size={18}
+          size={ICON.md}
           onPress={() => sceneApi.menu(scene.id)}
           accessibilityLabel={`Scene ${number} options`}
         />
@@ -94,7 +94,7 @@ export const SceneSection = memo(function SceneSectionBase({
             onPress={() => sceneApi.append(scene.id)}
             className="min-h-12 flex-row items-center gap-1 self-start"
           >
-            <Icon icon={PlusIcon} size={14} color="text-muted" />
+            <Icon icon={PlusIcon} size={ICON.xs} color="text-muted" />
             <Text variant="caption" tone="muted">
               add block
             </Text>

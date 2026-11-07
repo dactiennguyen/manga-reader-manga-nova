@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { DoneIcon } from '../../ui/icons';
 
-import { Icon, Pressable, Text } from '../../ui';
+import { ICON, Icon, Pressable, Text } from '../../ui';
 
 /** One choice in a radio group of cards. */
 export function OptionCard({
@@ -35,7 +35,7 @@ export function OptionCard({
           {hint}
         </Text>
       </View>
-      {selected && <Icon icon={DoneIcon} size={22} color="accent" />}
+      {selected && <Icon icon={DoneIcon} size={ICON.lg} color="accent" />}
     </Pressable>
   );
 }

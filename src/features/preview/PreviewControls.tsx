@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CaretDownIcon, CloseIcon, FlagIcon, MoreIcon, PenLineIcon } from '../../ui/icons';
 
-import { Button, Icon, IconButton, PANEL_SHADOW, Pressable, Slider, Text } from '../../ui';
+import { Button, ICON, Icon, IconButton, PANEL_SHADOW, Pressable, Slider, Text } from '../../ui';
 
 export function PageCounter({ label }: { label: string }) {
   const insets = useSafeAreaInsets();
@@ -51,7 +51,7 @@ export function ReaderTopBar({
         <Text variant="label" numberOfLines={1} className="shrink">
           {chapterTitle}
         </Text>
-        <Icon icon={CaretDownIcon} size={16} color="text-muted" />
+        <Icon icon={CaretDownIcon} size={ICON.sm} color="text-muted" />
       </Pressable>
       <IconButton
         icon={FlagIcon}

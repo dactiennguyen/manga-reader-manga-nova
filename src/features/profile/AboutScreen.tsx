@@ -1,10 +1,9 @@
 import { ScrollView, View } from 'react-native';
-import { PenLineIcon } from '../../ui/icons';
 
 import { version } from '../../../package.json';
 import { APP_NAME } from '../../core/model/constants';
 import { useAppNavigation } from '../../state/navigation';
-import { AppBar, Icon, ListItem, Screen, Section, Text } from '../../ui';
+import { AppBar, BrandMark, ListItem, Screen, Section, Text } from '../../ui';
 
 const CREDITS = [
   { name: 'Inter', license: 'SIL Open Font License 1.1', use: 'Interface typeface' },
@@ -21,8 +20,8 @@ export function AboutScreen() {
       <AppBar title="About" onBack={navigation.goBack} />
       <ScrollView className="flex-1" contentContainerClassName="gap-4 px-4 pb-8 md:px-6">
         <View className="items-center px-2 pb-2 pt-6">
-          <View className="mb-4 h-[88px] w-[88px] items-center justify-center rounded-lg bg-surface">
-            <Icon icon={PenLineIcon} size={40} color="accent" />
+          <View className="mb-4">
+            <BrandMark size={88} />
           </View>
           <Text variant="display" accessibilityRole="header">
             {APP_NAME}

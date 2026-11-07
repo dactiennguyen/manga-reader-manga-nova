@@ -5,7 +5,7 @@ import { ForwardIcon } from '../../ui/icons';
 import type { BlockDraft } from '../../core/ai/writing';
 import { BLOCK_LABEL, DIALOGUE_KIND_LABEL } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
-import { Avatar, Icon, Text } from '../../ui';
+import { Avatar, ICON, Icon, Text } from '../../ui';
 
 /** Mirrors the editor: margin and a small label, no card per block. */
 export function DraftBlockView({ draft, character }: { draft: BlockDraft; character: Character | undefined }) {
@@ -61,7 +61,7 @@ export function BeforeAfter({ label, before, after }: { label?: string; before: 
           </Text>
           <Text tone="secondary">{before}</Text>
         </View>
-        <Icon icon={ForwardIcon} size={16} color="ai" />
+        <Icon icon={ForwardIcon} size={ICON.sm} color="ai" />
         <View className="flex-1 gap-0.5">
           <Text variant="caption" tone="ai">
             After

@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
 import { BrushIcon, CheckIcon, EditIcon, EraserIcon, ExportIcon, PenLineIcon } from '../../ui/icons';
 
-import { Icon, type IconGlyph } from '../../ui';
+import { ICON, Icon, type IconGlyph } from '../../ui';
 
 export type WelcomeArtKind = 'write' | 'draw' | 'finish';
 
@@ -16,7 +16,7 @@ function Page({ children }: { children: ReactNode }) {
 function ActionTile({ icon }: { icon: IconGlyph }) {
   return (
     <View className="absolute -bottom-3 -right-3 h-14 w-14 items-center justify-center rounded-lg bg-accent">
-      <Icon icon={icon} size={26} color="on-accent" />
+      <Icon icon={icon} size={ICON.lg} color="on-accent" />
     </View>
   );
 }
@@ -52,13 +52,13 @@ function ToolStrip() {
   return (
     <View className="absolute -left-5 top-4 gap-1 rounded-lg bg-overlay p-1">
       <View className="h-9 w-9 items-center justify-center rounded-sm bg-accent/15">
-        <Icon icon={EditIcon} size={18} color="accent" />
+        <Icon icon={EditIcon} size={ICON.md} color="accent" />
       </View>
       <View className="h-9 w-9 items-center justify-center">
-        <Icon icon={BrushIcon} size={18} color="text-secondary" />
+        <Icon icon={BrushIcon} size={ICON.md} color="text-secondary" />
       </View>
       <View className="h-9 w-9 items-center justify-center">
-        <Icon icon={EraserIcon} size={18} color="text-secondary" />
+        <Icon icon={EraserIcon} size={ICON.md} color="text-secondary" />
       </View>
     </View>
   );
@@ -67,7 +67,7 @@ function ToolStrip() {
 function DrawPage() {
   return (
     <Page>
-      <PanelGrid active={<Icon icon={BrushIcon} size={24} color="accent" />} />
+      <PanelGrid active={<Icon icon={BrushIcon} size={ICON.lg} color="accent" />} />
       <ToolStrip />
     </Page>
   );
@@ -76,7 +76,7 @@ function DrawPage() {
 function FinishedPage() {
   return (
     <Page>
-      <PanelGrid active={<Icon icon={CheckIcon} size={24} color="accent" />} />
+      <PanelGrid active={<Icon icon={CheckIcon} size={ICON.lg} color="accent" />} />
       <ActionTile icon={ExportIcon} />
     </Page>
   );
