@@ -41,12 +41,36 @@ Chỉ so sánh nội dung trang. Giao diện app đổi hoàn toàn nên không 
 
 ## CI
 
-GitHub Actions, chỉ build Android:
+GitHub Actions, chỉ build Android. Có hai workflow:
 
-- **Mỗi lần đẩy code:** `tsc --noEmit`, `eslint`, `jest`.
-- **Bấm tay:** build AAB hoặc APK, giữ các tham số `version_name`, `version_code` như workflow cũ (`.github/workflows/build-android.yml`).
+| Workflow | Chạy khi nào | Làm gì |
+| --- | --- | --- |
+| `check.yml` | Mỗi lần đẩy code hoặc mở PR | `tsc`, `eslint`, `jest` |
+| `build-android.yml` | Bấm tay ở tab Actions, chọn **Build Android (manual)** | Kiểm tra như trên, rồi build APK hoặc AAB |
 
-Kế thừa workflow cũ nhưng lấy khóa ký từ GitHub Secrets.
+Tham số của `build-android.yml`:
+
+| Tham số | Ý nghĩa |
+| --- | --- |
+| `format` | `apk` để cài thẳng lên máy, `aab` để nộp Google Play |
+| `architecture` | Chỉ dùng cho APK. AAB luôn gồm cả 4 loại CPU |
+| `version_name` | Ví dụ `1.0.1` |
+| `version_code` | Phải tăng mỗi lần nộp Play. Để trống thì dùng số lần chạy workflow |
+
+Build xong, file nằm ở mục **Artifacts** của lần chạy và chỉ được giữ 1 ngày, nên hãy tải về ngay.
+
+AAB bắt buộc có upload key, nếu thiếu thì workflow dừng ngay ở bước đầu. APK không có khóa vẫn build được, nhưng ký bằng debug key nên chỉ dùng để thử.
+
+### GitHub Secrets
+
+Vào **Settings → Secrets and variables → Actions** của repo và thêm:
+
+| Secret | Giá trị |
+| --- | --- |
+| `MANGANOVA_KEYSTORE_BASE64` | Keystore mã hóa base64: `base64 -i ~/keys/manganova-upload.keystore \| pbcopy` |
+| `MANGANOVA_KEYSTORE_PASSWORD` | Mật khẩu keystore |
+| `MANGANOVA_KEY_ALIAS` | `manganova-upload` |
+| `MANGANOVA_KEY_PASSWORD` | Mật khẩu khóa |
 
 ## Ký app
 
@@ -64,7 +88,7 @@ Cất keystore ở nơi an toàn ngoài repo. Mất upload key thì phải xin G
 
 `android/app/build.gradle` đọc từ biến môi trường `MANGANOVA_KEYSTORE`, `MANGANOVA_KEYSTORE_PASSWORD`, `MANGANOVA_KEY_ALIAS`, `MANGANOVA_KEY_PASSWORD`, hoặc từ `android/keystore.properties` khi build tại máy. Khi chưa có khóa, bản release ký bằng debug key, và Play sẽ từ chối bản đó.
 
-Trên CI, lưu keystore dạng base64 trong Secrets rồi giải ra lúc build. Bật Play App Signing như hướng dẫn cũ.
+Trên CI, keystore lấy từ [GitHub Secrets](#github-secrets). Bật Play App Signing khi tải bản đầu tiên lên Play Console.
 
 ## Điều kiện phát hành
 

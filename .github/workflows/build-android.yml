@@ -1,0 +1,188 @@
+name: Build Android (manual)
+
+run-name: Android ${{ inputs.format }} · ${{ inputs.version_name }} (${{ inputs.version_code || github.run_number }}) · ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      format:
+        description: 'APK để cài thẳng lên máy. AAB để nộp Google Play, bắt buộc có upload key'
+        required: true
+        type: choice
+        default: apk
+        options:
+          - apk
+          - aab
+      architecture:
+        description: 'Chỉ dùng cho APK: arm64 cho điện thoại 64-bit, universal cho mọi CPU. AAB luôn gồm mọi CPU'
+        required: true
+        type: choice
+        default: arm64
+        options:
+          - arm64
+          - universal
+      version_name:
+        description: 'Version name hiển thị cho người dùng, ví dụ 1.0.1'
+        required: true
+        type: string
+        default: '1.0.0'
+      version_code:
+        description: 'Version code, số nguyên phải tăng mỗi lần nộp Play. Để trống thì dùng số lần chạy workflow'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build release ${{ inputs.format }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      CI: 'true'
+      NODE_OPTIONS: --max-old-space-size=4096
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check signing secrets
+        env:
+          BUILD_FORMAT: ${{ inputs.format }}
+          KEYSTORE_BASE64: ${{ secrets.MANGANOVA_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.MANGANOVA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.MANGANOVA_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.MANGANOVA_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            if [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+              echo 'Thiếu MANGANOVA_KEYSTORE_PASSWORD, MANGANOVA_KEY_ALIAS hoặc MANGANOVA_KEY_PASSWORD' >&2
+              exit 1
+            fi
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.keystore"
+            echo "MANGANOVA_KEYSTORE=$RUNNER_TEMP/upload.keystore" >> "$GITHUB_ENV"
+            echo 'Signed with the upload key' >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$BUILD_FORMAT" = 'aab' ]; then
+            echo 'AAB cần upload key: chưa có secret MANGANOVA_KEYSTORE_BASE64. Google Play từ chối bản ký bằng debug key' >&2
+            exit 1
+          else
+            echo '**Signed with the debug key.** This APK is for testing only.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check TypeScript
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test -- --runInBand
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager \
+            'platforms;android-37.0' \
+            'build-tools;37.0.0' \
+            'ndk;27.1.12297006' \
+            'cmake;3.22.1'
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+
+      - name: Resolve version
+        id: version
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+          VERSION_CODE: ${{ inputs.version_code }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          name="$(echo "$VERSION_NAME" | tr -d '[:space:]')"
+          code="$(echo "$VERSION_CODE" | tr -d '[:space:]')"
+          if [ -z "$code" ]; then code="$RUN_NUMBER"; fi
+          if ! [[ "$name" =~ ^[0-9]+(\.[0-9]+)*([-+][A-Za-z0-9.-]+)?$ ]]; then
+            echo "version_name không hợp lệ: '$name' (ví dụ hợp lệ: 1.0.1)" >&2; exit 1
+          fi
+          if ! [[ "$code" =~ ^[1-9][0-9]*$ ]] || [ "$code" -gt 2100000000 ]; then
+            echo "version_code phải là số nguyên dương nhỏ hơn 2100000000: '$code'" >&2; exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "Building version $name ($code)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build Android artifact
+        id: build
+        working-directory: android
+        env:
+          BUILD_FORMAT: ${{ inputs.format }}
+          BUILD_ARCHITECTURE: ${{ inputs.architecture }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          VERSION_CODE: ${{ steps.version.outputs.code }}
+          MANGANOVA_KEYSTORE_PASSWORD: ${{ secrets.MANGANOVA_KEYSTORE_PASSWORD }}
+          MANGANOVA_KEY_ALIAS: ${{ secrets.MANGANOVA_KEY_ALIAS }}
+          MANGANOVA_KEY_PASSWORD: ${{ secrets.MANGANOVA_KEY_PASSWORD }}
+        run: |
+          case "$BUILD_FORMAT" in
+            apk)
+              task=':app:assembleRelease'
+              artifact_path='android/app/build/outputs/apk/release/*.apk'
+              ;;
+            aab)
+              task=':app:bundleRelease'
+              artifact_path='android/app/build/outputs/bundle/release/*.aab'
+              BUILD_ARCHITECTURE=universal
+              ;;
+            *) echo 'Unsupported build format' >&2; exit 1 ;;
+          esac
+          case "$BUILD_ARCHITECTURE" in
+            arm64) architectures='arm64-v8a' ;;
+            universal) architectures='armeabi-v7a,arm64-v8a,x86,x86_64' ;;
+            *) echo 'Unsupported architecture' >&2; exit 1 ;;
+          esac
+          ./gradlew "$task" \
+            --no-daemon \
+            --stacktrace \
+            --max-workers=2 \
+            "-PreactNativeArchitectures=$architectures" \
+            "-PversionName=$VERSION_NAME" \
+            "-PversionCode=$VERSION_CODE"
+          echo "artifact_path=$artifact_path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: manganova-${{ steps.version.outputs.name }}-${{ steps.version.outputs.code }}-${{ inputs.format }}
+          path: ${{ steps.build.outputs.artifact_path }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+      - name: Remove the upload key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.keystore"
