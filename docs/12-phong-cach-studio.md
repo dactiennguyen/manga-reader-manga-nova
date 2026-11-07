@@ -19,26 +19,33 @@ Tài liệu này giải thích cảm giác của style và lý do đằng sau t�
 
 <img src="style/logo.png" alt="Logo Mangaka AI" width="160" />
 
-Logo là một trang truyện bị cắt bởi đường chia chéo, kèm một bong bóng thoại:
+Logo là chữ M in đậm, cắt tay như dao rọc giấy:
 
-- **Nửa trên màu giấy:** trang truyện là nhân vật chính.
-- **Nửa dưới san hô:** màu mực chính của app.
-- **Đường chia chéo:** thứ làm nên một trang manga, cũng chính là đường chia khung trong PanelLayout.
-- **Bong bóng cắt âm bản:** lời thoại, phần "viết" của công việc.
+- **Nét chữ nghiêng, đầu nét vát:** cảm giác poster in tay, không phải phông chữ có sẵn.
+- **Một nhát cắt chéo ở chân phải:** đường chia khung truyện, thứ làm nên một trang manga.
+- **Hai màu mực:** chữ màu giấy trên nền san hô, giống một bản in riso.
 
 Logo đọc được ở 48px, và có bản đơn sắc cho Themed Icons của Android 13 trở lên. File gốc ở `assets/icon/`. Sửa xong chạy `sh scripts/gen-icons.sh`, cần `rsvg-convert` và `magick`. Trong app dùng component `BrandMark`.
 
+## Màn khởi động
+
+<img src="style/screens/splash.png" alt="Màn khởi động" width="220" />
+
+Từ lúc chạm icon, màn hình phủ san hô với chữ M ở giữa, nối liền với icon vừa bấm. Splash giữ nguyên tới khi màn đầu tiên đã vẽ xong (`hideSplash` chạy trong `onReady` của `NavigationContainer`), rồi mờ dần trong 220ms sang trang giấy, nên không có khoảng trắng hay chớp màu. Nếu JS không khởi động được, splash tự tắt sau 8 giây.
+
+Khi splash rời đi, Android đặt lại màu thanh hệ thống theo theme. Vì vậy `AppTheme` phải khai `statusBarColor` trong suốt, và `MainActivity.applySystemBarIcons` áp lại màu icon sau đó.
+
 ## Màu
-
-![Bảng màu tối](style/palette-dark.svg)
-
-Nền tối là màu mực ấm, không phải xám lạnh. Bốn tầng bề mặt chênh nhau rất ít, đủ để thấy tầng mà không gây chú ý.
-
-Ở giao diện tối, chữ trên nền `accent` luôn dùng `on-accent`, không dùng trắng. Chữ trắng trên `accent` chỉ đạt 2,56:1.
 
 ![Bảng màu sáng](style/palette-light.svg)
 
-Giao diện sáng là nền giấy kem, hợp với tranh riso nhất. Màu nhấn đậm hơn để đạt độ tương phản. Đổi màu nào cũng phải chạy `__tests__/theme.contrast.test.ts`.
+Giao diện mặc định là nền giấy kem, vì tranh riso hòa vào nền thành một tờ giấy. Màu nhấn đậm hơn để đạt độ tương phản. Đổi màu nào cũng phải chạy `__tests__/theme.contrast.test.ts`.
+
+![Bảng màu tối](style/palette-dark.svg)
+
+Nền tối chọn trong Profile. Đây là màu mực ấm, không phải xám lạnh. Bốn tầng bề mặt chênh nhau rất ít, đủ để thấy tầng mà không gây chú ý.
+
+Ở giao diện tối, chữ trên nền `accent` luôn dùng `on-accent`, không dùng trắng. Chữ trắng trên `accent` chỉ đạt 2,56:1.
 
 ## Chữ
 

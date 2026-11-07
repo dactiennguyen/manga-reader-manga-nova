@@ -2,7 +2,6 @@ package com.mangakaai.app
 
 import android.content.pm.ActivityInfo
 import android.view.WindowManager
-import androidx.core.view.WindowCompat
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
 
@@ -47,13 +46,14 @@ class NativeScreenModule(reactContext: ReactApplicationContext) : NativeScreenSp
 
   /** Dark icons for a light screen, on the status bar and the navigation buttons alike. */
   override fun setSystemBarsDarkIcons(dark: Boolean) {
+    MainActivity.darkBarIcons = dark
     UiThreadUtil.runOnUiThread {
-      val window = reactApplicationContext.currentActivity?.window ?: return@runOnUiThread
-      WindowCompat.getInsetsController(window, window.decorView).apply {
-        isAppearanceLightStatusBars = dark
-        isAppearanceLightNavigationBars = dark
-      }
+      (reactApplicationContext.currentActivity as? MainActivity)?.applySystemBarIcons()
     }
+  }
+
+  override fun hideSplash() {
+    MainActivity.appReady = true
   }
 
   companion object {

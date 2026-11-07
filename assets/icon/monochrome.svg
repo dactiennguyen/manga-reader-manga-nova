@@ -1,14 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
-  <!-- Single colour for Android themed icons. The bubble is a hole, so the system tint shows through. -->
-  <defs>
-    <mask id="bubble">
-      <rect width="108" height="108" fill="#fff"/>
-      <ellipse cx="56" cy="36.500" rx="11" ry="6.800" fill="#000"/>
-      <path fill="#000" d="M50 41l-3.500 7 9.500-5z"/>
-    </mask>
-  </defs>
-  <g transform="translate(54 54) scale(.86) translate(-54 -54)" fill="#fff" mask="url(#bubble)">
-    <path d="M36 24h36a6 6 0 0 1 6 6v17L30 59.500V30a6 6 0 0 1 6-6z"/>
-    <path d="M78 53.500V78a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6V66z"/>
-  </g>
+  <!-- Single colour for Android themed icons. -->
+  <path fill="#fff" transform="translate(54 54) scale(0.068) translate(-508.5 -523.5)" d="M864 180L863 407 647 664 649 505 494 819 351 506 339 800 137 864 166 244 408 182 517 483 630 242Z M866 472L880 793 626 867 645 677Z"/>
 </svg>

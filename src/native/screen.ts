@@ -18,4 +18,9 @@ export function setSystemBarsDarkIcons(dark: boolean): void {
   NativeScreen?.setSystemBarsDarkIcons(dark);
 }
 
+/** The splash stays up until this is called, so the app appears fully drawn. */
+export function hideSplash(): void {
+  NativeScreen?.hideSplash();
+}
+
 export const orientationSupported = !!NativeScreen;

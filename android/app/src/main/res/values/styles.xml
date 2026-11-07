@@ -1,12 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme. The dark window colour avoids a white flash before the first frame. -->
+    <!-- Base application theme. The paper window colour avoids a white flash before the first frame. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
         <item name="android:windowBackground">@color/studio_bg</item>
+        <!-- Set here too: the splash restores these from the theme when it leaves. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <!-- Three-button navigation otherwise gets a white scrim over the app. -->
         <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
+    </style>
+
+    <!-- Shown from the tap on the icon until JS calls hideSplash. -->
+    <style name="SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_mark</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
 </resources>

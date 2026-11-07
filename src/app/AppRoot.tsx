@@ -16,7 +16,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { Uniwind, useUniwind } from 'uniwind';
 
 import { copyUriToCache } from '../native/files';
-import { setSystemBarsDarkIcons } from '../native/screen';
+import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
 import type { RootStackParamList } from '../state/navigation';
 import { appServices } from '../state/services';
 import { useSettings } from '../state/useSettings';
@@ -56,6 +56,7 @@ function useBoot() {
       error => {
         console.error(error);
         setState('failed');
+        hideSplash();
       },
     );
   }, [attempt]);
@@ -120,7 +121,10 @@ function Shell() {
       <NavigationContainer
         ref={navigationRef}
         theme={navigationTheme}
-        onReady={() => setDockShown(onTabs(navigationRef.getRootState()))}
+        onReady={() => {
+          setDockShown(onTabs(navigationRef.getRootState()));
+          hideSplash();
+        }}
         onStateChange={state => setDockShown(onTabs(state))}
       >
         <RootNavigator />

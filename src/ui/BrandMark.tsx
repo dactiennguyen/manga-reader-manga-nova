@@ -1,21 +1,19 @@
-import Svg, { Ellipse, Path, Rect } from 'react-native-svg';
+import Svg, { G, Path, Rect } from 'react-native-svg';
 
 /** Brand art, the same in both themes, so these colours are not interface tokens. Source: assets/icon. */
-const TILE = '#15120E';
-const PAGE = '#F6EFE3';
-const INK = '#F15A3C';
+const TILE = '#F15A3C';
+const PAPER = '#F6EFE3';
 
-const CROP = 18;
-const VIEW = 108 - CROP * 2;
+const MARK =
+  'M864 180L863 407 647 664 649 505 494 819 351 506 339 800 137 864 166 244 408 182 517 483 630 242Z M866 472L880 793 626 867 645 677Z';
 
 export function BrandMark({ size = 64 }: { size?: number }) {
   return (
-    <Svg width={size} height={size} viewBox={`${CROP} ${CROP} ${VIEW} ${VIEW}`} accessibilityLabel="Mangaka AI logo">
-      <Rect x={CROP} y={CROP} width={VIEW} height={VIEW} rx={16} fill={TILE} />
-      <Path fill={PAGE} d="M36 24h36a6 6 0 0 1 6 6v17L30 59.500V30a6 6 0 0 1 6-6z" />
-      <Path fill={INK} d="M78 53.500V78a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6V66z" />
-      <Ellipse cx={56} cy={36.5} rx={11} ry={6.8} fill={TILE} />
-      <Path fill={TILE} d="M50 41l-3.500 7 9.500-5z" />
+    <Svg width={size} height={size} viewBox="0 0 1024 1024" accessibilityLabel="App logo">
+      <Rect width={1024} height={1024} rx={228} fill={TILE} />
+      <G transform="translate(512 512) scale(.92) translate(-508.5 -523.5)">
+        <Path fill={PAPER} d={MARK} />
+      </G>
     </Svg>
   );
 }

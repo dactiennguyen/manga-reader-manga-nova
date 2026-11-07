@@ -16,7 +16,7 @@ So với app cũ, những thứ sau bị bỏ: viền mực 2dp, bóng cứng l�
 
 ## Màu
 
-Mặc định là giao diện tối (nền mực). Giao diện sáng (nền giấy) chọn trong Profile. Thanh công cụ ở màn vẽ luôn tối ở cả hai giao diện.
+Mặc định là giao diện sáng (nền giấy). Giao diện tối (nền mực) chọn trong Profile. Thanh công cụ ở màn vẽ luôn tối ở cả hai giao diện.
 
 | Token | Tối | Sáng | Dùng cho |
 | --- | --- | --- | --- |

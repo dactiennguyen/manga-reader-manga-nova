@@ -31,7 +31,7 @@ export type AppSettings = {
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  themeMode: 'dark',
+  themeMode: 'light',
   handedness: 'right',
   keepAwakeWhileDrawing: true,
   haptics: true,

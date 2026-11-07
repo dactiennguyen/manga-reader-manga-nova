@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288 288">
+  <!-- Android clips the splash icon to a 192dp circle inside this 288dp canvas. -->
+  <path fill="#F6EFE3" transform="translate(144 144) scale(0.17) translate(-508.5 -523.5)" d="M864 180L863 407 647 664 649 505 494 819 351 506 339 800 137 864 166 244 408 182 517 483 630 242Z M866 472L880 793 626 867 645 677Z"/>
+</svg>

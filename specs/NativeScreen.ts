@@ -6,6 +6,7 @@ export interface Spec extends TurboModule {
   setSecure(enabled: boolean): void;
   setKeepAwake(enabled: boolean): void;
   setSystemBarsDarkIcons(dark: boolean): void;
+  hideSplash(): void;
 }
 
 export default TurboModuleRegistry.get<Spec>('NativeScreen');
