@@ -62,18 +62,7 @@ Cất keystore ở nơi an toàn ngoài repo. Mất upload key thì phải xin G
 
 `.gitignore` phải có `*.keystore`, `*.jks`, `keystore.properties`.
 
-`android/app/build.gradle` đọc từ biến môi trường, hoặc `keystore.properties` khi build tại máy:
-
-```groovy
-signingConfigs {
-    release {
-        storeFile file(System.getenv("MANGANOVA_KEYSTORE") ?: props["storeFile"])
-        storePassword System.getenv("MANGANOVA_KEYSTORE_PASSWORD") ?: props["storePassword"]
-        keyAlias System.getenv("MANGANOVA_KEY_ALIAS") ?: props["keyAlias"]
-        keyPassword System.getenv("MANGANOVA_KEY_PASSWORD") ?: props["keyPassword"]
-    }
-}
-```
+`android/app/build.gradle` đọc từ biến môi trường `MANGANOVA_KEYSTORE`, `MANGANOVA_KEYSTORE_PASSWORD`, `MANGANOVA_KEY_ALIAS`, `MANGANOVA_KEY_PASSWORD`, hoặc từ `android/keystore.properties` khi build tại máy. Khi chưa có khóa, bản release ký bằng debug key, và Play sẽ từ chối bản đó.
 
 Trên CI, lưu keystore dạng base64 trong Secrets rồi giải ra lúc build. Bật Play App Signing như hướng dẫn cũ.
 

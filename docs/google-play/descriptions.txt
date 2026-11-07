@@ -1,0 +1,80 @@
+MANGANOVA - Google Play store listing (en-US)
+=============================================
+
+Google Play limits: app name 30 characters, short description 80 characters,
+full description 4000 characters. Every block below is within its limit.
+
+
+App name (30):
+Manganova: Manga Maker
+
+Short description (80):
+Draw, lay out and letter your own manga. Pens, panels, rulers, tones and export.
+
+Full description (4000):
+Manganova is a manga studio that fits in your pocket. Open a blank page and start drawing, split a page into panels, or plan your story first. Then letter it, read it like a real book and export it. There is no account to make and no subscription to manage, and your work stays on your phone.
+
+START THE WAY YOU LIKE
+• Draw now: go straight to a blank page and sketch.
+• Lay out a page: pick a panel template, then fill each panel.
+• Write first: plan scenes and dialogue, then turn them into pages.
+• Choose manga pages (B5 or A5, read right to left) or a vertical webtoon strip.
+
+DRAW ON YOUR PHONE
+• G-pen, pencil, brush, eraser, shapes, lasso fill and a colour picker.
+• Screentone fills at 10, 25, 40 and 60% density.
+• Up to 8 layers per panel with opacity and lock, and 50 undo steps.
+• Two fingers zoom and rotate. Two-finger tap undoes, three-finger tap redoes.
+• Stylus pressure, plus a stylus mode that keeps your palm off the page.
+• Import a photo or sketch onto a layer and ink over it.
+
+RULERS THAT KEEP YOUR LINES TRUE
+• One-point and two-point perspective with vanishing points you can drag.
+• Strokes settle on the line to the point, or on level and upright lines, so rooms and streets stay in shape.
+• Symmetry repeats every stroke across a line you can move. One undo takes back both sides.
+
+MATERIALS READY TO USE
+• Line-art backgrounds: classroom, street, rooftop, bedroom, forest path and city.
+• Patterns and effects: sparkles, falling petals, rain, impact burst, clouds and leaves.
+• Drop one into a panel and draw on top. Backgrounds slide under your drawing on their own layer.
+
+KEEP YOUR CHARACTERS ON MODEL
+• Pin a character on the canvas with their face, sheet and appearance notes while you draw.
+• Keep profiles with role, traits, goal, voice and appearance.
+• Store face and body drawings, six expressions and relationships between characters.
+
+LAY OUT YOUR PAGES
+• 31 panel templates: grids, diagonal cuts, full bleeds and 4-koma strips.
+• Drag panel borders, cut a panel with a line, merge panels, tilt corners and set gutters.
+• See every page on the storyboard, drag to reorder and track what is finished.
+
+LETTER AND POLISH
+• Speech, thought, shout, whisper and machine bubbles, plus narration boxes and SFX text.
+• Four lettering fonts. Drag, resize and rotate anything on the page.
+• Speed lines, focus lines, tones, gradients and sparkles.
+• Add language versions of every bubble for translated editions.
+
+PLAN YOUR STORY
+• Outline acts and chapters on a drag-and-drop board.
+• Write scene by scene with setting, action, dialogue, narration and sound-effect blocks.
+• Auto-paginate a chapter: your script becomes pages and panels in one tap.
+• Keep a world wiki of places, factions, terms and events, with a timeline.
+
+READ AND SHARE
+• Read your chapter like a real manga, with page spreads in landscape.
+• Export PDF, PNG pages in a ZIP, CBZ for comic readers, or one long webtoon image.
+• Back up a whole story as one .manganova file and open it on another device.
+
+OPTIONAL WRITING HELP
+Connect your own OpenAI-compatible server for help with the words: shape a story from an idea, plan chapters, find plot holes or ask about your story. This is optional and off by default. It helps with text only and never draws for you.
+
+PRIVATE BY DESIGN
+Your stories, drawings and characters stay on your device. There are no ads, no analytics and no sign-in. Nothing is uploaded unless you set up a server yourself.
+
+Made for anyone who wants to make comics: first-time creators, webtoon artists, doujinshi circles and students of manga.
+
+
+Notes for the Play Console
+--------------------------
+- Suggested category: Art & Design (or Comics). Content rating: fill in the IARC questionnaire; the app has no user-generated content shared online.
+- Screenshots and graphics are in screenshots/ and graphics/ next to this file; README.md there lists the required sizes.

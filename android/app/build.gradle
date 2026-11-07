@@ -59,6 +59,14 @@ react {
  */
 def enableProguardInReleaseBuilds = true
 
+/** The upload key, from the environment or android/keystore.properties. Neither belongs in git. */
+def keystoreProps = new Properties()
+def keystorePropsFile = rootProject.file("keystore.properties")
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+def uploadKeyPath = System.getenv("MANGANOVA_KEYSTORE") ?: keystoreProps["storeFile"]
+
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
  *
@@ -82,8 +90,8 @@ android {
         applicationId "com.manganova.manga.reader.org"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode((project.findProperty("versionCode") ?: 1) as int)
+        versionName(project.findProperty("versionName") ?: "1.0.0")
     }
     signingConfigs {
         debug {
@@ -92,14 +100,22 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (uploadKeyPath) {
+            release {
+                storeFile file(uploadKeyPath)
+                storePassword System.getenv("MANGANOVA_KEYSTORE_PASSWORD") ?: keystoreProps["storePassword"]
+                keyAlias System.getenv("MANGANOVA_KEY_ALIAS") ?: keystoreProps["keyAlias"]
+                keyPassword System.getenv("MANGANOVA_KEY_PASSWORD") ?: keystoreProps["keyPassword"]
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Uses the debug key until a new upload key exists. Keep that key out of git.
-            signingConfig signingConfigs.debug
+            // Google Play refuses the debug key. It only stands in until an upload key is set up.
+            signingConfig uploadKeyPath ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
