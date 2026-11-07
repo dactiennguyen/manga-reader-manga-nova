@@ -202,7 +202,7 @@ export function LibraryScreen() {
         visible={open === 'header'}
         onClose={() => setOpen(null)}
         items={[
-          { label: 'Import project (.mangaka)', icon: MoveToIcon, onPress: importProject },
+          { label: 'Import project (.manganova)', icon: MoveToIcon, onPress: importProject },
           { label: 'Trash', icon: DeleteIcon, onPress: () => navigation.navigate('Trash') },
           {
             label: layout === 'grid' ? 'List view' : 'Grid view',
@@ -239,7 +239,7 @@ export function LibraryScreen() {
                 },
                 {
                   label: 'Export project',
-                  subtitle: 'A .mangaka file for backup or moving devices',
+                  subtitle: 'A .manganova file for backup or moving devices',
                   icon: ExportIcon,
                   onPress: () => exportProjectFile(target.id),
                 },

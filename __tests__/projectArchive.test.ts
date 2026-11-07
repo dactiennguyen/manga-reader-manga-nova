@@ -1,7 +1,7 @@
 import { connectTestStorage } from './helpers/storage';
 import { exportArt, loadArt, newLayer, saveArt } from '../src/state/artStore';
 import { collectPanelIds } from '../src/core/layout/layout';
-import { buildProjectBundle as buildBundle, mapBundleImages, remapBundleIds } from '../src/core/archive/bundle';
+import { buildProjectBundle as buildBundle, isArchiveName, mapBundleImages, remapBundleIds } from '../src/core/archive/bundle';
 import { parseProjectBundle } from '../src/core/archive/parse';
 import { chapterIdsOf } from '../src/core/model/selectors';
 import { useStory } from '../src/state/useStory';
@@ -24,7 +24,7 @@ function seed() {
     pageSize: 'B5',
     style: 'shounen',
     color: false,
-    coverUri: '/data/app/mangaka/images/cover.png',
+    coverUri: '/data/app/manganova/images/cover.png',
   });
   const chapterId = chapterIdsOf(story().projects[projectId])[0];
   const minh = story().addCharacter(projectId, {
@@ -164,7 +164,7 @@ describe('project archive', () => {
     const mapped = mapBundleImages(bundle, path => (path.endsWith('cover.png') ? 'images/cover.png' : undefined));
     expect(mapped.project.coverUri).toBe('images/cover.png');
     expect(mapped.characters.find(character => character.name === 'Minh')?.sheet.face).toBeUndefined();
-    expect(bundle.project.coverUri).toBe('/data/app/mangaka/images/cover.png');
+    expect(bundle.project.coverUri).toBe('/data/app/manganova/images/cover.png');
   });
 
   it('keeps language versions and bubble translations through export and import', () => {
@@ -184,9 +184,23 @@ describe('project archive', () => {
     const { projectId } = seed();
     const bundle = buildProjectBundle(projectId)!;
     expect(parseProjectBundle(JSON.stringify(bundle)).project.title).toBe('The Delivery Boy');
-    expect(() => parseProjectBundle('not json')).toThrow("isn't a Mangaka project");
-    expect(() => parseProjectBundle(JSON.stringify({ version: 1, app: 'other' }))).toThrow("isn't a Mangaka project");
+    expect(() => parseProjectBundle('not json')).toThrow("isn't a Manganova project");
+    expect(() => parseProjectBundle(JSON.stringify({ version: 1, app: 'other' }))).toThrow("isn't a Manganova project");
     expect(() => parseProjectBundle(JSON.stringify({ ...bundle, version: 99 }))).toThrow();
+  });
+
+  it('still reads backups made under the old name', () => {
+    const { projectId } = seed();
+    const bundle = buildProjectBundle(projectId)!;
+    const old = JSON.stringify({ ...bundle, app: 'mangaka' });
+    expect(parseProjectBundle(old).project.title).toBe('The Delivery Boy');
+  });
+
+  it('accepts the new and the old file extension', () => {
+    expect(isArchiveName('Story.manganova')).toBe(true);
+    expect(isArchiveName('STORY.MANGAKA')).toBe(true);
+    expect(isArchiveName('story.zip')).toBe(false);
+    expect(isArchiveName('manganova')).toBe(false);
   });
 
   it('keeps art readable after ids change', () => {

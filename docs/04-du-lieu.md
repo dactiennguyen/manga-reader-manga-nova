@@ -98,18 +98,18 @@ Vì vậy patch hoàn tác của tranh chỉ là một dòng `art_layers`, tranh
 ## Đường dẫn file
 
 ```
-<filesDir>/mangaka/
-├── mangaka.db
+<filesDir>/manganova/
+├── manganova.db
 ├── images/    ảnh người dùng thêm: bìa, bảng thiết kế, ảnh thế giới, ảnh lớp
 ├── thumbs/    thumbnail, tạo lại được
-├── exports/   file đã xuất, mỗi truyện một thư mục <projectId>/, gồm cả .mangaka
+├── exports/   file đã xuất, mỗi truyện một thư mục <projectId>/, gồm cả .manganova
 └── backups/   bản sao DB trước migration
-<cacheDir>/mangaka-tmp/
+<cacheDir>/manganova-tmp/
 ```
 
-Dữ liệu chỉ lưu **đường dẫn tương đối** với `<filesDir>/mangaka/`, ví dụ `images/abc.jpg`. App cũ lưu đường dẫn tuyệt đối, có chỗ kèm `file://`, nên phải chuẩn hóa khi nhập.
+Dữ liệu chỉ lưu **đường dẫn tương đối** với `<filesDir>/manganova/`, ví dụ `images/abc.jpg`. App cũ lưu đường dẫn tuyệt đối, có chỗ kèm `file://`, nên phải chuẩn hóa khi nhập.
 
-`allowBackup` giữ `false`. Người dùng sao lưu bằng file `.mangaka`.
+`allowBackup` giữ `false`. Người dùng sao lưu bằng file `.manganova`.
 
 ## Dọn rác
 
@@ -132,9 +132,9 @@ GC chỉ chạy lúc khởi động lạnh, sau khi nạp xong dữ liệu. Nó 
 - Mỗi bước chạy trong transaction. Lỗi thì dừng, khôi phục bản sao, hiện màn hình báo lỗi kèm nút xuất dữ liệu.
 - Mỗi migration có test chạy trên `node:sqlite` qua port `Db`.
 
-## File `.mangaka`
+## File `.manganova`
 
-Đây là cách duy nhất mang truyện từ app cũ sang.
+Đây là cách duy nhất mang truyện từ app cũ sang. App xuất ra đuôi `.manganova` và vẫn nhập được đuôi `.mangaka` của app cũ. Không được bỏ đuôi cũ, vì file sao lưu đang dùng nó.
 
 **Bản 1 (app cũ):** file ZIP gồm `story.json` (`version: 1`, `app: 'mangaka'`, các thực thể, `art`) và `images/N.ext`. Không có lịch sử kịch bản, hội thoại trợ lý, cài đặt, thumbnail.
 

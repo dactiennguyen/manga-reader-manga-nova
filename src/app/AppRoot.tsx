@@ -36,7 +36,7 @@ async function openArchive(url: string | null | undefined): Promise<void> {
     return;
   }
   try {
-    const path = await copyUriToCache(url, 'incoming.mangaka');
+    const path = await copyUriToCache(url, 'incoming.manganova');
     const projectId = await appServices().importProject(path);
     if (navigationRef.isReady()) {
       navigationRef.navigate('Project', { projectId });

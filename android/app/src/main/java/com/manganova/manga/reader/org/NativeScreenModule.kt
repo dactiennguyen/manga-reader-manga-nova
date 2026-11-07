@@ -1,4 +1,4 @@
-package com.mangakaai.app
+package com.manganova.manga.reader.org
 
 import android.content.pm.ActivityInfo
 import android.view.WindowManager

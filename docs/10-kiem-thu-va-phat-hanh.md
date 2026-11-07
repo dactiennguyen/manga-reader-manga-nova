@@ -54,8 +54,8 @@ Không commit keystore hay mật khẩu. Repo cũ làm việc này có chủ đ�
 
 ```sh
 keytool -genkeypair -v -storetype PKCS12 \
-  -keystore ~/keys/mangaka-upload.keystore \
-  -alias mangaka-upload -keyalg RSA -keysize 2048 -validity 10000
+  -keystore ~/keys/manganova-upload.keystore \
+  -alias manganova-upload -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 Cất keystore ở nơi an toàn ngoài repo. Mất upload key thì phải xin Google đặt lại, còn lộ thì phải đổi.
@@ -67,10 +67,10 @@ Cất keystore ở nơi an toàn ngoài repo. Mất upload key thì phải xin G
 ```groovy
 signingConfigs {
     release {
-        storeFile file(System.getenv("MANGAKA_KEYSTORE") ?: props["storeFile"])
-        storePassword System.getenv("MANGAKA_KEYSTORE_PASSWORD") ?: props["storePassword"]
-        keyAlias System.getenv("MANGAKA_KEY_ALIAS") ?: props["keyAlias"]
-        keyPassword System.getenv("MANGAKA_KEY_PASSWORD") ?: props["keyPassword"]
+        storeFile file(System.getenv("MANGANOVA_KEYSTORE") ?: props["storeFile"])
+        storePassword System.getenv("MANGANOVA_KEYSTORE_PASSWORD") ?: props["storePassword"]
+        keyAlias System.getenv("MANGANOVA_KEY_ALIAS") ?: props["keyAlias"]
+        keyPassword System.getenv("MANGANOVA_KEY_PASSWORD") ?: props["keyPassword"]
     }
 }
 ```
@@ -81,7 +81,7 @@ Trên CI, lưu keystore dạng base64 trong Secrets rồi giải ra lúc build. 
 
 - [ ] Đi trọn luồng trên máy thật bằng bản release đã bật R8.
 - [ ] Nhập được mọi file `.mangaka` từ giai đoạn 0.
-- [ ] PDF, ZIP PNG, CBZ, ảnh dài, `.mangaka` đều đúng, gồm cả truyện A5.
+- [ ] PDF, ZIP PNG, CBZ, ảnh dài, `.manganova` đều đúng, gồm cả truyện A5.
 - [ ] Truyện 300 trang mở, cuộn, xuất được, không tràn bộ nhớ.
 - [ ] Mọi màn dùng được bằng TalkBack, trừ phần vẽ trên Canvas.
 - [ ] Mọi control đạt 48dp, test tương phản qua.

@@ -1,6 +1,6 @@
-# Mangaka AI: tài liệu viết lại
+# Manganova: tài liệu viết lại
 
-Bộ tài liệu này mô tả cách viết lại app Mangaka AI trên React Native 0.88.1, với giao diện mới "Studio". Người đọc là lập trình viên sẽ làm bản viết lại.
+Bộ tài liệu này mô tả cách viết lại app Manganova trên React Native 0.88.1, với giao diện mới "Studio". Người đọc là lập trình viên sẽ làm bản viết lại.
 
 Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader-manga-android`, nhánh `feature/first-version`, commit `88ec97a`.
 
@@ -11,7 +11,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 1 | [Tổng quan](01-tong-quan.md) | Vì sao viết lại, phạm vi, quyết định đã chốt, việc còn chờ |
 | 2 | [Kiến trúc](02-kien-truc.md) | Chia lớp, luồng dữ liệu, hoàn tác, AI, native |
 | 3 | [Stack và phiên bản](03-stack-va-phien-ban.md) | Dùng thư viện nào, bản nào, cách khởi tạo project |
-| 4 | [Dữ liệu](04-du-lieu.md) | Schema SQLite, lưu nét vẽ, dọn rác, nhập file `.mangaka` |
+| 4 | [Dữ liệu](04-du-lieu.md) | Schema SQLite, lưu nét vẽ, dọn rác, nhập file `.manganova` |
 | 5 | [Design system](05-design-system.md) | Token màu, chữ, thành phần, bố cục Studio |
 | 6 | [Màn hình](06-man-hinh.md) | Route, việc của từng màn, hành vi phải giữ |
 | 7 | [Canvas](07-canvas.md) | Thiết kế engine vẽ và các ngưỡng kiểm chứng |

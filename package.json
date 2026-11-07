@@ -1,5 +1,5 @@
 {
-  "name": "mangaka-ai",
+  "name": "manganova",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -59,11 +59,11 @@
     "node": "^22.13 || ^24.3"
   },
   "codegenConfig": {
-    "name": "MangakaSpecs",
+    "name": "ManganovaSpecs",
     "type": "modules",
     "jsSrcsDir": "specs",
     "android": {
-      "javaPackageName": "com.mangakaai.app"
+      "javaPackageName": "com.manganova.manga.reader.org"
     }
   }
 }

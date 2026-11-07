@@ -13,7 +13,7 @@ import type {
   WorldType,
 } from './types';
 
-export const APP_NAME = 'Mangaka AI';
+export const APP_NAME = 'Manganova';
 
 export const GENRES = [
   'Action',

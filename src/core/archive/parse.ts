@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { ID, PanelArt } from '../model/types';
 import type { ProjectBundle } from './bundle';
 
-const INVALID_MESSAGE = "This file can't be read or isn't a Mangaka project";
+const INVALID_MESSAGE = "This file can't be read or isn't a Manganova project";
 
 const id = z.string().min(1);
 const ids = z.array(id).optional();

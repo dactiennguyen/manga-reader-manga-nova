@@ -1,4 +1,4 @@
-package com.mangakaai.app
+package com.manganova.manga.reader.org
 
 import android.app.Application
 import com.facebook.react.PackageList

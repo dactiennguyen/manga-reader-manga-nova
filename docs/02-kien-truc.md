@@ -142,7 +142,7 @@ Giữ hai TurboModule, tổng khoảng 190 dòng Kotlin, không phụ thuộc th
 
 `codegenConfig` trong `package.json` chỉ khai Android.
 
-Thêm intent filter để mở file `.mangaka` từ app khác. App cũ chỉ nhập được qua Profile.
+Thêm intent filter để mở file `.manganova` và `.mangaka` từ app khác. App cũ chỉ nhập được qua Profile.
 
 ## Xử lý lỗi
 

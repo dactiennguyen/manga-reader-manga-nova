@@ -5,7 +5,7 @@ import { filesRoot, setFilesRoot, toAbsolute, toRelative, fileUri } from '../cor
 import { uid } from '../core/util/id';
 import NativeFiles from '../../specs/NativeFiles';
 
-setFilesRoot(`${RNFS.DocumentDirectoryPath}/mangaka`);
+setFilesRoot(`${RNFS.DocumentDirectoryPath}/manganova`);
 
 export const DIRS = {
   root: filesRoot(),
@@ -13,7 +13,7 @@ export const DIRS = {
   thumbs: `${filesRoot()}/thumbs`,
   exports: `${filesRoot()}/exports`,
   backups: `${filesRoot()}/backups`,
-  tmp: `${RNFS.CachesDirectoryPath}/mangaka-tmp`,
+  tmp: `${RNFS.CachesDirectoryPath}/manganova-tmp`,
 } as const;
 
 export const MIME = {
@@ -22,7 +22,7 @@ export const MIME = {
   pdf: 'application/pdf',
   zip: 'application/zip',
   cbz: 'application/vnd.comicbook+zip',
-  mangaka: 'application/octet-stream',
+  archive: 'application/octet-stream',
   text: 'text/plain',
 } as const;
 

@@ -32,7 +32,7 @@ Tab: `Home`, `Library`, `Assistant`, `Profile`. Nút (+) ở giữa Dock mở `N
 
 Bỏ các tham số không ai dùng: `NewProject.blankCanvas`, `Project.tab`, `World.type`, `World.view`, `Preview.pageId`. Dàn khung và Thoại vẫn chuyển qua lại bằng `replace` trong `ModeSwitch`.
 
-Thêm deep link cho intent `.mangaka`. Không có deep link nào khác.
+Thêm deep link cho intent `.manganova` và `.mangaka`. Không có deep link nào khác.
 
 ## Hành vi dễ mất khi viết lại
 

@@ -145,7 +145,7 @@ Quy tắc bắt buộc cho thành phần tương tác:
 - `Toast` và `Dialog` là thành phần tự vẽ, thay cho `ToastAndroid` và `Alert`. App cũ gọi hai thứ này 79 và 28 lần, không đổi được giao diện.
 - Một `Slider` duy nhất. App cũ có hai (`Slider`, `ToolSlider`).
 
-Icon dùng bộ **Phosphor**, khai một chỗ ở `src/ui/icons.ts` và đặt tên theo ý nghĩa, ví dụ `UndoIcon`. Mặc định dùng `regular`. Mục đang chọn dùng `fill`, nên trạng thái không chỉ dựa vào màu. Icon lớn minh họa dùng `duotone`. Quy tắc đầy đủ ở skill `mangaka-icons`, cách áp dụng phong cách ở skill `mangaka-ui` (thư mục `.claude/skills/`). Xem phiên bản ở [03-stack-va-phien-ban.md](03-stack-va-phien-ban.md)
+Icon dùng bộ **Phosphor**, khai một chỗ ở `src/ui/icons.ts` và đặt tên theo ý nghĩa, ví dụ `UndoIcon`. Mặc định dùng `regular`. Mục đang chọn dùng `fill`, nên trạng thái không chỉ dựa vào màu. Icon lớn minh họa dùng `duotone`. Quy tắc đầy đủ ở skill `manganova-icons`, cách áp dụng phong cách ở skill `manganova-ui` (thư mục `.claude/skills/`). Xem phiên bản ở [03-stack-va-phien-ban.md](03-stack-va-phien-ban.md)
 
 ## Bố cục các màn chính
 

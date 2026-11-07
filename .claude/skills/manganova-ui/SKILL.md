@@ -1,11 +1,11 @@
 ---
-name: mangaka-ui
-description: Build or restyle any screen or component in Mangaka AI in the Studio style. Use for layout, colour, spacing, typography, motion and visual polish, and before calling a UI change finished.
+name: manganova-ui
+description: Build or restyle any screen or component in Manganova in the Studio style. Use for layout, colour, spacing, typography, motion and visual polish, and before calling a UI change finished.
 ---
 
-# Studio style for Mangaka AI
+# Studio style for Manganova
 
-`docs/12-phong-cach-studio.md` shows the style and why it looks this way. `docs/05-design-system.md` is the source of truth for tokens and components. This skill is how to apply them. For icons, also use the `mangaka-icons` skill.
+`docs/12-phong-cach-studio.md` shows the style and why it looks this way. `docs/05-design-system.md` is the source of truth for tokens and components. This skill is how to apply them. For icons, also use the `manganova-icons` skill.
 
 ## Direction
 

@@ -1,9 +1,9 @@
 ---
-name: mangaka-icons
-description: Pick, add or change an icon in Mangaka AI. Use for any new icon, any IconButton, tool, tab or status glyph, and whenever a screen needs an icon.
+name: manganova-icons
+description: Pick, add or change an icon in Manganova. Use for any new icon, any IconButton, tool, tab or status glyph, and whenever a screen needs an icon.
 ---
 
-# Icons in Mangaka AI
+# Icons in Manganova
 
 One family for interface icons: Phosphor (`phosphor-react-native`). Do not add a second icon library, and never use emoji as an icon. Feature tiles are printed art, not icons: see `ART.tile*` in `src/ui/art.ts`.
 

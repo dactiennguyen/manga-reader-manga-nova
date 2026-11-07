@@ -1,7 +1,7 @@
 /**
  * Every icon in the app, named for what it means, so changing a glyph is one line here. Imported one
  * file at a time: the package index would pull all 1,512 icons into the bundle. Rules are in
- * .claude/skills/mangaka-icons/SKILL.md.
+ * .claude/skills/manganova-icons/SKILL.md.
  */
 export { ImageSquareIcon as AddImageIcon } from 'phosphor-react-native/src/icons/ImageSquare';
 export { PlusSquareIcon as AddPageIcon } from 'phosphor-react-native/src/icons/PlusSquare';

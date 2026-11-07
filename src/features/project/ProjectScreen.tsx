@@ -116,7 +116,7 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
             icon: CopyIcon,
             onPress: () => duplicateStory(projectId, copyId => navigation.push('Project', { projectId: copyId })),
           },
-          { label: 'Export project (.mangaka)', icon: ExportIcon, onPress: () => exportProjectFile(projectId) },
+          { label: 'Export project (.manganova)', icon: ExportIcon, onPress: () => exportProjectFile(projectId) },
           {
             label: project.done ? 'Mark as not completed' : 'Mark as completed',
             icon: MarkDoneIcon,

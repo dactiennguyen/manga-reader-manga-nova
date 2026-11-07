@@ -37,7 +37,7 @@ export async function exportProjectFile(projectId: ID): Promise<void> {
   try {
     toast('Packing project…');
     const path = await appServices().exportProject(projectId);
-    await shareFile(path, MIME.mangaka, `${title} project`);
+    await shareFile(path, MIME.archive, `${title} project`);
   } catch {
     toast('Could not export the project. Try again later');
   }

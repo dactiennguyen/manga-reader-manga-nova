@@ -1,4 +1,4 @@
-package com.mangakaai.app
+package com.manganova.manga.reader.org
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -151,7 +151,7 @@ class NativeFilesModule(reactContext: ReactApplicationContext) : NativeFilesSpec
 
   override fun copyText(text: String) {
     val clipboard = reactApplicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    clipboard.setPrimaryClip(ClipData.newPlainText("Mangaka AI", text))
+    clipboard.setPrimaryClip(ClipData.newPlainText("Manganova", text))
   }
 
   companion object {

@@ -80,10 +80,10 @@ Thư mục `manga-reader-ai` đã có `docs/`, nên tạo ở thư mục tạm r
 
 ```sh
 cd /Volumes/D/OUTSOURCE
-npx @react-native-community/cli@20.2.0 init MangakaAI \
+npx @react-native-community/cli@20.2.0 init Manganova \
   --version 0.88.1 \
-  --package-name com.mangakaai.app \
-  --title "Mangaka AI" \
+  --package-name com.manganova.manga.reader.org \
+  --title "Manganova" \
   --directory manga-reader-ai-init \
   --skip-git-init
 

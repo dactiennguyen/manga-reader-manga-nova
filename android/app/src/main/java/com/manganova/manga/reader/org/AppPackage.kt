@@ -1,4 +1,4 @@
-package com.mangakaai.app
+package com.manganova.manga.reader.org
 
 import com.facebook.react.BaseReactPackage
 import com.facebook.react.bridge.NativeModule

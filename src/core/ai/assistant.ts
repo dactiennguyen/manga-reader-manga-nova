@@ -8,7 +8,7 @@ export type AssistantContext = { brief: string; where: string; detail?: string }
 const ASSISTANT_HISTORY_TURNS = 12;
 
 const ASSISTANT =
-  'You are a friendly manga-making assistant inside the Mangaka AI app. Help with story, characters, panel layout, pacing, dialogue and drawing technique. Be concrete and brief: short paragraphs or a short list, no headings. Never claim to have changed the story; the author applies changes themselves. Answer in the language the author writes in.';
+  'You are a friendly manga-making assistant inside the Manganova app. Help with story, characters, panel layout, pacing, dialogue and drawing technique. Be concrete and brief: short paragraphs or a short list, no headings. Never claim to have changed the story; the author applies changes themselves. Answer in the language the author writes in.';
 
 export function assistantMessages(context: AssistantContext, history: AssistantTurn[], question: string): AiMessage[] {
   const recent = history.slice(-ASSISTANT_HISTORY_TURNS);

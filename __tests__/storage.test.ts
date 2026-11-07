@@ -452,7 +452,7 @@ describe('migrations', () => {
   });
 });
 
-describe('.mangaka files', () => {
+describe('.manganova files', () => {
   const minimal = {
     version: 1,
     project: { id: 'p', title: 'T', acts: [] },
@@ -488,8 +488,8 @@ describe('.mangaka files', () => {
   });
 
   it('rejects points that do not match the stride', () => {
-    expect(() => parseProjectBundle(withArt([1, 2, 3]))).toThrow("isn't a Mangaka project");
-    expect(() => parseProjectBundle(withArt([1, 2, 3, 4], true))).toThrow("isn't a Mangaka project");
+    expect(() => parseProjectBundle(withArt([1, 2, 3]))).toThrow("isn't a Manganova project");
+    expect(() => parseProjectBundle(withArt([1, 2, 3, 4], true))).toThrow("isn't a Manganova project");
   });
 
   it('drops rows whose chapter is missing instead of failing later', () => {
@@ -512,7 +512,7 @@ describe('.mangaka files', () => {
       ...minimal,
       pages: [{ id: 'g', chapterId: 'c', layout: { kind: 'split', id: 's', dir: 'x', t0: 0, t1: 1 } }],
     });
-    expect(() => parseProjectBundle(json)).toThrow("isn't a Mangaka project");
+    expect(() => parseProjectBundle(json)).toThrow("isn't a Manganova project");
   });
 });
 

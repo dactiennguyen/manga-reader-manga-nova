@@ -1,6 +1,6 @@
 # Phong cách Studio
 
-![Mangaka AI ở phong cách Studio](style/hero.png)
+![Manganova ở phong cách Studio](style/hero.png)
 
 **Một xưởng in nhỏ: mực, giấy và vài màu riso.** App có màu và có hồn như một cuốn zine in tay, còn khi bạn vẽ thì mọi thứ lùi lại để tranh của bạn dẫn đầu.
 
@@ -17,7 +17,7 @@ Tài liệu này giải thích cảm giác của style và lý do đằng sau t�
 
 ## Logo
 
-<img src="style/logo.png" alt="Logo Mangaka AI" width="160" />
+<img src="style/logo.png" alt="Logo Manganova" width="160" />
 
 Logo là chữ M in đậm, cắt tay như dao rọc giấy:
 
@@ -125,8 +125,8 @@ Cỡ icon theo thang `ICON`: `xs` 14, `sm` 16, `md` 20, `lg` 24, `xl` 32, `xxl` 
 
 Dự án có hai skill trong `.claude/skills/`:
 
-- **`mangaka-ui`** dùng khi dựng hoặc chỉnh màn hình. Có sẵn các bước kiểm tra trên máy.
-- **`mangaka-icons`** dùng khi thêm hay đổi icon.
+- **`manganova-ui`** dùng khi dựng hoặc chỉnh màn hình. Có sẵn các bước kiểm tra trên máy.
+- **`manganova-icons`** dùng khi thêm hay đổi icon.
 
 Bảng màu và bảng icon trong tài liệu này được sinh từ code, nên sẽ không lệch với app:
 

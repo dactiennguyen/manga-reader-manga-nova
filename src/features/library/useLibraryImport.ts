@@ -24,7 +24,7 @@ export function useLibraryImport(onImported: (projectId: ID) => void) {
       onImported(await appServices().importProject(picked.path));
       toast('Project imported');
     } catch {
-      toast('This file is unreadable or is not a Mangaka project');
+      toast('This file is unreadable or is not a Manganova project');
     } finally {
       setImporting(false);
     }

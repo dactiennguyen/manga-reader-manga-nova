@@ -23,7 +23,7 @@ import {
   zipDir,
 } from '../native/files';
 
-const INVALID_MESSAGE = "This file can't be read or isn't a Mangaka project";
+const INVALID_MESSAGE = "This file can't be read or isn't a Manganova project";
 const RELATIVE_IMAGE = /^images\/[A-Za-z0-9_-]+\.[A-Za-z0-9]+$/;
 
 export type ArchiveStory = {

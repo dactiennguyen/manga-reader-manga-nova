@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ARCHIVE_EXTENSION } from '../../core/archive/bundle';
+import { ARCHIVE_EXTENSION, isArchiveName } from '../../core/archive/bundle';
 import { pickToCache, pickerTypes, removeFile } from '../../native/files';
 import { useAppNavigation } from '../../state/navigation';
 import { appServices } from '../../state/services';
@@ -22,7 +22,7 @@ export function useImportArchive() {
         return;
       }
       cachePath = picked.path;
-      if (!picked.name.toLowerCase().endsWith(`.${ARCHIVE_EXTENSION}`)) {
+      if (!isArchiveName(picked.name)) {
         toast(`Pick a .${ARCHIVE_EXTENSION} file`);
         return;
       }

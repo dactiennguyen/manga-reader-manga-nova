@@ -3,7 +3,7 @@ import type { Db } from '../core/ports';
 import { migrate, pendingMigrations } from './migrations';
 import { openRaw, wrapDb } from './opDb';
 
-const DB_NAME = 'mangaka.db';
+const DB_NAME = 'manganova.db';
 const BACKUPS_KEPT = 2;
 
 async function backup(): Promise<string | null> {

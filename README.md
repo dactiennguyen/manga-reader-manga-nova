@@ -1,4 +1,4 @@
-# Mangaka AI
+# Manganova
 
 Android app for making a manga chapter on a phone: script, characters, panels, drawing, lettering, preview, export.
 

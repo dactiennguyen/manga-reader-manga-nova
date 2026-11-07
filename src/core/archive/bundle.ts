@@ -14,11 +14,19 @@ import type {
 } from '../model/types';
 import { uid } from '../util/id';
 
-export const ARCHIVE_EXTENSION = 'mangaka';
+export const ARCHIVE_EXTENSION = 'manganova';
+
+/** Backups from the old app and from before the rename use this one. */
+const LEGACY_ARCHIVE_EXTENSION = 'mangaka';
+
+export function isArchiveName(name: string): boolean {
+  const lower = name.toLowerCase();
+  return lower.endsWith(`.${ARCHIVE_EXTENSION}`) || lower.endsWith(`.${LEGACY_ARCHIVE_EXTENSION}`);
+}
 
 export type ProjectBundle = {
   version: 1;
-  app: 'mangaka';
+  app: 'manganova';
   exportedAt: number;
   project: Project;
   chapters: Chapter[];
@@ -65,7 +73,7 @@ export function buildProjectBundle(
   }
   return {
     version: 1,
-    app: 'mangaka',
+    app: 'manganova',
     exportedAt: Date.now(),
     project,
     chapters,
