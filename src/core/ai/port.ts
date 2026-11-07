@@ -44,7 +44,8 @@ export function normalizeBaseUrl(input: string): string {
   if (!/^https?:\/\//i.test(url)) {
     url = `https://${url}`;
   }
-  return /\/v\d+$/i.test(url) ? url : `${url}/v1`;
+  // A URL with a path is complete: Gemini's is /v1beta/openai.
+  return /^https?:\/\/[^/]+$/i.test(url) ? `${url}/v1` : url;
 }
 
 export function aiErrorMessage(error: unknown): string {

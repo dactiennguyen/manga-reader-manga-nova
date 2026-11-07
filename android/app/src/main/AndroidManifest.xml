@@ -34,6 +34,13 @@
             <data android:pathPattern=".*\\.mangaka" />
             <data android:pathPattern=".*\\..*\\.mangaka" />
         </intent-filter>
+        <!-- Drive, mail and download apps send URIs with no file name. The import checks the content. -->
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="content" />
+            <data android:mimeType="application/octet-stream" />
+        </intent-filter>
       </activity>
       <!-- Shares exported files (PDF, CBZ, images) through the Android share sheet. -->
       <provider

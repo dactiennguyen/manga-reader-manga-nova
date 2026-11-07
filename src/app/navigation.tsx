@@ -1,6 +1,7 @@
 import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { House, LibraryBig, Sparkles, User } from 'lucide-react-native';
+import { useWindowDimensions } from 'react-native';
 
 import { AssistantScreen } from '../features/assistant/AssistantScreen';
 import { CanvasScreen } from '../features/canvas/CanvasScreen';
@@ -25,7 +26,7 @@ import { WorldEntryScreen } from '../features/world/WorldEntryScreen';
 import { WorldScreen } from '../features/world/WorldScreen';
 import { useAppNavigation, type RootStackParamList, type TabParamList } from '../state/navigation';
 import { useSettings } from '../state/useSettings';
-import { Dock, useColor, type LucideIcon } from '../ui';
+import { DOCK_RAIL_WIDTH, Dock, useColor, type LucideIcon } from '../ui';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -66,8 +67,15 @@ const renderDock = (props: BottomTabBarProps) => <AppDock {...props} />;
 
 function Tabs() {
   const bg = useColor('bg');
+  const { width } = useWindowDimensions();
   return (
-    <Tab.Navigator tabBar={renderDock} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: bg } }}>
+    <Tab.Navigator
+      tabBar={renderDock}
+      screenOptions={{
+        headerShown: false,
+        sceneStyle: { backgroundColor: bg, paddingLeft: width >= 600 ? DOCK_RAIL_WIDTH : 0 },
+      }}
+    >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Library" component={LibraryScreen} />
       <Tab.Screen name="Assistant" component={AssistantScreen} />

@@ -102,7 +102,7 @@ Vì vậy patch hoàn tác của tranh chỉ là một dòng `art_layers`, tranh
 ├── mangaka.db
 ├── images/    ảnh người dùng thêm: bìa, bảng thiết kế, ảnh thế giới, ảnh lớp
 ├── thumbs/    thumbnail, tạo lại được
-├── exports/   file đã xuất
+├── exports/   file đã xuất, mỗi truyện một thư mục <projectId>/, gồm cả .mangaka
 └── backups/   bản sao DB trước migration
 <cacheDir>/mangaka-tmp/
 ```
@@ -119,7 +119,7 @@ Dữ liệu chỉ lưu **đường dẫn tương đối** với `<filesDir>/mang
 | Dòng có `deleted_at` khác | Xóa hẳn sau 7 ngày |
 | `gen` cũ, đuôi nét làm lại | Xóa khi không còn tham chiếu nào. Lịch sử chỉ ở trong bộ nhớ nên lúc khởi động không còn ai cần |
 | File trong `images/`, `thumbs/` | Quét đánh dấu: file không dòng nào trỏ tới thì xóa |
-| File trong `exports/` | Xóa theo truyện khi truyện bị xóa hẳn. Thêm nút xóa trong lịch sử xuất. App cũ không bao giờ xóa các file này |
+| File trong `exports/` | Xóa cả thư mục `<projectId>/` khi truyện bị xóa hẳn, qua hook của `connectStory`. Lịch sử xuất có nút xóa. App cũ không bao giờ xóa các file này |
 
 GC chỉ chạy lúc khởi động lạnh, sau khi nạp xong dữ liệu. Nó cũng xử lý luôn phần `deleteProjectForever` của app cũ để sót lại.
 

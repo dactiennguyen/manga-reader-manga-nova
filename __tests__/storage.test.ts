@@ -17,7 +17,17 @@ import {
   saveArt,
   undoArt,
 } from '../src/state/artStore';
-import { flushStory, redoStory, undoStory, undoable, useHistory, useStory } from '../src/state/useStory';
+import {
+  connectStory,
+  flushStory,
+  importEntities,
+  redoStory,
+  undoStory,
+  undoable,
+  useHistory,
+  useStory,
+} from '../src/state/useStory';
+import { createStoryRepo } from '../src/data/storyRepo';
 import { createNodeDb } from './helpers/nodeDb';
 import { connectTestStorage, restart } from './helpers/storage';
 
@@ -115,6 +125,48 @@ describe('story rows on disk', () => {
   });
 });
 
+describe('telling the app a story is gone', () => {
+  function watchDeletes() {
+    const db = connectTestStorage();
+    const deleted: string[] = [];
+    connectStory(createStoryRepo(db), undefined, id => deleted.push(id));
+    return { db, deleted };
+  }
+
+  it('fires for a story deleted for good, and not for Trash', () => {
+    const { deleted } = watchDeletes();
+    const { projectId } = newStory();
+    story().trashProject(projectId);
+    story().restoreProject(projectId);
+    expect(deleted).toEqual([]);
+    story().deleteProjectForever(projectId);
+    expect(deleted).toEqual([projectId]);
+  });
+
+  it('fires for each story the trash purge removes', () => {
+    const { deleted } = watchDeletes();
+    const first = newStory().projectId;
+    const second = newStory().projectId;
+    const kept = newStory().projectId;
+    story().trashProject(first);
+    story().trashProject(second);
+    story().purgeTrash(Date.now() + 365 * 24 * 3600 * 1000);
+    expect(deleted.sort()).toEqual([first, second].sort());
+    expect(story().projects[kept]).toBeDefined();
+  });
+
+  it('stays quiet when the whole state is swapped out', () => {
+    const { db, deleted } = watchDeletes();
+    newStory();
+    flushStory();
+    connectStory(null, undefined, id => deleted.push(id));
+    expect(story().projects).toEqual({});
+    connectStory(createStoryRepo(db), undefined, id => deleted.push(id));
+    expect(Object.keys(story().projects)).toHaveLength(1);
+    expect(deleted).toEqual([]);
+  });
+});
+
 describe('undo scopes', () => {
   it('merges typing in one scene into one step', () => {
     connectTestStorage();
@@ -150,6 +202,29 @@ describe('undo scopes', () => {
     story().bumpArt(pageId);
     undoStory(`page:${pageId}`);
     expect(story().pages[pageId].artRev).toBe(1);
+  });
+
+  it('keeps pages when script undo crosses a project change on the same chapter', () => {
+    connectTestStorage();
+    const { chapterId } = newStory();
+    const sceneId = story().addScene(chapterId);
+    const pageId = story().addPage(chapterId);
+    undoStory(`script:${chapterId}`);
+    expect(story().chapters[chapterId].sceneIds).toEqual([]);
+    expect(story().chapters[chapterId].pageIds).toEqual([pageId]);
+    redoStory(`script:${chapterId}`);
+    expect(story().chapters[chapterId].sceneIds).toEqual([sceneId]);
+    expect(story().chapters[chapterId].pageIds).toEqual([pageId]);
+  });
+
+  it('keeps scenes when project undo crosses a script change on the same chapter', () => {
+    connectTestStorage();
+    const { projectId, chapterId } = newStory();
+    story().addPage(chapterId);
+    const sceneId = story().addScene(chapterId);
+    undoStory(`project:${projectId}`);
+    expect(story().chapters[chapterId].pageIds).toEqual([]);
+    expect(story().chapters[chapterId].sceneIds).toEqual([sceneId]);
   });
 
   it('counts a group of actions as one step', () => {
@@ -302,6 +377,54 @@ describe('art', () => {
   });
 });
 
+describe('importing a story', () => {
+  const rows = (id: string, chapterId: string) => ({
+    projects: { [id]: { id, title: 'Imported', acts: [] } as never },
+    chapters: {},
+    scenes: { [`${id}-s`]: { id: `${id}-s`, chapterId, description: '', blocks: [] } },
+  });
+
+  it('leaves nothing behind and keeps saving when the rows break a foreign key', () => {
+    const db = connectTestStorage();
+    const { chapterId } = newStory();
+    expect(() => importEntities(rows('bad', 'no-such-chapter'))).toThrow();
+    expect(story().projects.bad).toBeUndefined();
+    const sceneId = story().addScene(chapterId, { description: 'still saved' });
+    flushStory();
+    restart(db);
+    expect(story().scenes[sceneId].description).toBe('still saved');
+    expect(story().projects.bad).toBeUndefined();
+  });
+
+  it('writes valid rows before showing them', () => {
+    const db = connectTestStorage();
+    const { chapterId } = newStory();
+    importEntities(rows('good', chapterId));
+    restart(db);
+    expect(story().projects.good.title).toBe('Imported');
+  });
+});
+
+describe('plans larger than the template', () => {
+  it('keeps every block of a 7 panel plan on a webtoon strip', () => {
+    connectTestStorage();
+    const projectId = story().createProject({
+      title: 'W',
+      genres: [],
+      logline: '',
+      format: 'webtoon',
+      pageSize: 'B5',
+      style: 'shounen',
+      color: false,
+    });
+    const chapterId = story().projects[projectId].acts[0].chapterIds[0];
+    const panels = Array.from({ length: 7 }, (_, index) => ({ description: `p${index}`, blockIds: [`b${index}`] }));
+    const pageId = story().addPage(chapterId, { plan: { panels } as never });
+    const kept = Object.values(story().pages[pageId].panels).flatMap(panel => panel.blockIds);
+    expect(kept.sort()).toEqual(['b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6']);
+  });
+});
+
 describe('migrations', () => {
   it('stops at the last good version when a step fails', () => {
     const db = createNodeDb();
@@ -367,6 +490,21 @@ describe('.mangaka files', () => {
   it('rejects points that do not match the stride', () => {
     expect(() => parseProjectBundle(withArt([1, 2, 3]))).toThrow("isn't a Mangaka project");
     expect(() => parseProjectBundle(withArt([1, 2, 3, 4], true))).toThrow("isn't a Mangaka project");
+  });
+
+  it('drops rows whose chapter is missing instead of failing later', () => {
+    const json = JSON.stringify({
+      ...minimal,
+      chapters: [{ id: 'c' }],
+      scenes: [
+        { id: 'keep', chapterId: 'c' },
+        { id: 'lost', chapterId: 'gone' },
+      ],
+      pages: [{ id: 'lost', chapterId: 'gone' }],
+    });
+    const bundle = parseProjectBundle(json);
+    expect(bundle.scenes.map(scene => scene.id)).toEqual(['keep']);
+    expect(bundle.pages).toEqual([]);
   });
 
   it('rejects a broken layout tree below the top level', () => {

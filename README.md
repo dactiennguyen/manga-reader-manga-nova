@@ -20,7 +20,7 @@ Release build:
 cd android && ./gradlew assembleRelease
 ```
 
-Release builds block screenshots (`SECURE_SCREEN` in `src/native/screen.ts`), so `adb screencap` returns a black image. Use a debug build to capture screens. The release build is signed with the debug key until an upload key exists.
+Release builds block screenshots (`SECURE_SCREEN` in `MainActivity.kt`), so `adb screencap` returns a black image. Use a debug build to capture screens. The release build is signed with the debug key until an upload key exists.
 
 ## Check
 

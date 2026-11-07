@@ -9,7 +9,7 @@ import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { DOCK_GAP, DOCK_HEIGHT } from './tokens';
 
-const PANEL_SHADOW = '0 6px 20px rgba(0,0,0,0.35)';
+export const PANEL_SHADOW = '0 6px 20px rgba(0,0,0,0.35)';
 
 export type DockItem = { key: string; label: string; icon: LucideIcon; selected: boolean; onPress: () => void };
 
@@ -126,6 +126,7 @@ export function ModeSwitch<T extends string>({
             accessibilityRole="tab"
             accessibilityLabel={option.label}
             accessibilityState={{ selected }}
+            hitSlop={{ top: 4, bottom: 4 }}
             onPress={() => onChange(option.value)}
             className={`flex-row items-center justify-center gap-1.5 overflow-hidden rounded-sm px-3 ${selected ? 'bg-accent' : ''}`}
           >

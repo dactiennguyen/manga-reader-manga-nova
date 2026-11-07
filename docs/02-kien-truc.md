@@ -85,7 +85,7 @@ export interface ArtRepo {
 
 ## Hoàn tác
 
-Mỗi commit lưu ảnh trước và sau của những dòng nó chạm tới. Hoàn tác là áp lại ảnh trước qua đúng đường ghi ở trên. Không có class lệnh, cũng không chụp toàn bộ tài liệu.
+Mỗi commit lưu ảnh trước và sau của những dòng nó chạm tới. Hoàn tác chỉ áp lại những trường mà commit đó đã đổi, qua đúng đường ghi ở trên, vì một dòng có thể thuộc hai ngăn: `sceneIds` của chương là lịch sử kịch bản, `pageIds` là lịch sử dự án. Không có class lệnh, cũng không chụp toàn bộ tài liệu.
 
 | Ngăn | Quản lý | Giới hạn |
 | --- | --- | --- |
@@ -96,7 +96,7 @@ Mỗi commit lưu ảnh trước và sau của những dòng nó chạm tới. H
 
 Quy tắc:
 
-- Các ngăn quản lý phần dữ liệu riêng, không chồng nhau.
+- Các ngăn quản lý phần dữ liệu riêng theo từng trường, không chồng nhau.
 - Dàn khung và Thoại dùng chung ngăn `page`. Ở app cũ, hoàn tác bố cục làm mất hiệu ứng vì `Snapshot` không có `effects` và `height`.
 - Thao tác chạm nhiều ngăn (`removeCharacter`, xóa bản ngôn ngữ) xóa các ngăn bị ảnh hưởng. Đây là cách `LetteringScreen` cũ đang làm.
 - `artRev` và `updatedAt` không nằm trong patch.

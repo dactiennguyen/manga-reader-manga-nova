@@ -378,6 +378,20 @@ describe('stylus', () => {
     expect(r.has('view')).toBe(true);
   });
 
+  it('draws when the hand rests on the screen before the pen lands', () => {
+    const r = rig({ stylusMode: true });
+    r.down(2, 600, 600, 'touch');
+    expect(r.state.mode).toBe('pan');
+    r.down(1, 300, 300, 'stylus');
+    expect(r.state.mode).toBe('draw');
+    r.move(2, 620, 620);
+    r.move(1, 330, 300);
+    r.time += 500;
+    r.up(1);
+    r.up(2);
+    expect(r.find('strokeCommit').stroke.points).toEqual([300, 300, 0.5, 330, 300, 0.5]);
+  });
+
   it('ignores a palm while the pen is drawing', () => {
     const r = rig({ stylusMode: true });
     r.down(1, 300, 300, 'stylus');

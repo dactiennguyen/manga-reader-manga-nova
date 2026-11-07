@@ -1,4 +1,14 @@
-import { useEffect, useState, type ComponentRef, type ReactNode, type Ref } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type ComponentRef,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import {
   ScrollView,
   TextInput,
@@ -6,7 +16,7 @@ import {
   type LayoutChangeEvent,
   type TextInputProps,
 } from 'react-native';
-import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
+import { GestureDetector, useExclusiveGestures, usePanGesture, useTapGesture } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import { Check, Minus, Plus, Search, X } from 'lucide-react-native';
@@ -16,6 +26,12 @@ import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { useColor } from './tokens';
+
+/**
+ * Inside a Modal: whether its window is on screen yet. Android drops a keyboard request from a window
+ * that has no focus, and a new Modal has none while it mounts, so `autoFocus` has to wait for this.
+ */
+export const ModalShownContext = createContext<boolean | null>(null);
 
 export type TextFieldProps = TextInputProps & {
   ref?: Ref<ComponentRef<typeof TextInput>>;
@@ -29,6 +45,15 @@ export function TextField({ ref, icon, onClear, className, inputClassName, multi
   const muted = useColor('text-muted');
   const accent = useColor('accent');
   const [focused, setFocused] = useState(false);
+  const input = useRef<ComponentRef<typeof TextInput>>(null);
+  useImperativeHandle(ref, () => input.current as ComponentRef<typeof TextInput>);
+  const modalShown = useContext(ModalShownContext);
+  const waitsForModal = !!props.autoFocus && modalShown !== null;
+  useEffect(() => {
+    if (waitsForModal && modalShown) {
+      input.current?.focus();
+    }
+  }, [waitsForModal, modalShown]);
   return (
     <View
       className={`flex-row items-center gap-2 rounded-sm border bg-surface px-3 ${
@@ -37,12 +62,13 @@ export function TextField({ ref, icon, onClear, className, inputClassName, multi
     >
       {!!icon && <Icon icon={icon} size={18} color="text-muted" />}
       <TextInput
-        ref={ref}
+        ref={input}
         multiline={multiline}
         placeholderTextColor={muted}
         cursorColor={accent}
         selectionColor={accent}
         {...props}
+        autoFocus={waitsForModal ? false : props.autoFocus}
         onFocus={event => {
           setFocused(true);
           props.onFocus?.(event);
@@ -398,9 +424,12 @@ export function Slider({
     scheduleOnRN(emit, next, done);
   };
 
+  // Seeking starts on activation, so a vertical scroll that passes over the slider changes nothing.
   const pan = usePanGesture({
     enabled: !disabled,
-    onBegin: event => {
+    activeOffsetX: [-6, 6],
+    failOffsetY: [-12, 12],
+    onActivate: event => {
       'worklet';
       dragging.value = true;
       seek(event.x, false);
@@ -409,12 +438,20 @@ export function Slider({
       'worklet';
       seek(event.x, false);
     },
-    onFinalize: event => {
+    onDeactivate: event => {
       'worklet';
       dragging.value = false;
       seek(event.x, true);
     },
   });
+  const tap = useTapGesture({
+    enabled: !disabled,
+    onDeactivate: event => {
+      'worklet';
+      seek(event.x, true);
+    },
+  });
+  const gesture = useExclusiveGestures(pan, tap);
 
   const thumb = useAnimatedStyle(() => ({ transform: [{ translateX: ratio.value * Math.max(0, width.value - THUMB) }] }));
   const fill = useAnimatedStyle(() => ({ width: THUMB / 2 + ratio.value * Math.max(0, width.value - THUMB) }));
@@ -434,7 +471,7 @@ export function Slider({
       onLayout={(event: LayoutChangeEvent) => width.set(event.nativeEvent.layout.width)}
       className={`h-12 ${disabled ? 'opacity-40' : ''} ${className ?? ''}`}
     >
-      <GestureDetector gesture={pan}>
+      <GestureDetector gesture={gesture}>
         <View className="h-12 w-full justify-center">
           <View className="h-1 rounded-full bg-overlay" />
           <Animated.View className="absolute h-1 rounded-full bg-accent" style={fill} />

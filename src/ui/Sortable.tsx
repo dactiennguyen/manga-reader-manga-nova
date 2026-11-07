@@ -14,6 +14,8 @@ export const SETTLE_MS = MOTION.fast;
 
 const LIFT_MS = 120;
 
+const GHOST_SHADOW = { boxShadow: '0 12px 32px rgba(0,0,0,0.45)' };
+
 export type DragState = {
   tx: SharedValue<number>;
   ty: SharedValue<number>;
@@ -128,7 +130,7 @@ export function DragGhost({
     <Animated.View
       pointerEvents="none"
       className="absolute z-20"
-      style={[{ left, top, width, boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }, style]}
+      style={[{ left, top, width }, GHOST_SHADOW, style]}
     >
       {children}
     </Animated.View>

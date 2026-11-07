@@ -86,5 +86,13 @@ export function parseProjectBundle(json: string): ProjectBundle {
       art[panelId] = value as unknown as PanelArt;
     }
   }
-  return { ...(parsed.data as unknown as ProjectBundle), art };
+  const story = parsed.data as unknown as ProjectBundle;
+  // Rows without a chapter were unreachable in the old app and would break the foreign keys here.
+  const chapterIds = new Set(story.chapters.map(chapter => chapter.id));
+  return {
+    ...story,
+    scenes: story.scenes.filter(scene => chapterIds.has(scene.chapterId)),
+    pages: story.pages.filter(page => chapterIds.has(page.chapterId)),
+    art,
+  };
 }

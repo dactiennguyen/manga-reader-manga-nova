@@ -37,7 +37,8 @@ export function matchCharacter(name: string, characters: Character[]): Character
   );
 }
 
-export function parseBlockDrafts(value: unknown, characters: Character[]): BlockDraft[] {
+/** With `exact`, every item must parse and the count must match, because drafts pair with blocks by index. */
+export function parseBlockDrafts(value: unknown, characters: Character[], exact?: number): BlockDraft[] {
   const source = Array.isArray(value)
     ? value
     : Array.isArray(field(value, 'blocks'))
@@ -49,6 +50,9 @@ export function parseBlockDrafts(value: unknown, characters: Character[]): Block
     const type = BLOCK_TYPES.find(candidate => candidate === rawType) ?? (rawType === 'sound' ? 'sfx' : undefined);
     const body = text(field(item, 'text'), type === 'dialogue' ? 240 : 400);
     if (!type || !body) {
+      if (exact !== undefined) {
+        throw new AiError('format', FORMAT_ERROR);
+      }
       continue;
     }
     const draft: BlockDraft = { type, text: body };
@@ -62,10 +66,10 @@ export function parseBlockDrafts(value: unknown, characters: Character[]): Block
     }
     drafts.push(draft);
   }
-  if (!drafts.length) {
+  if (!drafts.length || (exact !== undefined && drafts.length !== exact)) {
     throw new AiError('format', FORMAT_ERROR);
   }
-  return drafts.slice(0, 8);
+  return exact === undefined ? drafts.slice(0, 8) : drafts;
 }
 
 function blockSchema(): string {
@@ -195,7 +199,7 @@ export async function rewriteBlocks(
   const list = Object.values(characters).filter((item): item is Character => !!item);
   return askJson(
     rewriteMessages(brief, blocks, characters, instruction),
-    value => parseBlockDrafts(value, list),
+    value => parseBlockDrafts(value, list, blocks.length),
     signal,
   );
 }

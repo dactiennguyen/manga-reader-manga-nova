@@ -33,11 +33,14 @@ export type ArchiveStory = {
   importArt: (art: Record<ID, PanelArt>) => void;
 };
 
-async function freeArchivePath(base: string): Promise<string> {
-  let path = `${DIRS.exports}/${base}.${ARCHIVE_EXTENSION}`;
+/** Inside the story's own folder, so the file leaves with the story like every other export. */
+async function freeArchivePath(projectId: ID, base: string): Promise<string> {
+  const dir = `${DIRS.exports}/${projectId}`;
+  await RNFS.mkdir(dir);
+  let path = `${dir}/${base}.${ARCHIVE_EXTENSION}`;
   let n = 2;
   while (await RNFS.exists(path)) {
-    path = `${DIRS.exports}/${base}-${n}.${ARCHIVE_EXTENSION}`;
+    path = `${dir}/${base}-${n}.${ARCHIVE_EXTENSION}`;
     n++;
   }
   return path;
@@ -81,7 +84,7 @@ export async function exportProjectArchive(story: ArchiveStory, projectId: ID): 
     }
     const final = missing.size ? mapBundleImages(portable, path => (missing.has(path) ? undefined : path)) : portable;
     await RNFS.writeFile(`${tmpDir}/story.json`, JSON.stringify(final), 'utf8');
-    const outPath = await freeArchivePath(`${slugify(bundle.project.title)}-${dayKey()}`);
+    const outPath = await freeArchivePath(projectId, `${slugify(bundle.project.title)}-${dayKey()}`);
     await zipDir(tmpDir, outPath);
     return outPath;
   } finally {
@@ -124,6 +127,8 @@ export async function importProjectArchive(story: ArchiveStory, archivePath: str
       updatedAt: Date.now(),
     };
     delete project.deletedAt;
+    // Art first: if the story rows then fail, the panels are orphans for GC and no story half exists.
+    story.importArt(local.art);
     story.merge({
       projects: { [project.id]: project },
       chapters: byId(local.chapters),
@@ -133,7 +138,6 @@ export async function importProjectArchive(story: ArchiveStory, archivePath: str
       world: byId(local.world),
       pages: byId(local.pages),
     });
-    story.importArt(local.art);
     return project.id;
   } finally {
     await removeFile(tmpDir);

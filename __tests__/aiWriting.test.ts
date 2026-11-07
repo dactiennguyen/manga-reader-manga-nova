@@ -82,6 +82,12 @@ describe('script drafts', () => {
     expect(drafts[2].kind).toBe('speak');
     expect(drafts[3].type).toBe('sfx');
     expect(() => parseBlockDrafts({ blocks: [] }, cast)).toThrow(AiError);
+
+    const lines = Array.from({ length: 10 }, (_, index) => ({ type: 'action', text: `line ${index}` }));
+    expect(parseBlockDrafts({ blocks: lines }, cast, 10)).toHaveLength(10);
+    expect(() => parseBlockDrafts({ blocks: lines.slice(0, 9) }, cast, 10)).toThrow(AiError);
+    const broken = lines.map((line, index) => (index === 2 ? { type: 'action', text: '' } : line));
+    expect(() => parseBlockDrafts({ blocks: broken }, cast, 10)).toThrow(AiError);
   });
 
   it('parses single lines and sfx lists', () => {

@@ -30,3 +30,5 @@ export const MOTION = { instant: 100, fast: 160, base: 220, slow: 300 } as const
 export const DOCK_HEIGHT = 64;
 
 export const DOCK_GAP = 12;
+
+export const DOCK_RAIL_WIDTH = 80;

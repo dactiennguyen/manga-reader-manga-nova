@@ -179,6 +179,13 @@ function panelsFromPlan(
       blockIds: planned?.blockIds ?? [],
     });
   });
+  const overflow = plan?.panels.slice(order.length) ?? [];
+  const last = panels[order[order.length - 1]];
+  if (last && overflow.length) {
+    // Webtoon strips stop at 6 panels while a plan can hold more, so the last panel takes the rest.
+    last.blockIds = [...last.blockIds, ...overflow.flatMap(item => item.blockIds)];
+    last.description = [last.description, ...overflow.map(item => item.description)].filter(Boolean).join(' ');
+  }
   return { layout: built.layout, panels };
 }
 

@@ -358,6 +358,23 @@ function onDown(
     }
     return s;
   }
+  // The hand usually rests first, so a pen landing on a touch-only pan takes over instead of pinching.
+  if (e.pointer === 'stylus' && env.stylusMode && (s.mode === 'pan' || s.mode === 'view')) {
+    const t = e.changed[0];
+    clearHold(s, effects);
+    s.ids = [t.id];
+    s.pen = true;
+    s.pan = null;
+    s.base = null;
+    s.maxTouches = 1;
+    s.startTime = e.time;
+    s.startX = t.x;
+    s.startY = t.y;
+    s.moved = false;
+    s.token = s.token + 1;
+    startDraw(s, t, e.pressure, env, effects);
+    return s;
+  }
   // A palm landing beside the pen: the pen keeps drawing and the palm never existed.
   if (s.mode === 'draw' && s.pen && e.pointer === 'touch') {
     s.ids = ids.filter(id => !e.changed.some(t => t.id === id));

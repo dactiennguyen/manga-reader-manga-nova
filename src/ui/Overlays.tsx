@@ -16,11 +16,32 @@ import { Check, ChevronDown } from 'lucide-react-native';
 
 import { Button, type ButtonVariant } from './Button';
 import { Icon, type LucideIcon } from './Icon';
-import { TextField } from './Inputs';
+import { ModalShownContext, TextField } from './Inputs';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { haptic } from './haptics';
 import { DOCK_GAP, MOTION } from './tokens';
+
+/**
+ * Tells fields inside a Modal when its window can open the keyboard. See ModalShownContext. `onShow`
+ * alone is too early: it fires before the window manager hands the new window focus, and nothing
+ * reports that moment to JS. Waiting out the opening motion covers it.
+ */
+function useModalShown(open: boolean): [boolean, () => void] {
+  const [shown, setShown] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!open) {
+      setShown(false);
+    }
+    return () => {
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
+    };
+  }, [open]);
+  return [shown, () => (timer.current = setTimeout(() => setShown(true), MOTION.base))];
+}
 
 const DISMISS_DISTANCE = 96;
 const DISMISS_VELOCITY = 800;
@@ -50,6 +71,7 @@ export function Sheet({
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const [mounted, setMounted] = useState(visible);
+  const [shown, onShow] = useModalShown(mounted);
   const height = useSharedValue(600);
   const offset = useSharedValue(600);
   const scrim = useSharedValue(0);
@@ -99,7 +121,15 @@ export function Sheet({
   const backdrop = useAnimatedStyle(() => ({ opacity: scrim.value }));
 
   return (
-    <Modal visible={mounted} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
+    <Modal
+      visible={mounted}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+      onShow={onShow}
+      statusBarTranslucent
+      navigationBarTranslucent
+    >
       <GestureHandlerRootView className="flex-1">
         <KeyboardAvoidingView behavior="padding" className="flex-1 justify-end">
           <Animated.View className="absolute inset-0 bg-scrim" style={backdrop}>
@@ -133,7 +163,9 @@ export function Sheet({
                 {right}
               </View>
             )}
-            {scroll ? <ScrollView keyboardShouldPersistTaps="handled">{children}</ScrollView> : children}
+            <ModalShownContext.Provider value={shown}>
+              {scroll ? <ScrollView keyboardShouldPersistTaps="handled">{children}</ScrollView> : children}
+            </ModalShownContext.Provider>
           </Animated.View>
         </KeyboardAvoidingView>
       </GestureHandlerRootView>
@@ -164,8 +196,17 @@ export function Dialog({
   children?: ReactNode;
   actions?: DialogAction[];
 }) {
+  const [shown, onShow] = useModalShown(visible);
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent navigationBarTranslucent>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+      onShow={onShow}
+      statusBarTranslucent
+      navigationBarTranslucent
+    >
       <KeyboardAvoidingView behavior="padding" className="flex-1 items-center justify-center p-6">
         <RNPressable accessibilityLabel="Close" className="absolute inset-0 bg-scrim" onPress={onClose} />
         <View accessibilityViewIsModal className="max-h-[90%] w-full max-w-[560px] gap-3 rounded-xl bg-overlay p-6" style={{ boxShadow: '0 12px 32px rgba(0,0,0,0.45)' }}>
@@ -175,7 +216,7 @@ export function Dialog({
             </Text>
           )}
           {!!message && <Text tone="secondary">{message}</Text>}
-          {children}
+          <ModalShownContext.Provider value={shown}>{children}</ModalShownContext.Provider>
           {!!actions?.length && (
             <View className="mt-2 flex-row flex-wrap justify-end gap-2">
               {actions.map(action => (

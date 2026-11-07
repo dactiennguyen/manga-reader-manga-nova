@@ -50,7 +50,7 @@ Những mục này không chặn việc viết code ở giai đoạn đầu, nh�
 | --- | --- | --- | --- |
 | 1 | **Đổi khóa ký.** Repo cũ công khai và chứa keystore cùng mật khẩu ở dạng chữ thường (`android/app/build.gradle:90-100`). Coi khóa này là đã lộ | Tạo upload key mới, để ngoài git, dùng GitHub Secrets. App chưa lên Play nên việc đổi không ảnh hưởng ai | Trước lần upload đầu tiên |
 | 2 | **Kiểm tra URL git.** `origin` của repo cũ có nhúng thông tin xác thực. Nếu đó là token thì nó nằm trong `.git/config` | Thu hồi token nếu có, chuyển sang SSH hoặc credential helper | Sớm nhất có thể |
-| 3 | **Chống chụp màn hình.** Đã quyết: giữ như app cũ, bản release chặn chụp, bản debug không chặn. Đổi một hằng số `SECURE_SCREEN` là tắt được. Lưu ý: phải chụp ảnh cho Play trên bản debug | Xem lại trước khi phát hành | Giai đoạn 8 |
+| 3 | **Chống chụp màn hình.** Đã quyết: giữ như app cũ, bản release chặn chụp, bản debug không chặn. Đổi hằng số `SECURE_SCREEN` trong `MainActivity.kt` là tắt được. Lưu ý: phải chụp ảnh cho Play trên bản debug | Xem lại trước khi phát hành | Giai đoạn 8 |
 | 4 | **Package id.** Đã đổi sang `com.mangakaai.app`. Sau khi lên Play thì không đổi được nữa, nên nếu có tên miền riêng thì đổi trước lần upload đầu | Giữ, hoặc đổi theo tên miền thật | Trước lần upload đầu tiên |
 | 5 | **Server AI cho bản phát hành.** Người dùng phải tự chạy server. Công cụ `gemini-web2api` mà README nhắc tới là công cụ không chính thức, chỉ dùng khi phát triển | Không nhắc công cụ đó trong app hay trang Play. Nếu muốn AI chạy sẵn cho người dùng thì phải làm máy chủ trung gian, ngoài phạm vi bản này | Trước khi phát hành |
 

@@ -39,10 +39,35 @@ export function applyPatches(state: StoryData, patches: RowPatch[], side: 'befor
     if (row === null) {
       delete table[patch.id];
     } else {
-      table[patch.id] = row;
+      table[patch.id] = mergeRow(table[patch.id], patch, row);
     }
   }
   return next;
+}
+
+/**
+ * Applies only the fields this patch changed. One row can belong to two undo scopes: a chapter's
+ * sceneIds are script history and its pageIds are project history, so writing the whole snapshot
+ * back would erase what the other scope did since.
+ */
+function mergeRow(current: unknown, patch: RowPatch, row: unknown): unknown {
+  if (current === undefined || patch.before === null || patch.after === null) {
+    return row;
+  }
+  const before = patch.before as Record<string, unknown>;
+  const after = patch.after as Record<string, unknown>;
+  const source = row as Record<string, unknown>;
+  const merged = { ...(current as Record<string, unknown>) };
+  for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    if (before[key] !== after[key]) {
+      if (key in source) {
+        merged[key] = source[key];
+      } else {
+        delete merged[key];
+      }
+    }
+  }
+  return merged;
 }
 
 const NOISE = new Set(['updatedAt', 'scriptChangedAt']);

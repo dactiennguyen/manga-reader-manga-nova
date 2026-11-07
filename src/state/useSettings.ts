@@ -81,6 +81,11 @@ export function connectSettings(next: MetaRepo | null): void {
   useSettings.setState({ ...DEFAULT_SETTINGS, ...(raw ? (JSON.parse(raw) as Partial<AppSettings>) : null) });
 }
 
+/** The meta table, for small records that are not settings. Null until boot connects it. */
+export function metaStore(): MetaRepo | null {
+  return repo;
+}
+
 export function aiConfigured(): boolean {
   return normalizeBaseUrl(useSettings.getState().aiBaseUrl) !== '';
 }

@@ -15,6 +15,9 @@ describe('AI client helpers', () => {
     expect(normalizeBaseUrl(' example.com ')).toBe('https://example.com/v1');
     expect(normalizeBaseUrl('http://localhost:8081/')).toBe('http://localhost:8081/v1');
     expect(normalizeBaseUrl('https://example.com/v1/')).toBe('https://example.com/v1');
+    expect(normalizeBaseUrl('https://generativelanguage.googleapis.com/v1beta/openai/')).toBe(
+      'https://generativelanguage.googleapis.com/v1beta/openai',
+    );
   });
 
   it('pulls JSON out of fenced or chatty answers', () => {

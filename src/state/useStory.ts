@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import type { ChangeSet, RowPatch, StoryRepo, UndoScope } from '../core/ports';
 import type { ID, Project, StoryData } from '../core/model/types';
 import { EMPTY_STORY, createStoryActions, type StoryActions } from '../core/story/actions';
-import { applyPatches, diffStory, projectsTouched, scopesOf, undoablePatches } from '../core/story/changes';
+import { TABLES, applyPatches, diffStory, projectsTouched, scopesOf, undoablePatches } from '../core/story/changes';
 import { NO_TOUCH, metaOf, type ActionMeta, type ActionName } from '../core/story/scopes';
 import { clearScopes, pushEntry, stackOf, takeRedo, takeUndo, type History } from '../core/undo/history';
 import { copyArt, exportArt, saveArt } from './artStore';
@@ -19,6 +19,7 @@ const REWRITES_OTHER_SCOPES = new Set<ActionName>(['removeCharacter', 'renameLan
 
 let repo: StoryRepo | null = null;
 let onWriteError: (error: unknown) => void = () => {};
+let onProjectDeleted: (projectId: ID) => void = () => {};
 
 /** Rows waiting for disk. Failed writes stay here and go out with the next flush. */
 const dirty = new Map<string, RowPatch>();
@@ -92,6 +93,10 @@ function commit(base: StoryData, meta: ActionMeta, action: ActionName | null): v
     coalesceKey: meta.coalesceKey,
   };
   enqueue(change.patches, !!meta.typing);
+  // Read from the action's own patches: connectStory also swaps the whole state, and that deletes nothing.
+  change.patches
+    .filter(patch => patch.table === 'projects' && patch.after === null)
+    .forEach(patch => onProjectDeleted(patch.id));
   const scope = change.undoScope;
   if (!scope) {
     return;
@@ -180,6 +185,21 @@ function step(scope: UndoScope, side: 'before' | 'after'): boolean {
   return true;
 }
 
+/**
+ * Adds a whole story in one transaction, disk first. If the write fails it throws and memory stays as
+ * it was, so a bad file cannot sit in the write queue and block every later save.
+ */
+export function importEntities(data: Partial<StoryData>): void {
+  flushStory();
+  const state = dataOf(useStory.getState());
+  const next: StoryData = { ...state };
+  for (const table of TABLES) {
+    (next[table] as Record<ID, unknown>) = { ...state[table], ...data[table] };
+  }
+  repo?.apply(diffStory(state, next));
+  useStory.setState(next);
+}
+
 export const undoStory = (scope: UndoScope) => step(scope, 'before');
 
 export const redoStory = (scope: UndoScope) => step(scope, 'after');
@@ -194,9 +214,14 @@ export function clearHistory(scopes: UndoScope[]): void {
   useHistory.setState({ history: clearScopes(useHistory.getState().history, scopes) });
 }
 
-export function connectStory(next: StoryRepo | null, reportError: (error: unknown) => void = () => {}): void {
+export function connectStory(
+  next: StoryRepo | null,
+  reportError: (error: unknown) => void = () => {},
+  projectDeleted: (projectId: ID) => void = () => {},
+): void {
   repo = next;
   onWriteError = reportError;
+  onProjectDeleted = projectDeleted;
   dirty.clear();
   useHistory.setState({ history: {} });
   useStory.setState(next ? next.loadAll() : EMPTY_STORY);

@@ -166,7 +166,7 @@ Dock thay cho thanh tab của app cũ, nhưng vẫn giữ 4 tab và nút (+) m�
 
 ```
 ┌──────────────────────────┐
-│ ✓  Panel 3      ↶ ↷ ▤ ⋯  │  thanh trên, trong suốt
+│ ✓  Panel 3      ↶ ↷ ▤ ⋯  │  thanh trên nổi, nền `raised`
 │ ╭──╮                     │
 │ │✎ │  ┌───────────────┐  │  ToolRail nổi bên trái
 │ │▱ │  │               │  │  (bên phải nếu thuận tay trái)
