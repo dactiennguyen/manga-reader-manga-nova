@@ -23,26 +23,9 @@ Không tải cả thư mục `extra/` cùng 7 ảnh chính. Đó chỉ là ảnh
 
 ## 2. Việc bắt buộc trước khi nộp
 
-Hai việc đầu chưa xong, và thiếu việc nào cũng không nộp được.
+Việc 2 chưa xong, thiếu thì không nộp được.
 
-1. **Tạo upload key.** Bản release hiện ký bằng debug key, Google sẽ từ chối. Tạo khóa rồi cất ngoài repo:
-
-   ```sh
-   keytool -genkeypair -v -storetype PKCS12 \
-     -keystore ~/keys/manganova-upload.keystore \
-     -alias manganova-upload -keyalg RSA -keysize 2048 -validity 10000
-   ```
-
-   Rồi tạo `android/keystore.properties` (đã nằm trong `.gitignore`):
-
-   ```properties
-   storeFile=/Users/<bạn>/keys/manganova-upload.keystore
-   storePassword=...
-   keyAlias=manganova-upload
-   keyPassword=...
-   ```
-
-   Mất khóa thì phải xin Google đặt lại, nên hãy sao lưu nó và mật khẩu.
+1. **Upload key đã tạo.** Alias `manganova-upload`. Keystore và mật khẩu nằm ở `~/keys/` trên máy phát triển, không nằm trong repo. GitHub Actions lấy khóa từ Secrets, build trên máy lấy từ `android/keystore.properties`. Hãy sao lưu keystore và mật khẩu ra nơi an toàn: Secrets không đọc lại được, và mất khóa thì phải xin Google đặt lại.
 
 2. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào `website/privacy.html` và `website/terms.html`, rồi deploy lại theo [13-website.md](../13-website.md).
 
