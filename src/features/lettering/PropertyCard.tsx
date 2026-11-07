@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
-import { Bold, Circle, CircleCheck, PenLine, Trash2, User } from 'lucide-react-native';
+import { BoldIcon, CircleIcon, DeleteIcon, DoneIcon, PenLineIcon, UserIcon } from '../../ui/icons';
 
 import { clampFontSize } from '../../core/lettering/bubbleEdit';
 import { SFX_STYLES } from '../../core/lettering/bubbles';
@@ -109,15 +109,15 @@ export function BubbleCard({
         />
         {!sfx && (
           <IconButton
-            icon={Bold}
+            icon={BoldIcon}
             size={18}
             active={bubble.bold}
             onPress={() => onChange({ bold: !bubble.bold })}
             accessibilityLabel="Bold"
           />
         )}
-        <IconButton icon={PenLine} size={18} onPress={onEdit} accessibilityLabel="Edit text" />
-        <IconButton icon={Trash2} size={18} color="danger" onPress={onDelete} accessibilityLabel="Delete" />
+        <IconButton icon={PenLineIcon} size={18} onPress={onEdit} accessibilityLabel="Edit text" />
+        <IconButton icon={DeleteIcon} size={18} color="danger" onPress={onDelete} accessibilityLabel="Delete" />
       </View>
       {!!lang && (
         <Pressable
@@ -125,7 +125,7 @@ export function BubbleCard({
           onPress={onEdit}
           className="min-h-12 flex-row items-center gap-2"
         >
-          <Icon icon={translated ? CircleCheck : Circle} size={14} color={translated ? 'success' : 'warning'} />
+          <Icon icon={translated ? DoneIcon : CircleIcon} size={14} color={translated ? 'success' : 'warning'} />
           <Text variant="caption" tone="secondary" numberOfLines={1} className="flex-1">
             {translated ? `${lang}: ${translationOf(bubble, lang)}` : `No ${lang} text yet · showing the original`}
           </Text>
@@ -212,7 +212,7 @@ export function BubbleCard({
       {speech && (
         <Row>
           <Chip label="Tail" selected={!!bubble.tail} onPress={onToggleTail} />
-          <Chip label={speaker ?? 'Speaker'} icon={User} selected={!!speaker} onPress={onPickSpeaker} />
+          <Chip label={speaker ?? 'Speaker'} icon={UserIcon} selected={!!speaker} onPress={onPickSpeaker} />
         </Row>
       )}
     </ToolPanel>
@@ -235,7 +235,7 @@ export function EffectCard({
     <ToolPanel className="gap-0 py-1">
       <View className="flex-row items-center gap-1">
         <Text variant="label" className="flex-1">{`Effect · Panel ${panelNumber}`}</Text>
-        <IconButton icon={Trash2} size={18} color="danger" onPress={onDelete} accessibilityLabel="Delete effect" />
+        <IconButton icon={DeleteIcon} size={18} color="danger" onPress={onDelete} accessibilityLabel="Delete effect" />
       </View>
       <Row label="Type">
         {EFFECT_TYPES.map(type => (

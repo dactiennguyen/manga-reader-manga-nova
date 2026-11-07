@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
-import { EllipsisVertical, Plus, Sparkles } from 'lucide-react-native';
+import { AiIcon, MoreIcon, PlusIcon } from '../../ui/icons';
 
 import { LIMITS } from '../../core/model/constants';
 import { chapterIdsOf, chapterStatus } from '../../core/model/selectors';
@@ -168,7 +168,7 @@ function OutlineBoard({ project }: { project: Project }) {
     const body = (
       <>
         {act.chapterIds.map(id => renderCard(id))}
-        <Button title="Chapter" icon={Plus} variant="secondary" small onPress={() => addChapter(act.id)} />
+        <Button title="Chapter" icon={PlusIcon} variant="secondary" small onPress={() => addChapter(act.id)} />
       </>
     );
     return (
@@ -214,7 +214,7 @@ function OutlineBoard({ project }: { project: Project }) {
         title="Outline"
         subtitle={project.title}
         onBack={() => navigation.goBack()}
-        right={<IconButton icon={EllipsisVertical} onPress={() => menu.open({ kind: 'main' })} accessibilityLabel="More" />}
+        right={<IconButton icon={MoreIcon} onPress={() => menu.open({ kind: 'main' })} accessibilityLabel="More" />}
       />
       <View className="gap-2 px-4 pb-2">
         <TextField
@@ -228,12 +228,12 @@ function OutlineBoard({ project }: { project: Project }) {
           multiline
           submitBehavior="blurAndSubmit"
         />
-        {!outlined && <Button title="AI plot ideas" icon={Sparkles} variant="ai" small onPress={openPlotIdeas} className="self-start" />}
+        {!outlined && <Button title="AI plot ideas" icon={AiIcon} variant="ai" small onPress={openPlotIdeas} className="self-start" />}
       </View>
       {total === 0 && (
         <View className="gap-4 px-4 py-3">
           <Text tone="secondary">Not sure where to start? Add your first chapter and sum it up in one sentence.</Text>
-          <Button title="Add chapter" icon={Plus} onPress={() => addChapter()} className="self-start" />
+          <Button title="Add chapter" icon={PlusIcon} onPress={() => addChapter()} className="self-start" />
         </View>
       )}
       <View className="flex-1">

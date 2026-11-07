@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
-import { BookOpen, RefreshCw } from 'lucide-react-native';
+import { ReadIcon, RefreshIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { findPlotHoles, type PlotHole } from '../../core/ai/people';
@@ -60,7 +60,7 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
           <Text variant="caption" tone="ai">
             Issue {index + 1}
           </Text>
-          {!!hole.chapter && <Tag label={hole.chapter} icon={BookOpen} />}
+          {!!hole.chapter && <Tag label={hole.chapter} icon={ReadIcon} />}
         </View>
         <Text variant="label">{hole.issue}</Text>
         {!!hole.suggestion && (
@@ -74,7 +74,7 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
         {chapterId !== undefined && (
           <Button
             title="Open chapter"
-            icon={BookOpen}
+            icon={ReadIcon}
             variant="secondary"
             small
             onPress={() => openChapter(chapterId)}
@@ -114,7 +114,7 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
           </ScrollView>
           <SheetFooter>
             <View className="flex-row gap-2">
-              <Button title="Try again" icon={RefreshCw} variant="secondary" onPress={generate} className="flex-1" />
+              <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
               <Button title="Close" variant="ghost" onPress={sheet.close} className="flex-1" />
             </View>
           </SheetFooter>

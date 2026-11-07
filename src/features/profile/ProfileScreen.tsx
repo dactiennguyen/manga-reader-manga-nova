@@ -1,21 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import {
-  Circle,
-  CircleCheck,
-  Database,
-  FolderInput,
-  Hand,
-  Info,
-  Palette,
-  Pencil,
-  SlidersHorizontal,
-  Smartphone,
-  Sparkles,
-  Sun,
-  Trash,
-} from 'lucide-react-native';
+import { AiIcon, AwakeIcon, CircleIcon, DataIcon, DeleteIcon, DeviceIcon, DoneIcon, EditIcon, HandIcon, InfoIcon, MoveToIcon, PaletteIcon, SlidersIcon } from '../../ui/icons';
 
 import { ARCHIVE_EXTENSION } from '../../core/archive/bundle';
 import { ART_STYLE_LABEL } from '../../core/model/constants';
@@ -131,7 +117,7 @@ export function ProfileScreen() {
             {penName || 'No pen name yet'}
           </Text>
         </View>
-        <IconButton icon={Pencil} onPress={() => setEditingName(true)} accessibilityLabel="Edit pen name" />
+        <IconButton icon={EditIcon} onPress={() => setEditingName(true)} accessibilityLabel="Edit pen name" />
       </Card>
 
       <View className="flex-row gap-3">
@@ -147,14 +133,14 @@ export function ProfileScreen() {
 
       <Section title="Appearance">
         <ListItem
-          icon={Palette}
+          icon={PaletteIcon}
           title="Theme"
           right={<Value>{themeLabel}</Value>}
           chevron
           onPress={() => setMenu('theme')}
         />
         <ListItem
-          icon={Hand}
+          icon={HandIcon}
           title="Drawing hand"
           subtitle="Flips the side of the drawing toolbar"
           right={<Value>{handLabel}</Value>}
@@ -165,20 +151,20 @@ export function ProfileScreen() {
 
       <Section title="Writing and drawing">
         <ListItem
-          icon={SlidersHorizontal}
+          icon={SlidersIcon}
           title="Creative preferences"
           subtitle={`${ROLE_NAME[role]} · ${ART_STYLE_LABEL[defaultStyle]}`}
           chevron
           onPress={() => navigation.navigate('Preferences', { edit: true })}
         />
         <SwitchRow
-          icon={Sun}
+          icon={AwakeIcon}
           title="Keep screen on while drawing"
           value={keepAwake}
           onValueChange={value => set({ keepAwakeWhileDrawing: value })}
         />
         <SwitchRow
-          icon={Smartphone}
+          icon={DeviceIcon}
           title="Haptic feedback"
           value={haptics}
           onValueChange={value => set({ haptics: value })}
@@ -187,7 +173,7 @@ export function ProfileScreen() {
 
       <Section title="AI">
         <ListItem
-          icon={Sparkles}
+          icon={AiIcon}
           iconColor="ai"
           title="AI server"
           subtitle={aiAddress ? `${aiAddress} · ${aiModel}` : 'Add your own server to turn on AI help'}
@@ -199,23 +185,23 @@ export function ProfileScreen() {
 
       <Section title="Privacy and data">
         <ListItem
-          icon={FolderInput}
+          icon={MoveToIcon}
           title={`Import project (.${ARCHIVE_EXTENSION})`}
           subtitle={importing ? 'Importing…' : 'Add a backed-up story to your library'}
           chevron
           disabled={importing}
           onPress={onImport}
         />
-        <ListItem icon={Trash} title={`Trash (${stats.trashed})`} chevron onPress={() => navigation.navigate('Trash')} />
+        <ListItem icon={DeleteIcon} title={`Trash (${stats.trashed})`} chevron onPress={() => navigation.navigate('Trash')} />
         <ListItem
-          icon={Database}
+          icon={DataIcon}
           title="Storage used"
           right={<Value>{usedBytes === null ? '…' : formatBytes(usedBytes)}</Value>}
         />
       </Section>
 
       <Section title="More">
-        <ListItem icon={Info} title="About" chevron onPress={() => navigation.navigate('About')} />
+        <ListItem icon={InfoIcon} title="About" chevron onPress={() => navigation.navigate('About')} />
       </Section>
 
       <Menu
@@ -224,7 +210,7 @@ export function ProfileScreen() {
         title="Theme"
         items={THEME_OPTIONS.map(option => ({
           label: option.label,
-          icon: option.value === themeMode ? CircleCheck : Circle,
+          icon: option.value === themeMode ? DoneIcon : CircleIcon,
           onPress: () => set({ themeMode: option.value }),
         }))}
       />
@@ -234,7 +220,7 @@ export function ProfileScreen() {
         title="Drawing hand"
         items={HAND_OPTIONS.map(option => ({
           label: option.label,
-          icon: option.value === handedness ? CircleCheck : Circle,
+          icon: option.value === handedness ? DoneIcon : CircleIcon,
           onPress: () => set({ handedness: option.value }),
         }))}
       />

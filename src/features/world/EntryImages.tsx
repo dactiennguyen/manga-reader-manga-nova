@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
-import { ImagePlus, Plus, Star, Trash2 } from 'lucide-react-native';
+import { AddImageIcon, DeleteIcon, PlusIcon, StarIcon } from '../../ui/icons';
 
 import { LIMITS } from '../../core/model/constants';
 import type { WorldEntry } from '../../core/model/types';
@@ -51,7 +51,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
           onPress={addImage}
           className="mx-4 mt-3 h-13 flex-row items-center justify-center gap-2 overflow-hidden rounded-md bg-surface"
         >
-          <Icon icon={ImagePlus} size={18} color="text-secondary" />
+          <Icon icon={AddImageIcon} size={18} color="text-secondary" />
           <Text variant="label" tone="secondary">
             Add image
           </Text>
@@ -82,7 +82,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
               className="items-center justify-center gap-1 overflow-hidden rounded-md bg-surface"
               style={FRAME}
             >
-              <Icon icon={Plus} size={28} color="text-muted" />
+              <Icon icon={PlusIcon} size={28} color="text-muted" />
               <Text variant="caption" tone="muted">
                 {entry.images.length}/{LIMITS.worldImages}
               </Text>
@@ -97,7 +97,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
         items={[
           {
             label: 'Set as main image',
-            icon: Star,
+            icon: StarIcon,
             disabled: entry.images[0] === imageMenu,
             onPress: () => {
               if (imageMenu) {
@@ -107,7 +107,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
           },
           {
             label: 'Delete',
-            icon: Trash2,
+            icon: DeleteIcon,
             destructive: true,
             onPress: () => {
               if (imageMenu) {

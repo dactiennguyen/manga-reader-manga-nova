@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Image, Pressable as RNPressable, View } from 'react-native';
-import { ImagePlus, Lock, LockOpen, Plus, Trash2 } from 'lucide-react-native';
+import { AddImageIcon, DeleteIcon, LockIcon, PlusIcon, UnlockIcon } from '../../ui/icons';
 
 import { EXPRESSIONS, LIMITS } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
@@ -41,9 +41,9 @@ function SheetSlot({
         {path ? (
           <Image accessibilityIgnoresInvertColors source={{ uri: fileUri(path) }} className="h-full w-full" resizeMode="cover" />
         ) : locked ? (
-          <Icon icon={Lock} size={small ? 16 : 22} color="text-muted" />
+          <Icon icon={LockIcon} size={small ? 16 : 22} color="text-muted" />
         ) : (
-          <Icon icon={Plus} size={small ? 20 : 28} color="text-muted" />
+          <Icon icon={PlusIcon} size={small ? 20 : 28} color="text-muted" />
         )}
       </Pressable>
       <Text variant={small ? 'caption' : 'label'} tone="secondary" numberOfLines={1} className="text-center">
@@ -136,7 +136,7 @@ export function DesignTab({ character }: { character: Character }) {
 
   return (
     <View className="gap-3">
-      {locked && <Banner tone="info" icon={Lock} text="Locked as reference. Unlock to edit the appearance and images." />}
+      {locked && <Banner tone="info" icon={LockIcon} text="Locked as reference. Unlock to edit the appearance and images." />}
       <RNPressable
         accessible={locked}
         accessibilityRole="button"
@@ -175,9 +175,9 @@ export function DesignTab({ character }: { character: Character }) {
       </Text>
 
       {locked ? (
-        <Button title="Unlock to edit" icon={LockOpen} variant="secondary" onPress={() => update(character.id, { locked: false })} />
+        <Button title="Unlock to edit" icon={UnlockIcon} variant="secondary" onPress={() => update(character.id, { locked: false })} />
       ) : (
-        <Button title="Lock as reference" icon={Lock} disabled={!canLock} onPress={lock} />
+        <Button title="Lock as reference" icon={LockIcon} disabled={!canLock} onPress={lock} />
       )}
       {!locked && !canLock && (
         <Text variant="caption" tone="muted" className="text-center">
@@ -192,7 +192,7 @@ export function DesignTab({ character }: { character: Character }) {
         items={[
           {
             label: 'Replace image',
-            icon: ImagePlus,
+            icon: AddImageIcon,
             onPress: () => {
               if (menuSlot) {
                 upload(menuSlot);
@@ -201,7 +201,7 @@ export function DesignTab({ character }: { character: Character }) {
           },
           {
             label: 'Delete image',
-            icon: Trash2,
+            icon: DeleteIcon,
             destructive: true,
             onPress: () => {
               if (menuSlot) {

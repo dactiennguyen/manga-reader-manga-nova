@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { RefreshCw, Sparkles } from 'lucide-react-native';
+import { AiIcon, RefreshIcon } from './icons';
 
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { Text } from './Text';
-import { useColor } from './tokens';
+import { ICON, useColor } from './tokens';
 
 export function AiNote({ text, className }: { text: string; className?: string }) {
   return (
     <View className={`flex-row items-center gap-2 rounded-sm bg-ai/15 px-3 py-2 ${className ?? ''}`}>
-      <Icon icon={Sparkles} size={14} color="ai" />
+      <Icon icon={AiIcon} size={14} color="ai" weight="fill" />
       <Text variant="caption" tone="ai" className="flex-1">
         {text}
       </Text>
@@ -22,7 +22,7 @@ export function AiPanel({ title, children, className }: { title: string; childre
   return (
     <View className={`gap-2 rounded-md bg-ai/15 p-3 ${className ?? ''}`}>
       <View className="flex-row items-center gap-2">
-        <Icon icon={Sparkles} size={16} color="ai" />
+        <Icon icon={AiIcon} size={ICON.sm} color="ai" weight="fill" />
         <Text variant="label" tone="ai" className="flex-1">
           {title}
         </Text>
@@ -61,7 +61,7 @@ export function AiErrorBox({
       </Text>
       <View className="flex-row justify-end gap-2">
         {!!onCancel && <Button title="Cancel" variant="ghost" small onPress={onCancel} />}
-        {!!onRetry && <Button title="Retry" variant="secondary" icon={RefreshCw} small onPress={onRetry} />}
+        {!!onRetry && <Button title="Retry" variant="secondary" icon={RefreshIcon} small onPress={onRetry} />}
       </View>
     </View>
   );
@@ -82,5 +82,5 @@ export function AiButton({
   small?: boolean;
   className?: string;
 }) {
-  return <Button title={title} variant="ai" icon={Sparkles} onPress={onPress} loading={loading} disabled={disabled} small={small} className={className} />;
+  return <Button title={title} variant="ai" icon={AiIcon} onPress={onPress} loading={loading} disabled={disabled} small={small} className={className} />;
 }

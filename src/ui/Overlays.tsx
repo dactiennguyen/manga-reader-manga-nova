@@ -12,10 +12,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
-import { Check, ChevronDown } from 'lucide-react-native';
+import { CaretDownIcon, CheckIcon } from './icons';
 
 import { Button, type ButtonVariant } from './Button';
-import { Icon, type LucideIcon } from './Icon';
+import { Icon, type IconGlyph } from './Icon';
 import { ModalShownContext, TextField } from './Inputs';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
@@ -303,7 +303,7 @@ export function PromptDialog({
 
 export type MenuItem = {
   label: string;
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   onPress: () => void;
   destructive?: boolean;
   disabled?: boolean;
@@ -395,7 +395,7 @@ export function Dropdown<T extends string>({
         className="h-12 flex-row items-center gap-1 rounded-sm px-2"
       >
         <Text variant="label">{current?.label}</Text>
-        <Icon icon={ChevronDown} size={16} color="text-secondary" />
+        <Icon icon={CaretDownIcon} size={16} color="text-secondary" />
       </Pressable>
       <Modal visible={!!menu} transparent animationType="fade" onRequestClose={() => setMenu(null)} statusBarTranslucent>
         <RNPressable accessibilityLabel="Close" className="flex-1" onPress={() => setMenu(null)}>
@@ -416,7 +416,7 @@ export function Dropdown<T extends string>({
                 className="h-12 flex-row items-center justify-between gap-3 px-4"
               >
                 <Text variant="label">{option.label}</Text>
-                {option.value === value && <Icon icon={Check} size={16} color="accent" />}
+                {option.value === value && <Icon icon={CheckIcon} size={16} color="accent" />}
               </Pressable>
             ))}
           </View>

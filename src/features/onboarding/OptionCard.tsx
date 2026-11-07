@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { CircleCheck } from 'lucide-react-native';
+import { DoneIcon } from '../../ui/icons';
 
 import { Icon, Pressable, Text } from '../../ui';
 
@@ -35,7 +35,7 @@ export function OptionCard({
           {hint}
         </Text>
       </View>
-      {selected && <Icon icon={CircleCheck} size={22} color="accent" />}
+      {selected && <Icon icon={DoneIcon} size={22} color="accent" />}
     </Pressable>
   );
 }

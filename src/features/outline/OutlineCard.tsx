@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { PlusIcon } from '../../ui/icons';
 
 import { chapterName } from '../../core/model/selectors';
 import type { Chapter, ChapterStatus } from '../../core/model/types';
@@ -86,7 +86,7 @@ export function AddActButton({ board, onPress }: { board: boolean; onPress: () =
         board ? 'h-30 w-30 self-start' : ''
       }`}
     >
-      <Icon icon={Plus} color="text-secondary" />
+      <Icon icon={PlusIcon} color="text-secondary" />
       <Text variant="label" tone="secondary">
         Act
       </Text>

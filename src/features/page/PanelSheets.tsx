@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { CircleCheck, Copy, Expand, Focus, Frame, Pencil, ScrollText, SquareDashed, Trash2 } from 'lucide-react-native';
+import { CopyIcon, DeleteIcon, DoneIcon, EditIcon, ExpandIcon, FitIcon, PanelFrameIcon, ScriptIcon, SelectionIcon } from '../../ui/icons';
 
 import { copyLayout, hasLayoutClipboard } from '../../core/layout/pageEdit';
 import { HOME_VIEW } from '../../core/layout/pageView';
@@ -43,26 +43,26 @@ export function PanelSheets({ c }: { c: PanelController }) {
         items={[
           {
             label: 'View script for this page',
-            icon: ScrollText,
+            icon: ScriptIcon,
             onPress: () => navigation.navigate('Script', { chapterId: chapter.id, blockId: scriptBlockId }),
           },
-          { label: 'Fit to screen', icon: Focus, onPress: () => c.setView(HOME_VIEW) },
+          { label: 'Fit to screen', icon: FitIcon, onPress: () => c.setView(HOME_VIEW) },
           {
             label: c.safeGrid ? 'Hide safe area' : 'Show safe area',
-            icon: Frame,
+            icon: PanelFrameIcon,
             onPress: () => c.setSafeGrid(!c.safeGrid),
           },
           {
             label: 'Copy layout',
-            icon: Copy,
+            icon: CopyIcon,
             disabled: !layout,
             onPress: () => {
               copyLayout(page);
               toast('Layout copied');
             },
           },
-          { label: 'Paste layout', icon: SquareDashed, disabled: !hasLayoutClipboard(), onPress: c.paste },
-          { label: 'Clear all panels', icon: Trash2, destructive: true, disabled: !layout, onPress: c.clearPanels },
+          { label: 'Paste layout', icon: SelectionIcon, disabled: !hasLayoutClipboard(), onPress: c.paste },
+          { label: 'Clear all panels', icon: DeleteIcon, destructive: true, disabled: !layout, onPress: c.clearPanels },
         ]}
       />
       <Menu
@@ -74,15 +74,15 @@ export function PanelSheets({ c }: { c: PanelController }) {
             ? [
                 {
                   label: menuPanel.bleed ? 'Turn off bleed' : 'Bleed',
-                  icon: Expand,
+                  icon: ExpandIcon,
                   onPress: () => c.togglePanel(menuPanel.id, 'bleed'),
                 },
                 {
                   label: menuPanel.borderless ? 'Show border' : 'Borderless',
-                  icon: SquareDashed,
+                  icon: SelectionIcon,
                   onPress: () => c.togglePanel(menuPanel.id, 'borderless'),
                 },
-                { label: 'Delete panel', icon: Trash2, destructive: true, onPress: () => c.deletePanel(menuPanel.id) },
+                { label: 'Delete panel', icon: DeleteIcon, destructive: true, onPress: () => c.deletePanel(menuPanel.id) },
               ]
             : []
         }
@@ -91,11 +91,11 @@ export function PanelSheets({ c }: { c: PanelController }) {
         visible={sheet === 'art' && !!selectedPanel}
         onClose={closeSheet}
         items={[
-          { label: 'Edit description', icon: Pencil, onPress: () => c.setSheet('describe') },
-          { label: 'Change shot', icon: Focus, onPress: () => c.setSheet('shot') },
+          { label: 'Edit description', icon: EditIcon, onPress: () => c.setSheet('describe') },
+          { label: 'Change shot', icon: FitIcon, onPress: () => c.setSheet('shot') },
           {
             label: 'Delete art',
-            icon: Trash2,
+            icon: DeleteIcon,
             destructive: true,
             disabled: !selected || !panelHasArt(selected),
             onPress: c.deleteArt,
@@ -109,7 +109,7 @@ export function PanelSheets({ c }: { c: PanelController }) {
         items={[
           ...SHOTS.map(shot => ({
             label: SHOT_LABEL[shot],
-            icon: selectedPanel?.shot === shot ? CircleCheck : undefined,
+            icon: selectedPanel?.shot === shot ? DoneIcon : undefined,
             onPress: () => setShot(shot),
           })),
           { label: 'No shot', onPress: () => setShot(undefined) },

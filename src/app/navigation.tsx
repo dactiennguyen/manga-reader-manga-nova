@@ -1,6 +1,6 @@
 import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { House, LibraryBig, Sparkles, User } from 'lucide-react-native';
+import { AiIcon, HomeIcon, LibraryIcon, UserIcon } from '../ui/icons';
 import { useWindowDimensions } from 'react-native';
 
 import { AssistantScreen } from '../features/assistant/AssistantScreen';
@@ -26,16 +26,16 @@ import { WorldEntryScreen } from '../features/world/WorldEntryScreen';
 import { WorldScreen } from '../features/world/WorldScreen';
 import { useAppNavigation, type RootStackParamList, type TabParamList } from '../state/navigation';
 import { useSettings } from '../state/useSettings';
-import { DOCK_RAIL_WIDTH, Dock, useColor, type LucideIcon } from '../ui';
+import { DOCK_RAIL_WIDTH, Dock, useColor, type IconGlyph } from '../ui';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-const TAB_META: Record<keyof TabParamList, { label: string; icon: LucideIcon }> = {
-  Home: { label: 'Home', icon: House },
-  Library: { label: 'Library', icon: LibraryBig },
-  Assistant: { label: 'Assistant', icon: Sparkles },
-  Profile: { label: 'Profile', icon: User },
+const TAB_META: Record<keyof TabParamList, { label: string; icon: IconGlyph }> = {
+  Home: { label: 'Home', icon: HomeIcon },
+  Library: { label: 'Library', icon: LibraryIcon },
+  Assistant: { label: 'Assistant', icon: AiIcon },
+  Profile: { label: 'Profile', icon: UserIcon },
 };
 
 function AppDock({ state, navigation }: BottomTabBarProps) {

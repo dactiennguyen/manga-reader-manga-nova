@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { FlatList, Image, View } from 'react-native';
-import { Check, Trash2 } from 'lucide-react-native';
+import { CheckIcon, DeleteIcon } from '../../ui/icons';
 
 import type { ExportRecord } from '../../core/export/history';
 import type { ExportFormat } from '../../core/export/plan';
@@ -8,7 +8,7 @@ import type { ID } from '../../core/model/types';
 import { formatBytes } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
 import { useThumb } from '../../render/thumbs';
-import { Divider, Icon, IconButton, ListItem, Pressable, Text, type LucideIcon } from '../../ui';
+import { Divider, Icon, IconButton, ListItem, Pressable, Text, type IconGlyph } from '../../ui';
 
 export const FORMAT_LABEL: Record<ExportFormat, string> = { png: 'PNG', pdf: 'PDF', cbz: 'CBZ', long: 'Long image' };
 
@@ -19,7 +19,7 @@ export function FormatCard({
   selected,
   onPress,
 }: {
-  icon: LucideIcon;
+  icon: IconGlyph;
   title: string;
   description: string;
   selected: boolean;
@@ -40,7 +40,7 @@ export function FormatCard({
         <Text variant="label" tone={selected ? 'accent' : 'text'} className="flex-1">
           {title}
         </Text>
-        {selected && <Icon icon={Check} size={16} color="accent" />}
+        {selected && <Icon icon={CheckIcon} size={16} color="accent" />}
       </View>
       <Text variant="caption" tone="secondary">
         {description}
@@ -129,7 +129,7 @@ export function HistoryList({
                 />
               </View>
               <IconButton
-                icon={Trash2}
+                icon={DeleteIcon}
                 size={20}
                 color="text-muted"
                 onPress={() => onDelete(item)}

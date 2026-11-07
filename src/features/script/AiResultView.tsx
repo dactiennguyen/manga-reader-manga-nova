@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { Check, RefreshCw } from 'lucide-react-native';
+import { CheckIcon, RefreshIcon } from '../../ui/icons';
 
 import type { BlockDraft } from '../../core/ai/writing';
 import { BLOCK_LABEL, LIMITS } from '../../core/model/constants';
@@ -18,7 +18,7 @@ export type AiResult =
 function RetryRow({ onRetry, onDiscard }: { onRetry: () => void; onDiscard: () => void }) {
   return (
     <View className="flex-row gap-2">
-      <Button title="Try again" icon={RefreshCw} variant="secondary" onPress={onRetry} className="flex-1" />
+      <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={onRetry} className="flex-1" />
       <Button title="Discard" variant="ghost" onPress={onDiscard} className="flex-1" />
     </View>
   );
@@ -60,7 +60,7 @@ export function AiResultView({
         <Footer>
           <Button
             title={`Insert ${plural(result.drafts.length, 'block')}`}
-            icon={Check}
+            icon={CheckIcon}
             onPress={() => onInsert(location?.block.id ?? null, result.drafts)}
           />
           <RetryRow onRetry={onRetry} onDiscard={onDiscard} />
@@ -99,7 +99,7 @@ export function AiResultView({
         <Footer>
           <Button
             title={pairs.length > 1 ? `Replace ${plural(pairs.length, 'block')}` : 'Replace'}
-            icon={Check}
+            icon={CheckIcon}
             disabled={!pairs.length}
             onPress={() => onReplace(pairs)}
           />
@@ -129,7 +129,7 @@ export function AiResultView({
         <Footer>
           <Button
             title="Replace"
-            icon={Check}
+            icon={CheckIcon}
             disabled={!location}
             onPress={() => location && onReplace([{ id: location.block.id, text: result.text }])}
           />

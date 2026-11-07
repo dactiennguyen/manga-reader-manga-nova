@@ -1,19 +1,5 @@
 import { View } from 'react-native';
-import {
-  ArrowDown,
-  ArrowUp,
-  Check,
-  CircleCheck,
-  Copy,
-  Eye,
-  EyeOff,
-  Languages,
-  ListChecks,
-  ListOrdered,
-  MessageCircle,
-  ScrollText,
-  Trash2,
-} from 'lucide-react-native';
+import { ArrowDownIcon, ArrowUpIcon, BubbleIcon, CheckIcon, ChecklistIcon, CopyIcon, DeleteIcon, DoneIcon, HiddenIcon, OrderIcon, PreviewIcon, ScriptIcon, TranslateIcon } from '../../ui/icons';
 
 import type { PageBlock } from '../../core/lettering/script';
 import { bubbleText } from '../../core/lettering/translation';
@@ -115,7 +101,7 @@ function EffectsSheet({ c }: { c: LetteringController }) {
             close();
           }}
           right={
-            <IconButton icon={Trash2} color="danger" onPress={() => c.removeEffect(effect.id)} accessibilityLabel="Delete effect" />
+            <IconButton icon={DeleteIcon} color="danger" onPress={() => c.removeEffect(effect.id)} accessibilityLabel="Delete effect" />
           }
         />
       ))}
@@ -161,7 +147,7 @@ function DialogueListSheet({ c }: { c: LetteringController }) {
           subtitle={`Panel ${item.panelIndex + 1} · ${
             !item.placed ? 'Tap to place' : differs(item) ? 'Differs from script · Tap to update' : 'Placed'
           }`}
-          icon={item.placed ? CircleCheck : MessageCircle}
+          icon={item.placed ? DoneIcon : BubbleIcon}
           iconColor={item.placed ? 'success' : 'text-secondary'}
           onPress={() => press(item)}
         />
@@ -186,24 +172,24 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
         visible={state.sheet === 'menu'}
         onClose={close}
         items={[
-          { label: 'Page dialogue list', icon: ListChecks, onPress: () => open('list') },
+          { label: 'Page dialogue list', icon: ChecklistIcon, onPress: () => open('list') },
           {
             label: 'Language versions',
             subtitle: lang ? `Showing ${lang}` : 'Showing the original',
-            icon: Languages,
+            icon: TranslateIcon,
             onPress: () => open(languages.length ? 'language' : 'manage'),
           },
           {
             label: state.showOrder ? 'Hide reading order' : 'Show reading order',
-            icon: ListOrdered,
+            icon: OrderIcon,
             onPress: () => dispatch({ type: 'toggleOrder' }),
           },
           {
             label: state.hideBubbles ? 'Show all bubbles' : 'Hide all bubbles',
-            icon: state.hideBubbles ? Eye : EyeOff,
+            icon: state.hideBubbles ? PreviewIcon : HiddenIcon,
             onPress: () => dispatch({ type: 'toggleBubbles' }),
           },
-          { label: 'View script', icon: ScrollText, onPress: () => navigation.navigate('Script', { chapterId: page.chapterId }) },
+          { label: 'View script', icon: ScriptIcon, onPress: () => navigation.navigate('Script', { chapterId: page.chapterId }) },
         ]}
       />
       <Menu
@@ -214,10 +200,10 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
         items={
           item
             ? [
-                { label: 'Duplicate', icon: Copy, onPress: () => c.duplicate(item.id) },
-                { label: 'Bring forward', icon: ArrowUp, onPress: () => c.reorder(item.id, 1) },
-                { label: 'Send backward', icon: ArrowDown, onPress: () => c.reorder(item.id, -1) },
-                { label: 'Delete', icon: Trash2, destructive: true, onPress: () => c.removeBubble(item.id) },
+                { label: 'Duplicate', icon: CopyIcon, onPress: () => c.duplicate(item.id) },
+                { label: 'Bring forward', icon: ArrowUpIcon, onPress: () => c.reorder(item.id, 1) },
+                { label: 'Send backward', icon: ArrowDownIcon, onPress: () => c.reorder(item.id, -1) },
+                { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => c.removeBubble(item.id) },
               ]
             : []
         }
@@ -227,15 +213,15 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
         onClose={close}
         title="Language"
         items={[
-          { label: 'Original', icon: lang ? undefined : Check, onPress: () => setLang(null) },
+          { label: 'Original', icon: lang ? undefined : CheckIcon, onPress: () => setLang(null) },
           ...languages.map(name => ({
             label: name,
             subtitle: progressLabel(page.bubbles, name),
-            icon: lang === name ? Check : undefined,
+            icon: lang === name ? CheckIcon : undefined,
             onPress: () => setLang(name),
           })),
-          ...(lang ? [{ label: 'Translation list', icon: ListChecks, onPress: () => open('translate') }] : []),
-          { label: 'Manage languages…', icon: Languages, onPress: () => open('manage') },
+          ...(lang ? [{ label: 'Translation list', icon: ChecklistIcon, onPress: () => open('translate') }] : []),
+          { label: 'Manage languages…', icon: TranslateIcon, onPress: () => open('manage') },
         ]}
       />
       <ManageLanguagesSheet

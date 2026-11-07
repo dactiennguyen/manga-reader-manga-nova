@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, Share, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Check, Copy, EllipsisVertical, Plus, Search, Shapes, Share2, Trash2 } from 'lucide-react-native';
+import { CheckIcon, CopyIcon, DeleteIcon, MoreIcon, PlusIcon, SearchIcon, ShapesIcon, ShareIcon } from '../../ui/icons';
 
 import { WORLD_TYPES, WORLD_TYPE_LABEL } from '../../core/model/constants';
 import type { ID, WorldEntry, WorldType } from '../../core/model/types';
@@ -164,12 +164,12 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
         right={
           <>
             <IconButton
-              icon={Search}
+              icon={SearchIcon}
               active={searching}
               onPress={() => (searching ? closeSearch() : setSearching(true))}
               accessibilityLabel="Search"
             />
-            <IconButton icon={EllipsisVertical} onPress={() => setMoreMenu(true)} accessibilityLabel="More" />
+            <IconButton icon={MoreIcon} onPress={() => setMoreMenu(true)} accessibilityLabel="More" />
           </>
         }
       />
@@ -214,7 +214,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
         {showingEmpty ? (
           <View className="items-start gap-6 pt-6">
             <Text tone="secondary">{emptyText(trimmedQuery, view, filter)}</Text>
-            {!trimmedQuery && <Button title={emptyActionTitle} icon={Plus} onPress={emptyAction} />}
+            {!trimmedQuery && <Button title={emptyActionTitle} icon={PlusIcon} onPress={emptyAction} />}
           </View>
         ) : view === 'timeline' ? (
           <WorldTimeline events={events} chapters={chapters} onOpen={open} onLongPress={setRowMenuId} />
@@ -231,7 +231,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
           ))
         )}
       </ScrollView>
-      <Fab icon={Plus} label="New entry" onPress={() => setTypeMenu(true)} bottom={16 + insets.bottom} />
+      <Fab icon={PlusIcon} label="New entry" onPress={() => setTypeMenu(true)} bottom={16 + insets.bottom} />
 
       <Menu
         visible={typeMenu}
@@ -246,7 +246,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
       <Menu
         visible={moreMenu}
         onClose={() => setMoreMenu(false)}
-        items={[{ label: 'Export wiki as text', icon: Share2, onPress: exportWiki }]}
+        items={[{ label: 'Export wiki as text', icon: ShareIcon, onPress: exportWiki }]}
       />
       <Menu
         visible={!!rowEntry}
@@ -254,10 +254,10 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
         title={rowShown ? rowShown.title.trim() || UNTITLED : undefined}
         subtitle={rowShown ? WORLD_TYPE_LABEL[rowShown.type] : undefined}
         items={[
-          { label: 'Change type', icon: Shapes, onPress: () => setRetypeId(rowMenuId) },
+          { label: 'Change type', icon: ShapesIcon, onPress: () => setRetypeId(rowMenuId) },
           {
             label: 'Duplicate',
-            icon: Copy,
+            icon: CopyIcon,
             onPress: () => {
               if (rowEntry) {
                 duplicate(rowEntry);
@@ -266,7 +266,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
           },
           {
             label: 'Delete',
-            icon: Trash2,
+            icon: DeleteIcon,
             destructive: true,
             onPress: () => {
               if (rowEntry) {
@@ -282,7 +282,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
         title="Change type"
         items={WORLD_TYPES.map(type => ({
           label: WORLD_TYPE_LABEL[type],
-          icon: retypeEntry?.type === type ? Check : WORLD_TYPE_ICON[type],
+          icon: retypeEntry?.type === type ? CheckIcon : WORLD_TYPE_ICON[type],
           onPress: () => {
             if (retypeId) {
               useStory.getState().updateWorldEntry(retypeId, { type });

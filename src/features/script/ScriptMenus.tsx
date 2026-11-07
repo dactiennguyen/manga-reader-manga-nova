@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ChartColumn, Focus, FolderInput, History, PanelsTopLeft, Search, Share2, Sparkles, Trash2 } from 'lucide-react-native';
+import { AiIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, FitIcon, HistoryIcon, MoveToIcon, PanelsIcon, SearchIcon, ShareIcon, StatsIcon } from '../../ui/icons';
 
 import { BLOCK_LABEL } from '../../core/model/constants';
 import type { ID, Scene } from '../../core/model/types';
@@ -38,16 +38,16 @@ export function ScriptMainMenu({
       items={[
         {
           label: 'AI writing help',
-          icon: Sparkles,
+          icon: AiIcon,
           subtitle: 'Continue, rewrite, change voice, shorten, SFX ideas',
           onPress: onAi,
         },
-        { label: 'Find and replace', icon: Search, onPress: onFind },
-        { label: 'Paginate', icon: PanelsTopLeft, onPress: onPaginate },
-        { label: 'Version history', icon: History, onPress: onVersions },
-        { label: 'Focus mode', icon: Focus, onPress: onFocusMode },
-        { label: 'Statistics', icon: ChartColumn, onPress: onStats },
-        { label: 'Share script', icon: Share2, subtitle: 'Plain-text screenplay (.txt)', onPress: onShare },
+        { label: 'Find and replace', icon: SearchIcon, onPress: onFind },
+        { label: 'Paginate', icon: PanelsIcon, onPress: onPaginate },
+        { label: 'Version history', icon: HistoryIcon, onPress: onVersions },
+        { label: 'Focus mode', icon: FitIcon, onPress: onFocusMode },
+        { label: 'Statistics', icon: StatsIcon, onPress: onStats },
+        { label: 'Share script', icon: ShareIcon, subtitle: 'Plain-text screenplay (.txt)', onPress: onShare },
       ]}
     />
   );
@@ -83,12 +83,12 @@ export function BlockMenu({
       title={shown ? BLOCK_LABEL[shown.block.type] : 'Block'}
       subtitle={shown?.block.text.trim().replace(/\s+/g, ' ').slice(0, 60) || undefined}
       items={[
-        { label: 'Move up', icon: ArrowUp, disabled: edge.first, onPress: run(id => onMove(id, -1)) },
-        { label: 'Move down', icon: ArrowDown, disabled: edge.last, onPress: run(id => onMove(id, 1)) },
-        { label: 'Move to scene…', icon: FolderInput, disabled: sceneIds.length <= 1, onPress: run(onMoveToScene) },
+        { label: 'Move up', icon: ArrowUpIcon, disabled: edge.first, onPress: run(id => onMove(id, -1)) },
+        { label: 'Move down', icon: ArrowDownIcon, disabled: edge.last, onPress: run(id => onMove(id, 1)) },
+        { label: 'Move to scene…', icon: MoveToIcon, disabled: sceneIds.length <= 1, onPress: run(onMoveToScene) },
         {
           label: 'Delete block',
-          icon: Trash2,
+          icon: DeleteIcon,
           destructive: true,
           disabled: !shown || shown.scene.blocks.length <= 1,
           onPress: run(onDelete),
@@ -148,11 +148,11 @@ export function SceneMenu({
       onClose={onClose}
       title={`Scene ${index + 1}`}
       items={[
-        { label: 'Move up', icon: ArrowUp, disabled: index <= 0, onPress: () => onMove(index, -1) },
-        { label: 'Move down', icon: ArrowDown, disabled: index >= sceneIds.length - 1, onPress: () => onMove(index, 1) },
+        { label: 'Move up', icon: ArrowUpIcon, disabled: index <= 0, onPress: () => onMove(index, -1) },
+        { label: 'Move down', icon: ArrowDownIcon, disabled: index >= sceneIds.length - 1, onPress: () => onMove(index, 1) },
         {
           label: 'Delete scene',
-          icon: Trash2,
+          icon: DeleteIcon,
           destructive: true,
           disabled: sceneIds.length <= 1,
           onPress: () => {

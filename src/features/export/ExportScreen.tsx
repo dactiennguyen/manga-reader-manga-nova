@@ -1,6 +1,6 @@
 import { useRef, type ComponentRef } from 'react';
 import { ScrollView, View } from 'react-native';
-import { Upload } from 'lucide-react-native';
+import { ExportIcon } from '../../ui/icons';
 
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
 import { AppBar, Button, EmptyState, Screen, SectionHeader, Text } from '../../ui';
@@ -109,7 +109,7 @@ export function ExportScreen() {
       <View className="bg-bg p-4">
         <Button
           title={running ? 'Exporting…' : 'Export file'}
-          icon={Upload}
+          icon={ExportIcon}
           loading={running}
           disabled={running || pageIds.length === 0}
           onPress={screen.start}

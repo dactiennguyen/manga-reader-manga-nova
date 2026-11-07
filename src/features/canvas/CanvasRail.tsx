@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Pipette } from 'lucide-react-native';
+import { CaretLeftIcon, CaretRightIcon, EyedropperIcon } from '../../ui/icons';
 import { useState } from 'react';
 import { ScrollView, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { type AnimatedStyle } from 'react-native-reanimated';
@@ -42,7 +42,7 @@ export function CanvasRail({
   const shapeActive = isShapeId(tool) && !picking;
   const shapeDef = SHAPE_TOOLS.find(item => item.id === (isShapeId(tool) ? tool : shape)) ?? SHAPE_TOOLS[0];
   const current = isShapeId(tool) ? shapeDef : TOOLS.find(item => item.id === tool) ?? TOOLS[0];
-  const CollapseIcon = (side === 'left') === collapsed ? ChevronRight : ChevronLeft;
+  const CollapseIcon = (side === 'left') === collapsed ? CaretRightIcon : CaretLeftIcon;
 
   const button = (item: { id: CanvasTool; label: string }) => (
     <IconButton
@@ -93,7 +93,7 @@ export function CanvasRail({
               />
               {TOOLS.slice(4).map(button)}
               <IconButton
-                icon={Pipette}
+                icon={EyedropperIcon}
                 active={picking}
                 accessibilityLabel="Eyedropper"
                 onPress={() => {

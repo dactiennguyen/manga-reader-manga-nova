@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import { ArrowRight } from 'lucide-react-native';
+import { ForwardIcon } from '../../ui/icons';
 
 import type { BlockDraft } from '../../core/ai/writing';
 import { BLOCK_LABEL, DIALOGUE_KIND_LABEL } from '../../core/model/constants';
@@ -61,7 +61,7 @@ export function BeforeAfter({ label, before, after }: { label?: string; before: 
           </Text>
           <Text tone="secondary">{before}</Text>
         </View>
-        <Icon icon={ArrowRight} size={16} color="ai" />
+        <Icon icon={ForwardIcon} size={16} color="ai" />
         <View className="flex-1 gap-0.5">
           <Text variant="caption" tone="ai">
             After

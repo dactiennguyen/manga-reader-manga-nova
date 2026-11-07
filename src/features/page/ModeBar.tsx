@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Brush, MessageSquare, PanelsTopLeft } from 'lucide-react-native';
+import { BrushIcon, MessageIcon, PanelsIcon } from '../../ui/icons';
 
 import type { ID } from '../../core/model/types';
 import { useAppNavigation } from '../../state/navigation';
@@ -9,19 +10,24 @@ import { ModeSwitch } from '../../ui';
 export type PageMode = 'panels' | 'art' | 'lettering';
 
 const MODES = [
-  { value: 'panels', label: 'Panels', icon: PanelsTopLeft },
-  { value: 'art', label: 'Art', icon: Brush },
-  { value: 'lettering', label: 'Lettering', icon: MessageSquare },
+  { value: 'panels', label: 'Panels', icon: PanelsIcon },
+  { value: 'art', label: 'Art', icon: BrushIcon },
+  { value: 'lettering', label: 'Lettering', icon: MessageIcon },
 ] as const;
 
 export function ModeBar({
   pageId,
   mode,
   onChange,
+  leading,
+  trailing,
 }: {
   pageId: ID;
   mode: PageMode;
   onChange?: (mode: 'panels' | 'art') => void;
+  /** Sit either side of the switch, so the page keeps the whole stage. */
+  leading?: ReactNode;
+  trailing?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   const navigation = useAppNavigation();
@@ -40,8 +46,10 @@ export function ModeBar({
   };
 
   return (
-    <View className="items-center bg-bg px-4 pt-2" style={{ paddingBottom: insets.bottom + 8 }}>
+    <View className="flex-row items-center justify-center gap-1 bg-bg px-2 pt-2" style={{ paddingBottom: insets.bottom + 8 }}>
+      {leading}
       <ModeSwitch<PageMode> options={MODES} value={mode} onChange={select} />
+      {trailing}
     </View>
   );
 }

@@ -34,7 +34,7 @@ Các giá trị này lấy từ template chính thức `@react-native-community/
 | Bàn phím | `react-native-keyboard-controller` | 1.23.0 |
 | File | `@dr.pogodin/react-native-fs` | 2.41.0 |
 | Chọn file, ảnh | `@react-native-documents/picker` | 12.0.3 |
-| SVG, icon | `react-native-svg`, `lucide-react-native` | 15.16.1, 1.70.0 |
+| SVG, icon | `react-native-svg`, `phosphor-react-native` | 15.16.1, 3.0.6 |
 | Style | `uniwind` + `tailwindcss` | 1.13.2 + 4.3.5 |
 
 `perfect-freehand` 1.2.3 không cài qua npm mà chép mã nguồn vào `src/core/art/freehand.ts`, giữ giấy phép MIT. Lý do ở [07-canvas.md](07-canvas.md).
@@ -70,7 +70,7 @@ Thêm hai công cụ: `@testing-library/react-native` 14.1.0 cho test thành ph�
 | `react-native-mmkv`, `react-native-nitro-modules` | Bảng `meta` trong SQLite | Bớt hai thư viện native. Cài đặt rất nhỏ, đọc đồng bộ bằng `executeSync` |
 | `@sayem314/react-native-keep-awake` | Thêm một hàm trong `NativeScreen` | Một dòng Kotlin, không đáng một thư viện |
 | `ToastAndroid`, `Alert` | `Toast`, `Dialog` tự vẽ | Đổi được giao diện |
-| Font Material Icons | Lucide | Nét viền hợp phong cách Studio |
+| Font Material Icons | Phosphor | Có `regular`, `fill`, `duotone` trong một bộ, nên trạng thái đang chọn đổi kiểu icon mà vẫn cùng họ |
 
 Không dùng Drizzle, vì dữ liệu lưu dạng dòng tài liệu nên ORM không có việc gì để làm. Không dùng thư viện bottom sheet: `Sheet` tự viết bằng Reanimated và Gesture Handler vừa đủ, và phải khớp token Studio.
 

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { ArrowDown, ArrowUp } from 'lucide-react-native';
+import { ArrowDownIcon, ArrowUpIcon } from '../../ui/icons';
 
 import type { Chapter, ID, WorldEntry } from '../../core/model/types';
 import { UNTITLED, firstLine, timelineGroups, timelineSwap } from '../../core/world/worldTools';
@@ -63,14 +63,14 @@ export function WorldTimeline({
                     )}
                   </Pressable>
                   <IconButton
-                    icon={ArrowUp}
+                    icon={ArrowUpIcon}
                     size={18}
                     disabled={index === 0}
                     onPress={() => move(group.items, index, -1)}
                     accessibilityLabel="Move up"
                   />
                   <IconButton
-                    icon={ArrowDown}
+                    icon={ArrowDownIcon}
                     size={18}
                     disabled={index === group.items.length - 1}
                     onPress={() => move(group.items, index, 1)}

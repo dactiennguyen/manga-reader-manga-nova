@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { RefreshCw, Sparkles } from 'lucide-react-native';
+import { AiIcon, RefreshIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { suggestCharacter, type CharacterDraft } from '../../core/ai/people';
@@ -103,13 +103,13 @@ export function FillSheet({
         <SheetFooter>
           <Button
             title={applied ? `Fill ${plural(applied, 'field')}` : 'Nothing to fill'}
-            icon={Sparkles}
+            icon={AiIcon}
             variant="ai"
             disabled={!applied}
             onPress={() => apply(draft)}
           />
           <View className="flex-row gap-2">
-            <Button title="Try again" icon={RefreshCw} variant="secondary" onPress={generate} className="flex-1" />
+            <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
             <Button title="Discard" variant="ghost" onPress={sheet.close} className="flex-1" />
           </View>
         </SheetFooter>
@@ -160,7 +160,7 @@ export function FillSheet({
           </View>
         </ScrollView>
         <SheetFooter>
-          <Button title="Suggest character" icon={Sparkles} variant="ai" disabled={!keywords.trim()} onPress={generate} />
+          <Button title="Suggest character" icon={AiIcon} variant="ai" disabled={!keywords.trim()} onPress={generate} />
         </SheetFooter>
       </>
     );

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Check, CircleCheck, EllipsisVertical, MessageCircle, Redo2, StickyNote, Undo2, Wind, Zap } from 'lucide-react-native';
+import { BubbleIcon, CheckIcon, DoneIcon, EffectIcon, MoreIcon, NoteIcon, RedoIcon, SfxIcon, UndoIcon } from '../../ui/icons';
 
 import type { Chapter, BubbleType } from '../../core/model/types';
 import type { PageContext } from '../../render/drawPage';
@@ -13,10 +13,10 @@ import { LetteringSheets } from './LetteringSheets';
 import { LetteringStage } from './LetteringStage';
 import { useLetteringController } from './useLetteringController';
 
-const ADD_BUTTONS: { type: BubbleType; label: string; icon: typeof MessageCircle }[] = [
-  { type: 'speak', label: 'Dialogue', icon: MessageCircle },
-  { type: 'narration', label: 'Narration', icon: StickyNote },
-  { type: 'sfx', label: 'SFX', icon: Zap },
+const ADD_BUTTONS: { type: BubbleType; label: string; icon: typeof BubbleIcon }[] = [
+  { type: 'speak', label: 'Dialogue', icon: BubbleIcon },
+  { type: 'narration', label: 'Narration', icon: NoteIcon },
+  { type: 'sfx', label: 'SFX', icon: SfxIcon },
 ];
 
 function LetteringBody({ ctx, chapter, onBack }: { ctx: PageContext; chapter: Chapter; onBack: () => void }) {
@@ -30,16 +30,16 @@ function LetteringBody({ ctx, chapter, onBack }: { ctx: PageContext; chapter: Ch
         onBack={onBack}
         right={
           <>
-            <IconButton icon={Undo2} disabled={!c.canUndo} onPress={c.undo} accessibilityLabel="Undo" />
-            <IconButton icon={Redo2} disabled={!c.canRedo} onPress={c.redo} accessibilityLabel="Redo" />
+            <IconButton icon={UndoIcon} disabled={!c.canUndo} onPress={c.undo} accessibilityLabel="Undo" />
+            <IconButton icon={RedoIcon} disabled={!c.canRedo} onPress={c.redo} accessibilityLabel="Redo" />
             <IconButton
-              icon={page.done ? CircleCheck : Check}
+              icon={page.done ? DoneIcon : CheckIcon}
               active={page.done}
               onPress={() => setPagesDone([pageId], !page.done)}
               accessibilityLabel={page.done ? 'Mark page as not done' : 'Mark page as done'}
             />
             <IconButton
-              icon={EllipsisVertical}
+              icon={MoreIcon}
               onPress={() => dispatch({ type: 'openSheet', sheet: 'menu' })}
               accessibilityLabel="Menu"
             />
@@ -67,7 +67,7 @@ function LetteringBody({ ctx, chapter, onBack }: { ctx: PageContext; chapter: Ch
         })}
         <Chip
           label="Effects"
-          icon={Wind}
+          icon={EffectIcon}
           count={page.effects.length || undefined}
           selected={pending?.kind === 'effect'}
           onPress={() => dispatch({ type: 'openSheet', sheet: 'effects' })}

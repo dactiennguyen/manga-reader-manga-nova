@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { RefreshCw, Settings } from 'lucide-react-native';
+import { RefreshIcon, SettingsIcon } from '../../ui/icons';
 
 import { scriptText, storyBrief } from '../../core/ai/context';
 import { changeVoice, continueScript, rewriteBlocks, shortenLine, suggestSfx, type BlockDraft } from '../../core/ai/writing';
@@ -155,7 +155,7 @@ export function AiWriteSheet({
       return (
         <View className="gap-3 px-4 pb-4">
           <Text tone="secondary">Writing help needs an AI server. Set its address in Profile first.</Text>
-          <Button title="Open Profile" icon={Settings} variant="ai" onPress={() => sheet.closeThen(onOpenProfile)} />
+          <Button title="Open Profile" icon={SettingsIcon} variant="ai" onPress={() => sheet.closeThen(onOpenProfile)} />
         </View>
       );
     }
@@ -210,7 +210,7 @@ export function AiWriteSheet({
     }
     return (
       <Footer>
-        <Button title="Try again" icon={RefreshCw} variant="ai" onPress={retry} />
+        <Button title="Try again" icon={RefreshIcon} variant="ai" onPress={retry} />
         <Button title="Back" variant="ghost" onPress={back} />
       </Footer>
     );

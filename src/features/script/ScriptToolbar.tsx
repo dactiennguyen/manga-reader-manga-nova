@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { ArrowDown, ArrowUp, EllipsisVertical, Plus, Sparkles, Trash2 } from 'lucide-react-native';
+import { AiIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, MoreIcon, PlusIcon } from '../../ui/icons';
 
 import { BLOCK_LABEL, BLOCK_TYPES } from '../../core/model/constants';
 import type { BlockType } from '../../core/model/types';
@@ -45,7 +45,7 @@ export function ScriptToolbar({
           onPress={onAi}
           className="h-9 flex-row items-center gap-1.5 overflow-hidden rounded-sm bg-ai/15 px-3"
         >
-          <Icon icon={Sparkles} size={16} color="ai" />
+          <Icon icon={AiIcon} size={16} color="ai" />
           <Text variant="label" tone="ai">
             AI
           </Text>
@@ -53,11 +53,11 @@ export function ScriptToolbar({
         {BLOCK_TYPES.map(item => (
           <Chip key={item} label={BLOCK_LABEL[item]} selected={type === item} onPress={() => onType(item)} />
         ))}
-        <IconButton icon={Plus} onPress={onAdd} accessibilityLabel="Add block below" />
-        <IconButton icon={ArrowUp} onPress={() => onMove(-1)} disabled={first} accessibilityLabel="Move block up" />
-        <IconButton icon={ArrowDown} onPress={() => onMove(1)} disabled={last} accessibilityLabel="Move block down" />
-        <IconButton icon={Trash2} onPress={onDelete} disabled={!canDelete} accessibilityLabel="Delete block" />
-        <IconButton icon={EllipsisVertical} onPress={onMore} accessibilityLabel="Block options" />
+        <IconButton icon={PlusIcon} onPress={onAdd} accessibilityLabel="Add block below" />
+        <IconButton icon={ArrowUpIcon} onPress={() => onMove(-1)} disabled={first} accessibilityLabel="Move block up" />
+        <IconButton icon={ArrowDownIcon} onPress={() => onMove(1)} disabled={last} accessibilityLabel="Move block down" />
+        <IconButton icon={DeleteIcon} onPress={onDelete} disabled={!canDelete} accessibilityLabel="Delete block" />
+        <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel="Block options" />
       </ScrollView>
     </View>
   );

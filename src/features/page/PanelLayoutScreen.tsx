@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
-import { ChevronDown, ChevronLeft, ChevronRight, CircleCheck, EllipsisVertical, Redo2, Undo2 } from 'lucide-react-native';
+import { CaretDownIcon, CaretLeftIcon, CaretRightIcon, DoneIcon, MoreIcon, RedoIcon, UndoIcon } from '../../ui/icons';
 
 import type { Chapter } from '../../core/model/types';
 import { plural } from '../../core/util/format';
@@ -48,15 +48,15 @@ function PanelLayoutBody({
         onBack={c.goBack}
         right={
           <>
-            <IconButton icon={Undo2} disabled={!canUndo} onPress={() => undoStory(scope)} accessibilityLabel="Undo" />
-            <IconButton icon={Redo2} disabled={!canRedo} onPress={() => redoStory(scope)} accessibilityLabel="Redo" />
+            <IconButton icon={UndoIcon} disabled={!canUndo} onPress={() => undoStory(scope)} accessibilityLabel="Undo" />
+            <IconButton icon={RedoIcon} disabled={!canRedo} onPress={() => redoStory(scope)} accessibilityLabel="Redo" />
             <IconButton
-              icon={CircleCheck}
+              icon={DoneIcon}
               active={page.done}
               onPress={() => setPagesDone([pageId], !page.done)}
               accessibilityLabel={page.done ? 'Mark not done' : 'Mark page done'}
             />
-            <IconButton icon={EllipsisVertical} onPress={() => c.setSheet('menu')} accessibilityLabel="More" />
+            <IconButton icon={MoreIcon} onPress={() => c.setSheet('menu')} accessibilityLabel="More" />
           </>
         }
       >
@@ -68,7 +68,7 @@ function PanelLayoutBody({
           <Text variant="title" numberOfLines={1}>
             Page {index + 1} / {total}
           </Text>
-          <Icon icon={ChevronDown} />
+          <Icon icon={CaretDownIcon} />
         </Pressable>
       </AppBar>
       <View className="flex-1">
@@ -102,23 +102,27 @@ function PanelLayoutBody({
           )}
           <PanelGestureLayer live={live} />
         </View>
-        <View pointerEvents="box-none" className="absolute inset-x-2 bottom-1 flex-row justify-between">
-          <IconButton
-            icon={ChevronLeft}
-            onPress={() => c.goTo(index + (rtl ? 1 : -1))}
-            accessibilityLabel={rtl ? 'Next page' : 'Previous page'}
-            className="rounded-full bg-raised"
-          />
-          <IconButton
-            icon={ChevronRight}
-            onPress={() => c.goTo(index + (rtl ? -1 : 1))}
-            accessibilityLabel={rtl ? 'Previous page' : 'Next page'}
-            className="rounded-full bg-raised"
-          />
-        </View>
       </View>
       {mode === 'panels' ? <PanelToolBar c={c} /> : <PanelArtCard c={c} />}
-      <ModeBar pageId={pageId} mode={mode} onChange={c.changeMode} />
+      <ModeBar
+        pageId={pageId}
+        mode={mode}
+        onChange={c.changeMode}
+        leading={
+          <IconButton
+            icon={CaretLeftIcon}
+            onPress={() => c.goTo(index + (rtl ? 1 : -1))}
+            accessibilityLabel={rtl ? 'Next page' : 'Previous page'}
+          />
+        }
+        trailing={
+          <IconButton
+            icon={CaretRightIcon}
+            onPress={() => c.goTo(index + (rtl ? -1 : 1))}
+            accessibilityLabel={rtl ? 'Previous page' : 'Next page'}
+          />
+        }
+      />
       <PanelSheets c={c} />
     </Screen>
   );

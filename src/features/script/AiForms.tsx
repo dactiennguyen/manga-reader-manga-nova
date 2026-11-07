@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { PenLine, Repeat, Scissors, Sparkles, Speech, Zap } from 'lucide-react-native';
+import { AiIcon, CutIcon, PenLineIcon, RepeatIcon, SfxIcon, VoiceIcon } from '../../ui/icons';
 
 import { BLOCK_LABEL, LIMITS } from '../../core/model/constants';
 import { MAX_SCENE_REWRITE, type AiAction, type BlockLocation, type RewriteScope } from '../../core/script/aiDrafts';
@@ -44,14 +44,14 @@ export function AiActionMenu({
       <ListItem
         title={AI_TITLE.continue}
         subtitle={location ? 'Write the next 3 to 5 blocks after this one' : 'Write the next 3 to 5 blocks at the end'}
-        icon={PenLine}
+        icon={PenLineIcon}
         iconColor="ai"
         onPress={() => onChoose('continue')}
       />
       <ListItem
         title={AI_TITLE.rewrite}
         subtitle={available.rewrite ? 'This block or the whole scene, with an optional instruction' : 'Focus a written block first'}
-        icon={Repeat}
+        icon={RepeatIcon}
         iconColor="ai"
         disabled={!available.rewrite}
         onPress={() => onChoose('rewrite')}
@@ -59,7 +59,7 @@ export function AiActionMenu({
       <ListItem
         title={AI_TITLE.voice}
         subtitle={available.voice ? `Make the line sound like ${speakerName || 'the character'}` : 'Dialogue with a character only'}
-        icon={Speech}
+        icon={VoiceIcon}
         iconColor="ai"
         disabled={!available.voice}
         onPress={() => onChoose('voice')}
@@ -73,7 +73,7 @@ export function AiActionMenu({
               : 'Make the line fit one speech bubble'
             : 'Dialogue only'
         }
-        icon={Scissors}
+        icon={CutIcon}
         iconColor="ai"
         disabled={!available.shorten}
         onPress={() => onChoose('shorten')}
@@ -81,7 +81,7 @@ export function AiActionMenu({
       <ListItem
         title={AI_TITLE.sfx}
         subtitle={available.sfx ? 'Three sound effects for this action' : 'Action blocks only'}
-        icon={Zap}
+        icon={SfxIcon}
         iconColor="ai"
         disabled={!available.sfx}
         onPress={() => onChoose('sfx')}
@@ -143,7 +143,7 @@ export function AiRewriteForm({
         </ChipGroup>
       </ScrollView>
       <Footer>
-        <Button title={scope === 'scene' ? 'Rewrite scene' : 'Rewrite block'} icon={Sparkles} variant="ai" onPress={onSubmit} />
+        <Button title={scope === 'scene' ? 'Rewrite scene' : 'Rewrite block'} icon={AiIcon} variant="ai" onPress={onSubmit} />
       </Footer>
     </>
   );

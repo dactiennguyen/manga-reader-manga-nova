@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CircleCheck, EllipsisVertical, Eye, Plus, ScrollText, Share2, Trash2, X } from 'lucide-react-native';
+import { CloseIcon, DeleteIcon, DoneIcon, MoreIcon, PlusIcon, PreviewIcon, ScriptIcon, ShareIcon } from '../../ui/icons';
 
 import { isRtl, pageSize } from '../../core/layout/layout';
 import { chapterLabel, scriptOutdated } from '../../core/model/selectors';
@@ -86,22 +86,22 @@ export function StoryboardScreen({ navigation, route }: ScreenProps<'Storyboard'
         onBack={() => navigation.goBack()}
         right={
           selection ? (
-            <IconButton icon={X} onPress={() => setSelection(null)} accessibilityLabel="Cancel selection" />
+            <IconButton icon={CloseIcon} onPress={() => setSelection(null)} accessibilityLabel="Cancel selection" />
           ) : (
             <>
               <IconButton
-                icon={Eye}
+                icon={PreviewIcon}
                 disabled={pages.length === 0}
                 onPress={() => navigation.navigate('Preview', { projectId: project.id, chapterId })}
                 accessibilityLabel="Preview"
               />
               <IconButton
-                icon={Share2}
+                icon={ShareIcon}
                 disabled={pages.length === 0}
                 onPress={() => navigation.navigate('Export', { projectId: project.id, chapterId })}
                 accessibilityLabel="Export"
               />
-              <IconButton icon={EllipsisVertical} onPress={() => setMenuOpen(true)} accessibilityLabel="More" />
+              <IconButton icon={MoreIcon} onPress={() => setMenuOpen(true)} accessibilityLabel="More" />
             </>
           )
         }
@@ -131,7 +131,7 @@ export function StoryboardScreen({ navigation, route }: ScreenProps<'Storyboard'
           <Button
             title="Auto-paginate from script"
             variant="secondary"
-            icon={ScrollText}
+            icon={ScriptIcon}
             small
             onPress={() => setPaginating(true)}
           />
@@ -145,11 +145,11 @@ export function StoryboardScreen({ navigation, route }: ScreenProps<'Storyboard'
               : 'Write the script first, or start drawing right away.'}
           </Text>
           {hasScript ? (
-            <Button title="Auto-paginate from script" icon={ScrollText} onPress={() => setPaginating(true)} />
+            <Button title="Auto-paginate from script" icon={ScriptIcon} onPress={() => setPaginating(true)} />
           ) : (
-            <Button title="Write script" icon={ScrollText} onPress={() => navigation.navigate('Script', { chapterId })} />
+            <Button title="Write script" icon={ScriptIcon} onPress={() => navigation.navigate('Script', { chapterId })} />
           )}
-          <Button title="Add blank page" variant="secondary" icon={Plus} onPress={() => actions.addPage()} />
+          <Button title="Add blank page" variant="secondary" icon={PlusIcon} onPress={() => actions.addPage()} />
         </View>
       ) : listView ? (
         <StoryboardList pages={pages} {...shared} />
@@ -165,7 +165,7 @@ export function StoryboardScreen({ navigation, route }: ScreenProps<'Storyboard'
           <Button
             title="Delete"
             variant="danger"
-            icon={Trash2}
+            icon={DeleteIcon}
             disabled={selection.length === 0}
             onPress={() => actions.removePages(selection)}
             className="flex-1"
@@ -173,7 +173,7 @@ export function StoryboardScreen({ navigation, route }: ScreenProps<'Storyboard'
           <Button
             title="Mark done"
             variant="secondary"
-            icon={CircleCheck}
+            icon={DoneIcon}
             disabled={selection.length === 0}
             onPress={() => {
               setPagesDone(selection, true);
@@ -183,7 +183,7 @@ export function StoryboardScreen({ navigation, route }: ScreenProps<'Storyboard'
           />
         </View>
       ) : (
-        pages.length > 0 && <Fab icon={Plus} label="Page" onPress={() => actions.addPage()} bottom={insets.bottom + FAB_GAP} />
+        pages.length > 0 && <Fab icon={PlusIcon} label="Page" onPress={() => actions.addPage()} bottom={insets.bottom + FAB_GAP} />
       )}
       <StoryboardMenus
         chapter={chapter}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { X } from 'lucide-react-native';
+import { CloseIcon } from '../../ui/icons';
 
 import { SHOT_LABEL } from '../../core/model/constants';
 import { paginate, type PagePlan } from '../../core/model/paginate';
@@ -48,7 +48,7 @@ export function AutoPaginateSheet({
       onClose={onClose}
       title="Auto-paginate"
       subtitle={`${plural(plans.length, 'page')} · ${plural(panelTotal, 'panel')}`}
-      right={<IconButton icon={X} onPress={onClose} accessibilityLabel="Close" />}
+      right={<IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close" />}
       scroll={false}
       maxHeight="92%"
     >

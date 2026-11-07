@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { Languages as LanguagesIcon, Pencil, Plus, Trash2 } from 'lucide-react-native';
+import { DeleteIcon, EditIcon, PlusIcon, TranslateIcon } from '../../ui/icons';
 
 import { LANGUAGE_NAME_MAX, MAX_LANGUAGES, languageNameError, translationProgress } from '../../core/lettering/translation';
 import type { Bubble, Project } from '../../core/model/types';
@@ -66,17 +66,17 @@ export function ManageLanguagesSheet({
   return (
     <>
       <Sheet visible={visible} onClose={onClose} title="Languages" subtitle="The art is shared. Only the text changes.">
-        <ListItem title="Original" subtitle="The text you wrote first" icon={LanguagesIcon} />
+        <ListItem title="Original" subtitle="The text you wrote first" icon={TranslateIcon} />
         {languages.map(name => (
           <ListItem
             key={name}
             title={name}
-            icon={LanguagesIcon}
+            icon={TranslateIcon}
             right={
               <View className="flex-row items-center">
-                <IconButton icon={Pencil} size={18} onPress={() => setRenaming(name)} accessibilityLabel={`Rename ${name}`} />
+                <IconButton icon={EditIcon} size={18} onPress={() => setRenaming(name)} accessibilityLabel={`Rename ${name}`} />
                 <IconButton
-                  icon={Trash2}
+                  icon={DeleteIcon}
                   size={18}
                   color="danger"
                   onPress={() => remove(name)}
@@ -87,7 +87,7 @@ export function ManageLanguagesSheet({
           />
         ))}
         <View className="gap-3 p-4">
-          <Button title="Add language" icon={Plus} disabled={full} onPress={() => setAdding(true)} />
+          <Button title="Add language" icon={PlusIcon} disabled={full} onPress={() => setAdding(true)} />
           <Text variant="caption" tone="secondary" className="text-center">
             {full
               ? `A story can have up to ${MAX_LANGUAGES} extra languages.`

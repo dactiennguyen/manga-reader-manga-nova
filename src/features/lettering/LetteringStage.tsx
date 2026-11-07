@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Languages, ListChecks } from 'lucide-react-native';
+import { ChecklistIcon, TranslateIcon } from '../../ui/icons';
 
 import { defaultTail } from '../../core/lettering/bubbleEdit';
 import { plural } from '../../core/util/format';
@@ -110,7 +110,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
           <View pointerEvents="box-none" className="flex-row flex-wrap justify-center gap-2">
             <Chip
               label={lang ?? 'Original'}
-              icon={Languages}
+              icon={TranslateIcon}
               selected={!!lang}
               onPress={() => dispatch({ type: 'openSheet', sheet: 'language' })}
             />
@@ -129,7 +129,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
           <Button
             small
             variant="secondary"
-            icon={ListChecks}
+            icon={ChecklistIcon}
             title={`Auto-place dialogue (${c.unplaced.length})`}
             onPress={c.runAutoPlace}
           />

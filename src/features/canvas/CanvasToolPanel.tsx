@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp } from 'lucide-react-native';
+import { CaretDownIcon, CaretUpIcon } from '../../ui/icons';
 import { useState, type ReactNode } from 'react';
 import { ScrollView, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { type AnimatedStyle } from 'react-native-reanimated';
@@ -100,7 +100,7 @@ export function CanvasToolPanel({
             )}
           </View>
           <IconButton
-            icon={open ? ChevronDown : ChevronUp}
+            icon={open ? CaretDownIcon : CaretUpIcon}
             color="text-muted"
             onPress={() => setOpen(value => !value)}
             accessibilityLabel={open ? 'Collapse tool panel' : 'Expand tool panel'}

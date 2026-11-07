@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { Brush, Ellipsis, LayoutGrid, ListOrdered, Merge, Minus, Plus, Scissors, SlidersHorizontal } from 'lucide-react-native';
+import { BrushIcon, CutIcon, MergeIcon, MinusIcon, MoreHorizontalIcon, OrderIcon, PlusIcon, SlidersIcon, TemplatesIcon } from '../../ui/icons';
 
 import { SHOT_LABEL } from '../../core/model/constants';
 import { useAppNavigation } from '../../state/navigation';
@@ -47,20 +47,20 @@ export function PanelToolBar({ c }: { c: PanelController }) {
         </View>
       )}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="items-center gap-2 py-1.5">
-        <Chip label="Templates" icon={LayoutGrid} onPress={() => c.setTemplatesOpen(true)} />
+        <Chip label="Templates" icon={TemplatesIcon} onPress={() => c.setTemplatesOpen(true)} />
         {!!layout && (
           <>
-            <Chip label="Cut" icon={Scissors} selected={tool === 'cut'} onPress={() => c.pickTool('cut')} />
-            <Chip label="Merge" icon={Merge} selected={tool === 'merge'} onPress={() => c.pickTool('merge')} />
-            <Chip label="Gutter" icon={SlidersHorizontal} selected={tool === 'gutter'} onPress={() => c.pickTool('gutter')} />
-            <Chip label="Order" icon={ListOrdered} selected={tool === 'order'} onPress={() => c.pickTool('order')} />
+            <Chip label="Cut" icon={CutIcon} selected={tool === 'cut'} onPress={() => c.pickTool('cut')} />
+            <Chip label="Merge" icon={MergeIcon} selected={tool === 'merge'} onPress={() => c.pickTool('merge')} />
+            <Chip label="Gutter" icon={SlidersIcon} selected={tool === 'gutter'} onPress={() => c.pickTool('gutter')} />
+            <Chip label="Order" icon={OrderIcon} selected={tool === 'order'} onPress={() => c.pickTool('order')} />
           </>
         )}
         {tool === 'order' && !!page.order && <Chip label="Auto" onPress={c.autoOrder} />}
         {c.webtoon && (
           <>
-            <Chip label="Extend strip" icon={Plus} onPress={c.extend} />
-            <Chip label="Shorten" icon={Minus} onPress={c.shorten} />
+            <Chip label="Extend strip" icon={PlusIcon} onPress={c.extend} />
+            <Chip label="Shorten" icon={MinusIcon} onPress={c.shorten} />
           </>
         )}
       </ScrollView>
@@ -87,8 +87,8 @@ export function PanelArtCard({ c }: { c: PanelController }) {
           {panel.description || 'No description'}
         </Text>
       </View>
-      <Button title="Draw" icon={Brush} small onPress={() => navigation.navigate('Canvas', { pageId, panelId: panel.id })} />
-      <IconButton icon={Ellipsis} onPress={() => c.setSheet('art')} accessibilityLabel="Panel options" />
+      <Button title="Draw" icon={BrushIcon} small onPress={() => navigation.navigate('Canvas', { pageId, panelId: panel.id })} />
+      <IconButton icon={MoreHorizontalIcon} onPress={() => c.setSheet('art')} accessibilityLabel="Panel options" />
     </ToolPanel>
   );
 }

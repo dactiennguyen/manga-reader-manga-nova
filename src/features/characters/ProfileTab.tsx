@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { PlusIcon } from '../../ui/icons';
 
 import { LIMITS } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
@@ -61,7 +61,7 @@ export function ProfileTab({ character }: { character: Character }) {
             submitBehavior="submit"
             className="flex-1"
           />
-          <IconButton icon={Plus} onPress={addTrait} disabled={full || !trait.trim()} accessibilityLabel="Add trait" />
+          <IconButton icon={PlusIcon} onPress={addTrait} disabled={full || !trait.trim()} accessibilityLabel="Add trait" />
         </View>
         <Text variant="caption" tone="muted">
           Tap a trait to remove it.

@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { PenLine } from 'lucide-react-native';
+import { PenLineIcon } from '../../ui/icons';
 
 import { version } from '../../../package.json';
 import { APP_NAME } from '../../core/model/constants';
@@ -22,7 +22,7 @@ export function AboutScreen() {
       <ScrollView className="flex-1" contentContainerClassName="gap-4 px-4 pb-8 md:px-6">
         <View className="items-center px-2 pb-2 pt-6">
           <View className="mb-4 h-[88px] w-[88px] items-center justify-center rounded-lg bg-surface">
-            <Icon icon={PenLine} size={40} color="accent" />
+            <Icon icon={PenLineIcon} size={40} color="accent" />
           </View>
           <Text variant="display" accessibilityRole="header">
             {APP_NAME}

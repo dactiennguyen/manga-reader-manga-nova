@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Archive, FileText, GalleryVertical, Images } from 'lucide-react-native';
+import { ArchiveIcon, DocumentIcon, ImagesIcon, LongImageIcon } from '../../ui/icons';
 
 import type { ExportFormat, ExportOptions, ExportQuality, LongWidth } from '../../core/export/plan';
 import { chapterLabel } from '../../core/model/selectors';
@@ -16,15 +16,15 @@ import {
   SwitchRow,
   Text,
   TextField,
-  type LucideIcon,
+  type IconGlyph,
 } from '../../ui';
 import { FORMAT_LABEL, FormatCard, OptionRow } from './ExportParts';
 
-const FORMATS: { value: ExportFormat; icon: LucideIcon; description: string }[] = [
-  { value: 'png', icon: Images, description: 'One image per page, packed in a ZIP. Good for social posts.' },
-  { value: 'pdf', icon: FileText, description: 'For printing or sending to beta readers.' },
-  { value: 'cbz', icon: Archive, description: 'Opens in comic reader apps.' },
-  { value: 'long', icon: GalleryVertical, description: 'Stitches pages into a vertical strip for webtoon platforms.' },
+const FORMATS: { value: ExportFormat; icon: IconGlyph; description: string }[] = [
+  { value: 'png', icon: ImagesIcon, description: 'One image per page, packed in a ZIP. Good for social posts.' },
+  { value: 'pdf', icon: DocumentIcon, description: 'For printing or sending to beta readers.' },
+  { value: 'cbz', icon: ArchiveIcon, description: 'Opens in comic reader apps.' },
+  { value: 'long', icon: LongImageIcon, description: 'Stitches pages into a vertical strip for webtoon platforms.' },
 ];
 
 export function ChapterPicker({

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { X } from 'lucide-react-native';
+import { CloseIcon } from '../../ui/icons';
 
 import { ART_STYLE_LABEL } from '../../core/model/constants';
 import type { Project } from '../../core/model/types';
@@ -68,7 +68,7 @@ export function NextStepCard({ step, onHide }: { step: NextStep; onHide: () => v
         <Text variant="label" tone="accent" className="flex-1">
           Next step
         </Text>
-        <IconButton icon={X} size={18} accessibilityLabel="Hide suggestion" onPress={onHide} />
+        <IconButton icon={CloseIcon} size={18} accessibilityLabel="Hide suggestion" onPress={onHide} />
       </View>
       <Text>{step.text}</Text>
       <View className="flex-row flex-wrap gap-2">

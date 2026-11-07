@@ -1,28 +1,14 @@
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  CircleCheck,
-  Copy,
-  Flag,
-  LayoutGrid,
-  List,
-  ListChecks,
-  ScrollText,
-  SquarePlus,
-  Trash2,
-} from 'lucide-react-native';
+import { AddPageIcon, ArrowDownIcon, ArrowUpIcon, BackIcon, ChecklistIcon, CopyIcon, DeleteIcon, DoneIcon, FlagIcon, ForwardIcon, ListIcon, ScriptIcon, TemplatesIcon } from '../../ui/icons';
 
 import type { Chapter, ID, Page } from '../../core/model/types';
 import { moveArrows, type MoveArrow } from '../../core/reorder/storyboardGrid';
 import { useAppNavigation } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
-import { Dialog, Menu, Text, type LucideIcon } from '../../ui';
+import { Dialog, Menu, Text, type IconGlyph } from '../../ui';
 import { clearPageFlag, setPagesDone } from '../page/pageActions';
 import type { useStoryboardActions } from './useStoryboardActions';
 
-const ARROW: Record<MoveArrow, LucideIcon> = { left: ArrowLeft, right: ArrowRight, up: ArrowUp, down: ArrowDown };
+const ARROW: Record<MoveArrow, IconGlyph> = { left: BackIcon, right: ForwardIcon, up: ArrowUpIcon, down: ArrowDownIcon };
 
 export function StoryboardMenus({
   chapter,
@@ -59,13 +45,13 @@ export function StoryboardMenus({
         visible={menuOpen}
         onClose={onCloseMenu}
         items={[
-          { label: 'View script', icon: ScrollText, onPress: () => navigation.navigate('Script', { chapterId: chapter.id }) },
+          { label: 'View script', icon: ScriptIcon, onPress: () => navigation.navigate('Script', { chapterId: chapter.id }) },
           listView
-            ? { label: 'View: Grid', icon: LayoutGrid, onPress: onToggleList }
-            : { label: 'View: List', icon: List, onPress: onToggleList },
+            ? { label: 'View: Grid', icon: TemplatesIcon, onPress: onToggleList }
+            : { label: 'View: List', icon: ListIcon, onPress: onToggleList },
           chapter.pageIds.length > 0 && {
             label: 'Select multiple',
-            icon: ListChecks,
+            icon: ChecklistIcon,
             onPress: () => actions.setSelection([]),
           },
         ]}
@@ -79,12 +65,12 @@ export function StoryboardMenus({
             ? [
                 {
                   label: page.done ? 'Mark not done' : 'Mark done',
-                  icon: CircleCheck,
+                  icon: DoneIcon,
                   onPress: () => setPagesDone([page.id], !page.done),
                 },
-                { label: 'Duplicate', icon: Copy, onPress: () => story.duplicatePage(page.id) },
-                { label: 'Insert page before', icon: SquarePlus, onPress: () => actions.addPage(index) },
-                { label: 'Insert page after', icon: SquarePlus, onPress: () => actions.addPage(index + 1) },
+                { label: 'Duplicate', icon: CopyIcon, onPress: () => story.duplicatePage(page.id) },
+                { label: 'Insert page before', icon: AddPageIcon, onPress: () => actions.addPage(index) },
+                { label: 'Insert page after', icon: AddPageIcon, onPress: () => actions.addPage(index + 1) },
                 {
                   label: 'Move earlier',
                   icon: ARROW[arrows.earlier],
@@ -97,9 +83,9 @@ export function StoryboardMenus({
                   disabled: index >= chapter.pageIds.length - 1,
                   onPress: () => story.movePage(chapter.id, index, index + 1),
                 },
-                !!page.flag && { label: 'View flag note', icon: Flag, onPress: () => actions.setFlagNote(page.id) },
-                !!page.flag && { label: 'Remove flag', icon: Flag, onPress: () => clearPageFlag(page.id) },
-                { label: 'Delete', icon: Trash2, destructive: true, onPress: () => actions.removePages([page.id]) },
+                !!page.flag && { label: 'View flag note', icon: FlagIcon, onPress: () => actions.setFlagNote(page.id) },
+                !!page.flag && { label: 'Remove flag', icon: FlagIcon, onPress: () => clearPageFlag(page.id) },
+                { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => actions.removePages([page.id]) },
               ]
             : []
         }

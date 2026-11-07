@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { CircleCheck, Wifi } from 'lucide-react-native';
+import { ConnectionIcon, DoneIcon } from '../../ui/icons';
 
 import { normalizeBaseUrl } from '../../core/ai/port';
 import { appServices } from '../../state/services';
@@ -108,14 +108,14 @@ export function AiServerSheet({ visible, onClose }: { visible: boolean; onClose:
 
         {state.status === 'loading' && <AiLoading label="Contacting the server…" onCancel={cancel} />}
         {state.status === 'done' && (
-          <Banner tone="success" icon={CircleCheck} text="Connected. The server answered the test message." />
+          <Banner tone="success" icon={DoneIcon} text="Connected. The server answered the test message." />
         )}
         {state.status === 'error' && <AiErrorBox message={state.message} onRetry={test} onCancel={cancel} />}
         {(state.status === 'idle' || state.status === 'done') && (
           <Button
             title={state.status === 'done' ? 'Test again' : 'Test connection'}
             variant="secondary"
-            icon={Wifi}
+            icon={ConnectionIcon}
             onPress={test}
             disabled={!resolved}
           />

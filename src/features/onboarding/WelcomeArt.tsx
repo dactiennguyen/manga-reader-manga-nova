@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import { Brush, Check, Eraser, PenLine, Pencil, Upload } from 'lucide-react-native';
+import { BrushIcon, CheckIcon, EditIcon, EraserIcon, ExportIcon, PenLineIcon } from '../../ui/icons';
 
-import { Icon, type LucideIcon } from '../../ui';
+import { Icon, type IconGlyph } from '../../ui';
 
 export type WelcomeArtKind = 'write' | 'draw' | 'finish';
 
@@ -13,7 +13,7 @@ function Page({ children }: { children: ReactNode }) {
   return <View className="flex-1 gap-2 rounded-md bg-raised p-3">{children}</View>;
 }
 
-function ActionTile({ icon }: { icon: LucideIcon }) {
+function ActionTile({ icon }: { icon: IconGlyph }) {
   return (
     <View className="absolute -bottom-3 -right-3 h-14 w-14 items-center justify-center rounded-lg bg-accent">
       <Icon icon={icon} size={26} color="on-accent" />
@@ -31,7 +31,7 @@ function ScriptPage() {
       <View className="mt-2 h-2 w-1/3 rounded-full bg-control-border" />
       <View className="h-2 w-full rounded-full bg-overlay" />
       <View className="h-2 w-3/4 rounded-full bg-overlay" />
-      <ActionTile icon={PenLine} />
+      <ActionTile icon={PenLineIcon} />
     </Page>
   );
 }
@@ -52,13 +52,13 @@ function ToolStrip() {
   return (
     <View className="absolute -left-5 top-4 gap-1 rounded-lg bg-overlay p-1">
       <View className="h-9 w-9 items-center justify-center rounded-sm bg-accent/15">
-        <Icon icon={Pencil} size={18} color="accent" />
+        <Icon icon={EditIcon} size={18} color="accent" />
       </View>
       <View className="h-9 w-9 items-center justify-center">
-        <Icon icon={Brush} size={18} color="text-secondary" />
+        <Icon icon={BrushIcon} size={18} color="text-secondary" />
       </View>
       <View className="h-9 w-9 items-center justify-center">
-        <Icon icon={Eraser} size={18} color="text-secondary" />
+        <Icon icon={EraserIcon} size={18} color="text-secondary" />
       </View>
     </View>
   );
@@ -67,7 +67,7 @@ function ToolStrip() {
 function DrawPage() {
   return (
     <Page>
-      <PanelGrid active={<Icon icon={Brush} size={24} color="accent" />} />
+      <PanelGrid active={<Icon icon={BrushIcon} size={24} color="accent" />} />
       <ToolStrip />
     </Page>
   );
@@ -76,8 +76,8 @@ function DrawPage() {
 function FinishedPage() {
   return (
     <Page>
-      <PanelGrid active={<Icon icon={Check} size={24} color="accent" />} />
-      <ActionTile icon={Upload} />
+      <PanelGrid active={<Icon icon={CheckIcon} size={24} color="accent" />} />
+      <ActionTile icon={ExportIcon} />
     </Page>
   );
 }

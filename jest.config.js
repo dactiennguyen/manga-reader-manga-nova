@@ -8,7 +8,7 @@ const ESM_PACKAGES = [
   '@dr.pogodin',
   '@react-native-documents',
   'uniwind',
-  'lucide-react-native',
+  'phosphor-react-native',
 ];
 
 module.exports = {

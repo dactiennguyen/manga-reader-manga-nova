@@ -19,13 +19,13 @@ import {
 import { GestureDetector, useExclusiveGestures, usePanGesture, useTapGesture } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
-import { Check, Minus, Plus, Search, X } from 'lucide-react-native';
+import { CheckIcon, CloseIcon, MinusIcon, PlusIcon, SearchIcon } from './icons';
 
-import { Icon, type LucideIcon } from './Icon';
+import { Icon, type IconGlyph } from './Icon';
 import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
-import { useColor } from './tokens';
+import { ICON, useColor } from './tokens';
 
 /**
  * Inside a Modal: whether its window is on screen yet. Android drops a keyboard request from a window
@@ -35,7 +35,7 @@ export const ModalShownContext = createContext<boolean | null>(null);
 
 export type TextFieldProps = TextInputProps & {
   ref?: Ref<ComponentRef<typeof TextInput>>;
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   onClear?: () => void;
   className?: string;
   inputClassName?: string;
@@ -79,13 +79,13 @@ export function TextField({ ref, icon, onClear, className, inputClassName, multi
         }}
         className={`flex-1 p-0 text-body font-inter text-text ${inputClassName ?? ''}`}
       />
-      {!!onClear && !!props.value && <IconButton icon={X} size={18} onPress={onClear} accessibilityLabel="Clear" color="text-muted" />}
+      {!!onClear && !!props.value && <IconButton icon={CloseIcon} size={18} onPress={onClear} accessibilityLabel="Clear" color="text-muted" />}
     </View>
   );
 }
 
 export function SearchField(props: Omit<TextFieldProps, 'icon'>) {
-  return <TextField icon={Search} returnKeyType="search" {...props} />;
+  return <TextField icon={SearchIcon} returnKeyType="search" {...props} />;
 }
 
 export function FieldLabel({ children }: { children: string }) {
@@ -109,7 +109,7 @@ export function Chip({
   selected?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   count?: number;
   className?: string;
 }) {
@@ -124,7 +124,7 @@ export function Chip({
         selected ? 'bg-accent' : 'bg-overlay'
       } ${className ?? ''}`}
     >
-      {!!icon && <Icon icon={icon} size={16} color={selected ? 'on-accent' : 'text-secondary'} />}
+      {!!icon && <Icon icon={icon} size={ICON.sm} color={selected ? 'on-accent' : 'text-secondary'} weight={selected ? 'fill' : 'regular'} />}
       <Text variant="label" tone={selected ? 'onAccent' : 'secondary'} numberOfLines={1}>
         {label}
       </Text>
@@ -247,7 +247,7 @@ export function Checkbox({ checked, onChange, label }: { checked: boolean; onCha
           checked ? 'border-accent bg-accent' : 'border-control-border'
         }`}
       >
-        {checked && <Icon icon={Check} size={16} color="on-accent" />}
+        {checked && <Icon icon={CheckIcon} size={16} color="on-accent" />}
       </View>
       {!!label && <Text className="flex-1">{label}</Text>}
     </Pressable>
@@ -328,7 +328,7 @@ export function SwitchRow({
   subtitle?: string;
   value: boolean;
   onValueChange: (value: boolean) => void;
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   disabled?: boolean;
 }) {
   return (
@@ -366,11 +366,11 @@ export function Stepper({
 }) {
   return (
     <View className="flex-row items-center gap-1">
-      <IconButton icon={Minus} size={18} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} accessibilityLabel={`Decrease ${label}`} />
+      <IconButton icon={MinusIcon} size={18} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} accessibilityLabel={`Decrease ${label}`} />
       <Text variant="mono" className="min-w-10 text-center">
         {format ? format(value) : value}
       </Text>
-      <IconButton icon={Plus} size={18} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} accessibilityLabel={`Increase ${label}`} />
+      <IconButton icon={PlusIcon} size={18} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} accessibilityLabel={`Increase ${label}`} />
     </View>
   );
 }

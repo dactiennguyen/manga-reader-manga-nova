@@ -1,4 +1,4 @@
-import { Maximize2, Minimize2, X } from 'lucide-react-native';
+import { CloseIcon, MaximizeIcon, MinimizeIcon } from '../../ui/icons';
 import { useState } from 'react';
 import { Image, StyleSheet, TextInput, View } from 'react-native';
 import { GestureDetector, usePanGesture, useSimultaneousGestures, useTapGesture } from 'react-native-gesture-handler';
@@ -66,12 +66,12 @@ export function ReferenceWindow({
         />
         <View className="flex-row justify-between">
           <IconButton
-            icon={big ? Minimize2 : Maximize2}
+            icon={big ? MinimizeIcon : MaximizeIcon}
             size={16}
             onPress={() => setBig(value => !value)}
             accessibilityLabel={big ? 'Shrink reference image' : 'Enlarge reference image'}
           />
-          <IconButton icon={X} size={16} onPress={onClose} accessibilityLabel="Hide reference image" />
+          <IconButton icon={CloseIcon} size={16} onPress={onClose} accessibilityLabel="Hide reference image" />
         </View>
       </Animated.View>
     </GestureDetector>

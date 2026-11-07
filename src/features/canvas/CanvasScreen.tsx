@@ -1,4 +1,4 @@
-import { FlipHorizontal, Grid2x2, Image as ImageIcon, ImagePlus, Pencil, Trash } from 'lucide-react-native';
+import { AddImageIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon } from '../../ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, View, type LayoutChangeEvent } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -251,12 +251,12 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
         onClose={() => setMenuOpen(false)}
         title={`Panel ${shape.index + 1}`}
         items={[
-          { label: 'Flip view horizontally', icon: FlipHorizontal, onPress: () => setFlip(value => !value) },
-          { label: grid ? 'Hide grid' : 'Show grid', icon: Grid2x2, onPress: () => setGrid(value => !value) },
-          stylusMode && { label: 'Draw with a finger again', icon: Pencil, onPress: () => setStylusMode(false) },
-          { label: 'Add reference image', icon: ImagePlus, onPress: addReference },
+          { label: 'Flip view horizontally', icon: FlipIcon, onPress: () => setFlip(value => !value) },
+          { label: grid ? 'Hide grid' : 'Show grid', icon: GridIcon, onPress: () => setGrid(value => !value) },
+          stylusMode && { label: 'Draw with a finger again', icon: EditIcon, onPress: () => setStylusMode(false) },
+          { label: 'Add reference image', icon: AddImageIcon, onPress: addReference },
           { label: 'Import image into layer', icon: ImageIcon, onPress: importImage },
-          { label: 'Clear current layer', icon: Trash, destructive: true, onPress: clearActive },
+          { label: 'Clear current layer', icon: DeleteIcon, destructive: true, onPress: clearActive },
         ]}
       />
       {tipsSeen ? null : <TipsOverlay onClose={() => useSettings.getState().set({ canvasTipsSeen: true })} />}

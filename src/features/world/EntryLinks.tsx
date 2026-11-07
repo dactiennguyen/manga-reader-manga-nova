@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { BookOpen, Check, Plus, Trash2, UserPlus } from 'lucide-react-native';
+import { AddUserIcon, CheckIcon, DeleteIcon, PlusIcon, ReadIcon } from '../../ui/icons';
 
 import type { Chapter, ID, WorldEntry } from '../../core/model/types';
 import { anchorLabel, entryMentions } from '../../core/world/worldTools';
@@ -54,7 +54,7 @@ export function EntryTypeFields({ entry, chapters }: { entry: WorldEntry; chapte
             <ListItem
               title={leader ? leader.name.trim() || 'Unnamed' : 'Choose a leader'}
               left={leader ? <Avatar character={leader} size={32} /> : undefined}
-              icon={leader ? undefined : UserPlus}
+              icon={leader ? undefined : AddUserIcon}
               chevron
               onPress={() => setPicking(true)}
             />
@@ -67,7 +67,7 @@ export function EntryTypeFields({ entry, chapters }: { entry: WorldEntry; chapte
         title="Time anchor"
         items={anchorOptions.map(option => ({
           label: anchorLabel(option.value, chapters),
-          icon: activeAnchor === option.value ? Check : undefined,
+          icon: activeAnchor === option.value ? CheckIcon : undefined,
           onPress: () => update(entry.id, { anchor: option.value }),
         }))}
       />
@@ -122,7 +122,7 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
             </Pressable>
           );
         })}
-        <Button title="Add" icon={Plus} variant="secondary" small onPress={() => setPicking(true)} />
+        <Button title="Add" icon={PlusIcon} variant="secondary" small onPress={() => setPicking(true)} />
       </View>
       {related.length > 0 && (
         <Text variant="caption" tone="muted" className="mt-2">
@@ -145,7 +145,7 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
                 key={item.chapterId}
                 title={item.label}
                 subtitle={item.count === 1 ? '1 mention' : `${item.count} mentions`}
-                icon={BookOpen}
+                icon={ReadIcon}
                 chevron
                 onPress={() => navigation.navigate('Script', { chapterId: item.chapterId, blockId: item.blockId })}
               />
@@ -161,7 +161,7 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
         items={[
           {
             label: 'Remove from this entry',
-            icon: Trash2,
+            icon: DeleteIcon,
             destructive: true,
             onPress: () => update(entry.id, { characterIds: entry.characterIds.filter(id => id !== chipMenuId) }),
           },

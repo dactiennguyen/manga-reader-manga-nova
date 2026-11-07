@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { ArrowRight, X } from 'lucide-react-native';
+import { CloseIcon, ForwardIcon } from '../../ui/icons';
 
 import type { ScreenProps } from '../../state/navigation';
 import { AppBar, Button, IconButton, Screen } from '../../ui';
@@ -15,7 +15,7 @@ export function NewProjectScreen(props: ScreenProps<'NewProject'>) {
         title="New story"
         subtitle={`Step ${step + 1}/3`}
         onBack={form.back}
-        right={<IconButton icon={X} onPress={form.close} accessibilityLabel="Close" />}
+        right={<IconButton icon={CloseIcon} onPress={form.close} accessibilityLabel="Close" />}
       />
       <View className="flex-row gap-1 px-4 pt-2">
         {[0, 1, 2].map(index => (
@@ -35,7 +35,7 @@ export function NewProjectScreen(props: ScreenProps<'NewProject'>) {
       <View className="flex-row gap-3 p-4">
         {step > 0 && <Button title="Back" variant="secondary" onPress={form.back} />}
         {step < 2 ? (
-          <Button title="Next" icon={ArrowRight} onPress={form.next} disabled={step === 0 && !name} className="flex-1" />
+          <Button title="Next" icon={ForwardIcon} onPress={form.next} disabled={step === 0 && !name} className="flex-1" />
         ) : (
           <Button title="Create story" onPress={form.create} disabled={!name} className="flex-1" />
         )}

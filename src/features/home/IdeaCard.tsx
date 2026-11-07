@@ -1,7 +1,7 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Keyboard, View } from 'react-native';
-import { Plus, Sparkles } from 'lucide-react-native';
+import { AiIcon, PlusIcon } from '../../ui/icons';
 
 import { suggestStory, type StoryIdea } from '../../core/ai/story';
 import { LIMITS } from '../../core/model/constants';
@@ -78,7 +78,7 @@ export function IdeaCard({ empty }: { empty: boolean }) {
         <Button
           title="Shape with AI"
           variant="ai"
-          icon={Sparkles}
+          icon={AiIcon}
           onPress={() => shapeWithAi(trimmed)}
           disabled={!trimmed || aiLoading}
           small={!empty}
@@ -86,7 +86,7 @@ export function IdeaCard({ empty }: { empty: boolean }) {
         />
         <Button
           title="Create story"
-          icon={Plus}
+          icon={PlusIcon}
           onPress={startFromIdea}
           disabled={!trimmed}
           small={!empty}

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Check } from 'lucide-react-native';
+import { CheckIcon } from '../../ui/icons';
 
 import { PROJECT_STATUS_LABEL } from '../../core/model/constants';
 import type { LibraryRow } from '../../core/story/library';
@@ -12,7 +12,7 @@ type CardProps = { row: LibraryRow; highlighted: boolean; onPress: () => void; o
 function DoneMark() {
   return (
     <View className="absolute right-1 top-1 h-6 w-6 items-center justify-center rounded-sm bg-raised">
-      <Icon icon={Check} size={16} color="success" />
+      <Icon icon={CheckIcon} size={16} color="success" />
     </View>
   );
 }

@@ -1,6 +1,6 @@
 import { ActivityIndicator, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Icon, type LucideIcon } from './Icon';
+import { Icon, type IconGlyph } from './Icon';
 import { Pressable } from './Pressable';
 import { Text, type TextTone } from './Text';
 import { useColor, type ColorToken } from './tokens';
@@ -29,7 +29,7 @@ export function Button({
   title: string;
   onPress?: () => void;
   variant?: ButtonVariant;
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   loading?: boolean;
   disabled?: boolean;
   small?: boolean;

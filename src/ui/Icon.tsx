@@ -1,19 +1,20 @@
-import type { LucideIcon } from 'lucide-react-native';
+import type { Icon as IconGlyph, IconWeight } from 'phosphor-react-native';
 
 import { ICON, useColor, type ColorToken } from './tokens';
 
-export type { LucideIcon };
+export type { IconGlyph, IconWeight };
 
+/** `regular` by default. A selected control uses `fill`, so its state never rests on colour alone. */
 export function Icon({
   icon: Glyph,
   size = ICON.md,
   color = 'text',
-  strokeWidth = 2,
+  weight = 'regular',
 }: {
-  icon: LucideIcon;
+  icon: IconGlyph;
   size?: number;
   color?: ColorToken;
-  strokeWidth?: number;
+  weight?: IconWeight;
 }) {
-  return <Glyph size={size} color={useColor(color)} strokeWidth={strokeWidth} />;
+  return <Glyph size={size} color={useColor(color)} weight={weight} />;
 }

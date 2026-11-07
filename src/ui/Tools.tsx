@@ -1,17 +1,17 @@
 import type { ReactNode } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Plus } from 'lucide-react-native';
+import { PlusIcon } from './icons';
 
-import { Icon, type LucideIcon } from './Icon';
+import { Icon, type IconGlyph } from './Icon';
 import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
-import { DOCK_GAP, DOCK_HEIGHT } from './tokens';
+import { DOCK_GAP, DOCK_HEIGHT, ICON } from './tokens';
 
 export const PANEL_SHADOW = '0 6px 20px rgba(0,0,0,0.35)';
 
-export type DockItem = { key: string; label: string; icon: LucideIcon; selected: boolean; onPress: () => void };
+export type DockItem = { key: string; label: string; icon: IconGlyph; selected: boolean; onPress: () => void };
 
 export function useDockInset(): number {
   const { width } = useWindowDimensions();
@@ -35,7 +35,7 @@ export function Dock({ items, onCreate }: { items: DockItem[]; onCreate: () => v
         item.selected ? 'bg-accent/15' : ''
       }`}
     >
-      <Icon icon={item.icon} size={22} color={item.selected ? 'accent' : 'text-muted'} />
+      <Icon icon={item.icon} size={22} color={item.selected ? 'accent' : 'text-muted'} weight={item.selected ? 'fill' : 'regular'} />
       <Text variant="caption" tone={item.selected ? 'accent' : 'muted'} numberOfLines={1} maxFontSizeMultiplier={1.3}>
         {item.label}
       </Text>
@@ -49,7 +49,7 @@ export function Dock({ items, onCreate }: { items: DockItem[]; onCreate: () => v
       onPress={onCreate}
       className="h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-accent"
     >
-      <Icon icon={Plus} size={24} color="on-accent" />
+      <Icon icon={PlusIcon} size={24} color="on-accent" weight="bold" />
     </Pressable>
   );
   if (rail) {
@@ -77,7 +77,7 @@ export function Dock({ items, onCreate }: { items: DockItem[]; onCreate: () => v
   );
 }
 
-export type ToolItem = { key: string; label: string; icon: LucideIcon; selected?: boolean; onPress: () => void; onLongPress?: () => void };
+export type ToolItem = { key: string; label: string; icon: IconGlyph; selected?: boolean; onPress: () => void; onLongPress?: () => void };
 
 export function ToolRail({ items, side = 'left', top = 72 }: { items: ToolItem[]; side?: 'left' | 'right'; top?: number }) {
   return (
@@ -112,7 +112,7 @@ export function ModeSwitch<T extends string>({
   value,
   onChange,
 }: {
-  options: readonly { value: T; label: string; icon?: LucideIcon }[];
+  options: readonly { value: T; label: string; icon?: IconGlyph }[];
   value: T;
   onChange: (value: T) => void;
 }) {
@@ -130,7 +130,9 @@ export function ModeSwitch<T extends string>({
             onPress={() => onChange(option.value)}
             className={`flex-row items-center justify-center gap-1.5 overflow-hidden rounded-sm px-3 ${selected ? 'bg-accent' : ''}`}
           >
-            {!!option.icon && <Icon icon={option.icon} size={16} color={selected ? 'on-accent' : 'text-secondary'} />}
+            {!!option.icon && (
+              <Icon icon={option.icon} size={ICON.sm} color={selected ? 'on-accent' : 'text-secondary'} weight={selected ? 'fill' : 'regular'} />
+            )}
             <Text variant="label" tone={selected ? 'onAccent' : 'secondary'}>
               {option.label}
             </Text>

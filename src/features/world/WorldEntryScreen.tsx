@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { Check, EllipsisVertical, Shapes, Sparkles, Trash2 } from 'lucide-react-native';
+import { AiIcon, CheckIcon, DeleteIcon, MoreIcon, ShapesIcon } from '../../ui/icons';
 
 import { WORLD_TYPES, WORLD_TYPE_LABEL } from '../../core/model/constants';
 import type { WorldEntry } from '../../core/model/types';
@@ -67,7 +67,7 @@ function EntryBody({ entry }: { entry: WorldEntry }) {
       <AppBar
         title={WORLD_TYPE_LABEL[entry.type]}
         onBack={() => navigation.goBack()}
-        right={<IconButton icon={EllipsisVertical} onPress={() => setMenu(true)} accessibilityLabel="More" />}
+        right={<IconButton icon={MoreIcon} onPress={() => setMenu(true)} accessibilityLabel="More" />}
       />
       <KeyboardAwareScrollView bottomOffset={24} keyboardShouldPersistTaps="handled" contentContainerClassName="pb-12">
         <EntryImages entry={entry} />
@@ -100,7 +100,7 @@ function EntryBody({ entry }: { entry: WorldEntry }) {
             <Text variant="caption" tone="muted" className="flex-1">
               {titleText ? 'Let the AI draft this entry from its title.' : 'Add a title to write this entry with AI.'}
             </Text>
-            <Button title="Write with AI" icon={Sparkles} variant="ai" small disabled={!titleText} onPress={openDescribe} />
+            <Button title="Write with AI" icon={AiIcon} variant="ai" small disabled={!titleText} onPress={openDescribe} />
           </View>
           <EntryLinks entry={entry} chapters={chapters} />
         </View>
@@ -111,8 +111,8 @@ function EntryBody({ entry }: { entry: WorldEntry }) {
         onClose={() => setMenu(false)}
         title={entry.title.trim() || UNTITLED}
         items={[
-          { label: 'Change type', icon: Shapes, subtitle: WORLD_TYPE_LABEL[entry.type], onPress: () => setTypeMenu(true) },
-          { label: 'Delete', icon: Trash2, destructive: true, onPress: remove },
+          { label: 'Change type', icon: ShapesIcon, subtitle: WORLD_TYPE_LABEL[entry.type], onPress: () => setTypeMenu(true) },
+          { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: remove },
         ]}
       />
       <Menu
@@ -121,7 +121,7 @@ function EntryBody({ entry }: { entry: WorldEntry }) {
         title="Change type"
         items={WORLD_TYPES.map(type => ({
           label: WORLD_TYPE_LABEL[type],
-          icon: entry.type === type ? Check : WORLD_TYPE_ICON[type],
+          icon: entry.type === type ? CheckIcon : WORLD_TYPE_ICON[type],
           onPress: () => update(entry.id, { type }),
         }))}
       />

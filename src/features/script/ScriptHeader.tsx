@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EllipsisVertical, Minimize2, Redo2, Undo2 } from 'lucide-react-native';
+import { MinimizeIcon, MoreIcon, RedoIcon, UndoIcon } from '../../ui/icons';
 
 import { AppBar, IconButton, Text } from '../../ui';
 
@@ -31,8 +31,8 @@ export function ScriptHeader({
   if (focusMode) {
     return (
       <View className="flex-row justify-end px-2">
-        <IconButton icon={Undo2} onPress={onUndo} disabled={!canUndo} accessibilityLabel="Undo" />
-        <IconButton icon={Minimize2} onPress={onExitFocus} accessibilityLabel="Exit focus mode" />
+        <IconButton icon={UndoIcon} onPress={onUndo} disabled={!canUndo} accessibilityLabel="Undo" />
+        <IconButton icon={MinimizeIcon} onPress={onExitFocus} accessibilityLabel="Exit focus mode" />
       </View>
     );
   }
@@ -44,9 +44,9 @@ export function ScriptHeader({
         onBack={onBack}
         right={
           <>
-            <IconButton icon={Undo2} onPress={onUndo} disabled={!canUndo} accessibilityLabel="Undo" />
-            <IconButton icon={Redo2} onPress={onRedo} disabled={!canRedo} accessibilityLabel="Redo" />
-            <IconButton icon={EllipsisVertical} onPress={onMore} accessibilityLabel="More" />
+            <IconButton icon={UndoIcon} onPress={onUndo} disabled={!canUndo} accessibilityLabel="Undo" />
+            <IconButton icon={RedoIcon} onPress={onRedo} disabled={!canRedo} accessibilityLabel="Redo" />
+            <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel="More" />
           </>
         }
       />

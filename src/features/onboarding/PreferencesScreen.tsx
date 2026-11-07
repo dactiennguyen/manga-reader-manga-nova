@@ -1,22 +1,22 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
 import { BackHandler, ScrollView, View } from 'react-native';
-import { Brush, PenLine, Star } from 'lucide-react-native';
+import { BrushIcon, PenLineIcon, StarIcon } from '../../ui/icons';
 
 import { GENRES, LIMITS } from '../../core/model/constants';
 import type { ScreenProps } from '../../state/navigation';
 import { DEFAULT_SETTINGS, useSettings, type CreatorRole } from '../../state/useSettings';
-import { AppBar, Button, Chip, ChipGroup, Icon, ProgressBar, Screen, Text, toast, type LucideIcon } from '../../ui';
+import { AppBar, Button, Chip, ChipGroup, Icon, ProgressBar, Screen, Text, toast, type IconGlyph } from '../../ui';
 import { OptionCard } from './OptionCard';
 import { StylePicker } from './StylePicker';
 
 const STEP_COUNT = 3;
 const STEP_OFFSET = 2;
 
-const ROLES: { id: CreatorRole; label: string; hint: string; icon: LucideIcon }[] = [
-  { id: 'write', label: 'Write stories', hint: 'I have ideas and want to turn them into a script', icon: PenLine },
-  { id: 'draw', label: 'Draw', hint: 'I want to open a canvas and start drawing', icon: Brush },
-  { id: 'both', label: 'Both', hint: 'I write and draw my own stories', icon: Star },
+const ROLES: { id: CreatorRole; label: string; hint: string; icon: IconGlyph }[] = [
+  { id: 'write', label: 'Write stories', hint: 'I have ideas and want to turn them into a script', icon: PenLineIcon },
+  { id: 'draw', label: 'Draw', hint: 'I want to open a canvas and start drawing', icon: BrushIcon },
+  { id: 'both', label: 'Both', hint: 'I write and draw my own stories', icon: StarIcon },
 ];
 
 const QUESTIONS = [

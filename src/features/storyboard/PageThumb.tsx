@@ -1,5 +1,5 @@
 import { Image, View } from 'react-native';
-import { Check, Circle, CircleCheck, Flag, PanelsTopLeft, PenLine } from 'lucide-react-native';
+import { CheckIcon, CircleIcon, DoneIcon, FlagIcon, PanelsIcon, PenLineIcon } from '../../ui/icons';
 
 import { PAGE_STATUS_LABEL } from '../../core/model/constants';
 import { pageStatus } from '../../core/model/selectors';
@@ -8,13 +8,13 @@ import { STORYBOARD_SIZES, pageLabel } from '../../core/reorder/storyboardGrid';
 import { useThumb } from '../../render/thumbs';
 import { panelHasArt } from '../../state/artStore';
 import { usePage } from '../../state/hooks';
-import { Icon, Pressable, Skeleton, Text, type ColorToken, type LucideIcon } from '../../ui';
+import { Icon, Pressable, Skeleton, Text, type ColorToken, type IconGlyph } from '../../ui';
 
-const STATUS_ICON: Record<PageStatus, LucideIcon> = {
-  empty: Circle,
-  paneled: PanelsTopLeft,
-  drawing: PenLine,
-  done: CircleCheck,
+const STATUS_ICON: Record<PageStatus, IconGlyph> = {
+  empty: CircleIcon,
+  paneled: PanelsIcon,
+  drawing: PenLineIcon,
+  done: DoneIcon,
 };
 
 const STATUS_COLOR: Record<PageStatus, ColorToken> = {
@@ -88,14 +88,14 @@ export function PageThumb({
               selected ? 'border-accent bg-accent' : 'border-control-border bg-surface'
             }`}
           >
-            {selected && <Icon icon={Check} size={16} color="on-accent" />}
+            {selected && <Icon icon={CheckIcon} size={16} color="on-accent" />}
           </View>
         )}
       </View>
       <View className="flex-row items-center justify-center gap-1" style={{ height: STORYBOARD_SIZES.metaHeight }}>
         <Text variant="label">{number}</Text>
         <Icon icon={STATUS_ICON[status]} size={14} color={STATUS_COLOR[status]} />
-        {!!page.flag && <Icon icon={Flag} size={14} color="warning" />}
+        {!!page.flag && <Icon icon={FlagIcon} size={14} color="warning" />}
       </View>
     </Pressable>
   );

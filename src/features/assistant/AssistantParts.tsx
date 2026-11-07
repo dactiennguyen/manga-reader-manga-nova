@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Check, Copy, MessageSquare, Plus, Sparkles, StickyNote, Trash2 } from 'lucide-react-native';
+import { AiIcon, CheckIcon, CopyIcon, DeleteIcon, MessageIcon, NoteIcon, PlusIcon } from '../../ui/icons';
 
 import type { Project } from '../../core/model/types';
 import { plural } from '../../core/util/format';
@@ -19,15 +19,15 @@ export function AssistantBubble({
   return (
     <View className="max-w-[92%] gap-2 self-start rounded-lg bg-surface p-3">
       <View className="flex-row items-center gap-1">
-        <Icon icon={Sparkles} size={14} color="ai" />
+        <Icon icon={AiIcon} size={14} color="ai" />
         <Text variant="caption" tone="ai">
           Assistant
         </Text>
       </View>
       <Text selectable>{message.text}</Text>
       <View className="-ml-2 flex-row flex-wrap gap-1">
-        <Button title="Copy" icon={Copy} variant="ghost" small onPress={onCopy} />
-        {!!onSave && <Button title="Save as note" icon={StickyNote} variant="ghost" small onPress={onSave} />}
+        <Button title="Copy" icon={CopyIcon} variant="ghost" small onPress={onCopy} />
+        {!!onSave && <Button title="Save as note" icon={NoteIcon} variant="ghost" small onPress={onSave} />}
       </View>
     </View>
   );
@@ -63,7 +63,7 @@ export function WelcomePanel({
   return (
     <View className="items-center gap-3 px-2 py-6">
       <View className="h-16 w-16 items-center justify-center rounded-full bg-ai/15">
-        <Icon icon={Sparkles} size={28} color="ai" />
+        <Icon icon={AiIcon} size={28} color="ai" />
       </View>
       <Text variant="heading" className="text-center">
         {project ? `Ask about ${project.title || 'your story'}` : 'Ask anything about making manga'}
@@ -75,7 +75,7 @@ export function WelcomePanel({
       </Text>
       <View className="mt-2 w-full items-center gap-2">
         {prompts.map(prompt => (
-          <Chip key={prompt} label={prompt} icon={Sparkles} onPress={() => onPrompt(prompt)} />
+          <Chip key={prompt} label={prompt} icon={AiIcon} onPress={() => onPrompt(prompt)} />
         ))}
       </View>
     </View>
@@ -104,7 +104,7 @@ export function ConversationsSheet({
   return (
     <Sheet visible={visible} onClose={onClose} title="Conversations" subtitle={subtitle}>
       <View className="p-4 pt-2">
-        <Button title="New conversation" icon={Plus} onPress={onNew} />
+        <Button title="New conversation" icon={PlusIcon} onPress={onNew} />
       </View>
       {conversations.length === 0 && (
         <Text tone="secondary" className="px-4 pb-4 text-center">
@@ -118,13 +118,13 @@ export function ConversationsSheet({
             key={conversation.id}
             title={conversation.title}
             subtitle={`${plural(conversation.messages.length, 'message')} · ${formatRelative(conversation.updatedAt)}`}
-            icon={active ? Check : MessageSquare}
+            icon={active ? CheckIcon : MessageIcon}
             iconColor={active ? 'ai' : undefined}
             selected={active}
             onPress={() => onPick(conversation)}
             right={
               <IconButton
-                icon={Trash2}
+                icon={DeleteIcon}
                 size={18}
                 color="danger"
                 onPress={() => onRemove(conversation)}

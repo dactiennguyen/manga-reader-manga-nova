@@ -54,7 +54,6 @@ jest.mock('react-native-reanimated', () => {
 });
 jest.mock('react-native-worklets', () => ({ scheduleOnRN: (run: (...args: unknown[]) => void, ...args: unknown[]) => run(...args) }));
 jest.mock('react-native-keyboard-controller', () => require('react-native-keyboard-controller/jest'));
-jest.mock('lucide-react-native', () => new Proxy({}, { get: () => () => null }));
 jest.mock('uniwind', () => ({ useCSSVariable: () => '#000000' }));
 jest.mock('@shopify/react-native-skia', () => ({}));
 jest.mock('react-native-svg', () => new Proxy({ __esModule: true }, { get: () => () => null }));

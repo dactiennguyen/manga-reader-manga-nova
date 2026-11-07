@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { ArrowDown, ArrowUp, Copy, ListOrdered, Pencil, Plus, Trash, TriangleAlert } from 'lucide-react-native';
+import { ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, EditIcon, OrderIcon, PlusIcon, WarningIcon } from '../../ui/icons';
 
 import { CHAPTER_STATUS_LABEL, LIMITS } from '../../core/model/constants';
 import { chapterIdsOf, chapterName, chapterProgress, chapterStatus, scriptOutdated } from '../../core/model/selectors';
@@ -70,7 +70,7 @@ function ChapterRow({
       </View>
       {scriptOutdated(chapter) && (
         <View className="flex-row items-center gap-1">
-          <Icon icon={TriangleAlert} size={14} color="warning" />
+          <Icon icon={WarningIcon} size={14} color="warning" />
           <Text variant="caption" tone="warning">
             Script changed
           </Text>
@@ -124,24 +124,24 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
 
   const menuItems: MenuItem[] = target
     ? [
-        { label: 'Rename', icon: Pencil, onPress: () => setOpen('rename') },
-        { label: 'Move up', icon: ArrowUp, disabled: !canMoveChapterUp(acts, target), onPress: () => move(target, -1) },
+        { label: 'Rename', icon: EditIcon, onPress: () => setOpen('rename') },
+        { label: 'Move up', icon: ArrowUpIcon, disabled: !canMoveChapterUp(acts, target), onPress: () => move(target, -1) },
         {
           label: 'Move down',
-          icon: ArrowDown,
+          icon: ArrowDownIcon,
           disabled: !canMoveChapterDown(acts, target),
           onPress: () => move(target, 1),
         },
         {
           label: 'Duplicate',
-          icon: Copy,
+          icon: CopyIcon,
           onPress: () => {
             if (useStory.getState().duplicateChapter(target)) {
               toast('Chapter duplicated');
             }
           },
         },
-        { label: 'Delete', icon: Trash, destructive: true, onPress: () => setOpen('delete') },
+        { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => setOpen('delete') },
       ]
     : [];
   const targetName = target ? nameOf(target) : '';
@@ -168,12 +168,12 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
       <View className="flex-row justify-between gap-2">
         <Button
           title="Outline"
-          icon={ListOrdered}
+          icon={OrderIcon}
           variant="secondary"
           small
           onPress={() => navigation.navigate('Outline', { projectId: project.id })}
         />
-        <Button title="Add chapter" icon={Plus} small onPress={addChapter} />
+        <Button title="Add chapter" icon={PlusIcon} small onPress={addChapter} />
       </View>
 
       {flat.length === 0 && <EmptyState title="No chapters yet." message="Add the first one!" />}

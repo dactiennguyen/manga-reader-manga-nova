@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { FlatList, View } from 'react-native';
-import { ArchiveRestore, Trash } from 'lucide-react-native';
+import { DeleteIcon, RestoreIcon } from '../../ui/icons';
 
 import { LIMITS } from '../../core/model/constants';
 import { trashedProjects } from '../../core/model/selectors';
@@ -57,7 +57,7 @@ export function TrashScreen() {
         title="Trash"
         onBack={navigation.goBack}
         right={
-          items.length > 0 ? <IconButton icon={Trash} onPress={onDeleteAll} accessibilityLabel="Delete all" /> : undefined
+          items.length > 0 ? <IconButton icon={DeleteIcon} onPress={onDeleteAll} accessibilityLabel="Delete all" /> : undefined
         }
       />
       <FlatList
@@ -74,7 +74,7 @@ export function TrashScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={Trash}
+            icon={DeleteIcon}
             title="Trash is empty"
             message={`Stories you delete stay here for ${LIMITS.trashDays} days before they are gone for good.`}
           />
@@ -94,7 +94,7 @@ export function TrashScreen() {
                 <View className="mt-3 flex-row flex-wrap gap-2">
                   <Button
                     title="Restore"
-                    icon={ArchiveRestore}
+                    icon={RestoreIcon}
                     variant="secondary"
                     small
                     onPress={() => onRestore(item)}

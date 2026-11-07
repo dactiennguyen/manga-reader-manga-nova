@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Lock, Plus, UserPlus } from 'lucide-react-native';
+import { AddUserIcon, LockIcon, PlusIcon } from '../../ui/icons';
 
 import { ROLE_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
@@ -96,7 +96,7 @@ export function CharacterPicker({
           subtitle={ROLE_LABEL[character.role]}
           left={<Avatar character={character} size={40} />}
           selected={selectedIds.includes(character.id)}
-          right={character.locked ? <Icon icon={Lock} size={16} color="text-muted" /> : undefined}
+          right={character.locked ? <Icon icon={LockIcon} size={16} color="text-muted" /> : undefined}
           onPress={() => choose(character.id)}
         />
       ))}
@@ -112,10 +112,10 @@ export function CharacterPicker({
               onSubmitEditing={create}
               className="flex-1"
             />
-            <Button title="Create" icon={Plus} small onPress={create} disabled={!name.trim()} />
+            <Button title="Create" icon={PlusIcon} small onPress={create} disabled={!name.trim()} />
           </View>
         ) : (
-          <ListItem title="Quick-create a character" icon={UserPlus} onPress={() => setCreating(true)} />
+          <ListItem title="Quick-create a character" icon={AddUserIcon} onPress={() => setCreating(true)} />
         ))}
     </Sheet>
   );

@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, Image, ScrollView, View, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, ChevronRight } from 'lucide-react-native';
+import { BackIcon, CaretRightIcon } from './icons';
 
 import type { Character, Project } from '../core/model/types';
 import { fileUri } from '../core/util/paths';
 import { Button } from './Button';
-import { Icon, type LucideIcon } from './Icon';
+import { Icon, type IconGlyph } from './Icon';
 import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
@@ -84,7 +84,7 @@ export function AppBar({
 }) {
   return (
     <View className="min-h-14 flex-row items-center gap-1 px-1">
-      {!hideBack && <IconButton icon={ArrowLeft} onPress={onBack} accessibilityLabel="Go back" />}
+      {!hideBack && <IconButton icon={BackIcon} onPress={onBack} accessibilityLabel="Go back" />}
       <View className={`flex-1 ${hideBack ? 'px-3' : ''}`}>
         {children ?? (
           <>
@@ -151,7 +151,7 @@ export function Badge({ text, tone = 'accent' }: { text: string; tone?: 'accent'
   );
 }
 
-export function Tag({ label, icon, className }: { label: string; icon?: LucideIcon; className?: string }) {
+export function Tag({ label, icon, className }: { label: string; icon?: IconGlyph; className?: string }) {
   return (
     <View className={`flex-row items-center gap-1 self-start rounded-sm bg-overlay px-2 py-1 ${className ?? ''}`}>
       {!!icon && <Icon icon={icon} size={14} color="text-secondary" />}
@@ -171,7 +171,7 @@ export function Banner({
   text: string;
   tone?: 'warning' | 'info' | 'danger' | 'success';
   action?: { label: string; onPress: () => void };
-  icon?: LucideIcon;
+  icon?: IconGlyph;
 }) {
   const look = {
     info: { box: 'bg-accent/15', text: 'accent', icon: 'accent' },
@@ -242,7 +242,7 @@ export function ListItem({
 }: {
   title: string;
   subtitle?: string;
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   iconColor?: ColorToken;
   left?: ReactNode;
   right?: ReactNode;
@@ -269,7 +269,7 @@ export function ListItem({
         )}
       </View>
       {right}
-      {chevron && <Icon icon={ChevronRight} color="text-muted" size={18} />}
+      {chevron && <Icon icon={CaretRightIcon} color="text-muted" size={18} />}
     </>
   );
   const box = `min-h-14 flex-row items-center gap-3 px-4 py-2 ${selected ? 'bg-accent/15' : ''}`;
@@ -296,14 +296,18 @@ export function EmptyState({
   message,
   action,
 }: {
-  icon?: LucideIcon;
+  icon?: IconGlyph;
   title: string;
   message?: string;
   action?: { label: string; onPress: () => void };
 }) {
   return (
     <View className="items-center gap-3 px-6 py-12">
-      {!!icon && <Icon icon={icon} size={40} color="text-muted" strokeWidth={1.5} />}
+      {!!icon && (
+        <View className="mb-1 h-16 w-16 items-center justify-center rounded-full bg-accent/15">
+          <Icon icon={icon} size={32} color="accent" weight="duotone" />
+        </View>
+      )}
       <Text variant="heading" className="text-center">
         {title}
       </Text>
@@ -355,7 +359,7 @@ export function Fab({
   onPress,
   bottom = 16,
 }: {
-  icon: LucideIcon;
+  icon: IconGlyph;
   label: string;
   onPress: () => void;
   bottom?: number;
@@ -373,6 +377,22 @@ export function Fab({
         {label}
       </Text>
     </Pressable>
+  );
+}
+
+const COVER_SMALL = 96;
+
+/** A typeset cover for a story without an image: the title carries it, and one accent mark. */
+function TitleCover({ title, width }: { title: string; width: number }) {
+  const name = title.trim() || 'Untitled';
+  const small = width < COVER_SMALL;
+  return (
+    <View className={`absolute inset-0 justify-between ${small ? 'p-2' : 'p-3'}`}>
+      <View className={`rounded-full bg-accent ${small ? 'h-1 w-4' : 'h-1 w-6'}`} />
+      <Text variant={small ? 'caption' : 'heading'} numberOfLines={small ? 3 : 4} maxFontSizeMultiplier={1.2}>
+        {name}
+      </Text>
+    </View>
   );
 }
 
@@ -398,9 +418,7 @@ export function Cover({
           style={{ width, height }}
         />
       ) : (
-        <Text variant="heading" tone="muted" className="p-2 text-center" numberOfLines={3}>
-          {project.title.trim().slice(0, 1).toUpperCase() || '?'}
-        </Text>
+        <TitleCover title={project.title} width={width} />
       )}
       {children}
     </View>

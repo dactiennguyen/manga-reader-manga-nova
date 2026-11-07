@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Save, Share2 } from 'lucide-react-native';
+import { SaveIcon, ShareIcon } from '../../ui/icons';
 
 import type { ExportRecord } from '../../core/export/history';
 import { formatBytes } from '../../core/util/format';
@@ -42,10 +42,10 @@ export function ExportStatus({
           {FORMAT_LABEL[phase.result.format]} · {formatBytes(phase.result.size)}
         </Text>
         <View className="mt-1 flex-row gap-2">
-          <Button title="Share" icon={Share2} className="flex-1" onPress={() => onShare(phase.result)} />
+          <Button title="Share" icon={ShareIcon} className="flex-1" onPress={() => onShare(phase.result)} />
           <Button
             title="Save to device"
-            icon={Save}
+            icon={SaveIcon}
             variant="secondary"
             className="flex-1"
             onPress={() => onSave(phase.result)}

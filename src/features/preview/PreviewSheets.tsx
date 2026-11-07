@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { Eye, EyeOff, Flag, Languages, RotateCw, Sun } from 'lucide-react-native';
+import { AwakeIcon, FlagIcon, HiddenIcon, PreviewIcon, RotateIcon, TranslateIcon } from '../../ui/icons';
 
 import { chapterLabel } from '../../core/model/selectors';
 import type { Chapter, ID, PageFlag } from '../../core/model/types';
@@ -40,7 +40,7 @@ function FlagEditor({ pageId, flag, onClose }: { pageId: ID; flag: PageFlag | un
         {flag && <Button title="Remove flag" variant="secondary" className="flex-1" onPress={() => save(undefined)} />}
         <Button
           title={flag ? 'Save' : 'Flag page'}
-          icon={Flag}
+          icon={FlagIcon}
           className="flex-1"
           onPress={() => save({ note: note.trim(), reasons })}
         />
@@ -182,27 +182,27 @@ export function ReaderMenus({
         items={[
           {
             label: hideUnfinished ? 'Show unfinished pages' : 'Hide unfinished pages',
-            icon: hideUnfinished ? Eye : EyeOff,
+            icon: hideUnfinished ? PreviewIcon : HiddenIcon,
             onPress: onToggleUnfinished,
           },
           {
             label: 'Flag list',
             subtitle: flagCount === 1 ? '1 flagged page' : `${flagCount} flagged pages`,
-            icon: Flag,
+            icon: FlagIcon,
             onPress: () => onSheet('flags'),
           },
-          { label: 'Keep screen on', subtitle: awake ? 'On' : 'Off', icon: Sun, onPress: onToggleAwake },
+          { label: 'Keep screen on', subtitle: awake ? 'On' : 'Off', icon: AwakeIcon, onPress: onToggleAwake },
           manga &&
             orientationSupported && {
               label: landscape ? 'Rotate to portrait' : 'Rotate to landscape',
               subtitle: landscape ? 'One page at a time' : 'Two-page spread view',
-              icon: RotateCw,
+              icon: RotateIcon,
               onPress: onRotate,
             },
           languages.length > 0 && {
             label: 'Language',
             subtitle: activeLang ?? 'Original',
-            icon: Languages,
+            icon: TranslateIcon,
             onPress: () => onSheet('language'),
           },
         ]}

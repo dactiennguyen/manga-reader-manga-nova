@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Check, Circle, CircleCheck, Sparkles } from 'lucide-react-native';
+import { AiIcon, CheckIcon, CircleIcon, DoneIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { translateLines } from '../../core/ai/translate';
@@ -178,7 +178,7 @@ export function TranslationSheet({
       <View className="gap-2">
         <Button
           title={missing ? `Translate missing with AI (${missing})` : 'Translate missing with AI'}
-          icon={Sparkles}
+          icon={AiIcon}
           variant="ai"
           disabled={missing === 0}
           onPress={() => translate('missing')}
@@ -211,7 +211,7 @@ export function TranslationSheet({
                 <TextField multiline value={item.text} placeholder={`${lang} text`} onChangeText={text => editProposal(index, text)} />
               </Card>
             ))}
-            <Button title="Apply" icon={Check} variant="ai" onPress={apply} />
+            <Button title="Apply" icon={CheckIcon} variant="ai" onPress={apply} />
             <Button title="Discard" variant="ghost" onPress={() => setProposals(null)} />
           </AiPanel>
         ) : (
@@ -225,7 +225,7 @@ export function TranslationSheet({
                 <Card key={bubble.id} className="gap-2 p-3">
                   <View className="flex-row items-center gap-2">
                     <Icon
-                      icon={hasTranslation(bubble, lang) ? CircleCheck : Circle}
+                      icon={hasTranslation(bubble, lang) ? DoneIcon : CircleIcon}
                       size={14}
                       color={hasTranslation(bubble, lang) ? 'success' : 'warning'}
                     />

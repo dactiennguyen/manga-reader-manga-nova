@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import { Brush, X, Lightbulb } from 'lucide-react-native';
+import { BrushIcon, CloseIcon, IdeaIcon } from '../../ui/icons';
 
 import { activeProjects, projectProgress } from '../../core/model/selectors';
 import { tipOfDay } from '../../core/story/ideas';
@@ -58,7 +58,7 @@ export function HomeScreen() {
           <Button
             title="Open blank canvas"
             variant="secondary"
-            icon={Brush}
+            icon={BrushIcon}
             onPress={() => openBlankCanvas(navigation, useSettings.getState().defaultStyle)}
           />
         )}
@@ -71,7 +71,7 @@ export function HomeScreen() {
           <SectionHeader
             right={
               <IconButton
-                icon={X}
+                icon={CloseIcon}
                 size={18}
                 accessibilityLabel="Hide today's tip"
                 onPress={() => useSettings.getState().set({ tipDismissedDay: today })}
@@ -81,7 +81,7 @@ export function HomeScreen() {
             Tip of the day
           </SectionHeader>
           <Card className="flex-row items-start gap-2 p-3">
-            <Icon icon={Lightbulb} size={18} color="accent" />
+            <Icon icon={IdeaIcon} size={18} color="accent" />
             <Text variant="bodySmall" className="flex-1">
               {tipOfDay(today)}
             </Text>

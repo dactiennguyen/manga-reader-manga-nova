@@ -1,17 +1,5 @@
 import { useState } from 'react';
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  Columns2,
-  FolderInput,
-  List,
-  Pencil,
-  Share2,
-  Sparkles,
-  Trash2,
-} from 'lucide-react-native';
+import { AiIcon, ArrowDownIcon, ArrowUpIcon, BackIcon, ColumnsIcon, DeleteIcon, EditIcon, ForwardIcon, ListIcon, MoveToIcon, ShareIcon } from '../../ui/icons';
 
 import type { Act, Chapter, ID, Project } from '../../core/model/types';
 import { chapterCount, chapterEdges, locateChapter, shiftTarget } from '../../core/story/outlineTools';
@@ -91,10 +79,10 @@ export function useOutlineMenu({
   const mainMenu = (): MenuContent => ({
     title: 'Outline',
     items: [
-      { label: listMode ? 'View as board' : 'View as list', icon: listMode ? Columns2 : List, onPress: actions.toggleList },
-      { label: 'AI plot ideas', icon: Sparkles, onPress: actions.openPlotIdeas },
-      { label: 'Find plot holes (AI)', icon: Sparkles, onPress: actions.openPlotHoles },
-      { label: 'Export outline as text', icon: Share2, onPress: actions.shareOutline },
+      { label: listMode ? 'View as board' : 'View as list', icon: listMode ? ColumnsIcon : ListIcon, onPress: actions.toggleList },
+      { label: 'AI plot ideas', icon: AiIcon, onPress: actions.openPlotIdeas },
+      { label: 'Find plot holes (AI)', icon: AiIcon, onPress: actions.openPlotHoles },
+      { label: 'Export outline as text', icon: ShareIcon, onPress: actions.shareOutline },
     ],
   });
 
@@ -104,13 +92,13 @@ export function useOutlineMenu({
       title: `Chapter ${numbers[id] ?? ''}`,
       subtitle: chapters[id]?.title,
       items: [
-        { label: 'Edit chapter', icon: Pencil, onPress: () => actions.editChapter(id) },
-        { label: 'Break into scenes (AI)', icon: Sparkles, onPress: () => actions.breakIntoScenes(id) },
-        { label: 'Move up', icon: ArrowUp, disabled: first, onPress: () => shiftChapter(id, -1) },
-        { label: 'Move down', icon: ArrowDown, disabled: last, onPress: () => shiftChapter(id, 1) },
+        { label: 'Edit chapter', icon: EditIcon, onPress: () => actions.editChapter(id) },
+        { label: 'Break into scenes (AI)', icon: AiIcon, onPress: () => actions.breakIntoScenes(id) },
+        { label: 'Move up', icon: ArrowUpIcon, disabled: first, onPress: () => shiftChapter(id, -1) },
+        { label: 'Move down', icon: ArrowDownIcon, disabled: last, onPress: () => shiftChapter(id, 1) },
         acts.length > 1 && {
           label: 'Move to act…',
-          icon: FolderInput,
+          icon: MoveToIcon,
           onPress: () => open({ kind: 'chapterToAct', chapterId: id }),
         },
       ],
@@ -153,20 +141,20 @@ export function useOutlineMenu({
       title: act.title,
       subtitle: chapterCount(act.chapterIds.length),
       items: [
-        { label: 'Rename', icon: Pencil, onPress: () => actions.renameAct(act.id) },
+        { label: 'Rename', icon: EditIcon, onPress: () => actions.renameAct(act.id) },
         {
           label: 'Move left',
-          icon: ArrowLeft,
+          icon: BackIcon,
           disabled: actIndex === 0,
           onPress: () => story().moveAct(projectId, act.id, -1),
         },
         {
           label: 'Move right',
-          icon: ArrowRight,
+          icon: ForwardIcon,
           disabled: actIndex === acts.length - 1,
           onPress: () => story().moveAct(projectId, act.id, 1),
         },
-        { label: 'Delete act', icon: Trash2, destructive: true, onPress: () => requestRemoveAct(act) },
+        { label: 'Delete act', icon: DeleteIcon, destructive: true, onPress: () => requestRemoveAct(act) },
       ],
     };
   };

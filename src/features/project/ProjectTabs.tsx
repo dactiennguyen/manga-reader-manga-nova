@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Globe, Lock, NotebookPen, Plus, Users } from 'lucide-react-native';
+import { CharactersIcon, LockIcon, NotesIcon, PlusIcon, WorldIcon } from '../../ui/icons';
 
 import { ROLE_LABEL, WORLD_TYPE_LABEL, WORLD_TYPES } from '../../core/model/constants';
 import { charactersOf, worldOf } from '../../core/model/selectors';
@@ -26,7 +26,7 @@ export function CharactersTab({ state, projectId }: TabProps) {
   if (characters.length === 0) {
     return (
       <EmptyState
-        icon={Users}
+        icon={CharactersIcon}
         title="No one here yet."
         message="Create your main character first!"
         action={{ label: 'Create character', onPress: add }}
@@ -36,7 +36,7 @@ export function CharactersTab({ state, projectId }: TabProps) {
   return (
     <View className="gap-3">
       <View className="flex-row justify-end">
-        <Button title="Character" icon={Plus} small onPress={add} />
+        <Button title="Character" icon={PlusIcon} small onPress={add} />
       </View>
       <View className="flex-row flex-wrap">
         {characters.map(character => {
@@ -53,7 +53,7 @@ export function CharactersTab({ state, projectId }: TabProps) {
                 <Avatar character={character} size={72} />
                 {character.locked && (
                   <View className="absolute -bottom-0.5 -right-0.5 h-[22px] w-[22px] items-center justify-center rounded-full bg-raised">
-                    <Icon icon={Lock} size={12} color="text-secondary" />
+                    <Icon icon={LockIcon} size={12} color="text-secondary" />
                   </View>
                 )}
               </View>
@@ -85,7 +85,7 @@ export function WorldTab({ state, projectId }: TabProps) {
     <View className="gap-3">
       {entries.length === 0 ? (
         <EmptyState
-          icon={Globe}
+          icon={WorldIcon}
           title="Where does the story take place?"
           message="Keep track of places, factions and terms here."
           action={{ label: 'New entry', onPress: () => setPicking(true) }}
@@ -99,7 +99,7 @@ export function WorldTab({ state, projectId }: TabProps) {
               small
               onPress={() => navigation.navigate('World', { projectId })}
             />
-            <Button title="New entry" icon={Plus} small onPress={() => setPicking(true)} />
+            <Button title="New entry" icon={PlusIcon} small onPress={() => setPicking(true)} />
           </View>
           {ENTRY_TYPES.map(type => {
             const group = entries.filter(entry => entry.type === type);
@@ -150,7 +150,7 @@ export function NotesTab({ state, projectId }: TabProps) {
   if (notes.length === 0) {
     return (
       <EmptyState
-        icon={NotebookPen}
+        icon={NotesIcon}
         title="Had a sudden idea?"
         message="Jot it down here before it slips away."
         action={{ label: 'Note', onPress: add }}
@@ -160,7 +160,7 @@ export function NotesTab({ state, projectId }: TabProps) {
   return (
     <View className="gap-3">
       <View className="flex-row justify-end">
-        <Button title="Note" icon={Plus} small onPress={add} />
+        <Button title="Note" icon={PlusIcon} small onPress={add} />
       </View>
       <Section>
         {notes.map(note => (

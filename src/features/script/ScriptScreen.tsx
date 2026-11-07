@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'r
 import { Keyboard, View, type ScrollViewProps } from 'react-native';
 import { KeyboardAwareScrollView, KeyboardStickyView, type KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 import { FlashList, type ListRenderItem } from '@shopify/flash-list';
-import { ArrowRight, Plus } from 'lucide-react-native';
+import { ForwardIcon, PlusIcon } from '../../ui/icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { isRtl } from '../../core/layout/layout';
@@ -160,8 +160,8 @@ function ScriptEditor({ chapter, initialBlockId }: { chapter: Chapter; initialBl
 
   const footer = (
     <View className="gap-3 px-4 pb-24 md:px-6">
-      <Button title="New scene" icon={Plus} variant="secondary" onPress={ctl.addScene} />
-      <Button title="Paginate" icon={ArrowRight} onPress={openStoryboard} />
+      <Button title="New scene" icon={PlusIcon} variant="secondary" onPress={ctl.addScene} />
+      <Button title="Paginate" icon={ForwardIcon} onPress={openStoryboard} />
     </View>
   );
 

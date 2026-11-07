@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { TextInput, View } from 'react-native';
-import { ChevronDown, ChevronRight, EllipsisVertical, Plus } from 'lucide-react-native';
+import { CaretDownIcon, CaretRightIcon, MoreIcon, PlusIcon } from '../../ui/icons';
 
 import { estimateScenePages } from '../../core/model/paginate';
 import type { Character, ID, Scene } from '../../core/model/types';
@@ -44,14 +44,14 @@ export const SceneSection = memo(function SceneSectionBase({
           onPress={() => sceneApi.toggle(scene.id)}
           className="min-h-12 flex-1 flex-row items-center gap-2"
         >
-          <Icon icon={scene.collapsed ? ChevronRight : ChevronDown} size={18} />
+          <Icon icon={scene.collapsed ? CaretRightIcon : CaretDownIcon} size={18} />
           <Text variant="heading">Scene {number}</Text>
           <Text variant="caption" tone="muted" className="shrink" numberOfLines={1}>
             {pagesText(estimateScenePages(scene))} · {plural(scene.blocks.length, 'block')}
           </Text>
         </Pressable>
         <IconButton
-          icon={EllipsisVertical}
+          icon={MoreIcon}
           size={18}
           onPress={() => sceneApi.menu(scene.id)}
           accessibilityLabel={`Scene ${number} options`}
@@ -94,7 +94,7 @@ export const SceneSection = memo(function SceneSectionBase({
             onPress={() => sceneApi.append(scene.id)}
             className="min-h-12 flex-row items-center gap-1 self-start"
           >
-            <Icon icon={Plus} size={14} color="text-muted" />
+            <Icon icon={PlusIcon} size={14} color="text-muted" />
             <Text variant="caption" tone="muted">
               add block
             </Text>

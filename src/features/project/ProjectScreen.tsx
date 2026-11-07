@@ -1,17 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import {
-  BookCheck,
-  Copy,
-  EllipsisVertical,
-  Image as ImageIcon,
-  Palette,
-  Pencil,
-  Play,
-  Share,
-  Trash,
-  Upload,
-} from 'lucide-react-native';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, MarkDoneIcon, MoreIcon, PaletteIcon, PlayIcon } from '../../ui/icons';
 
 import { ART_STYLE_LABEL, ART_STYLES } from '../../core/model/constants';
 import { projectProgress } from '../../core/model/selectors';
@@ -71,16 +60,16 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
         right={
           <>
             <IconButton
-              icon={Play}
+              icon={PlayIcon}
               accessibilityLabel="Preview"
               onPress={() => navigation.navigate('Preview', { projectId })}
             />
             <IconButton
-              icon={Upload}
+              icon={ExportIcon}
               accessibilityLabel="Export"
               onPress={() => navigation.navigate('Export', { projectId })}
             />
-            <IconButton icon={EllipsisVertical} accessibilityLabel="More" onPress={() => setMenu(true)} />
+            <IconButton icon={MoreIcon} accessibilityLabel="More" onPress={() => setMenu(true)} />
           </>
         }
       />
@@ -108,26 +97,26 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
         onClose={() => setMenu(false)}
         title={project.title || 'Untitled'}
         items={[
-          { label: 'Edit details', icon: Pencil, onPress: () => setEditing(true) },
+          { label: 'Edit details', icon: EditIcon, onPress: () => setEditing(true) },
           { label: 'Change cover', icon: ImageIcon, onPress: () => changeProjectCover(projectId) },
           {
             label: 'Change art style',
             subtitle: ART_STYLE_LABEL[project.style],
-            icon: Palette,
+            icon: PaletteIcon,
             onPress: () => setStyleMenu(true),
           },
           {
             label: 'Duplicate story',
-            icon: Copy,
+            icon: CopyIcon,
             onPress: () => duplicateStory(projectId, copyId => navigation.push('Project', { projectId: copyId })),
           },
-          { label: 'Export project (.mangaka)', icon: Share, onPress: () => exportProjectFile(projectId) },
+          { label: 'Export project (.mangaka)', icon: ExportIcon, onPress: () => exportProjectFile(projectId) },
           {
             label: project.done ? 'Mark as not completed' : 'Mark as completed',
-            icon: BookCheck,
+            icon: MarkDoneIcon,
             onPress: () => useStory.getState().updateProject(projectId, { done: !project.done }),
           },
-          { label: 'Delete story', icon: Trash, destructive: true, onPress: remove },
+          { label: 'Delete story', icon: DeleteIcon, destructive: true, onPress: remove },
         ]}
       />
       <Menu

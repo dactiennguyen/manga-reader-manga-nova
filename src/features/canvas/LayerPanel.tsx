@@ -1,17 +1,4 @@
-import {
-  ArrowDown,
-  ArrowUp,
-  Eye,
-  EyeOff,
-  Image as ImageIcon,
-  Lock,
-  LockOpen,
-  Merge,
-  Pencil,
-  Plus,
-  Trash,
-  X,
-} from 'lucide-react-native';
+import { ArrowDownIcon, ArrowUpIcon, CloseIcon, DeleteIcon, EditIcon, HiddenIcon, ImageIcon, LockIcon, MergeIcon, PlusIcon, PreviewIcon, UnlockIcon } from '../../ui/icons';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated';
@@ -128,8 +115,8 @@ export function LayerPanel({
             Layers {art.layers.length}/{LIMITS.layers}
           </Text>
           <IconButton icon={ImageIcon} size={20} onPress={onImportImage} accessibilityLabel="Import image into layer" />
-          <IconButton icon={Plus} size={20} onPress={add} disabled={full} accessibilityLabel="Add layer" />
-          <IconButton icon={X} size={20} onPress={onClose} accessibilityLabel="Close" />
+          <IconButton icon={PlusIcon} size={20} onPress={add} disabled={full} accessibilityLabel="Add layer" />
+          <IconButton icon={CloseIcon} size={20} onPress={onClose} accessibilityLabel="Close" />
         </View>
         <ScrollView contentContainerClassName="gap-2 pb-4">
           {art.layers
@@ -144,7 +131,7 @@ export function LayerPanel({
                 >
                   <View className="flex-row items-center gap-1">
                     <IconButton
-                      icon={layer.visible ? Eye : EyeOff}
+                      icon={layer.visible ? PreviewIcon : HiddenIcon}
                       size={20}
                       accessibilityLabel={layer.visible ? 'Hide layer' : 'Show layer'}
                       onPress={() => editLayer(panelId, layer.id, { visible: !layer.visible })}
@@ -164,7 +151,7 @@ export function LayerPanel({
                       </Text>
                     </Pressable>
                     <IconButton
-                      icon={layer.locked ? Lock : LockOpen}
+                      icon={layer.locked ? LockIcon : UnlockIcon}
                       size={20}
                       accessibilityLabel={layer.locked ? 'Unlock layer' : 'Lock layer'}
                       onPress={() => editLayer(panelId, layer.id, { locked: !layer.locked })}
@@ -187,33 +174,33 @@ export function LayerPanel({
                       </View>
                       <View className="flex-row justify-between">
                         <IconButton
-                          icon={ArrowUp}
+                          icon={ArrowUpIcon}
                           size={20}
                           accessibilityLabel="Move layer up"
                           onPress={() => move(index, 1)}
                           disabled={index >= art.layers.length - 1}
                         />
                         <IconButton
-                          icon={ArrowDown}
+                          icon={ArrowDownIcon}
                           size={20}
                           accessibilityLabel="Move layer down"
                           onPress={() => move(index, -1)}
                           disabled={index === 0}
                         />
                         <IconButton
-                          icon={Merge}
+                          icon={MergeIcon}
                           size={20}
                           accessibilityLabel="Merge down"
                           onPress={() => mergeDown(index)}
                           disabled={index === 0}
                         />
                         <IconButton
-                          icon={Pencil}
+                          icon={EditIcon}
                           size={20}
                           accessibilityLabel="Rename layer"
                           onPress={() => setRenameId(layer.id)}
                         />
-                        <IconButton icon={Trash} size={20} accessibilityLabel="Delete layer" onPress={() => remove(layer)} />
+                        <IconButton icon={DeleteIcon} size={20} accessibilityLabel="Delete layer" onPress={() => remove(layer)} />
                       </View>
                     </>
                   ) : null}

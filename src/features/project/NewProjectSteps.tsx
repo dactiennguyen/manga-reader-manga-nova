@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { Check, RefreshCw, Sparkles } from 'lucide-react-native';
+import { AiIcon, CheckIcon, RefreshIcon } from '../../ui/icons';
 
 import { ART_STYLE_LABEL, LIMITS } from '../../core/model/constants';
 import { FORMATS, type FormatKey } from '../../core/story/newProject';
@@ -87,7 +87,7 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
           <Button
             title="Suggest with AI"
             variant="ai"
-            icon={Sparkles}
+            icon={AiIcon}
             small
             onPress={form.suggest}
             disabled={!aiSource || ai.status === 'loading'}
@@ -124,8 +124,8 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
           </Text>
           <View className="flex-row flex-wrap justify-end gap-2">
             <Button title="Discard" variant="ghost" small onPress={form.resetAi} />
-            <Button title="Try again" variant="secondary" icon={RefreshCw} small onPress={form.suggest} />
-            <Button title="Use" variant="ai" icon={Check} small onPress={() => form.acceptSuggestion(ai.data)} />
+            <Button title="Try again" variant="secondary" icon={RefreshIcon} small onPress={form.suggest} />
+            <Button title="Use" variant="ai" icon={CheckIcon} small onPress={() => form.acceptSuggestion(ai.data)} />
           </View>
         </AiPanel>
       )}

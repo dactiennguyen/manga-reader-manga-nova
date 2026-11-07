@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Image, Modal, Pressable as RNPressable, ScrollView, View, useWindowDimensions, type TextInputProps } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X } from 'lucide-react-native';
+import { CloseIcon } from '../../ui/icons';
 
 import { fileUri } from '../../core/util/paths';
 import { FieldLabel, IconButton, Text, TextField } from '../../ui';
@@ -137,7 +137,7 @@ export function ImageViewer({ path, title, onClose }: { path: string | null | un
           <Text variant="label" numberOfLines={1} className="flex-1">
             {title ?? ''}
           </Text>
-          <IconButton icon={X} onPress={onClose} accessibilityLabel="Close" className="bg-overlay" />
+          <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close" className="bg-overlay" />
         </View>
       </View>
     </Modal>

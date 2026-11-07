@@ -10,7 +10,7 @@ import {
   type NativeGesture,
 } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { Flag } from 'lucide-react-native';
+import { FlagIcon } from '../../ui/icons';
 
 import type { ID } from '../../core/model/types';
 import { pageLabel } from '../../core/preview/reader';
@@ -46,7 +46,7 @@ function PageSlot({ pageId, width, options }: { pageId: ID; width: number; optio
       )}
       {page?.flag && (
         <View className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-accent">
-          <Icon icon={Flag} size={16} color="on-accent" />
+          <Icon icon={FlagIcon} size={16} color="on-accent" />
         </View>
       )}
     </View>

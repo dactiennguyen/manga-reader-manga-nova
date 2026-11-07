@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
-import { Settings, Sparkles } from 'lucide-react-native';
+import { AiIcon, SettingsIcon } from '../../ui/icons';
 
 import { AiErrorBox, AiLoading, Button, Icon, Text } from '../../ui';
 
@@ -28,7 +28,7 @@ export function useSheetClose(onClose: () => void) {
 export function AiMark({ label = 'AI suggestion' }: { label?: string }) {
   return (
     <View className="flex-row items-center gap-1 self-start rounded-sm bg-ai/15 px-2 py-1">
-      <Icon icon={Sparkles} size={14} color="ai" />
+      <Icon icon={AiIcon} size={14} color="ai" />
       <Text variant="caption" tone="ai">
         {label}
       </Text>
@@ -39,14 +39,14 @@ export function AiMark({ label = 'AI suggestion' }: { label?: string }) {
 export function AiSetupNotice({ onOpenProfile }: { onOpenProfile: () => void }) {
   return (
     <View className="items-center gap-3 p-6">
-      <Icon icon={Sparkles} size={32} color="ai" />
+      <Icon icon={AiIcon} size={32} color="ai" />
       <Text variant="heading" className="text-center">
         AI is not set up yet
       </Text>
       <Text tone="secondary" className="text-center">
         To get AI suggestions, set the AI server address in Profile first.
       </Text>
-      <Button title="Open Profile" icon={Settings} variant="ai" onPress={onOpenProfile} className="mt-2 self-stretch" />
+      <Button title="Open Profile" icon={SettingsIcon} variant="ai" onPress={onOpenProfile} className="mt-2 self-stretch" />
     </View>
   );
 }

@@ -1,22 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  ArrowDownUp,
-  BookCheck,
-  Copy,
-  EllipsisVertical,
-  FolderInput,
-  Image as ImageIcon,
-  LayoutGrid,
-  LibraryBig,
-  List,
-  Pencil,
-  Plus,
-  Search,
-  Share,
-  Trash,
-} from 'lucide-react-native';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, LibraryIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlusIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
 
 import { LIMITS, PROJECT_STATUS_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
@@ -131,8 +116,8 @@ export function LibraryScreen() {
         hideBack
         right={
           <>
-            {!searching && <IconButton icon={Search} onPress={() => setSearching(true)} accessibilityLabel="Search" />}
-            <IconButton icon={EllipsisVertical} onPress={() => setOpen('header')} accessibilityLabel="More" />
+            {!searching && <IconButton icon={SearchIcon} onPress={() => setSearching(true)} accessibilityLabel="Search" />}
+            <IconButton icon={MoreIcon} onPress={() => setOpen('header')} accessibilityLabel="More" />
           </>
         }
       >
@@ -185,7 +170,7 @@ export function LibraryScreen() {
                 </Text>
                 <Button
                   title={LIBRARY_SORT_LABEL[sort]}
-                  icon={ArrowDownUp}
+                  icon={SortIcon}
                   variant="ghost"
                   small
                   onPress={() => setOpen('sort')}
@@ -200,7 +185,7 @@ export function LibraryScreen() {
         ListEmptyComponent={
           rows.length === 0 ? (
             <EmptyState
-              icon={LibraryBig}
+              icon={LibraryIcon}
               title="Your shelf is empty."
               message="Create your first story!"
               action={{ label: 'New story', onPress: newStory }}
@@ -210,17 +195,17 @@ export function LibraryScreen() {
           )
         }
       />
-      {rows.length > 0 && <Fab icon={Plus} label="New story" onPress={newStory} bottom={insets.bottom + (dockInset || 16)} />}
+      {rows.length > 0 && <Fab icon={PlusIcon} label="New story" onPress={newStory} bottom={insets.bottom + (dockInset || 16)} />}
 
       <Menu
         visible={open === 'header'}
         onClose={() => setOpen(null)}
         items={[
-          { label: 'Import project (.mangaka)', icon: FolderInput, onPress: importProject },
-          { label: 'Trash', icon: Trash, onPress: () => navigation.navigate('Trash') },
+          { label: 'Import project (.mangaka)', icon: MoveToIcon, onPress: importProject },
+          { label: 'Trash', icon: DeleteIcon, onPress: () => navigation.navigate('Trash') },
           {
             label: layout === 'grid' ? 'List view' : 'Grid view',
-            icon: layout === 'grid' ? List : LayoutGrid,
+            icon: layout === 'grid' ? ListIcon : TemplatesIcon,
             onPress: () => useSettings.getState().set({ libraryLayout: layout === 'grid' ? 'list' : 'grid' }),
           },
         ]}
@@ -242,27 +227,27 @@ export function LibraryScreen() {
         items={
           target
             ? [
-                { label: 'Rename', icon: Pencil, onPress: () => setOpen('rename') },
+                { label: 'Rename', icon: EditIcon, onPress: () => setOpen('rename') },
                 { label: 'Change cover', icon: ImageIcon, onPress: () => changeProjectCover(target.id) },
                 {
                   label: 'Duplicate',
                   subtitle: 'A full copy with its own script, pages and art',
-                  icon: Copy,
+                  icon: CopyIcon,
                   onPress: () =>
                     duplicateStory(target.id, copyId => navigation.navigate('Project', { projectId: copyId })),
                 },
                 {
                   label: 'Export project',
                   subtitle: 'A .mangaka file for backup or moving devices',
-                  icon: Share,
+                  icon: ExportIcon,
                   onPress: () => exportProjectFile(target.id),
                 },
                 {
                   label: target.done ? 'Mark as not done' : 'Mark as done',
-                  icon: BookCheck,
+                  icon: MarkDoneIcon,
                   onPress: () => useStory.getState().updateProject(target.id, { done: !target.done }),
                 },
-                { label: 'Delete', icon: Trash, destructive: true, onPress: () => trashProjectWithConfirm(target) },
+                { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => trashProjectWithConfirm(target) },
               ]
             : []
         }

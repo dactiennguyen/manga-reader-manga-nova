@@ -1,7 +1,7 @@
 import { useRef, type ComponentRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useKeyboardState } from 'react-native-keyboard-controller';
-import { CircleStop, History, Send } from 'lucide-react-native';
+import { HistoryIcon, SendIcon, StopIcon } from '../../ui/icons';
 
 import { useAppNavigation } from '../../state/navigation';
 import { useAiConfigured } from '../../state/useSettings';
@@ -38,7 +38,7 @@ export function AssistantScreen() {
         hideBack
         right={
           <IconButton
-            icon={History}
+            icon={HistoryIcon}
             badge={conversations.length > 1 ? conversations.length : undefined}
             onPress={() => chat.setListOpen(true)}
             accessibilityLabel="Conversations"
@@ -85,7 +85,7 @@ export function AssistantScreen() {
         />
         {loading ? (
           <IconButton
-            icon={CircleStop}
+            icon={StopIcon}
             size={22}
             color="danger"
             onPress={chat.cancel}
@@ -94,7 +94,7 @@ export function AssistantScreen() {
           />
         ) : (
           <IconButton
-            icon={Send}
+            icon={SendIcon}
             size={20}
             color="on-ai"
             disabled={!canSend}

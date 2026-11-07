@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { View } from 'react-native';
-import { ChevronDown, ChevronUp, X } from 'lucide-react-native';
+import { CaretDownIcon, CaretUpIcon, CloseIcon } from '../../ui/icons';
 
 import type { FindContext } from '../../core/script/blockOps';
 import { Button, Chip, IconButton, SearchField, Text, TextField } from '../../ui';
@@ -55,9 +55,9 @@ export const FindBar = memo(function FindBarBase({
           accessibilityLabel="Find in script"
           className="flex-1"
         />
-        <IconButton icon={ChevronUp} onPress={onPrevious} disabled={none} accessibilityLabel="Previous match" />
-        <IconButton icon={ChevronDown} onPress={onNext} disabled={none} accessibilityLabel="Next match" />
-        <IconButton icon={X} onPress={onClose} accessibilityLabel="Close find" />
+        <IconButton icon={CaretUpIcon} onPress={onPrevious} disabled={none} accessibilityLabel="Previous match" />
+        <IconButton icon={CaretDownIcon} onPress={onNext} disabled={none} accessibilityLabel="Next match" />
+        <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close find" />
       </View>
       <View className="flex-row items-center gap-2">
         <TextField

@@ -1,5 +1,5 @@
 import { View, useWindowDimensions } from 'react-native';
-import { Check } from 'lucide-react-native';
+import { CheckIcon } from '../../ui/icons';
 
 import { ART_STYLES } from '../../core/model/constants';
 import type { ArtStyle } from '../../core/model/types';
@@ -34,7 +34,7 @@ export function StylePicker({ value, onChange }: { value: ArtStyle; onChange: (s
             </View>
             {selected && (
               <View className="absolute right-2 top-2 h-6 w-6 items-center justify-center rounded-full bg-accent">
-                <Icon icon={Check} size={14} color="on-accent" />
+                <Icon icon={CheckIcon} size={14} color="on-accent" />
               </View>
             )}
           </Pressable>

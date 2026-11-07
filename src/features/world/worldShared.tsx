@@ -1,17 +1,17 @@
 import { Image, View } from 'react-native';
-import { BookMarked, CalendarClock, Flag, MapPin, StickyNote } from 'lucide-react-native';
+import { ChapterIcon, EventIcon, FlagIcon, NoteIcon, PlaceIcon } from '../../ui/icons';
 
 import type { WorldEntry, WorldType } from '../../core/model/types';
 import { fileUri } from '../../core/util/paths';
 import { UNTITLED, firstLine } from '../../core/world/worldTools';
-import { Card, Icon, Text, type LucideIcon } from '../../ui';
+import { Card, Icon, Text, type IconGlyph } from '../../ui';
 
-export const WORLD_TYPE_ICON: Record<WorldType, LucideIcon> = {
-  place: MapPin,
-  faction: Flag,
-  term: BookMarked,
-  event: CalendarClock,
-  note: StickyNote,
+export const WORLD_TYPE_ICON: Record<WorldType, IconGlyph> = {
+  place: PlaceIcon,
+  faction: FlagIcon,
+  term: ChapterIcon,
+  event: EventIcon,
+  note: NoteIcon,
 };
 
 export function EntryThumb({ entry, size = 48 }: { entry: WorldEntry; size?: number }) {

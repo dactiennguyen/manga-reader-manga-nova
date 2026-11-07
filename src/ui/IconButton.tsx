@@ -1,6 +1,6 @@
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Icon, type LucideIcon } from './Icon';
+import { Icon, type IconGlyph } from './Icon';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
 import { ICON, type ColorToken } from './tokens';
@@ -18,7 +18,7 @@ export function IconButton({
   className,
   style,
 }: {
-  icon: LucideIcon;
+  icon: IconGlyph;
   onPress?: () => void;
   onLongPress?: () => void;
   size?: number;
@@ -43,7 +43,7 @@ export function IconButton({
         className ?? ''
       }`}
     >
-      <Icon icon={icon} size={size} color={active ? 'accent' : color} />
+      <Icon icon={icon} size={size} color={active ? 'accent' : color} weight={active ? 'fill' : 'regular'} />
       {badge !== undefined && (
         <View className="absolute right-1 top-1 h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1">
           <Text variant="caption" tone="onAccent">

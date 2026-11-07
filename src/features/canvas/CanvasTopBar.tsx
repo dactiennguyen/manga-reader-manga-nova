@@ -1,4 +1,4 @@
-import { Check, EllipsisVertical, Layers, Redo2, Undo2 } from 'lucide-react-native';
+import { CheckIcon, LayersIcon, MoreIcon, RedoIcon, UndoIcon } from '../../ui/icons';
 import { memo, useEffect } from 'react';
 import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { type AnimatedStyle } from 'react-native-reanimated';
@@ -21,13 +21,13 @@ const HistoryButtons = memo(function HistoryButtonsInner({ panelId }: { panelId:
   return (
     <>
       <IconButton
-        icon={Undo2}
+        icon={UndoIcon}
         onPress={() => undoArt(panelId)}
         disabled={!canUndoArt(panelId)}
         accessibilityLabel="Undo"
       />
       <IconButton
-        icon={Redo2}
+        icon={RedoIcon}
         onPress={() => redoArt(panelId)}
         disabled={!canRedoArt(panelId)}
         accessibilityLabel="Redo"
@@ -63,15 +63,15 @@ export function CanvasTopBar({
       className="absolute left-2 right-2 flex-row items-center rounded-lg bg-raised px-1"
       style={[{ top: insets.top }, fade]}
     >
-      <IconButton icon={Check} onPress={onDone} accessibilityLabel="Done" />
+      <IconButton icon={CheckIcon} onPress={onDone} accessibilityLabel="Done" />
       <View pointerEvents="none" className="flex-1 px-2">
         <Text variant="title" numberOfLines={1} maxFontSizeMultiplier={1.3}>
           {title}
         </Text>
       </View>
       <HistoryButtons panelId={panelId} />
-      <IconButton icon={Layers} onPress={onLayers} active={layersOpen} accessibilityLabel="Layers" />
-      <IconButton icon={EllipsisVertical} onPress={onMore} accessibilityLabel="More" />
+      <IconButton icon={LayersIcon} onPress={onLayers} active={layersOpen} accessibilityLabel="Layers" />
+      <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel="More" />
     </Animated.View>
   );
 }

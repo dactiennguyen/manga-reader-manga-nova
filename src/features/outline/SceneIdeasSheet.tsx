@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ArrowRight, CircleCheck, Info, MapPin, Plus, RefreshCw, Sparkles } from 'lucide-react-native';
+import { AiIcon, DoneIcon, ForwardIcon, InfoIcon, PlaceIcon, PlusIcon, RefreshIcon } from '../../ui/icons';
 
 import { suggestScenes, type SceneIdea } from '../../core/ai/story';
 import { chapterName } from '../../core/model/selectors';
@@ -81,7 +81,7 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
       return (
         <>
           <View className="items-center gap-3 p-6">
-            <Icon icon={CircleCheck} size={32} color="success" />
+            <Icon icon={DoneIcon} size={32} color="success" />
             <Text variant="heading" className="text-center">
               {plural(added, 'scene')} added to the script
             </Text>
@@ -90,7 +90,7 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
             </Text>
           </View>
           <SheetFooter>
-            <Button title="Open script" icon={ArrowRight} onPress={openScript} />
+            <Button title="Open script" icon={ForwardIcon} onPress={openScript} />
             <Button title="Done" variant="ghost" onPress={sheet.close} />
           </SheetFooter>
         </>
@@ -132,7 +132,7 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
                 </Text>
                 {!!idea.setting && (
                   <View className="flex-row items-center gap-1">
-                    <Icon icon={MapPin} size={14} color="text-muted" />
+                    <Icon icon={PlaceIcon} size={14} color="text-muted" />
                     <Text variant="label" className="flex-1">
                       {idea.setting}
                     </Text>
@@ -143,9 +143,9 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
             ))}
           </ScrollView>
           <SheetFooter>
-            <Button title="Add to script" icon={Plus} onPress={() => accept(ideas)} />
+            <Button title="Add to script" icon={PlusIcon} onPress={() => accept(ideas)} />
             <View className="flex-row gap-2">
-              <Button title="Try again" icon={RefreshCw} variant="secondary" onPress={generate} className="flex-1" />
+              <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
               <Button title="Discard" variant="ghost" onPress={sheet.close} className="flex-1" />
             </View>
           </SheetFooter>
@@ -168,13 +168,13 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
           {!hasSummary && (
             <Banner
               tone="warning"
-              icon={Info}
+              icon={InfoIcon}
               text="This chapter has no summary, so the scenes will be generic. Add a summary first for better results, or continue anyway."
             />
           )}
         </ScrollView>
         <SheetFooter>
-          <Button title={hasSummary ? 'Suggest scenes' : 'Continue anyway'} icon={Sparkles} variant="ai" onPress={generate} />
+          <Button title={hasSummary ? 'Suggest scenes' : 'Continue anyway'} icon={AiIcon} variant="ai" onPress={generate} />
         </SheetFooter>
       </>
     );

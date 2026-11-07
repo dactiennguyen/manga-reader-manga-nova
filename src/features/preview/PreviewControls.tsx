@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChevronDown, EllipsisVertical, Flag, PenLine, X } from 'lucide-react-native';
+import { CaretDownIcon, CloseIcon, FlagIcon, MoreIcon, PenLineIcon } from '../../ui/icons';
 
 import { Button, Icon, IconButton, PANEL_SHADOW, Pressable, Slider, Text } from '../../ui';
 
@@ -42,7 +42,7 @@ export function ReaderTopBar({
       className="absolute inset-x-2 flex-row items-center gap-1 rounded-xl bg-raised p-1"
       style={{ top: insets.top + 8, boxShadow: PANEL_SHADOW }}
     >
-      <IconButton icon={X} onPress={onClose} accessibilityLabel="Close preview" />
+      <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close preview" />
       <Pressable
         accessibilityLabel={`${chapterTitle}, choose a chapter`}
         onPress={onChapters}
@@ -51,17 +51,17 @@ export function ReaderTopBar({
         <Text variant="label" numberOfLines={1} className="shrink">
           {chapterTitle}
         </Text>
-        <Icon icon={ChevronDown} size={16} color="text-muted" />
+        <Icon icon={CaretDownIcon} size={16} color="text-muted" />
       </Pressable>
       <IconButton
-        icon={Flag}
+        icon={FlagIcon}
         active={flagged}
         disabled={!canFlag}
         onPress={onFlag}
         accessibilityLabel="Flag this page"
       />
       <IconButton
-        icon={EllipsisVertical}
+        icon={MoreIcon}
         badge={flagCount || undefined}
         onPress={onMore}
         accessibilityLabel="More options"
@@ -107,7 +107,7 @@ export function ReaderBottomBar({
           {label}
         </Text>
       </View>
-      <Button title="Edit this page" icon={PenLine} variant="secondary" small disabled={!canEdit} onPress={onEdit} />
+      <Button title="Edit this page" icon={PenLineIcon} variant="secondary" small disabled={!canEdit} onPress={onEdit} />
     </View>
   );
 }

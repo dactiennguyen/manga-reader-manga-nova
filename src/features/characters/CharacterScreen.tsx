@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { BookOpen, Check, ChevronDown, Copy, EllipsisVertical, Lock, Sparkles, Trash2 } from 'lucide-react-native';
+import { AiIcon, CaretDownIcon, CheckIcon, CopyIcon, DeleteIcon, LockIcon, MoreIcon, ReadIcon } from '../../ui/icons';
 
 import { LIMITS, ROLE_LABEL } from '../../core/model/constants';
 import { chapterLabel, characterUsage } from '../../core/model/selectors';
@@ -113,7 +113,7 @@ function CharacterBody({ character }: { character: Character }) {
       <AppBar
         title="Character"
         onBack={() => navigation.goBack()}
-        right={<IconButton icon={EllipsisVertical} onPress={() => setMenu(true)} accessibilityLabel="More" />}
+        right={<IconButton icon={MoreIcon} onPress={() => setMenu(true)} accessibilityLabel="More" />}
       />
       <KeyboardAwareScrollView
         bottomOffset={24}
@@ -127,7 +127,7 @@ function CharacterBody({ character }: { character: Character }) {
             <Avatar character={character} size={88} square />
             {character.locked && (
               <View className="absolute -bottom-1.5 -right-1.5 h-6.5 w-6.5 items-center justify-center rounded-full bg-overlay">
-                <Icon icon={Lock} size={12} color="text-secondary" />
+                <Icon icon={LockIcon} size={12} color="text-secondary" />
               </View>
             )}
           </View>
@@ -156,7 +156,7 @@ function CharacterBody({ character }: { character: Character }) {
                 <Text variant="label" tone="secondary">
                   {ROLE_LABEL[character.role]}
                 </Text>
-                <Icon icon={ChevronDown} size={14} color="text-muted" />
+                <Icon icon={CaretDownIcon} size={14} color="text-muted" />
               </Pressable>
               <Text variant="label" tone="muted">
                 ·
@@ -179,7 +179,7 @@ function CharacterBody({ character }: { character: Character }) {
         </View>
         <View className="gap-2 p-4">
           {isNew && !name.text.trim() && <Banner text="What is this character called? Type a name above to begin." />}
-          {tab === 'profile' && <Button title="Fill with AI" icon={Sparkles} variant="ai" small onPress={openFill} className="mb-2 self-start" />}
+          {tab === 'profile' && <Button title="Fill with AI" icon={AiIcon} variant="ai" small onPress={openFill} className="mb-2 self-start" />}
           {tab === 'profile' && <ProfileTab key={fillVersion} character={character} />}
           {tab === 'design' && <DesignTab character={character} />}
           {tab === 'relations' && <RelationsTab character={character} />}
@@ -191,9 +191,9 @@ function CharacterBody({ character }: { character: Character }) {
         onClose={() => setMenu(false)}
         title={character.name.trim() || 'Character'}
         items={[
-          { label: 'Duplicate', icon: Copy, onPress: duplicate },
-          { label: 'Where they appear', icon: BookOpen, onPress: () => setUsageSheet(true) },
-          { label: 'Delete character', icon: Trash2, destructive: true, onPress: remove },
+          { label: 'Duplicate', icon: CopyIcon, onPress: duplicate },
+          { label: 'Where they appear', icon: ReadIcon, onPress: () => setUsageSheet(true) },
+          { label: 'Delete character', icon: DeleteIcon, destructive: true, onPress: remove },
         ]}
       />
       <Menu
@@ -202,7 +202,7 @@ function CharacterBody({ character }: { character: Character }) {
         title="Role"
         items={ROLES.map(role => ({
           label: ROLE_LABEL[role],
-          icon: role === character.role ? Check : undefined,
+          icon: role === character.role ? CheckIcon : undefined,
           onPress: () => update(character.id, { role }),
         }))}
       />
@@ -242,7 +242,7 @@ function CharacterBody({ character }: { character: Character }) {
           <ListItem
             key={chapterId}
             title={chapterLabel(useStory.getState(), chapterId)}
-            icon={BookOpen}
+            icon={ReadIcon}
             chevron
             onPress={() => {
               usageTarget.current = chapterId;

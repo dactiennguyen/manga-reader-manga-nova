@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { ArrowRight, Plus, Trash2 } from 'lucide-react-native';
+import { DeleteIcon, ForwardIcon, PlusIcon } from '../../ui/icons';
 
 import { LIMITS } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
@@ -120,15 +120,15 @@ export function ChapterEditSheet({
             {cast.map(id => (
               <Chip key={id} label={characters[id].name || 'Unnamed'} selected onPress={() => toggleCharacter(id)} />
             ))}
-            <Chip label="Add" icon={Plus} onPress={() => setPicking(true)} />
+            <Chip label="Add" icon={PlusIcon} onPress={() => setPicking(true)} />
           </ChipRow>
           {cast.length > 0 && (
             <Text variant="caption" tone="muted">
               Tap a name to remove it from the chapter.
             </Text>
           )}
-          <Button title="Write script" icon={ArrowRight} onPress={openScript} className="mt-3" />
-          <Button title="Delete chapter" icon={Trash2} variant="danger" onPress={remove} />
+          <Button title="Write script" icon={ForwardIcon} onPress={openScript} className="mt-3" />
+          <Button title="Delete chapter" icon={DeleteIcon} variant="danger" onPress={remove} />
         </View>
       </Sheet>
       <CharacterPicker

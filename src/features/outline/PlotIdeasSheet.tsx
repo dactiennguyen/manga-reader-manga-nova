@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ChevronLeft, Info, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react-native';
+import { AiIcon, CaretLeftIcon, DeleteIcon, InfoIcon, PlusIcon, RefreshIcon } from '../../ui/icons';
 
 import { suggestPlots, type PlotDirection } from '../../core/ai/story';
 import type { ID } from '../../core/model/types';
@@ -123,7 +123,7 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
           </View>
         ) : null,
       )}
-      <Button title="Use this direction" icon={Sparkles} variant="ai" onPress={() => use(direction)} />
+      <Button title="Use this direction" icon={AiIcon} variant="ai" onPress={() => use(direction)} />
     </View>
   );
 
@@ -139,17 +139,17 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
           <Text variant="caption" tone="secondary">
             Keeps everything you have. The new chapters go after the existing ones in each act.
           </Text>
-          <Button title="Add after existing chapters" icon={Plus} onPress={() => apply(direction, 'append')} />
+          <Button title="Add after existing chapters" icon={PlusIcon} onPress={() => apply(direction, 'append')} />
         </View>
         <View className="gap-2 rounded-md bg-danger/15 p-3">
           <Text variant="caption" tone="danger">
             Deletes {lostText}. This cannot be undone.
           </Text>
-          <Button title="Replace existing chapters" icon={Trash2} variant="danger" onPress={() => replace(direction)} />
+          <Button title="Replace existing chapters" icon={DeleteIcon} variant="danger" onPress={() => replace(direction)} />
         </View>
       </ScrollView>
       <SheetFooter>
-        <Button title="Back to directions" icon={ChevronLeft} variant="ghost" onPress={() => setPicked(null)} />
+        <Button title="Back to directions" icon={CaretLeftIcon} variant="ghost" onPress={() => setPicked(null)} />
       </SheetFooter>
     </>
   );
@@ -177,13 +177,13 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
         {!logline && (
           <Banner
             tone="warning"
-            icon={Info}
+            icon={InfoIcon}
             text="Without a logline the suggestions will be generic. You can write one sentence about your story at the top of the outline first, or continue anyway."
           />
         )}
       </ScrollView>
       <SheetFooter>
-        <Button title={logline ? 'Suggest plot directions' : 'Continue anyway'} icon={Sparkles} variant="ai" onPress={generate} />
+        <Button title={logline ? 'Suggest plot directions' : 'Continue anyway'} icon={AiIcon} variant="ai" onPress={generate} />
       </SheetFooter>
     </>
   );
@@ -218,7 +218,7 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
             {state.data.map(renderDirection)}
           </ScrollView>
           <SheetFooter>
-            <Button title="Try again" icon={RefreshCw} variant="secondary" onPress={generate} />
+            <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} />
           </SheetFooter>
         </>
       );

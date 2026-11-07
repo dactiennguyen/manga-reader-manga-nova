@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { Pencil, Plus, StickyNote, Trash2 } from 'lucide-react-native';
+import { DeleteIcon, EditIcon, NoteIcon, PlusIcon } from '../../ui/icons';
 
 import { relationsOf } from '../../core/model/selectors';
 import type { Character, ID } from '../../core/model/types';
@@ -77,7 +77,7 @@ export function RelationsTab({ character }: { character: Character }) {
           </Card>
         ))
       )}
-      <Button title="Relation" icon={Plus} variant="secondary" onPress={() => setPicking(true)} />
+      <Button title="Relation" icon={PlusIcon} variant="secondary" onPress={() => setPicking(true)} />
       {items.length > 0 && (
         <Text variant="caption" tone="muted" className="text-center">
           Relations go both ways. Long-press a row to edit its label or note, or to delete it.
@@ -135,17 +135,17 @@ export function RelationsTab({ character }: { character: Character }) {
         items={[
           {
             label: 'Edit label',
-            icon: Pencil,
+            icon: EditIcon,
             onPress: () => setEditing(menuId ? { id: menuId, field: 'label' } : null),
           },
           {
             label: 'Edit note',
-            icon: StickyNote,
+            icon: NoteIcon,
             onPress: () => setEditing(menuId ? { id: menuId, field: 'note' } : null),
           },
           {
             label: 'Delete relation',
-            icon: Trash2,
+            icon: DeleteIcon,
             destructive: true,
             onPress: () => {
               if (menuItem) {

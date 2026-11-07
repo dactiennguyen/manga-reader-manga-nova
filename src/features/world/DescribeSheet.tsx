@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
-import { FilePen, Plus, RefreshCw } from 'lucide-react-native';
+import { EditFileIcon, PlusIcon, RefreshIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { describeWorldEntry } from '../../core/ai/people';
@@ -105,13 +105,13 @@ export function DescribeSheet({
           <SheetFooter>
             <Button
               title={hasBody ? 'Replace content' : 'Use as content'}
-              icon={FilePen}
+              icon={EditFileIcon}
               variant="ai"
               onPress={() => apply(text, 'replace')}
             />
-            {hasBody && <Button title="Append" icon={Plus} onPress={() => apply(text, 'append')} />}
+            {hasBody && <Button title="Append" icon={PlusIcon} onPress={() => apply(text, 'append')} />}
             <View className="flex-row gap-2">
-              <Button title="Try again" icon={RefreshCw} variant="secondary" onPress={generate} className="flex-1" />
+              <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
               <Button title="Discard" variant="ghost" onPress={sheet.close} className="flex-1" />
             </View>
           </SheetFooter>
