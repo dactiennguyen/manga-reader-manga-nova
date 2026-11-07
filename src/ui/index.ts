@@ -1,4 +1,5 @@
 export * from './Ai';
+export * from './art';
 export * from './BrandMark';
 export * from './Button';
 export * from './Icon';

@@ -213,9 +213,9 @@ export function Tabs<T extends string>({
             accessibilityLabel={tab.badge ? `${tab.label}, ${tab.badge}` : tab.label}
             accessibilityState={{ selected }}
             onPress={() => onChange(tab.key)}
-            className={`h-12 flex-row items-center justify-center gap-1.5 border-b-2 px-3 ${
+            className={`h-12 flex-row items-center justify-center gap-1.5 border-b-2 ${
               selected ? 'border-accent' : 'border-transparent'
-            } ${stretch ? 'flex-1' : ''}`}
+            } ${stretch ? 'flex-1 px-1' : 'px-3'}`}
           >
             <Text variant="label" tone={selected ? 'accent' : 'secondary'} numberOfLines={1}>
               {tab.label}

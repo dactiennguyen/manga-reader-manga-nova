@@ -10,6 +10,7 @@ export type TextTone =
   | 'onAccent'
   | 'ai'
   | 'onAi'
+  | 'onPaper'
   | 'danger'
   | 'success'
   | 'warning';
@@ -33,6 +34,7 @@ const TONE: Record<TextTone, string> = {
   onAccent: 'text-on-accent',
   ai: 'text-ai',
   onAi: 'text-on-ai',
+  onPaper: 'text-on-paper',
   danger: 'text-danger',
   success: 'text-success',
   warning: 'text-warning',

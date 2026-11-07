@@ -2,7 +2,7 @@
 
 ![Mangaka AI ở phong cách Studio](style/hero.png)
 
-**Một xưởng vẽ về đêm: bàn tối, đèn tập trung vào trang giấy.** Mọi thứ khác lùi lại để tranh của bạn là thứ sáng nhất trên màn hình.
+**Một xưởng in nhỏ: mực, giấy và vài màu riso.** App có màu và có hồn như một cuốn zine in tay, còn khi bạn vẽ thì mọi thứ lùi lại để tranh của bạn dẫn đầu.
 
 Tài liệu này giải thích cảm giác của style và lý do đằng sau từng quyết định. Bảng tra token đầy đủ nằm ở [05-design-system.md](05-design-system.md).
 
@@ -10,10 +10,10 @@ Tài liệu này giải thích cảm giác của style và lý do đằng sau t�
 
 | Ý tưởng | Nghĩa là gì | Nhìn thấy ở đâu |
 | --- | --- | --- |
-| **Trang truyện dẫn đầu** | Giấy trắng là mảng sáng lớn nhất. Giao diện không cạnh tranh với nó | Canvas, Lettering, Preview |
-| **Một màu nhấn** | Xanh điện chỉ dành cho hành động chính và trạng thái đang chọn. Tím chỉ dành cho AI | Nút chính, tab đang chọn, thanh tiến độ |
+| **Làm bằng tay** | Tranh có nét run, hạt in và lệch màu. Không phát sáng, không bóng bẩy | Onboarding, bìa truyện, màn trống |
+| **Màu đến từ mực** | San hô là màu nhấn của giao diện. Mỗi thể loại và tính năng có một màu mực riêng | Bìa, tile ở Project, nút chính |
+| **Trang truyện dẫn đầu** | Khi làm việc, giao diện lùi lại và không cạnh tranh với tranh | Canvas, Lettering, Preview |
 | **Chiều sâu bằng độ sáng** | Bề mặt càng nổi càng sáng. Gần như không dùng viền hay bóng | Thẻ, dock, sheet |
-| **Công cụ nổi** | Thanh công cụ là panel nổi, thu gọn được và không chiếm chỗ của tranh | Thanh bên Canvas, thẻ bong bóng |
 
 ## Logo
 
@@ -22,7 +22,7 @@ Tài liệu này giải thích cảm giác của style và lý do đằng sau t�
 Logo là một trang truyện bị cắt bởi đường chia chéo, kèm một bong bóng thoại:
 
 - **Nửa trên màu giấy:** trang truyện là nhân vật chính.
-- **Nửa dưới xanh điện:** màu nhấn duy nhất của app.
+- **Nửa dưới san hô:** màu mực chính của app.
 - **Đường chia chéo:** thứ làm nên một trang manga, cũng chính là đường chia khung trong PanelLayout.
 - **Bong bóng cắt âm bản:** lời thoại, phần "viết" của công việc.
 
@@ -32,13 +32,13 @@ Logo đọc được ở 48px, và có bản đơn sắc cho Themed Icons của 
 
 ![Bảng màu tối](style/palette-dark.svg)
 
-Bốn tầng bề mặt chênh nhau rất ít, đủ để thấy tầng mà không gây chú ý. Đó là lý do một panel `raised` tách khỏi nền `bg` mà không cần viền.
+Nền tối là màu mực ấm, không phải xám lạnh. Bốn tầng bề mặt chênh nhau rất ít, đủ để thấy tầng mà không gây chú ý.
 
-Ở giao diện tối, chữ trên nền `accent` luôn dùng `on-accent`, không dùng trắng. Chữ trắng trên `accent` chỉ đạt 2,77:1.
+Ở giao diện tối, chữ trên nền `accent` luôn dùng `on-accent`, không dùng trắng. Chữ trắng trên `accent` chỉ đạt 2,56:1.
 
 ![Bảng màu sáng](style/palette-light.svg)
 
-Giao diện sáng giữ nguyên cấu trúc, và màu nhấn đậm hơn để đạt độ tương phản trên nền trắng. Đổi màu nào cũng phải chạy `__tests__/theme.contrast.test.ts`.
+Giao diện sáng là nền giấy kem, hợp với tranh riso nhất. Màu nhấn đậm hơn để đạt độ tương phản. Đổi màu nào cũng phải chạy `__tests__/theme.contrast.test.ts`.
 
 ## Chữ
 
@@ -54,6 +54,23 @@ Giao diện dùng một phông duy nhất là **Inter**, có đủ dấu tiếng
 | Số liệu nhỏ | 2/4 pages | `caption` 12, vừa |
 
 Phông **trong trang truyện** là dữ liệu tranh, không thuộc giao diện: Patrick Hand cho thoại, Be Vietnam Pro cho chữ thường, Anton cho SFX.
+
+## Tranh minh họa
+
+<img src="style/art.png" alt="Bộ tranh riso" width="720" />
+
+Mọi tranh là bản in riso: mực đen và **một** màu mực trên giấy kem, có hạt in, nét tay không đều và màu hơi lệch. Mỗi thể loại có màu riêng, và tranh thể loại dùng luôn làm bìa cho truyện chưa có ảnh.
+
+| Thể loại | Màu mực |
+| --- | --- |
+| Shounen | San hô |
+| Shoujo | Hồng |
+| Seinen | Xanh ngọc |
+| Chibi | Vàng hướng dương |
+| Horror | Xanh rêu |
+| Slice of life | Cam ấm |
+
+Tranh được tạo bằng AI nên phải kiểm soát chặt để **không có cảm giác AI**: không neon, không phát sáng, không bóng bẩy, không chi tiết quá mức, không tím hồng. Nếu một tranh nhìn "quá AI", bỏ và làm lại. File ở `src/assets/art/`, đăng ký trong `src/ui/art.ts`.
 
 ## Icon
 
@@ -77,17 +94,20 @@ Cỡ icon theo thang `ICON`: `xs` 14, `sm` 16, `md` 20, `lg` 24, `xl` 32, `xxl` 
 
 | Màn | Điều cần để ý |
 | --- | --- |
+| <img src="style/screens/welcome.png" alt="Onboarding" width="220" /> | **Onboarding.** Tranh chiếm phần lớn màn hình, kể câu chuyện trước khi nói về tính năng |
+| <img src="style/screens/library.png" alt="Library" width="220" /> | **Library.** Bìa theo thể loại biến danh sách thành một kệ truyện. Tên in ở phần giấy trống phía trên |
 | <img src="style/screens/canvas.png" alt="Canvas" width="220" /> | **Canvas.** Tranh chiếm gần hết màn hình. Công cụ đang chọn là ngòi bút tô đặc, các công cụ khác giữ nét mảnh |
 | <img src="style/screens/lettering.png" alt="Lettering" width="220" /> | **Lettering.** Thẻ thuộc tính nổi trên trang, và trang tự đẩy lên để bong bóng đang chọn luôn nhìn thấy, gồm cả đuôi và tay cầm |
 | <img src="style/screens/storyboard.png" alt="Storyboard" width="220" /> | **Storyboard.** Trang trắng nổi trên nền tối. Thứ tự đọc từ phải sang trái được ghi ngay đầu màn |
-| <img src="style/screens/project.png" alt="Project" width="220" /> | **Project.** Truyện chưa có ảnh bìa dùng bìa chữ: tên truyện và một vạch màu nhấn, không để ô trống |
-| <img src="style/screens/light.png" alt="Giao diện sáng" width="220" /> | **Giao diện sáng.** Cùng cấu trúc, cùng thứ bậc. Màu nhấn đậm hơn để đủ tương phản |
+| <img src="style/screens/project.png" alt="Project" width="220" /> | **Project.** Hàng tile in riso đưa bạn tới từng phần của truyện, mỗi tile một màu mực |
+| <img src="style/screens/light.png" alt="Giao diện sáng" width="220" /> | **Giao diện giấy.** Cùng cấu trúc, cùng thứ bậc, nhưng tranh và nền hòa thành một tờ giấy |
 
 ## Nên và không nên
 
 | Nên | Không nên |
 | --- | --- |
 | Dành màu nhấn cho một hành động chính mỗi màn | Tô màu nhấn lên nhiều nút cùng lúc |
+| Dùng tranh riso cho các màn có cảm xúc | Dùng tranh neon, bóng bẩy hoặc có cảm giác AI |
 | Tách bề mặt bằng độ sáng | Thêm viền quanh mọi thẻ |
 | Đặt công cụ vào một hàng nếu còn chỗ | Để công cụ đè lên tranh |
 | Làm màn trống có icon và bước tiếp theo | Để lại khoảng trống hoặc một ô xám |
@@ -107,4 +127,4 @@ Bảng màu và bảng icon trong tài liệu này được sinh từ code, nên
 python3 scripts/gen-style-assets.py
 ```
 
-Kiểm tra giao diện phải chụp từ bản debug, vì bản release bật `FLAG_SECURE` nên ảnh chụp ra đen.
+Kiểm tra giao diện phải chụp từ bản debug, vì bản release bật `FLAG_SECURE` nên ảnh chụp ra đen. Nên chụp trên máy thật dùng ba nút điều hướng: nhiều lỗi về chiều rộng và thanh hệ thống không thấy trên máy ảo. Các ảnh trong tài liệu này chụp từ Redmi Note 10S.

@@ -1,9 +1,10 @@
-import { useRef, type ComponentRef } from 'react';
+import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
+import { useCallback, useRef, type ComponentRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useKeyboardState } from 'react-native-keyboard-controller';
 import { HistoryIcon, SendIcon, StopIcon } from '../../ui/icons';
 
-import { useAppNavigation } from '../../state/navigation';
+import { useAppNavigation, type TabParamList } from '../../state/navigation';
 import { useAiConfigured } from '../../state/useSettings';
 import { AiErrorBox, AiLoading, AppBar, ICON, IconButton, Screen, TextField, useDockInset } from '../../ui';
 import {
@@ -22,9 +23,14 @@ export function AssistantScreen() {
   const dockInset = useDockInset();
   const keyboardOpen = useKeyboardState(state => state.isVisible);
   const configured = useAiConfigured();
-  const chat = useAssistantChat();
+  const tab = useNavigation<NavigationProp<TabParamList, 'Assistant'>>();
+  const { params } = useRoute<RouteProp<TabParamList, 'Assistant'>>();
+  const chat = useAssistantChat(params?.projectId);
   const { active, ai, conversations, input, loading, project, where } = chat;
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+
+  /** A story passed in holds only for this visit: the dock opens the latest one. */
+  useFocusEffect(useCallback(() => () => tab.setParams({ projectId: undefined }), [tab]));
 
   const messages = active?.messages ?? [];
   const canSend = configured && !loading && input.trim().length > 0;

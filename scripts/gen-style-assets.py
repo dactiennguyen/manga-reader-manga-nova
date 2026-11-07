@@ -68,7 +68,7 @@ def luminance(color):
 
 
 def swatch(x, y, w, h, name, color):
-    ink = '#111214' if luminance(color) > 0.3 else '#F1F2F4'
+    ink = '#1C1712' if luminance(color) > 0.3 else '#F6EFE3'
     return (
         "<rect x='%g' y='%g' width='%g' height='%g' rx='12' fill='%s' stroke='#7A7E88' stroke-opacity='.35'/>" % (x, y, w, h, color)
         + text(x + 14, y + h - 32, name, 14, ink, 600)
@@ -138,8 +138,8 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     colors = palette()
     names = registry()
-    palette_sheet(colors, 'dark', 'Bảng màu tối, giao diện mặc định', '#1A1B1F', '#F1F2F4')
-    palette_sheet(colors, 'light', 'Bảng màu sáng', '#FFFFFF', '#15161A')
+    palette_sheet(colors, 'dark', 'Nền mực, giao diện mặc định', colors['dark']['surface'], colors['dark']['text'])
+    palette_sheet(colors, 'light', 'Nền giấy', colors['light']['surface'], colors['light']['text'])
     icon_sheet(colors, names)
     weight_sheet(colors, names)
 

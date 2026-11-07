@@ -13,6 +13,8 @@ import { useAppNavigation } from '../../state/navigation';
 import { useSettings, type CreatorRole, type Handedness, type ThemeMode } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import {
+  ART,
+  ArtBanner,
   Card,
   IconButton,
   ListItem,
@@ -99,9 +101,13 @@ export function ProfileScreen() {
 
   return (
     <Screen scroll bottomInset={dockInset} contentClassName="pt-4">
-      <Text variant="display" accessibilityRole="header">
-        Profile
-      </Text>
+      <ArtBanner source={ART.profileBanner} ratio={2}>
+        <View className="absolute left-4 top-3">
+          <Text variant="display" tone="onPaper" accessibilityRole="header">
+            Profile
+          </Text>
+        </View>
+      </ArtBanner>
 
       <Card className="flex-row items-center gap-3 p-4">
         <View className="h-16 w-16 items-center justify-center rounded-full bg-accent">

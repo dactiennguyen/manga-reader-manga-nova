@@ -1,11 +1,11 @@
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
 import { AiIcon, CheckIcon, CopyIcon, DeleteIcon, MessageIcon, NoteIcon, PlusIcon } from '../../ui/icons';
 
 import type { Project } from '../../core/model/types';
 import { plural } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
 import type { AssistantMessage, Conversation } from '../../state/useAssistant';
-import { AiNote, Button, Chip, ICON, Icon, IconButton, ListItem, Sheet, Text } from '../../ui';
+import { ART, AiNote, Button, Chip, ICON, Icon, IconButton, ListItem, Sheet, Text } from '../../ui';
 
 export function AssistantBubble({
   message,
@@ -62,9 +62,7 @@ export function WelcomePanel({
 }) {
   return (
     <View className="items-center gap-3 px-2 py-6">
-      <View className="h-16 w-16 items-center justify-center rounded-full bg-ai/15">
-        <Icon icon={AiIcon} size={ICON.xl} color="ai" />
-      </View>
+      <Image accessibilityIgnoresInvertColors source={ART.assistantHero} className="h-20 w-20 rounded-lg" />
       <Text variant="heading" className="text-center">
         {project ? `Ask about ${project.title || 'your story'}` : 'Ask anything about making manga'}
       </Text>

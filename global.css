@@ -5,41 +5,45 @@
 @layer theme {
   :root {
     @variant dark {
-      --color-bg: #111214;
-      --color-surface: #1a1b1f;
-      --color-raised: #232429;
-      --color-overlay: #2c2e34;
-      --color-text: #f1f2f4;
-      --color-text-secondary: #b4b7bf;
-      --color-text-muted: #9a9ea7;
-      --color-accent: #6c98ff;
-      --color-on-accent: #0b1020;
-      --color-ai: #b69cff;
-      --color-on-ai: #17102e;
-      --color-danger: #ff7a7a;
-      --color-success: #4cd19a;
-      --color-warning: #f5b94a;
-      --color-divider: #3a3c44;
-      --color-control-border: #7a7e88;
+      --color-bg: #15120e;
+      --color-surface: #1f1b16;
+      --color-raised: #29241e;
+      --color-overlay: #332d26;
+      --color-text: #f6efe3;
+      --color-text-secondary: #cfc5b4;
+      --color-text-muted: #aca190;
+      --color-accent: #ff7a5c;
+      --color-on-accent: #240d06;
+      --color-ai: #63cdc4;
+      --color-on-ai: #06201e;
+      --color-danger: #ff9aa6;
+      --color-success: #86d29a;
+      --color-warning: #f4c552;
+      --color-divider: #40392f;
+      --color-control-border: #8c8273;
+      --color-paper: #f6efe3;
+      --color-on-paper: #1c1712;
       --color-scrim: rgba(0, 0, 0, 0.6);
     }
     @variant light {
-      --color-bg: #f4f5f7;
-      --color-surface: #ffffff;
-      --color-raised: #ffffff;
-      --color-overlay: #eceef1;
-      --color-text: #15161a;
-      --color-text-secondary: #454852;
-      --color-text-muted: #5f636d;
-      --color-accent: #2457d6;
-      --color-on-accent: #ffffff;
-      --color-ai: #6a3fd8;
-      --color-on-ai: #ffffff;
-      --color-danger: #c42b2b;
-      --color-success: #12784f;
-      --color-warning: #8a5a00;
-      --color-divider: #dadde2;
-      --color-control-border: #7c808a;
+      --color-bg: #f6efe3;
+      --color-surface: #fffaf0;
+      --color-raised: #fffdf7;
+      --color-overlay: #efe5d4;
+      --color-text: #1c1712;
+      --color-text-secondary: #4b4338;
+      --color-text-muted: #645a4c;
+      --color-accent: #bf3419;
+      --color-on-accent: #fffaf0;
+      --color-ai: #0c6a6c;
+      --color-on-ai: #fffaf0;
+      --color-danger: #a51c3a;
+      --color-success: #1d6a40;
+      --color-warning: #765000;
+      --color-divider: #ddd1bd;
+      --color-control-border: #887c6b;
+      --color-paper: #f6efe3;
+      --color-on-paper: #1c1712;
       --color-scrim: rgba(0, 0, 0, 0.45);
     }
   }

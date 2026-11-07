@@ -6,7 +6,7 @@ import type { ID } from '../core/model/types';
 export type TabParamList = {
   Home: undefined;
   Library: undefined;
-  Assistant: undefined;
+  Assistant: { projectId?: ID } | undefined;
   Profile: undefined;
 };
 

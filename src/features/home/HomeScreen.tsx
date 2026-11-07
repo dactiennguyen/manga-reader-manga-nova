@@ -9,7 +9,7 @@ import { dayKey } from '../../core/util/time';
 import { useStoryData } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
-import { Button, Card, ICON, Icon, IconButton, Screen, SectionHeader, Text, useDockInset } from '../../ui';
+import { ART, ArtBanner, Button, Card, ICON, Icon, IconButton, Screen, SectionHeader, Text, useDockInset } from '../../ui';
 import { openBlankCanvas } from './blankCanvas';
 import { ContinueCard } from './ContinueCard';
 import { IdeaCard } from './IdeaCard';
@@ -30,14 +30,16 @@ export function HomeScreen() {
 
   return (
     <Screen scroll keyboard bottomInset={dockInset} contentClassName="pt-4">
-      <View>
-        <Text variant="display" accessibilityRole="header">
-          {penName ? `Hi ${penName}` : 'Hi there'}
-        </Text>
-        <Text tone="secondary">{empty ? 'Start a new story today.' : 'Which story are you working on today?'}</Text>
-      </View>
-
-      {empty && <Text variant="heading">Tell me your idea!</Text>}
+      <ArtBanner source={ART.homeHero} ratio={3 / 2}>
+        <View className="absolute left-4 top-3 w-1/2">
+          <Text variant="display" tone="onPaper" accessibilityRole="header" numberOfLines={1}>
+            {penName ? `Hi ${penName}` : 'Hi there'}
+          </Text>
+          <Text variant="bodySmall" tone="onPaper" numberOfLines={2}>
+            {empty ? 'Start a new story today.' : 'What are we drawing today?'}
+          </Text>
+        </View>
+      </ArtBanner>
 
       {!!current && (
         <View className="gap-2">

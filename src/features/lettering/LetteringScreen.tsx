@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { BubbleIcon, CheckIcon, DoneIcon, EffectIcon, MoreIcon, NoteIcon, RedoIcon, SfxIcon, UndoIcon } from '../../ui/icons';
 
 import type { Chapter, BubbleType } from '../../core/model/types';
@@ -52,7 +52,12 @@ function LetteringBody({ ctx, chapter, onBack }: { ctx: PageContext; chapter: Ch
         </View>
       )}
       <LetteringStage c={c} />
-      <View className="flex-row items-center justify-around gap-1 px-2 py-2">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="grow-0"
+        contentContainerClassName="grow items-center justify-around gap-2 px-2 py-2"
+      >
         {ADD_BUTTONS.map(item => {
           const picked = pending?.kind === 'bubble' && pending.type === item.type;
           return (
@@ -72,7 +77,7 @@ function LetteringBody({ ctx, chapter, onBack }: { ctx: PageContext; chapter: Ch
           selected={pending?.kind === 'effect'}
           onPress={() => dispatch({ type: 'openSheet', sheet: 'effects' })}
         />
-      </View>
+      </ScrollView>
       <ModeBar pageId={pageId} mode="lettering" />
       <LetteringSheets c={c} />
     </Screen>

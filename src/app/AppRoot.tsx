@@ -12,10 +12,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { AppState, Linking, StatusBar, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
 import { copyUriToCache } from '../native/files';
+import { setSystemBarsDarkIcons } from '../native/screen';
 import type { RootStackParamList } from '../state/navigation';
 import { appServices } from '../state/services';
 import { useSettings } from '../state/useSettings';
@@ -109,6 +110,10 @@ function Shell() {
     };
   }, []);
 
+  useEffect(() => {
+    setSystemBarsDarkIcons(!dark);
+  }, [dark]);
+
   return (
     <>
       <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
@@ -120,10 +125,17 @@ function Shell() {
       >
         <RootNavigator />
       </NavigationContainer>
+      <NavBarBacking />
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
       <ConfirmHost />
     </>
   );
+}
+
+/** Pages scroll under the system bar, and three-button navigation would vanish against white paper. */
+function NavBarBacking() {
+  const { bottom } = useSafeAreaInsets();
+  return <View pointerEvents="none" className="absolute inset-x-0 bottom-0 bg-bg" style={{ height: bottom }} />;
 }
 
 export function AppRoot() {

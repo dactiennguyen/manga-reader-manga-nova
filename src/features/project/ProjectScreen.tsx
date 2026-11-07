@@ -10,6 +10,7 @@ import type { ScreenProps } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
 import { AppBar, EmptyState, IconButton, Menu, Screen, Tabs } from '../../ui';
 import { ChaptersTab } from './ChaptersTab';
+import { ProjectTools } from './ProjectTools';
 import { EditInfoSheet } from './EditInfoSheet';
 import { NextStepCard, ProjectSummary } from './ProjectSummary';
 import { CharactersTab, NotesTab, WorldTab } from './ProjectTabs';
@@ -76,8 +77,13 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
       <ScrollView className="flex-1" contentContainerClassName="pb-12" stickyHeaderIndices={[2]}>
         <ProjectSummary project={project} progress={progress} onAddSummary={() => setEditing(true)} />
 
-        <View className="px-4 pb-3">
-          {!!nextStep && !stepHidden && <NextStepCard step={nextStep} onHide={() => setStepHidden(true)} />}
+        <View>
+          <ProjectTools project={project} onTab={setTab} />
+          {!!nextStep && !stepHidden && (
+            <View className="px-4 pb-3">
+              <NextStepCard step={nextStep} onHide={() => setStepHidden(true)} />
+            </View>
+          )}
         </View>
 
         <View className="bg-bg px-2">

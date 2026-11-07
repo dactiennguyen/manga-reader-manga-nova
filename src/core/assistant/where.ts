@@ -20,6 +20,12 @@ export function latestProject(projects: Record<string, Project>): Project | unde
   return latest;
 }
 
+/** The story the person asked from, or else the one they changed last. */
+export function assistantProject(projects: Record<string, Project>, projectId: string | undefined): Project | undefined {
+  const asked = projectId ? projects[projectId] : undefined;
+  return asked && !asked.deletedAt ? asked : latestProject(projects);
+}
+
 export function whereOf(project: Project | undefined, chapterTitle: string | undefined): string {
   if (!project) {
     return 'Home';

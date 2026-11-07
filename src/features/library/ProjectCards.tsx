@@ -37,9 +37,11 @@ export function GridCard({ row, highlighted, onPress, onLongPress, width }: Card
           <ProgressBar value={row.ratio} />
         </View>
       </Cover>
-      <Text variant="label" numberOfLines={2}>
-        {project.title || 'Untitled'}
-      </Text>
+      {!!project.coverUri && (
+        <Text variant="label" numberOfLines={2}>
+          {project.title || 'Untitled'}
+        </Text>
+      )}
       <Text variant="caption" tone="muted">
         {row.chapters} ch.
       </Text>

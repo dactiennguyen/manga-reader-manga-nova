@@ -10,7 +10,7 @@ import { plural } from '../../core/util/format';
 import { useStoryData } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
-import { AppBar, Button, Card, Cover, EmptyState, IconButton, Screen, Text, confirm, snackbar, toast } from '../../ui';
+import { ART, AppBar, Button, Card, Cover, EmptyState, IconButton, Screen, Text, confirm, snackbar, toast } from '../../ui';
 
 export function TrashScreen() {
   const navigation = useAppNavigation();
@@ -74,7 +74,7 @@ export function TrashScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            icon={DeleteIcon}
+            art={ART.emptyTrash}
             title="Trash is empty"
             message={`Stories you delete stay here for ${LIMITS.trashDays} days before they are gone for good.`}
           />

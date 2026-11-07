@@ -2,12 +2,12 @@
 
 Bản giới thiệu có hình ảnh ở [12-phong-cach-studio.md](12-phong-cach-studio.md). Tài liệu này là bảng tra token.
 
-Studio thay cho "Mực và Giấy" của app cũ. Hướng thiết kế: một công cụ vẽ chuyên nghiệp, nền than chì, panel nổi bo mềm, một màu nhấn. Tranh đen trắng là thứ sáng nhất trên màn hình, giao diện lùi về phía sau.
+Studio thay cho "Mực và Giấy" của app cũ. Hướng thiết kế: một xưởng in nhỏ. Nền mực ấm hoặc giấy kem, panel nổi bo mềm, màu san hô làm màu nhấn, và tranh minh họa in riso cho phần có cảm xúc. Ở màn làm việc, tranh của người dùng vẫn là thứ sáng nhất.
 
 ## Nguyên tắc
 
 1. **Tranh là nhân vật chính.** Trang truyện luôn nền trắng, nằm trên nền tối. Không đặt màu nhấn sát mép tranh nếu không cần thiết.
-2. **Một màu nhấn.** Xanh điện chỉ dùng cho hành động chính và trạng thái đang chọn. Tím dành riêng cho AI.
+2. **Màu đến từ mực in.** San hô dùng cho hành động chính và trạng thái đang chọn. Xanh ngọc dành riêng cho AI. Tranh minh họa mang thêm các màu mực khác theo thể loại.
 3. **Phân tầng bằng độ sáng, không bằng viền.** Bề mặt càng nổi càng sáng. Viền chỉ dùng khi hai bề mặt cạnh nhau khó phân biệt.
 4. **Công cụ nổi, không chiếm chỗ.** Ở màn làm việc, thanh công cụ là panel nổi có thể thu gọn.
 5. **Mọi giá trị đi qua token.** Style viết bằng class Tailwind (`className`), token khai ở `global.css`: `bg-surface`, `text-text-muted`, `rounded-lg`, `text-title`. Không viết mã màu, cỡ chữ hay bo góc trực tiếp trong màn hình. ESLint chặn việc này (xem [02-kien-truc.md](02-kien-truc.md)).
@@ -16,26 +16,28 @@ So với app cũ, những thứ sau bị bỏ: viền mực 2dp, bóng cứng l�
 
 ## Màu
 
-Mặc định là giao diện tối. Giao diện sáng vẫn có, chọn trong Profile. Thanh công cụ ở màn vẽ luôn tối ở cả hai giao diện.
+Mặc định là giao diện tối (nền mực). Giao diện sáng (nền giấy) chọn trong Profile. Thanh công cụ ở màn vẽ luôn tối ở cả hai giao diện.
 
 | Token | Tối | Sáng | Dùng cho |
 | --- | --- | --- | --- |
-| `bg` | `#111214` | `#F4F5F7` | Nền màn hình, nền quanh trang truyện |
-| `surface` | `#1A1B1F` | `#FFFFFF` | Thẻ, danh sách |
-| `raised` | `#232429` | `#FFFFFF` | Panel nổi, dock, sheet |
-| `overlay` | `#2C2E34` | `#ECEEF1` | Menu, dialog, ô đang nhấn |
-| `text` | `#F1F2F4` | `#15161A` | Chữ chính |
-| `textSecondary` | `#B4B7BF` | `#454852` | Mô tả, nhãn phụ |
-| `textMuted` | `#9A9EA7` | `#5F636D` | Chú thích, placeholder |
-| `accent` | `#6C98FF` | `#2457D6` | Nút chính, tab đang chọn, tiến độ |
-| `onAccent` | `#0B1020` | `#FFFFFF` | Chữ và icon trên nền `accent` |
-| `ai` | `#B69CFF` | `#6A3FD8` | Nút và kết quả của AI |
-| `onAi` | `#17102E` | `#FFFFFF` | Chữ trên nền `ai` |
-| `danger` | `#FF7A7A` | `#C42B2B` | Xóa, lỗi |
-| `success` | `#4CD19A` | `#12784F` | Trang đã xong, đã lưu |
-| `warning` | `#F5B94A` | `#8A5A00` | Trang bị đánh dấu cần sửa |
-| `divider` | `#3A3C44` | `#DADDE2` | Đường kẻ trang trí |
-| `controlBorder` | `#7A7E88` | `#7C808A` | Viền ô nhập, checkbox, switch |
+| `bg` | `#15120E` | `#F6EFE3` | Nền màn hình, nền quanh trang truyện |
+| `surface` | `#1F1B16` | `#FFFAF0` | Thẻ, danh sách |
+| `raised` | `#29241E` | `#FFFDF7` | Panel nổi, dock, sheet |
+| `overlay` | `#332D26` | `#EFE5D4` | Menu, dialog, ô đang nhấn |
+| `text` | `#F6EFE3` | `#1C1712` | Chữ chính |
+| `textSecondary` | `#CFC5B4` | `#4B4338` | Mô tả, nhãn phụ |
+| `textMuted` | `#ACA190` | `#645A4C` | Chú thích, placeholder |
+| `accent` | `#FF7A5C` | `#BF3419` | Nút chính, tab đang chọn, tiến độ |
+| `onAccent` | `#240D06` | `#FFFAF0` | Chữ và icon trên nền `accent` |
+| `ai` | `#63CDC4` | `#0C6A6C` | Nút và kết quả của AI |
+| `onAi` | `#06201E` | `#FFFAF0` | Chữ trên nền `ai` |
+| `danger` | `#FF9AA6` | `#A51C3A` | Xóa, lỗi |
+| `success` | `#86D29A` | `#1D6A40` | Trang đã xong, đã lưu |
+| `warning` | `#F4C552` | `#765000` | Trang bị đánh dấu cần sửa |
+| `divider` | `#40392F` | `#DDD1BD` | Đường kẻ trang trí |
+| `controlBorder` | `#8C8273` | `#887C6B` | Viền ô nhập, checkbox, switch |
+| `paper` | `#F6EFE3` | `#F6EFE3` | Nền sau tranh in, giống nhau ở cả hai giao diện |
+| `onPaper` | `#1C1712` | `#1C1712` | Chữ đặt trên tranh in |
 | `scrim` | `rgba(0,0,0,0.6)` | `rgba(0,0,0,0.45)` | Nền mờ sau sheet, dialog |
 
 Các token nền mềm (`accentSoft`, `aiSoft`, `dangerSoft`, `successSoft`, `warningSoft`) lấy màu gốc với độ đục 16% trên `surface`.
@@ -44,18 +46,20 @@ Các token nền mềm (`accentSoft`, `aiSoft`, `dangerSoft`, `successSoft`, `wa
 
 | Cặp | Tỉ lệ |
 | --- | --- |
-| `accent` trên `overlay`, tối | 4,89:1 |
-| `success` trên `overlay`, sáng | 4,72:1 |
-| `danger` trên `overlay`, sáng | 4,85:1 |
-| `textMuted` trên `overlay`, tối | 5,06:1 |
-| `onAccent` trên `accent`, tối | 6,83:1 |
-| `controlBorder` trên `overlay`, tối (phần tử không phải chữ, yêu cầu 3:1) | 3,34:1 |
-| `controlBorder` trên `overlay`, sáng | 3,40:1 |
+| `accent` trên `overlay`, sáng | 4,52:1 |
+| `ai` trên `overlay`, sáng | 5,11:1 |
+| `accent` trên `overlay`, tối | 5,30:1 |
+| `textMuted` trên `overlay`, tối | 5,35:1 |
+| `onAccent` trên `accent`, sáng | 5,43:1 |
+| `onAccent` trên `accent`, tối | 7,21:1 |
+| `onPaper` trên `paper` | 15,56:1 |
+| `controlBorder` trên `overlay`, sáng (phần tử không phải chữ, yêu cầu 3:1) | 3,27:1 |
+| `controlBorder` trên `overlay`, tối | 3,60:1 |
 
 Lưu ý khi sửa bảng màu:
 
-- Ở giao diện tối, **không dùng chữ trắng trên nền `accent`**: chỉ đạt 2,77:1. Luôn dùng `onAccent`.
-- `divider` chỉ đạt 1,56:1 nên chỉ dùng để trang trí. Viền của một control phải dùng `controlBorder`.
+- Ở giao diện tối, **không dùng chữ trắng trên nền `accent`**: chỉ đạt 2,56:1. Luôn dùng `onAccent`.
+- `divider` chỉ đạt 1,50:1 nên chỉ dùng để trang trí. Viền của một control phải dùng `controlBorder`.
 - Đổi màu nào phải chạy lại test tương phản (`__tests__/theme.contrast.test.ts`). Test này đọc thẳng `global.css`.
 
 Bảng màu vẽ (21 ô màu mẫu ở Canvas) và màu của trang truyện là dữ liệu tranh, không phải token giao diện. Chúng không đổi theo giao diện sáng tối.

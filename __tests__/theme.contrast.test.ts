@@ -41,6 +41,10 @@ describe.each(['dark', 'light'] as const)('%s theme contrast', variant => {
     expect(ratio(t['on-ai'], t.ai)).toBeGreaterThanOrEqual(4.5);
   });
 
+  it('keeps text on printed art at 4.5:1', () => {
+    expect(ratio(t['on-paper'], t.paper)).toBeGreaterThanOrEqual(4.5);
+  });
+
   it('keeps control borders at 3:1 on every surface', () => {
     SURFACES.forEach(surface => expect(ratio(t['control-border'], t[surface])).toBeGreaterThanOrEqual(3));
   });

@@ -14,4 +14,8 @@ export function setKeepAwake(enabled: boolean): void {
   NativeScreen?.setKeepAwake(enabled);
 }
 
+export function setSystemBarsDarkIcons(dark: boolean): void {
+  NativeScreen?.setSystemBarsDarkIcons(dark);
+}
+
 export const orientationSupported = !!NativeScreen;

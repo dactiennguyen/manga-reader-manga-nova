@@ -95,7 +95,7 @@ export function BubbleCard({
   return (
     <ToolPanel className="gap-0 py-1">
       <View className="flex-row items-center gap-1">
-        <Text variant="label" numberOfLines={1} className="flex-1">
+        <Text variant="caption" tone="secondary" numberOfLines={1} className="min-w-14 flex-1">
           {BUBBLE_TYPE_LABEL[bubble.type]}
         </Text>
         <Stepper

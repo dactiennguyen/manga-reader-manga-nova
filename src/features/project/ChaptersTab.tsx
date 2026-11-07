@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, EditIcon, OrderIcon, PlusIcon, WarningIcon } from '../../ui/icons';
+import { ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon, WarningIcon } from '../../ui/icons';
 
 import { CHAPTER_STATUS_LABEL, LIMITS } from '../../core/model/constants';
 import { chapterIdsOf, chapterName, chapterProgress, chapterStatus, scriptOutdated } from '../../core/model/selectors';
@@ -101,7 +101,6 @@ function ChapterRow({
 }
 
 export function ChaptersTab({ state, project }: { state: StoryData; project: Project }) {
-  const navigation = useAppNavigation();
   const [target, setTarget] = useState<ID | null>(null);
   const [open, setOpen] = useState<'menu' | 'rename' | 'delete' | null>(null);
 
@@ -166,14 +165,7 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
 
   return (
     <View className="gap-3">
-      <View className="flex-row justify-between gap-2">
-        <Button
-          title="Outline"
-          icon={OrderIcon}
-          variant="secondary"
-          small
-          onPress={() => navigation.navigate('Outline', { projectId: project.id })}
-        />
+      <View className="flex-row justify-end">
         <Button title="Add chapter" icon={PlusIcon} small onPress={addChapter} />
       </View>
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { CharactersIcon, LockIcon, NotesIcon, PlusIcon, WorldIcon } from '../../ui/icons';
+import { LockIcon, PlusIcon } from '../../ui/icons';
 
 import { ROLE_LABEL, WORLD_TYPE_LABEL, WORLD_TYPES } from '../../core/model/constants';
 import { charactersOf, worldOf } from '../../core/model/selectors';
@@ -8,7 +8,7 @@ import type { ID, StoryData, WorldType } from '../../core/model/types';
 import { formatRelative } from '../../core/util/time';
 import { useAppNavigation } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
-import { Avatar, Button, EmptyState, ICON, Icon, ListItem, Menu, Pressable, Section, Text } from '../../ui';
+import { ART, Avatar, Button, EmptyState, ICON, Icon, ListItem, Menu, Pressable, Section, Text } from '../../ui';
 
 type TabProps = { state: StoryData; projectId: ID };
 
@@ -26,7 +26,7 @@ export function CharactersTab({ state, projectId }: TabProps) {
   if (characters.length === 0) {
     return (
       <EmptyState
-        icon={CharactersIcon}
+        art={ART.emptyCharacters}
         title="No one here yet."
         message="Create your main character first!"
         action={{ label: 'Create character', onPress: add }}
@@ -85,7 +85,7 @@ export function WorldTab({ state, projectId }: TabProps) {
     <View className="gap-3">
       {entries.length === 0 ? (
         <EmptyState
-          icon={WorldIcon}
+          art={ART.emptyWorld}
           title="Where does the story take place?"
           message="Keep track of places, factions and terms here."
           action={{ label: 'New entry', onPress: () => setPicking(true) }}
@@ -150,7 +150,7 @@ export function NotesTab({ state, projectId }: TabProps) {
   if (notes.length === 0) {
     return (
       <EmptyState
-        icon={NotesIcon}
+        art={ART.tileNotes}
         title="Had a sudden idea?"
         message="Jot it down here before it slips away."
         action={{ label: 'Note', onPress: add }}

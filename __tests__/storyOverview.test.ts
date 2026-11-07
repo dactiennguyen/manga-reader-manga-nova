@@ -1,4 +1,4 @@
-import { latestProject, noteTitleFor, whereOf } from '../src/core/assistant/where';
+import { assistantProject, latestProject, noteTitleFor, whereOf } from '../src/core/assistant/where';
 import { DAILY_TIPS } from '../src/core/model/constants';
 import type { Act, Project } from '../src/core/model/types';
 import {
@@ -232,6 +232,28 @@ describe('assistant context', () => {
     });
     expect(latestProject(story().projects)?.id).toBe(a.projectId);
     expect(latestProject({})).toBeUndefined();
+  });
+
+  it('follows the story it was asked from, not the last one changed', () => {
+    const a = makeProject('A');
+    const b = makeProject('B');
+    const projects = {
+      [a.projectId]: { ...projectOf(a.projectId), updatedAt: 1 },
+      [b.projectId]: { ...projectOf(b.projectId), updatedAt: 9 },
+    };
+    expect(assistantProject(projects, a.projectId)?.id).toBe(a.projectId);
+    expect(assistantProject(projects, undefined)?.id).toBe(b.projectId);
+  });
+
+  it('falls back to the latest story when the one asked for is gone', () => {
+    const a = makeProject('A');
+    const b = makeProject('B');
+    const projects = {
+      [a.projectId]: { ...projectOf(a.projectId), updatedAt: 9, deletedAt: 10 },
+      [b.projectId]: { ...projectOf(b.projectId), updatedAt: 1 },
+    };
+    expect(assistantProject(projects, a.projectId)?.id).toBe(b.projectId);
+    expect(assistantProject(projects, 'missing')?.id).toBe(b.projectId);
   });
 
   it('describes the author position', () => {

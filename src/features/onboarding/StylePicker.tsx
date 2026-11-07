@@ -23,7 +23,7 @@ export function StylePicker({ value, onChange }: { value: ArtStyle; onChange: (s
               selected ? 'bg-accent/15' : 'bg-surface'
             }`}
           >
-            <StyleSample style={item.id} selected={selected} />
+            <StyleSample style={item.id} />
             <View className="gap-0.5 p-2">
               <Text variant="label" tone={selected ? 'accent' : 'text'}>
                 {item.label}

@@ -4,7 +4,7 @@ set -e
 cd "$(dirname "$0")/.."
 RES=android/app/src/main/res
 SRC=assets/icon
-BG='#111214'
+BG='#15120E'
 TMP=$(mktemp -d)
 for spec in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
   d=${spec%%:*}; s=${spec##*:}

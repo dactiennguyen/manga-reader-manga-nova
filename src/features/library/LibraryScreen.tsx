@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, LibraryIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlusIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlusIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
 
 import { LIMITS, PROJECT_STATUS_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
@@ -22,6 +22,7 @@ import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import {
+  ART,
   AppBar,
   Button,
   Chip,
@@ -185,7 +186,7 @@ export function LibraryScreen() {
         ListEmptyComponent={
           rows.length === 0 ? (
             <EmptyState
-              icon={LibraryIcon}
+              art={ART.emptyLibrary}
               title="Your shelf is empty."
               message="Create your first story!"
               action={{ label: 'New story', onPress: newStory }}

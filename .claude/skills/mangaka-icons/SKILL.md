@@ -5,7 +5,7 @@ description: Pick, add or change an icon in Mangaka AI. Use for any new icon, an
 
 # Icons in Mangaka AI
 
-One family: Phosphor (`phosphor-react-native`). Do not add a second icon library, and never use emoji as an icon.
+One family for interface icons: Phosphor (`phosphor-react-native`). Do not add a second icon library, and never use emoji as an icon. Feature tiles are printed art, not icons: see `ART.tile*` in `src/ui/art.ts`.
 
 ## Where icons live
 

@@ -3,7 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { askAssistant, quickPrompts, type AssistantTurn } from '../../core/ai/assistant';
 import { storyBrief } from '../../core/ai/context';
-import { latestProject, noteTitleFor, whereOf } from '../../core/assistant/where';
+import { assistantProject, noteTitleFor, whereOf } from '../../core/assistant/where';
 import type { ID } from '../../core/model/types';
 import { copyText } from '../../native/files';
 import { useAppNavigation } from '../../state/navigation';
@@ -18,9 +18,9 @@ import {
 import { useStory } from '../../state/useStory';
 import { confirm, snackbar, toast } from '../../ui';
 
-export function useAssistantChat() {
+export function useAssistantChat(projectId?: ID) {
   const navigation = useAppNavigation();
-  const project = useStory(useShallow(s => latestProject(s.projects)));
+  const project = useStory(useShallow(s => assistantProject(s.projects, projectId)));
   const chapterTitle = useStory(s => {
     const chapterId = project?.lastOpened?.chapterId;
     return chapterId ? s.chapters[chapterId]?.title : undefined;

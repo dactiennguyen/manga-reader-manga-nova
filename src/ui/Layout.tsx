@@ -1,11 +1,21 @@
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Image, ScrollView, View, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  View,
+  type ImageSourcePropType,
+  type StyleProp,
+  type ViewProps,
+  type ViewStyle,
+} from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackIcon, CaretRightIcon } from './icons';
 
 import type { Character, Project } from '../core/model/types';
 import { fileUri } from '../core/util/paths';
+import { STYLE_ART } from './art';
 import { Button } from './Button';
 import { Icon, type IconGlyph } from './Icon';
 import { IconButton } from './IconButton';
@@ -292,18 +302,22 @@ export function ListItem({
 
 export function EmptyState({
   icon,
+  art,
   title,
   message,
   action,
 }: {
   icon?: IconGlyph;
+  /** Printed artwork. Takes the place of the icon. */
+  art?: ImageSourcePropType;
   title: string;
   message?: string;
   action?: { label: string; onPress: () => void };
 }) {
   return (
     <View className="items-center gap-3 px-6 py-12">
-      {!!icon && (
+      {!!art && <Image accessibilityIgnoresInvertColors source={art} className="mb-1 h-44 w-44 rounded-xl" />}
+      {!art && !!icon && (
         <View className="mb-1 h-16 w-16 items-center justify-center rounded-full bg-accent/15">
           <Icon icon={icon} size={ICON.xl} color="accent" weight="duotone" />
         </View>
@@ -380,19 +394,33 @@ export function Fab({
   );
 }
 
+/** A required image carries its pixel size as its style, so the fill has to be stated. */
+const FILL = { width: '100%', height: '100%' } as const;
+
+/** Printed art across the width, with room to lay text over the empty paper. */
+export function ArtBanner({ source, ratio, children }: { source: ImageSourcePropType; ratio: number; children?: ReactNode }) {
+  return (
+    <View className="overflow-hidden rounded-xl bg-paper" style={{ aspectRatio: ratio }}>
+      <Image accessibilityIgnoresInvertColors source={source} resizeMode="cover" className="absolute inset-0" style={FILL} />
+      {children}
+    </View>
+  );
+}
+
 const COVER_SMALL = 96;
 
-/** A typeset cover for a story without an image: the title carries it, and one accent mark. */
-function TitleCover({ title, width }: { title: string; width: number }) {
-  const name = title.trim() || 'Untitled';
+/** The art of the story's style with its title printed in the empty top of the sheet, like a zine. */
+function PrintedCover({ project, width, height }: { project: Pick<Project, 'title' | 'style'>; width: number; height: number }) {
   const small = width < COVER_SMALL;
   return (
-    <View className={`absolute inset-0 justify-between ${small ? 'p-2 pb-3' : 'p-3 pb-5'}`}>
-      <View className={`rounded-full bg-accent ${small ? 'h-1 w-4' : 'h-1 w-6'}`} />
-      <Text variant={small ? 'caption' : 'heading'} numberOfLines={small ? 3 : 4} maxFontSizeMultiplier={1.2}>
-        {name}
-      </Text>
-    </View>
+    <>
+      <Image accessibilityIgnoresInvertColors source={STYLE_ART[project.style]} className="absolute inset-0" style={{ width, height }} />
+      <View className={`absolute inset-x-0 top-0 ${small ? 'p-1.5' : 'p-3'}`}>
+        <Text variant={small ? 'caption' : 'heading'} tone="onPaper" numberOfLines={2} maxFontSizeMultiplier={1.2}>
+          {project.title.trim() || 'Untitled'}
+        </Text>
+      </View>
+    </>
   );
 }
 
@@ -402,7 +430,7 @@ export function Cover({
   children,
   className,
 }: {
-  project: Pick<Project, 'title' | 'coverUri'>;
+  project: Pick<Project, 'title' | 'coverUri' | 'style'>;
   width: number;
   children?: ReactNode;
   className?: string;
@@ -418,7 +446,7 @@ export function Cover({
           style={{ width, height }}
         />
       ) : (
-        <TitleCover title={project.title} width={width} />
+        <PrintedCover project={project} width={width} height={height} />
       )}
       {children}
     </View>

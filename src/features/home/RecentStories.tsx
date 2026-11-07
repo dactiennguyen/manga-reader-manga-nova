@@ -29,9 +29,11 @@ export function RecentStories({ projects }: { projects: Project[] }) {
             className="w-[104px] gap-1"
           >
             <Cover project={project} width={104} />
-            <Text variant="label" numberOfLines={2}>
-              {project.title || 'Untitled'}
-            </Text>
+            {!!project.coverUri && (
+              <Text variant="label" numberOfLines={2}>
+                {project.title || 'Untitled'}
+              </Text>
+            )}
           </Pressable>
         ))}
       </ScrollView>

@@ -1,22 +1,12 @@
-import { View } from 'react-native';
-import { ChibiIcon, HorrorIcon, PreviewIcon, ShoujoIcon, ShounenIcon, SliceOfLifeIcon } from '../../ui/icons';
+import { Image, View } from 'react-native';
 
 import type { ArtStyle } from '../../core/model/types';
-import { ICON, Icon, type IconGlyph } from '../../ui';
+import { STYLE_ART } from '../../ui';
 
-const STYLE_ICON: Record<ArtStyle, IconGlyph> = {
-  shounen: ShounenIcon,
-  shoujo: ShoujoIcon,
-  seinen: PreviewIcon,
-  chibi: ChibiIcon,
-  horror: HorrorIcon,
-  slice: SliceOfLifeIcon,
-};
-
-export function StyleSample({ style, selected }: { style: ArtStyle; selected?: boolean }) {
+export function StyleSample({ style }: { style: ArtStyle }) {
   return (
-    <View className="h-28 items-center justify-center bg-overlay">
-      <Icon icon={STYLE_ICON[style]} size={ICON.xxl} color={selected ? 'accent' : 'text-secondary'} />
+    <View className="h-44 bg-paper">
+      <Image accessibilityIgnoresInvertColors source={STYLE_ART[style]} resizeMode="cover" className="h-full w-full" />
     </View>
   );
 }
