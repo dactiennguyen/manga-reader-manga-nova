@@ -1,0 +1,155 @@
+import '../../global.css';
+
+import {
+  DarkTheme,
+  DefaultTheme,
+  NavigationContainer,
+  createNavigationContainerRef,
+  type NavigationState,
+  type Theme,
+} from '@react-navigation/native';
+import { useEffect, useMemo, useState } from 'react';
+import { AppState, Linking, StatusBar, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Uniwind, useUniwind } from 'uniwind';
+
+import { copyUriToCache } from '../native/files';
+import type { RootStackParamList } from '../state/navigation';
+import { appServices } from '../state/services';
+import { useSettings } from '../state/useSettings';
+import { flushStory } from '../state/useStory';
+import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
+import { boot } from './boot';
+import { RootNavigator } from './navigation';
+
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+function onTabs(state: NavigationState | undefined): boolean {
+  return state?.routes[state.index]?.name === 'Tabs';
+}
+
+async function openArchive(url: string | null | undefined): Promise<void> {
+  if (!url || !/^(content|file):/.test(url)) {
+    return;
+  }
+  try {
+    const path = await copyUriToCache(url, 'incoming.mangaka');
+    const projectId = await appServices().importProject(path);
+    if (navigationRef.isReady()) {
+      navigationRef.navigate('Project', { projectId });
+    }
+    toast('Story imported');
+  } catch (error) {
+    toast(error instanceof Error ? error.message : "This file can't be read.");
+  }
+}
+
+function useBoot() {
+  const [state, setState] = useState<'loading' | 'ready' | 'failed'>('loading');
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    boot().then(
+      () => setState('ready'),
+      error => {
+        console.error(error);
+        setState('failed');
+      },
+    );
+  }, [attempt]);
+  return {
+    state,
+    retry: () => {
+      setState('loading');
+      setAttempt(n => n + 1);
+    },
+  };
+}
+
+function useThemeMode() {
+  const mode = useSettings(s => s.themeMode);
+  useEffect(() => {
+    Uniwind.setTheme(mode);
+  }, [mode]);
+}
+
+function Shell() {
+  const { theme } = useUniwind();
+  const dark = theme === 'dark';
+  const [dockShown, setDockShown] = useState(false);
+  const bg = useColor('bg');
+  const surface = useColor('surface');
+  const text = useColor('text');
+  const accent = useColor('accent');
+  const divider = useColor('divider');
+
+  const navigationTheme = useMemo<Theme>(() => {
+    const base = dark ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: { ...base.colors, primary: accent, background: bg, card: surface, text, border: divider, notification: accent },
+    };
+  }, [accent, bg, dark, divider, surface, text]);
+
+  useEffect(() => {
+    const flush = AppState.addEventListener('change', next => {
+      if (next !== 'active') {
+        flushStory();
+      }
+    });
+    Linking.getInitialURL().then(openArchive);
+    const link = Linking.addEventListener('url', (event: { url: string }) => {
+      openArchive(event.url);
+    });
+    return () => {
+      flush.remove();
+      link.remove();
+      flushStory();
+    };
+  }, []);
+
+  return (
+    <>
+      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      <NavigationContainer
+        ref={navigationRef}
+        theme={navigationTheme}
+        onReady={() => setDockShown(onTabs(navigationRef.getRootState()))}
+        onStateChange={state => setDockShown(onTabs(state))}
+      >
+        <RootNavigator />
+      </NavigationContainer>
+      <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
+      <ConfirmHost />
+    </>
+  );
+}
+
+export function AppRoot() {
+  const { state, retry } = useBoot();
+  useThemeMode();
+  return (
+    <GestureHandlerRootView className="flex-1 bg-bg">
+      <SafeAreaProvider>
+        <KeyboardProvider>
+          <ErrorBoundary>
+            {state === 'ready' ? (
+              <Shell />
+            ) : state === 'failed' ? (
+              <View className="flex-1 items-center justify-center gap-3 p-6">
+                <Text variant="title" className="text-center">
+                  Couldn't open your stories
+                </Text>
+                <Text tone="secondary" className="text-center">
+                  Your data was not changed.
+                </Text>
+                <Button title="Try again" onPress={retry} />
+              </View>
+            ) : null}
+          </ErrorBoundary>
+        </KeyboardProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}

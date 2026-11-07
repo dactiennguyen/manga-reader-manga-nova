@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+/* Studio design tokens. docs/05-design-system.md is the reference; contrast is checked by __tests__/theme.contrast.test.ts. */
+@layer theme {
+  :root {
+    @variant dark {
+      --color-bg: #111214;
+      --color-surface: #1a1b1f;
+      --color-raised: #232429;
+      --color-overlay: #2c2e34;
+      --color-text: #f1f2f4;
+      --color-text-secondary: #b4b7bf;
+      --color-text-muted: #9a9ea7;
+      --color-accent: #6c98ff;
+      --color-on-accent: #0b1020;
+      --color-ai: #b69cff;
+      --color-on-ai: #17102e;
+      --color-danger: #ff7a7a;
+      --color-success: #4cd19a;
+      --color-warning: #f5b94a;
+      --color-divider: #3a3c44;
+      --color-control-border: #7a7e88;
+      --color-scrim: rgba(0, 0, 0, 0.6);
+    }
+    @variant light {
+      --color-bg: #f4f5f7;
+      --color-surface: #ffffff;
+      --color-raised: #ffffff;
+      --color-overlay: #eceef1;
+      --color-text: #15161a;
+      --color-text-secondary: #454852;
+      --color-text-muted: #5f636d;
+      --color-accent: #2457d6;
+      --color-on-accent: #ffffff;
+      --color-ai: #6a3fd8;
+      --color-on-ai: #ffffff;
+      --color-danger: #c42b2b;
+      --color-success: #12784f;
+      --color-warning: #8a5a00;
+      --color-divider: #dadde2;
+      --color-control-border: #7c808a;
+      --color-scrim: rgba(0, 0, 0, 0.45);
+    }
+  }
+}
+
+@theme {
+  --font-inter: 'Inter-Regular';
+  --font-inter-medium: 'Inter-Medium';
+  --font-inter-semibold: 'Inter-SemiBold';
+  --font-inter-bold: 'Inter-Bold';
+
+  --text-display: 28px;
+  --text-display--line-height: 34px;
+  --text-title: 20px;
+  --text-title--line-height: 26px;
+  --text-heading: 16px;
+  --text-heading--line-height: 22px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-label: 14px;
+  --text-label--line-height: 20px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-mono: 13px;
+  --text-mono--line-height: 18px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}

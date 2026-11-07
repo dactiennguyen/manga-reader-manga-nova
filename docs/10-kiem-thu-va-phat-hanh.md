@@ -1,0 +1,99 @@
+# Kiểm thử và phát hành
+
+## Các lớp kiểm thử
+
+| Lớp | Công cụ | Phạm vi | Chạy khi |
+| --- | --- | --- | --- |
+| Lõi | Jest trên Node, không giả lập RN | `src/core`: 17 file test cũ, reducer, ops, undo | Mỗi commit |
+| Dữ liệu | Jest, port `Db` dùng `node:sqlite` | Migration thật, repo, GC, nhập `.mangaka` | Mỗi commit |
+| Thành phần | React Native Testing Library | `src/ui`, trạng thái và thuộc tính trợ năng | Mỗi commit |
+| Luồng | Maestro trên máy ảo | Luồng chính, nhập, xuất | Trước mỗi bản build |
+| Ảnh trang | So sánh PNG | `render/` | Khi sửa `render/` |
+| Máy thật | Tay | Vẽ, bút, rung, chụm hai ngón | Cuối mỗi giai đoạn |
+
+App cũ không có test thành phần nào, 17 file đều là test logic.
+
+## Test bắt buộc
+
+- `__tests__/theme.contrast.test.ts`: đọc file token, kiểm tra mọi cặp ở [05-design-system.md](05-design-system.md#màu) đạt ngưỡng.
+- GC không xóa bất kỳ thứ gì còn được tham chiếu, kể cả: tranh trong khung có `deleted_at` chưa hết hạn, ảnh dùng ở bìa, ảnh trong `LayerImage`, ảnh trong `CharacterSheet`, ảnh của `WorldEntry`.
+- Hoàn tác: mỗi thao tác tạo patch, áp ngược, thu về đúng trạng thái trước.
+- Đổi mẫu khung, Undo, tranh còn nguyên.
+- Nhập file `.mangaka` bản 1 thật, gồm trường hợp id lớp trùng nhau giữa các khung.
+- Migration chạy từ mọi phiên bản cũ.
+
+## So sánh ảnh trang
+
+Trang truyện phải giống app cũ, vì người dùng mang truyện cũ sang.
+
+1. Ở giai đoạn 0, dùng app cũ xuất PNG các trang của truyện mẫu sinh bởi `sampleStory.test.ts`, làm ảnh chuẩn.
+2. Bản mới dựng cùng trang đó ở cùng độ phân giải.
+3. So sánh từng pixel, cho phép sai số nhỏ do khử răng cưa. Ngưỡng chốt sau lần chạy đầu.
+
+Chỉ so sánh nội dung trang. Giao diện app đổi hoàn toàn nên không so sánh.
+
+## Thiết bị thử
+
+- Máy ảo Pixel, API 34 và API 36.
+- Một máy Android tầm trung thật, dùng cho mọi số đo.
+- Một máy có bút cảm ứng.
+- Một máy tính bảng 10 inch hoặc máy ảo tương đương.
+
+## CI
+
+GitHub Actions, chỉ build Android:
+
+- **Mỗi lần đẩy code:** `tsc --noEmit`, `eslint`, `jest`.
+- **Bấm tay:** build AAB hoặc APK, giữ các tham số `version_name`, `version_code` như workflow cũ (`.github/workflows/build-android.yml`).
+
+Kế thừa workflow cũ nhưng lấy khóa ký từ GitHub Secrets.
+
+## Ký app
+
+Không commit keystore hay mật khẩu. Repo cũ làm việc này có chủ đích, và đó là lý do phải tạo khóa mới.
+
+```sh
+keytool -genkeypair -v -storetype PKCS12 \
+  -keystore ~/keys/mangaka-upload.keystore \
+  -alias mangaka-upload -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Cất keystore ở nơi an toàn ngoài repo. Mất upload key thì phải xin Google đặt lại, còn lộ thì phải đổi.
+
+`.gitignore` phải có `*.keystore`, `*.jks`, `keystore.properties`.
+
+`android/app/build.gradle` đọc từ biến môi trường, hoặc `keystore.properties` khi build tại máy:
+
+```groovy
+signingConfigs {
+    release {
+        storeFile file(System.getenv("MANGAKA_KEYSTORE") ?: props["storeFile"])
+        storePassword System.getenv("MANGAKA_KEYSTORE_PASSWORD") ?: props["storePassword"]
+        keyAlias System.getenv("MANGAKA_KEY_ALIAS") ?: props["keyAlias"]
+        keyPassword System.getenv("MANGAKA_KEY_PASSWORD") ?: props["keyPassword"]
+    }
+}
+```
+
+Trên CI, lưu keystore dạng base64 trong Secrets rồi giải ra lúc build. Bật Play App Signing như hướng dẫn cũ.
+
+## Điều kiện phát hành
+
+- [ ] Đi trọn luồng trên máy thật bằng bản release đã bật R8.
+- [ ] Nhập được mọi file `.mangaka` từ giai đoạn 0.
+- [ ] PDF, ZIP PNG, CBZ, ảnh dài, `.mangaka` đều đúng, gồm cả truyện A5.
+- [ ] Truyện 300 trang mở, cuộn, xuất được, không tràn bộ nhớ.
+- [ ] Mọi màn dùng được bằng TalkBack, trừ phần vẽ trên Canvas.
+- [ ] Mọi control đạt 48dp, test tương phản qua.
+- [ ] Không còn mã màu, `ToastAndroid`, `Alert` trong `src/features`.
+- [ ] GC đã chạy thật trên dữ liệu thử mà không mất gì.
+- [ ] Đã xong các việc ở [bảng cần quyết](01-tong-quan.md#việc-bạn-cần-quyết-hoặc-tự-làm).
+
+## Google Play
+
+Làm theo `docs/google-play/README.md` của repo cũ, với các thay đổi:
+
+- Dùng khóa ký mới.
+- Chụp lại toàn bộ ảnh điện thoại và máy tính bảng, làm lại feature graphic theo Studio. Nếu vẫn giữ `FLAG_SECURE` thì phải chụp trên bản debug.
+- Đọc lại chính sách quyền riêng tư. Nội dung hiện tại vẫn đúng nếu không thêm đăng nhập, quảng cáo, analytics hay server AI mặc định.
+- Tài khoản cá nhân tạo sau 13/11/2023 phải qua thử nghiệm kín: 12 người liên tục 14 ngày.
