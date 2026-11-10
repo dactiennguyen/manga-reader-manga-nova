@@ -1,6 +1,9 @@
 import type { PageSize } from '../model/types';
 
-export type ExportFormat = 'png' | 'pdf' | 'cbz' | 'long';
+export type ExportFormat = 'png' | 'pdf' | 'cbz' | 'long' | 'social';
+
+/** The frame each panel is placed in for a social post. */
+export type SocialShape = 'square' | 'portrait' | 'story';
 
 export type ExportQuality = 1 | 2;
 
@@ -16,6 +19,7 @@ export type ExportOptions = {
   longWidth: LongWidth;
   autoCut: boolean;
   gap: number;
+  socialShape: SocialShape;
   lang?: string | null;
 };
 
@@ -37,7 +41,7 @@ export function padNumber(n: number): string {
 }
 
 export function extraPageCount(options: Pick<ExportOptions, 'format' | 'cover' | 'info'>): number {
-  return options.format === 'long' ? 0 : (options.cover ? 1 : 0) + (options.info ? 1 : 0);
+  return options.format === 'long' || options.format === 'social' ? 0 : (options.cover ? 1 : 0) + (options.info ? 1 : 0);
 }
 
 /** The info page exists only in a PDF, and a language the story no longer has falls back to the original. */
@@ -67,4 +71,31 @@ export function longSegments(heights: readonly number[], gap: number, limit: num
     }
   });
   return segments;
+}
+
+type Box = { x: number; y: number; w: number; h: number };
+
+export const SOCIAL_SIZE: Record<SocialShape, { w: number; h: number }> = {
+  square: { w: 1080, h: 1080 },
+  portrait: { w: 1080, h: 1350 },
+  story: { w: 1080, h: 1920 },
+};
+
+export const SOCIAL_MARGIN = 48;
+
+/** Sharper than this gains nothing on a phone and costs memory for every page. */
+export const SOCIAL_MAX_PAGE_WIDTH = 3600;
+
+/** Where a panel lands in the frame: as large as fits inside the margin, centred. `scale` is frame pixels per page unit. */
+export function socialPlacement(panel: Box, frame: { w: number; h: number }, margin = SOCIAL_MARGIN): Box & { scale: number } {
+  const scale = Math.min((frame.w - margin * 2) / panel.w, (frame.h - margin * 2) / panel.h);
+  const w = panel.w * scale;
+  const h = panel.h * scale;
+  return { x: (frame.w - w) / 2, y: (frame.h - h) / 2, w, h, scale };
+}
+
+/** The width to draw a page at so that its most enlarged panel is still sharp in the frame. */
+export function socialPageWidth(panels: readonly Box[], pageWidth: number, frame: { w: number; h: number }): number {
+  const scale = Math.max(0, ...panels.map(panel => socialPlacement(panel, frame).scale));
+  return Math.max(1, Math.min(SOCIAL_MAX_PAGE_WIDTH, Math.ceil(pageWidth * scale)));
 }

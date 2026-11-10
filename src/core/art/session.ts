@@ -1,3 +1,4 @@
+import { msg } from '../i18n';
 import type { Stroke, StrokeTool, ID } from '../model/types';
 import {
   IDENTITY_TRANSFORM,
@@ -37,6 +38,12 @@ import { screenToPage, type CanvasTool, type ViewState } from './tools';
  * One deliberate impurity: stroke.points is appended in place. Copying it per event is the O(n^2) this
  * rewrite exists to remove. The reducer owns that array until it hands it over in a strokeCommit effect.
  */
+
+/** Toast text. The worklets below only carry it; the screen translates it when it shows the toast. */
+const LAYER_LOCKED = msg('Layer is locked');
+const LAYER_HIDDEN = msg('Layer is hidden');
+const LAYER_EMPTY = msg('Layer is empty');
+const STYLUS_DETECTED = msg('Stylus detected. One finger now pans the view.');
 
 export const ZOOM_MIN = 0.1;
 export const ZOOM_MAX = 16;
@@ -307,7 +314,7 @@ function startDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv,
   const layer = env.layer;
   if (!layer || layer.locked || !layer.visible) {
     s.mode = 'blocked';
-    effects.push({ kind: 'toast', message: layer?.locked ? 'Layer is locked' : 'Layer is hidden' });
+    effects.push({ kind: 'toast', message: layer?.locked ? LAYER_LOCKED : LAYER_HIDDEN });
     return;
   }
   const p = screenToPage(s.view, env.pageW, t.x, t.y);
@@ -315,7 +322,7 @@ function startDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv,
     const bounds = layer.bounds;
     if (!bounds) {
       s.mode = 'blocked';
-      effects.push({ kind: 'toast', message: 'Layer is empty' });
+      effects.push({ kind: 'toast', message: LAYER_EMPTY });
       return;
     }
     s.mode = 'move';
@@ -386,7 +393,7 @@ function onDown(
     s.pen = e.pointer === 'stylus';
     if (s.pen && !env.stylusMode) {
       effects.push({ kind: 'stylusDetected' });
-      effects.push({ kind: 'toast', message: 'Stylus detected. One finger now pans the view.' });
+      effects.push({ kind: 'toast', message: STYLUS_DETECTED });
     }
     if (env.picking) {
       s.mode = 'pick';

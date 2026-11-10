@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { askAssistant, quickPrompts, type AssistantTurn } from '../../core/ai/assistant';
 import { storyBrief } from '../../core/ai/context';
+import { t } from '../../core/i18n';
 import { assistantProject, noteTitleFor, whereOf } from '../../core/assistant/where';
 import type { ID } from '../../core/model/types';
 import { copyText } from '../../native/files';
@@ -82,9 +83,9 @@ export function useAssistantChat(projectId?: ID) {
   const copy = (message: AssistantMessage) => {
     try {
       copyText(message.text);
-      toast('Copied');
+      toast(t('Copied'));
     } catch {
-      toast('Could not copy');
+      toast(t('Could not copy'));
     }
   };
 
@@ -98,8 +99,8 @@ export function useAssistantChat(projectId?: ID) {
       fromAssistant: true,
     });
     snackbar({
-      message: 'Saved as a note in the world wiki',
-      actionLabel: 'Open',
+      message: t('Saved as a note in the world wiki'),
+      actionLabel: t('Open'),
       onAction: () => navigation.navigate('WorldEntry', { entryId }),
     });
   };
@@ -119,8 +120,8 @@ export function useAssistantChat(projectId?: ID) {
   };
 
   const remove = async (conversation: Conversation) => {
-    const ok = await confirm('Delete this conversation?', conversation.title, {
-      confirmText: 'Delete',
+    const ok = await confirm(t('Delete this conversation?'), conversation.title, {
+      confirmText: t('Delete'),
       destructive: true,
     });
     if (ok) {

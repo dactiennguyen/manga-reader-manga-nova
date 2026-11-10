@@ -3,6 +3,7 @@ import { FlatList, View, useWindowDimensions } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
+import { t } from '../../core/i18n';
 import { chapterLabel, chapterNumber } from '../../core/model/selectors';
 import type { ID } from '../../core/model/types';
 import { END_CARD_HEIGHT, itemOfSliderValue, sliderValueOfItem } from '../../core/preview/reader';
@@ -45,17 +46,17 @@ export function PreviewScreen() {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-bg p-6">
         <EmptyState
-          title={project && chapter ? 'This chapter has no pages to read yet.' : 'There is nothing to preview yet.'}
+          title={project && chapter ? t('This chapter has no pages to read yet.') : t('There is nothing to preview yet.')}
           action={
             project && chapter
               ? {
-                  label: 'Go to storyboard',
+                  label: t('Go to storyboard'),
                   onPress: () => navigation.replace('Storyboard', { chapterId: chapter.id }),
                 }
               : undefined
           }
         />
-        <Button title="Close" variant="secondary" onPress={close} />
+        <Button title={t('Close')} variant="secondary" onPress={close} />
       </View>
     );
   }
@@ -201,7 +202,7 @@ export function PreviewScreen() {
       />
       <FlagSheet
         pageId={flagPageId}
-        pageLabel={flagPageId ? `Page ${allPageIds.indexOf(flagPageId) + 1}` : ''}
+        pageLabel={flagPageId ? t('Page {n}', { n: allPageIds.indexOf(flagPageId) + 1 }) : ''}
         onClose={() => setFlagPageId(null)}
       />
     </View>

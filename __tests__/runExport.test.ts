@@ -5,11 +5,11 @@ import { imagesToPdf, removeFile, zipDir } from '../src/native/files';
 import { renderPageImage } from '../src/render/drawPage';
 import { useStory } from '../src/state/useStory';
 
-const fakeImage = () => ({ dispose: jest.fn(), encodeToBase64: () => 'b64' });
+const fakeImage = () => ({ dispose: jest.fn(), encodeToBase64: () => 'b64', width: () => 2000 });
 
 jest.mock('@shopify/react-native-skia', () => {
   const image = () => ({ dispose: jest.fn(), encodeToBase64: () => 'b64' });
-  const canvas = { drawColor: jest.fn(), drawImage: jest.fn(), drawRect: jest.fn(), drawImageRect: jest.fn() };
+  const canvas = { drawColor: jest.fn(), drawImage: jest.fn(), drawRect: jest.fn(), drawImageRect: jest.fn(), drawImageRectCubic: jest.fn() };
   const paragraph = { layout: jest.fn(), getHeight: () => 40, paint: jest.fn() };
   return {
     ImageFormat: { PNG: 'png', JPEG: 'jpeg' },
@@ -25,10 +25,23 @@ jest.mock('@shopify/react-native-skia', () => {
     },
   };
 });
-jest.mock('../src/render/drawPage', () => ({
-  pageContext: () => ({ size: { w: 1000, h: 1412 } }),
-  renderPageImage: jest.fn(),
-}));
+jest.mock('../src/render/drawPage', () => {
+  const { TEMPLATES, buildTemplate, computePanels } = require('../src/core/layout/layout');
+  let seq = 0;
+  const built = buildTemplate(
+    TEMPLATES.find((template: { count: number; kind: string }) => template.count === 2 && template.kind === 'grid'),
+    () => `panel-${++seq}`,
+  );
+  const panels = Object.fromEntries(built.panelIds.map((id: string) => [id, { id, blockIds: [] }]));
+  return {
+    pageContext: (id: string) => {
+      const size = { w: 1000, h: 1412 };
+      const page = { layout: id === 'empty' ? null : built.layout, panels: id === 'empty' ? {} : panels, gutterH: 22, gutterV: 12 };
+      return { size, page, rtl: true, shapes: computePanels(page, size, { rtl: true }) };
+    },
+    renderPageImage: jest.fn(),
+  };
+});
 jest.mock('../src/render/fonts', () => ({
   FONT_FAMILY: { display: 'Anton', sans: 'Sans', sansBold: 'SansBold' },
   loadFonts: async () => ({}),
@@ -65,6 +78,7 @@ const base: ExportOptions = {
   longWidth: 800,
   autoCut: true,
   gap: 0,
+  socialShape: 'square',
   lang: null,
 };
 
@@ -111,6 +125,34 @@ describe('PDF page width (old bug #8)', () => {
     story({ format: 'webtoon' });
     await run();
     expect(pdf.mock.calls[0][3]).toBe(false);
+  });
+});
+
+describe('social posts', () => {
+  const { Skia } = require('@shopify/react-native-skia');
+  const canvas = () => Skia.Surface.Make().getCanvas();
+
+  it('writes one framed image per panel and zips them', async () => {
+    const result = await run({ format: 'social', socialShape: 'story' });
+    const written = RNFS.writeFile.mock.calls.map(([path]: [string]) => path.split('/').pop());
+    expect(written).toEqual(['001.png', '002.png', '003.png', '004.png']);
+    expect(render).toHaveBeenCalledTimes(2);
+    expect(result).toMatchObject({ mime: 'application/zip', pages: 4, format: 'social' });
+    expect(result.fileName).toMatch(/-story\.zip$/);
+  });
+
+  it('cuts each panel from the page and centres it in the frame', async () => {
+    await run({ format: 'social', socialShape: 'square' }, ['a']);
+    const [, source, dest] = canvas().drawImageRectCubic.mock.calls[0];
+    // The fake page image is 2000 px wide for a 1000 unit page.
+    expect(source.width / source.height).toBeCloseTo(dest.width / dest.height, 5);
+    expect(dest.x + dest.width / 2).toBeCloseTo(540, 5);
+    expect(dest.y + dest.height / 2).toBeCloseTo(540, 5);
+    expect(Math.max(dest.width, dest.height)).toBeCloseTo(1080 - 96, 5);
+  });
+
+  it('fails when no page has panels', async () => {
+    await expect(run({ format: 'social' }, ['empty'])).rejects.toThrow('no panels');
   });
 });
 

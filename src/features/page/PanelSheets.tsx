@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { CopyIcon, DeleteIcon, DoneIcon, EditIcon, ExpandIcon, FitIcon, PanelFrameIcon, ScriptIcon, SelectionIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { copyLayout, hasLayoutClipboard } from '../../core/layout/pageEdit';
 import { HOME_VIEW } from '../../core/layout/pageView';
 import { SHOTS, SHOT_LABEL } from '../../core/model/constants';
@@ -42,47 +43,49 @@ export function PanelSheets({ c }: { c: PanelController }) {
         onClose={closeSheet}
         items={[
           {
-            label: 'View script for this page',
+            label: t('View script for this page'),
             icon: ScriptIcon,
             onPress: () => navigation.navigate('Script', { chapterId: chapter.id, blockId: scriptBlockId }),
           },
-          { label: 'Fit to screen', icon: FitIcon, onPress: () => c.setView(HOME_VIEW) },
+          { label: t('Fit to screen'), icon: FitIcon, onPress: () => c.setView(HOME_VIEW) },
           {
-            label: c.safeGrid ? 'Hide safe area' : 'Show safe area',
+            label: c.safeGrid ? t('Hide safe area') : t('Show safe area'),
             icon: PanelFrameIcon,
             onPress: () => c.setSafeGrid(!c.safeGrid),
           },
           {
-            label: 'Copy layout',
+            label: t('Copy layout'),
             icon: CopyIcon,
             disabled: !layout,
             onPress: () => {
               copyLayout(page);
-              toast('Layout copied');
+              toast(t('Layout copied'));
             },
           },
-          { label: 'Paste layout', icon: SelectionIcon, disabled: !hasLayoutClipboard(), onPress: c.paste },
-          { label: 'Clear all panels', icon: DeleteIcon, destructive: true, disabled: !layout, onPress: c.clearPanels },
+          { label: t('Paste layout'), icon: SelectionIcon, disabled: !hasLayoutClipboard(), onPress: c.paste },
+          { label: t('Clear all panels'), icon: DeleteIcon, destructive: true, disabled: !layout, onPress: c.clearPanels },
         ]}
       />
       <Menu
         visible={!!panelMenu?.open && !!menuPanel}
         onClose={closePanelMenu}
-        title={menuPanel ? `Panel ${(shapes.find(shape => shape.id === menuPanel.id)?.index ?? 0) + 1}` : undefined}
+        title={
+          menuPanel ? t('Panel {n}', { n: (shapes.find(shape => shape.id === menuPanel.id)?.index ?? 0) + 1 }) : undefined
+        }
         items={
           menuPanel
             ? [
                 {
-                  label: menuPanel.bleed ? 'Turn off bleed' : 'Bleed',
+                  label: menuPanel.bleed ? t('Turn off bleed') : t('Bleed'),
                   icon: ExpandIcon,
                   onPress: () => c.togglePanel(menuPanel.id, 'bleed'),
                 },
                 {
-                  label: menuPanel.borderless ? 'Show border' : 'Borderless',
+                  label: menuPanel.borderless ? t('Show border') : t('Borderless'),
                   icon: SelectionIcon,
                   onPress: () => c.togglePanel(menuPanel.id, 'borderless'),
                 },
-                { label: 'Delete panel', icon: DeleteIcon, destructive: true, onPress: () => c.deletePanel(menuPanel.id) },
+                { label: t('Delete panel'), icon: DeleteIcon, destructive: true, onPress: () => c.deletePanel(menuPanel.id) },
               ]
             : []
         }
@@ -91,10 +94,10 @@ export function PanelSheets({ c }: { c: PanelController }) {
         visible={sheet === 'art' && !!selectedPanel}
         onClose={closeSheet}
         items={[
-          { label: 'Edit description', icon: EditIcon, onPress: () => c.setSheet('describe') },
-          { label: 'Change shot', icon: FitIcon, onPress: () => c.setSheet('shot') },
+          { label: t('Edit description'), icon: EditIcon, onPress: () => c.setSheet('describe') },
+          { label: t('Change shot'), icon: FitIcon, onPress: () => c.setSheet('shot') },
           {
-            label: 'Delete art',
+            label: t('Delete art'),
             icon: DeleteIcon,
             destructive: true,
             disabled: !selected || !panelHasArt(selected),
@@ -105,22 +108,22 @@ export function PanelSheets({ c }: { c: PanelController }) {
       <Menu
         visible={sheet === 'shot' && !!selectedPanel}
         onClose={closeSheet}
-        title="Shot"
+        title={t('Shot')}
         items={[
           ...SHOTS.map(shot => ({
-            label: SHOT_LABEL[shot],
+            label: t(SHOT_LABEL[shot]),
             icon: selectedPanel?.shot === shot ? DoneIcon : undefined,
             onPress: () => setShot(shot),
           })),
-          { label: 'No shot', onPress: () => setShot(undefined) },
+          { label: t('No shot'), onPress: () => setShot(undefined) },
         ]}
       />
       <PromptDialog
         visible={sheet === 'describe' && !!selectedPanel}
         onClose={closeSheet}
-        title="Panel description"
+        title={t('Panel description')}
         initialValue={selectedPanel?.description ?? ''}
-        placeholder="What happens in this panel?"
+        placeholder={t('What happens in this panel?')}
         multiline
         allowEmpty
         onSubmit={value => {
@@ -140,13 +143,13 @@ export function PanelSheets({ c }: { c: PanelController }) {
             c.goTo(target);
           }
         }}
-        title="Jump to page"
+        title={t('Jump to page')}
       >
         {chapter.pageIds.map((id, target) => (
           <ListItem
             key={id}
-            title={`Page ${target + 1}`}
-            subtitle={id === pageId ? 'Current' : undefined}
+            title={t('Page {n}', { n: target + 1 })}
+            subtitle={id === pageId ? t('Current') : undefined}
             onPress={() => {
               jumpTo.current = id === pageId ? null : target;
               closeSheet();

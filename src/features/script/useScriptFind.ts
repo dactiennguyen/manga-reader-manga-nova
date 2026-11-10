@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BackHandler, Keyboard } from 'react-native';
 
+import { t, tn } from '../../core/i18n';
 import type { Block, ID, Scene } from '../../core/model/types';
 import { findContext } from '../../core/script/blockOps';
 import { findInText, findMatches, replaceAllInScenes, replaceRange, type SceneChange } from '../../core/script/scriptTools';
@@ -89,8 +90,8 @@ export function useScriptFind(chapterId: ID, scenes: Scene[], ops: FindOps) {
     setFindIndex(0);
     Keyboard.dismiss();
     snackbar({
-      message: `Replaced ${count} ${count === 1 ? 'occurrence' : 'occurrences'}`,
-      actionLabel: 'Undo',
+      message: tn(count, 'Replaced {count} occurrence', 'Replaced {count} occurrences'),
+      actionLabel: t('Undo'),
       onAction: ops.undo,
     });
   };

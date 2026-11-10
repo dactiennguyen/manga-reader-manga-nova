@@ -7,6 +7,7 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 
+import { msg, t } from '../../core/i18n';
 import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
 import { Button, Screen, Text } from '../../ui';
@@ -15,18 +16,18 @@ import { WelcomeArt, type WelcomeArtKind } from './WelcomeArt';
 const SLIDES: { kind: WelcomeArtKind; title: string; text: string }[] = [
   {
     kind: 'draw',
-    title: 'Draw your manga',
-    text: 'Sketch and ink on your phone with pens, layers and panels made for comics.',
+    title: msg('Draw your manga'),
+    text: msg('Sketch and ink on your phone with pens, layers and panels made for comics.'),
   },
   {
     kind: 'write',
-    title: 'Plan it your way',
-    text: 'Start with a sketch or a script, then map out your pages on the storyboard.',
+    title: msg('Plan it your way'),
+    text: msg('Start with a sketch or a script, then map out your pages on the storyboard.'),
   },
   {
     kind: 'finish',
-    title: 'Finish a full chapter',
-    text: 'Lay out panels, letter your dialogue, and export a file to share.',
+    title: msg('Finish a full chapter'),
+    text: msg('Lay out panels, letter your dialogue, and export a file to share.'),
   },
 ];
 
@@ -70,7 +71,7 @@ export function WelcomeScreen() {
   return (
     <Screen padded={false}>
       <View className="h-14 flex-row items-center justify-end px-2">
-        <Button title="Skip" variant="ghost" small onPress={goPreferences} />
+        <Button title={t('Skip')} variant="ghost" small onPress={goPreferences} />
       </View>
       <ScrollView
         ref={scroller}
@@ -86,10 +87,10 @@ export function WelcomeScreen() {
             <WelcomeArt kind={slide.kind} />
             <View className="min-h-28 gap-2">
               <Text variant="display" accessibilityRole="header">
-                {slide.title}
+                {t(slide.title)}
               </Text>
               <Text tone="secondary" numberOfLines={2}>
-                {slide.text}
+                {t(slide.text)}
               </Text>
             </View>
           </View>
@@ -97,7 +98,7 @@ export function WelcomeScreen() {
       </ScrollView>
       <View
         accessible
-        accessibilityLabel={`Slide ${index + 1} of ${SLIDES.length}`}
+        accessibilityLabel={t('Slide {n} of {total}', { n: index + 1, total: SLIDES.length })}
         className="flex-row justify-center gap-2 py-3"
       >
         {SLIDES.map((slide, i) => (
@@ -105,7 +106,7 @@ export function WelcomeScreen() {
         ))}
       </View>
       <View className="px-6 pb-4">
-        <Button title="Get started" onPress={onNext} />
+        <Button title={t('Get started')} onPress={onNext} />
       </View>
     </Screen>
   );

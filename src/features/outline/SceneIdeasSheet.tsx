@@ -3,9 +3,9 @@ import { ScrollView, View } from 'react-native';
 import { AiIcon, DoneIcon, ForwardIcon, InfoIcon, PlaceIcon, PlusIcon, RefreshIcon } from '../../ui/icons';
 
 import { suggestScenes, type SceneIdea } from '../../core/ai/story';
+import { t, tn } from '../../core/i18n';
 import { chapterName } from '../../core/model/selectors';
 import type { Block, ID } from '../../core/model/types';
-import { plural } from '../../core/util/format';
 import { uid } from '../../core/util/id';
 import { useChapter } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
@@ -83,15 +83,15 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
           <View className="items-center gap-3 p-6">
             <Icon icon={DoneIcon} size={ICON.xl} color="success" />
             <Text variant="heading" className="text-center">
-              {plural(added, 'scene')} added to the script
+              {tn(added, '{count} scene added to the script', '{count} scenes added to the script')}
             </Text>
             <Text tone="secondary" className="text-center">
-              Open the script to write the action and dialogue for each scene.
+              {t('Open the script to write the action and dialogue for each scene.')}
             </Text>
           </View>
           <SheetFooter>
-            <Button title="Open script" icon={ForwardIcon} onPress={openScript} />
-            <Button title="Done" variant="ghost" onPress={sheet.close} />
+            <Button title={t('Open script')} icon={ForwardIcon} onPress={openScript} />
+            <Button title={t('Done')} variant="ghost" onPress={sheet.close} />
           </SheetFooter>
         </>
       );
@@ -100,14 +100,14 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
       return <AiSetupNotice onOpenProfile={openProfile} />;
     }
     if (state.status === 'loading') {
-      return <AiBusy label="Breaking the chapter into scenes…" onCancel={cancel} />;
+      return <AiBusy label={t('Breaking the chapter into scenes…')} onCancel={cancel} />;
     }
     if (state.status === 'error') {
       return (
         <>
           <AiFailure message={state.message} onRetry={generate} />
           <SheetFooter>
-            <Button title="Close" variant="ghost" onPress={sheet.close} />
+            <Button title={t('Close')} variant="ghost" onPress={sheet.close} />
           </SheetFooter>
         </>
       );
@@ -120,15 +120,17 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
             <AiMark />
             <Text variant="caption" tone="muted">
               {existing > 0
-                ? `This chapter's script already has ${plural(existing, 'scene')}. These will be added after ${
-                    existing === 1 ? 'it' : 'them'
-                  }.`
-                : 'Nothing is added to the script until you accept.'}
+                ? tn(
+                    existing,
+                    "This chapter's script already has {count} scene. These will be added after it.",
+                    "This chapter's script already has {count} scenes. These will be added after them.",
+                  )
+                : t('Nothing is added to the script until you accept.')}
             </Text>
             {ideas.map((idea, index) => (
               <View key={index} className="gap-1 rounded-lg bg-surface p-3">
                 <Text variant="caption" tone="ai">
-                  Scene {existing + index + 1}
+                  {t('Scene {n}', { n: existing + index + 1 })}
                 </Text>
                 {!!idea.setting && (
                   <View className="flex-row items-center gap-1">
@@ -143,10 +145,10 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
             ))}
           </ScrollView>
           <SheetFooter>
-            <Button title="Add to script" icon={PlusIcon} onPress={() => accept(ideas)} />
+            <Button title={t('Add to script')} icon={PlusIcon} onPress={() => accept(ideas)} />
             <View className="flex-row gap-2">
-              <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
-              <Button title="Discard" variant="ghost" onPress={sheet.close} className="flex-1" />
+              <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
+              <Button title={t('Discard')} variant="ghost" onPress={sheet.close} className="flex-1" />
             </View>
           </SheetFooter>
         </>
@@ -156,25 +158,24 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
       <>
         <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
           <Text tone="secondary">
-            The AI proposes three to six scenes for this chapter, each with a setting and a short description. You
-            preview them before anything is added to the script.
+            {t('The AI proposes three to six scenes for this chapter, each with a setting and a short description. You preview them before anything is added to the script.')}
           </Text>
           <View className="gap-0.5 rounded-md bg-surface p-3">
             <Text variant="caption" tone="muted">
-              Summary
+              {t('Summary')}
             </Text>
-            <Text tone={hasSummary ? 'text' : 'muted'}>{hasSummary ? chapter.summary.trim() : 'Not written yet'}</Text>
+            <Text tone={hasSummary ? 'text' : 'muted'}>{hasSummary ? chapter.summary.trim() : t('Not written yet')}</Text>
           </View>
           {!hasSummary && (
             <Banner
               tone="warning"
               icon={InfoIcon}
-              text="This chapter has no summary, so the scenes will be generic. Add a summary first for better results, or continue anyway."
+              text={t('This chapter has no summary, so the scenes will be generic. Add a summary first for better results, or continue anyway.')}
             />
           )}
         </ScrollView>
         <SheetFooter>
-          <Button title={hasSummary ? 'Suggest scenes' : 'Continue anyway'} icon={AiIcon} variant="ai" onPress={generate} />
+          <Button title={hasSummary ? t('Suggest scenes') : t('Continue anyway')} icon={AiIcon} variant="ai" onPress={generate} />
         </SheetFooter>
       </>
     );
@@ -185,7 +186,7 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
       visible={sheet.visible}
       onClose={sheet.close}
       onClosed={sheet.onClosed}
-      title="Break into scenes"
+      title={t('Break into scenes')}
       subtitle={name}
       scroll={false}
       maxHeight="90%"

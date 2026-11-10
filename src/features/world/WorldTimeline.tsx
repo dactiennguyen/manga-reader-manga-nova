@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { ArrowDownIcon, ArrowUpIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import type { Chapter, ID, WorldEntry } from '../../core/model/types';
 import { UNTITLED, firstLine, timelineGroups, timelineSwap } from '../../core/world/worldTools';
 import { undoable, useStory } from '../../state/useStory';
@@ -35,10 +36,10 @@ export function WorldTimeline({
       {groups.map(group => (
         <View key={group.key} className="mb-3">
           <Text variant="heading" tone={group.key === 'none' ? 'muted' : 'text'} className="mb-2">
-            {group.label}
+            {t(group.label)}
           </Text>
           {group.items.map((entry, index) => {
-            const title = entry.title.trim() || UNTITLED;
+            const title = entry.title.trim() || t(UNTITLED);
             const line = firstLine(entry.body);
             return (
               <View key={entry.id} className="flex-row items-stretch">
@@ -67,14 +68,14 @@ export function WorldTimeline({
                     size={ICON.md}
                     disabled={index === 0}
                     onPress={() => move(group.items, index, -1)}
-                    accessibilityLabel="Move up"
+                    accessibilityLabel={t('Move up')}
                   />
                   <IconButton
                     icon={ArrowDownIcon}
                     size={ICON.md}
                     disabled={index === group.items.length - 1}
                     onPress={() => move(group.items, index, 1)}
-                    accessibilityLabel="Move down"
+                    accessibilityLabel={t('Move down')}
                   />
                 </View>
               </View>

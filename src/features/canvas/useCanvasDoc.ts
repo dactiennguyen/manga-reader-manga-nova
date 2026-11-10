@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { transformLayer, type LayerTransform } from '../../core/art/artMath';
 import { mirrorStroke } from '../../core/art/guides';
 import { activeLayerOf } from '../../core/art/tools';
+import { t } from '../../core/i18n';
 import type { ArtLayer, ID, PanelArt, Stroke } from '../../core/model/types';
 import { useImageCacheRev } from '../../render/images';
 import { appendToScene, syncLayerScene, type LayerScene } from '../../render/layerScene';
@@ -102,7 +103,7 @@ export function useCanvasDoc(panelId: ID, pageId: ID, engine: CanvasEngine): Can
           scenes.current.set(layerId, appendToScene(scene, ...strokes));
         }
       } catch {
-        toast("Couldn't save that stroke.");
+        toast(t("Couldn't save that stroke."));
       }
       publish(pictures(), seq, false);
     },

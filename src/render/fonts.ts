@@ -2,6 +2,7 @@ import { Skia, type SkTypefaceFontProvider } from '@shopify/react-native-skia';
 import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 
+import { msg } from '../core/i18n';
 import type { BubbleFont } from '../core/model/types';
 
 export const FONT_FAMILY: Record<BubbleFont, string> = {
@@ -12,10 +13,10 @@ export const FONT_FAMILY: Record<BubbleFont, string> = {
 };
 
 export const FONT_LABEL: Record<BubbleFont, string> = {
-  hand: 'Handwritten',
-  sans: 'Sans',
-  sansBold: 'Sans bold',
-  display: 'Display',
+  hand: msg('Handwritten'),
+  sans: msg('Sans'),
+  sansBold: msg('Sans bold'),
+  display: msg('Display'),
 };
 
 const SOURCES: Record<BubbleFont, number> = {

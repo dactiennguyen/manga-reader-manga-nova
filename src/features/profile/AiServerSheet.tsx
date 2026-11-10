@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { ConnectionIcon, DoneIcon } from '../../ui/icons';
 
 import { normalizeBaseUrl } from '../../core/ai/port';
+import { t } from '../../core/i18n';
 import { appServices } from '../../state/services';
 import { useAiTask } from '../../state/useAiTask';
 import { DEFAULT_SETTINGS, useSettings } from '../../state/useSettings';
@@ -50,43 +51,42 @@ export function AiServerSheet({ visible, onClose }: { visible: boolean; onClose:
       aiApiKey: apiKey.trim(),
       aiModel: model.trim() || DEFAULT_MODEL,
     });
-    toast(nextAddress ? 'AI server saved' : 'AI turned off');
+    toast(nextAddress ? t('AI server saved') : t('AI turned off'));
     onClose();
   };
 
   return (
-    <Sheet visible={visible} onClose={onClose} title="AI server" subtitle="Runs on a server you control">
+    <Sheet visible={visible} onClose={onClose} title={t('AI server')} subtitle={t('Runs on a server you control')}>
       <View className="gap-3 px-4 pb-2 pt-1">
         <View className="gap-1">
-          <FieldLabel>Server address</FieldLabel>
+          <FieldLabel>{t('Server address')}</FieldLabel>
           <TextField
             value={address}
             onChangeText={edit(setAddress)}
             onClear={() => edit(setAddress)('')}
             placeholder="ai.example.com"
-            accessibilityLabel="Server address"
+            accessibilityLabel={t('Server address')}
             maxLength={ADDRESS_MAX}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
           />
           <Text variant="caption" tone="muted">
-            An OpenAI-compatible server. Release builds need https. Leave empty to turn AI
-            off.
+            {t('An OpenAI-compatible server. Release builds need https. Leave empty to turn AI off.')}
           </Text>
           {!!resolved && (
             <Text variant="caption" tone="secondary" numberOfLines={1}>
-              Connects to {resolved}
+              {t('Connects to {address}', { address: resolved })}
             </Text>
           )}
         </View>
         <View className="gap-1">
-          <FieldLabel>API key (optional)</FieldLabel>
+          <FieldLabel>{t('API key (optional)')}</FieldLabel>
           <TextField
             value={apiKey}
             onChangeText={edit(setApiKey)}
-            placeholder="Only if your server asks for one"
-            accessibilityLabel="API key"
+            placeholder={t('Only if your server asks for one')}
+            accessibilityLabel={t('API key')}
             maxLength={KEY_MAX}
             autoCapitalize="none"
             autoCorrect={false}
@@ -94,26 +94,26 @@ export function AiServerSheet({ visible, onClose }: { visible: boolean; onClose:
           />
         </View>
         <View className="gap-1">
-          <FieldLabel>Model</FieldLabel>
+          <FieldLabel>{t('Model')}</FieldLabel>
           <TextField
             value={model}
             onChangeText={edit(setModel)}
             placeholder={DEFAULT_MODEL}
-            accessibilityLabel="Model"
+            accessibilityLabel={t('Model')}
             maxLength={MODEL_MAX}
             autoCapitalize="none"
             autoCorrect={false}
           />
         </View>
 
-        {state.status === 'loading' && <AiLoading label="Contacting the server…" onCancel={cancel} />}
+        {state.status === 'loading' && <AiLoading label={t('Contacting the server…')} onCancel={cancel} />}
         {state.status === 'done' && (
-          <Banner tone="success" icon={DoneIcon} text="Connected. The server answered the test message." />
+          <Banner tone="success" icon={DoneIcon} text={t('Connected. The server answered the test message.')} />
         )}
         {state.status === 'error' && <AiErrorBox message={state.message} onRetry={test} onCancel={cancel} />}
         {(state.status === 'idle' || state.status === 'done') && (
           <Button
-            title={state.status === 'done' ? 'Test again' : 'Test connection'}
+            title={state.status === 'done' ? t('Test again') : t('Test connection')}
             variant="secondary"
             icon={ConnectionIcon}
             onPress={test}
@@ -122,8 +122,8 @@ export function AiServerSheet({ visible, onClose }: { visible: boolean; onClose:
         )}
 
         <View className="flex-row gap-3">
-          <Button title="Cancel" variant="ghost" onPress={onClose} className="flex-1" />
-          <Button title="Save" onPress={save} className="flex-1" />
+          <Button title={t('Cancel')} variant="ghost" onPress={onClose} className="flex-1" />
+          <Button title={t('Save')} onPress={save} className="flex-1" />
         </View>
       </View>
     </Sheet>

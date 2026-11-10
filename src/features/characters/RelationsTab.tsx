@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { DeleteIcon, EditIcon, NoteIcon, PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { relationsOf } from '../../core/model/selectors';
 import type { Character, ID } from '../../core/model/types';
 import { useAppNavigation } from '../../state/navigation';
@@ -32,12 +33,12 @@ export function RelationsTab({ character }: { character: Character }) {
   const menuItem = items.find(item => item.relation.id === menuId);
   const menuShown = useSticky(menuItem);
   const editingItem = items.find(item => item.relation.id === editing?.id);
-  const pendingName = pendingOther ? characters[pendingOther]?.name.trim() || 'this character' : '';
-  const selfName = character.name.trim() || 'This character';
+  const pendingName = pendingOther ? characters[pendingOther]?.name.trim() || t('this character') : '';
+  const selfName = character.name.trim() || t('This character');
 
   const remove = async (relationId: ID, otherName: string) => {
-    const ok = await confirm('Delete relation?', `The relation with ${otherName || 'this character'} is removed for both.`, {
-      confirmText: 'Delete',
+    const ok = await confirm(t('Delete relation?'), t('The relation with {name} is removed for both.', { name: otherName || t('this character') }), {
+      confirmText: t('Delete'),
       destructive: true,
     });
     if (ok) {
@@ -49,13 +50,13 @@ export function RelationsTab({ character }: { character: Character }) {
     <View className="gap-3">
       {items.length === 0 ? (
         <Text tone="secondary" className="py-4">
-          {selfName} has no relations yet. Add friends, enemies, family… to remember who is tied to whom.
+          {t('{name} has no relations yet. Add friends, enemies, family… to remember who is tied to whom.', { name: selfName })}
         </Text>
       ) : (
         items.map(({ relation, other }) => (
           <Card
             key={relation.id}
-            accessibilityLabel={`${other.name.trim() || 'Unnamed'}, ${relation.label || 'No label'}`}
+            accessibilityLabel={`${other.name.trim() || t('Unnamed')}, ${relation.label || t('No label')}`}
             onPress={() => navigation.push('Character', { characterId: other.id })}
             onLongPress={() => setMenuId(relation.id)}
             className="flex-row items-center gap-3 p-3"
@@ -63,10 +64,10 @@ export function RelationsTab({ character }: { character: Character }) {
             <Avatar character={other} size={48} />
             <View className="flex-1 gap-0.5">
               <Text variant="heading" numberOfLines={1}>
-                {other.name.trim() || 'Unnamed'}
+                {other.name.trim() || t('Unnamed')}
               </Text>
               <Text variant="label" tone="accent" numberOfLines={1}>
-                {relation.label || 'No label'}
+                {relation.label || t('No label')}
               </Text>
               {!!relation.note && (
                 <Text variant="caption" tone="secondary" numberOfLines={1}>
@@ -77,10 +78,10 @@ export function RelationsTab({ character }: { character: Character }) {
           </Card>
         ))
       )}
-      <Button title="Relation" icon={PlusIcon} variant="secondary" onPress={() => setPicking(true)} />
+      <Button title={t('Relation')} icon={PlusIcon} variant="secondary" onPress={() => setPicking(true)} />
       {items.length > 0 && (
         <Text variant="caption" tone="muted" className="text-center">
-          Relations go both ways. Long-press a row to edit its label or note, or to delete it.
+          {t('Relations go both ways. Long-press a row to edit its label or note, or to delete it.')}
         </Text>
       )}
 
@@ -89,7 +90,7 @@ export function RelationsTab({ character }: { character: Character }) {
         onClose={() => setPicking(false)}
         projectId={character.projectId}
         excludeIds={excludeIds}
-        title="Related to whom?"
+        title={t('Related to whom?')}
         onPick={otherId => {
           if (otherId && otherId !== character.id) {
             setPendingOther(otherId);
@@ -99,10 +100,10 @@ export function RelationsTab({ character }: { character: Character }) {
       <PromptDialog
         visible={!!pendingOther}
         onClose={() => setPendingOther(null)}
-        title="Relation label"
-        message={`What are ${selfName} and ${pendingName} to each other?`}
-        placeholder="Best friend, enemy, sibling…"
-        confirmText="Add"
+        title={t('Relation label')}
+        message={t('What are {a} and {b} to each other?', { a: selfName, b: pendingName })}
+        placeholder={t('Best friend, enemy, sibling…')}
+        confirmText={t('Add')}
         maxLength={LABEL_MAX}
         onSubmit={label => {
           if (pendingOther) {
@@ -115,9 +116,9 @@ export function RelationsTab({ character }: { character: Character }) {
         key={editing ? `${editing.id}-${editing.field}` : 'none'}
         visible={!!editing && !!editingItem}
         onClose={() => setEditing(null)}
-        title={editing?.field === 'note' ? 'Relation note' : 'Relation label'}
+        title={editing?.field === 'note' ? t('Relation note') : t('Relation label')}
         initialValue={editing?.field === 'note' ? editingItem?.relation.note : editingItem?.relation.label}
-        placeholder={editing?.field === 'note' ? 'A one-line note' : 'Best friend, enemy, sibling…'}
+        placeholder={editing?.field === 'note' ? t('A one-line note') : t('Best friend, enemy, sibling…')}
         maxLength={editing?.field === 'note' ? NOTE_MAX : LABEL_MAX}
         allowEmpty={editing?.field === 'note'}
         onSubmit={value => {
@@ -130,21 +131,21 @@ export function RelationsTab({ character }: { character: Character }) {
       <Menu
         visible={!!menuItem}
         onClose={() => setMenuId(null)}
-        title={menuShown ? menuShown.other.name.trim() || 'Unnamed' : undefined}
+        title={menuShown ? menuShown.other.name.trim() || t('Unnamed') : undefined}
         subtitle={menuShown?.relation.label}
         items={[
           {
-            label: 'Edit label',
+            label: t('Edit label'),
             icon: EditIcon,
             onPress: () => setEditing(menuId ? { id: menuId, field: 'label' } : null),
           },
           {
-            label: 'Edit note',
+            label: t('Edit note'),
             icon: NoteIcon,
             onPress: () => setEditing(menuId ? { id: menuId, field: 'note' } : null),
           },
           {
-            label: 'Delete relation',
+            label: t('Delete relation'),
             icon: DeleteIcon,
             destructive: true,
             onPress: () => {

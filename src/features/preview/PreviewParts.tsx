@@ -12,6 +12,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { FlagIcon } from '../../ui/icons';
 
+import { msg, t, tn } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { pageLabel } from '../../core/preview/reader';
 import { slotAtPoint } from '../../core/preview/spreads';
@@ -25,13 +26,13 @@ import { useZoom } from './useZoom';
 const BADGE_ZONE = 52;
 
 const PAGE_ACTIONS: AccessibilityActionInfo[] = [
-  { name: 'activate', label: 'Show or hide controls' },
-  { name: 'longpress', label: 'Flag this page' },
+  { name: 'activate', label: msg('Show or hide controls') },
+  { name: 'longpress', label: msg('Flag this page') },
 ];
 
 const TURN_ACTIONS: AccessibilityActionInfo[] = [
-  { name: 'nextPage', label: 'Next page' },
-  { name: 'previousPage', label: 'Previous page' },
+  { name: 'nextPage', label: msg('Next page') },
+  { name: 'previousPage', label: msg('Previous page') },
 ];
 
 function PageSlot({ pageId, width, options }: { pageId: ID; width: number; options: PageDrawOptions }) {
@@ -41,7 +42,7 @@ function PageSlot({ pageId, width, options }: { pageId: ID; width: number; optio
       <PageView pageId={pageId} width={width} options={options} />
       {page && !page.done && (
         <View className="absolute left-2 top-2 rounded-sm bg-raised/80 px-2 py-0.5">
-          <Text variant="caption">Not done</Text>
+          <Text variant="caption">{t('Not done')}</Text>
         </View>
       )}
       {page?.flag && (
@@ -207,7 +208,10 @@ export const PreviewPage = memo(function PreviewPageItem({
           accessible
           accessibilityRole="image"
           accessibilityLabel={label}
-          accessibilityActions={zoomable ? [...PAGE_ACTIONS, ...TURN_ACTIONS] : PAGE_ACTIONS}
+          accessibilityActions={(zoomable ? [...PAGE_ACTIONS, ...TURN_ACTIONS] : PAGE_ACTIONS).map(action => ({
+            ...action,
+            label: action.label && t(action.label),
+          }))}
           onAccessibilityAction={onAccessibilityAction}
           className="absolute inset-0 items-center justify-center"
         >
@@ -248,14 +252,14 @@ export function EndCard({
     <View className="items-center justify-center" style={{ width, height }}>
       <Card className="w-4/5 max-w-[360px] gap-3 p-4">
         <Text variant="display" accessibilityRole="header" className="text-center">
-          End of chapter {chapterNumber}
+          {t('End of chapter {n}', { n: chapterNumber })}
         </Text>
         <Text variant="caption" tone="secondary" className="text-center">
-          {pageCount === 1 ? '1 page' : `${pageCount} pages`}
+          {tn(pageCount, '{count} page', '{count} pages')}
         </Text>
-        {hasNext && <Button title="Read next chapter" onPress={onNext} />}
-        <Button title="Export" variant={hasNext ? 'secondary' : 'primary'} onPress={onExport} />
-        <Button title="Close" variant="ghost" onPress={onClose} />
+        {hasNext && <Button title={t('Read next chapter')} onPress={onNext} />}
+        <Button title={t('Export')} variant={hasNext ? 'secondary' : 'primary'} onPress={onExport} />
+        <Button title={t('Close')} variant="ghost" onPress={onClose} />
       </Card>
     </View>
   );

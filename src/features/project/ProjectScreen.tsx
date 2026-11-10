@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, MarkDoneIcon, MoreIcon, PaletteIcon, PlayIcon } from '../../ui/icons';
 
+import { msg, t } from '../../core/i18n';
 import { ART_STYLE_LABEL, ART_STYLES } from '../../core/model/constants';
 import { projectProgress } from '../../core/model/selectors';
 import { nextStepOf } from '../../core/story/nextStep';
@@ -19,10 +20,10 @@ import { changeProjectCover, duplicateStory, exportProjectFile, trashProjectWith
 type ProjectTab = 'chapters' | 'characters' | 'world' | 'notes';
 
 const TABS: { key: ProjectTab; label: string }[] = [
-  { key: 'chapters', label: 'Chapters' },
-  { key: 'characters', label: 'Characters' },
-  { key: 'world', label: 'World' },
-  { key: 'notes', label: 'Notes' },
+  { key: 'chapters', label: msg('Chapters') },
+  { key: 'characters', label: msg('Characters') },
+  { key: 'world', label: msg('World') },
+  { key: 'notes', label: msg('Notes') },
 ];
 
 export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
@@ -41,8 +42,8 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
   if (!project || project.deletedAt) {
     return (
       <Screen padded={false}>
-        <AppBar title="Story" onBack={navigation.goBack} />
-        <EmptyState title="Story not found" message="This story was deleted or is in Trash." />
+        <AppBar title={t('Story')} onBack={navigation.goBack} />
+        <EmptyState title={t('Story not found')} message={t('This story was deleted or is in Trash.')} />
       </Screen>
     );
   }
@@ -56,21 +57,21 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
   return (
     <Screen padded={false}>
       <AppBar
-        title={project.title || 'Untitled'}
+        title={project.title || t('Untitled')}
         onBack={navigation.goBack}
         right={
           <>
             <IconButton
               icon={PlayIcon}
-              accessibilityLabel="Preview"
+              accessibilityLabel={t('Preview')}
               onPress={() => navigation.navigate('Preview', { projectId })}
             />
             <IconButton
               icon={ExportIcon}
-              accessibilityLabel="Export"
+              accessibilityLabel={t('Export')}
               onPress={() => navigation.navigate('Export', { projectId })}
             />
-            <IconButton icon={MoreIcon} accessibilityLabel="More" onPress={() => setMenu(true)} />
+            <IconButton icon={MoreIcon} accessibilityLabel={t('More')} onPress={() => setMenu(true)} />
           </>
         }
       />
@@ -87,7 +88,7 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
         </View>
 
         <View className="bg-bg px-2">
-          <Tabs tabs={TABS} value={tab} onChange={setTab} stretch />
+          <Tabs tabs={TABS.map(item => ({ ...item, label: t(item.label) }))} value={tab} onChange={setTab} stretch />
         </View>
 
         <View className="p-4">
@@ -101,37 +102,37 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
       <Menu
         visible={menu}
         onClose={() => setMenu(false)}
-        title={project.title || 'Untitled'}
+        title={project.title || t('Untitled')}
         items={[
-          { label: 'Edit details', icon: EditIcon, onPress: () => setEditing(true) },
-          { label: 'Change cover', icon: ImageIcon, onPress: () => changeProjectCover(projectId) },
+          { label: t('Edit details'), icon: EditIcon, onPress: () => setEditing(true) },
+          { label: t('Change cover'), icon: ImageIcon, onPress: () => changeProjectCover(projectId) },
           {
-            label: 'Change art style',
-            subtitle: ART_STYLE_LABEL[project.style],
+            label: t('Change art style'),
+            subtitle: t(ART_STYLE_LABEL[project.style]),
             icon: PaletteIcon,
             onPress: () => setStyleMenu(true),
           },
           {
-            label: 'Duplicate story',
+            label: t('Duplicate story'),
             icon: CopyIcon,
             onPress: () => duplicateStory(projectId, copyId => navigation.push('Project', { projectId: copyId })),
           },
-          { label: 'Export project (.manganova)', icon: ExportIcon, onPress: () => exportProjectFile(projectId) },
+          { label: t('Export project (.manganova)'), icon: ExportIcon, onPress: () => exportProjectFile(projectId) },
           {
-            label: project.done ? 'Mark as not completed' : 'Mark as completed',
+            label: project.done ? t('Mark as not completed') : t('Mark as completed'),
             icon: MarkDoneIcon,
             onPress: () => useStory.getState().updateProject(projectId, { done: !project.done }),
           },
-          { label: 'Delete story', icon: DeleteIcon, destructive: true, onPress: remove },
+          { label: t('Delete story'), icon: DeleteIcon, destructive: true, onPress: remove },
         ]}
       />
       <Menu
         visible={styleMenu}
         onClose={() => setStyleMenu(false)}
-        title="Art style"
+        title={t('Art style')}
         items={ART_STYLES.map(item => ({
-          label: item.id === project.style ? `${item.label} (selected)` : item.label,
-          subtitle: item.hint,
+          label: item.id === project.style ? t('{style} (selected)', { style: t(item.label) }) : t(item.label),
+          subtitle: t(item.hint),
           onPress: () => useStory.getState().updateProject(projectId, { style: item.id }),
         }))}
       />

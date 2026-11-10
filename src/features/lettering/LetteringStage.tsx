@@ -2,8 +2,8 @@ import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { ChecklistIcon, TranslateIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import { defaultTail } from '../../core/lettering/bubbleEdit';
-import { plural } from '../../core/util/format';
 import { PageView } from '../../render/PageView';
 import { Button, Chip, Text, useColor } from '../../ui';
 import { LetteringGestureLayer } from './LetteringGestures';
@@ -45,7 +45,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
         <View
           accessible
           accessibilityRole="image"
-          accessibilityLabel={`Page with ${plural(page.bubbles.length, 'bubble')}`}
+          accessibilityLabel={tn(page.bubbles.length, 'Page with {count} bubble', 'Page with {count} bubbles')}
           className="absolute"
           style={{
             left: (box.w - bw) / 2,
@@ -109,7 +109,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
         {languages.length > 0 && !pending && (
           <View pointerEvents="box-none" className="flex-row flex-wrap justify-center gap-2">
             <Chip
-              label={lang ?? 'Original'}
+              label={lang ?? t('Original')}
               icon={TranslateIcon}
               selected={!!lang}
               onPress={() => dispatch({ type: 'openSheet', sheet: 'language' })}
@@ -121,7 +121,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
         )}
         {pending ? (
           <Chip
-            label={pending.kind === 'bubble' ? 'Tap the page to place · Cancel' : 'Tap a panel to apply · Cancel'}
+            label={pending.kind === 'bubble' ? t('Tap the page to place · Cancel') : t('Tap a panel to apply · Cancel')}
             selected
             onPress={() => dispatch({ type: 'pend', pending: null })}
           />
@@ -130,7 +130,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
             small
             variant="secondary"
             icon={ChecklistIcon}
-            title={`Auto-place dialogue (${c.unplaced.length})`}
+            title={t('Auto-place dialogue ({count})', { count: c.unplaced.length })}
             onPress={c.runAutoPlace}
           />
         ) : null}
@@ -150,10 +150,10 @@ export function LetteringStage({ c }: { c: LetteringController }) {
         {isOrphan && stored && (
           <View className="min-h-12 flex-row items-center gap-2 rounded-md bg-raised px-2 py-1">
             <Text variant="label" tone="danger" className="flex-1">
-              No longer in script
+              {t('No longer in script')}
             </Text>
-            <Button small variant="ghost" title="Keep" onPress={() => c.changeBubble(stored.id, { blockId: undefined })} />
-            <Button small variant="danger" title="Delete" onPress={() => c.removeBubble(stored.id)} />
+            <Button small variant="ghost" title={t('Keep')} onPress={() => c.changeBubble(stored.id, { blockId: undefined })} />
+            <Button small variant="danger" title={t('Delete')} onPress={() => c.removeBubble(stored.id)} />
           </View>
         )}
         {stored && !draft && !hideBubbles && (

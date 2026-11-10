@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import type { Character } from '../../model/types';
 import { uid } from '../../util/id';
 import { omit, touchProject } from './helpers';
@@ -55,7 +56,7 @@ export function createCharacterActions(set: StorySet, get: StoryGet): CharacterA
       }
       return get().addCharacter(source.projectId, {
         ...source,
-        name: `${source.name} (copy)`,
+        name: t('{title} (copy)', { title: source.name }),
         locked: false,
         sheet: { ...source.sheet, expressions: { ...source.sheet.expressions } },
       });

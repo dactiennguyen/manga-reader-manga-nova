@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
+import { t } from '../../core/i18n';
 import { GENRES, LIMITS } from '../../core/model/constants';
 import type { Project } from '../../core/model/types';
 import { useStory } from '../../state/useStory';
@@ -23,7 +24,7 @@ export function EditInfoSheet({ project, visible, onClose }: { project: Project;
     if (genres.includes(genre)) {
       setGenres(genres.filter(item => item !== genre));
     } else if (genres.length >= LIMITS.genresPerProject) {
-      toast(`Pick up to ${LIMITS.genresPerProject} genres`);
+      toast(t('Pick up to {max} genres', { max: LIMITS.genresPerProject }));
     } else {
       setGenres([...genres, genre]);
     }
@@ -35,23 +36,23 @@ export function EditInfoSheet({ project, visible, onClose }: { project: Project;
   };
 
   return (
-    <Sheet visible={visible} onClose={onClose} title="Edit details" maxHeight="90%">
+    <Sheet visible={visible} onClose={onClose} title={t('Edit details')} maxHeight="90%">
       <View className="gap-2 p-4 pt-1">
-        <FieldLabel>Story title</FieldLabel>
+        <FieldLabel>{t('Story title')}</FieldLabel>
         <TextField
           value={title}
           onChangeText={setTitle}
           maxLength={LIMITS.projectTitle}
-          placeholder="Story title"
-          accessibilityLabel="Story title"
+          placeholder={t('Story title')}
+          accessibilityLabel={t('Story title')}
         />
-        <FieldLabel>{`Genres (${genres.length}/${LIMITS.genresPerProject})`}</FieldLabel>
+        <FieldLabel>{t('Genres ({count}/{max})', { count: genres.length, max: LIMITS.genresPerProject })}</FieldLabel>
         <ChipGroup>
           {GENRES.map(genre => (
-            <Chip key={genre} label={genre} selected={genres.includes(genre)} onPress={() => toggle(genre)} />
+            <Chip key={genre} label={t(genre)} selected={genres.includes(genre)} onPress={() => toggle(genre)} />
           ))}
         </ChipGroup>
-        <FieldLabel>One-line summary</FieldLabel>
+        <FieldLabel>{t('One-line summary')}</FieldLabel>
         <TextField
           value={logline}
           onChangeText={setLogline}
@@ -59,13 +60,13 @@ export function EditInfoSheet({ project, visible, onClose }: { project: Project;
           multiline
           textAlignVertical="top"
           inputClassName="min-h-20"
-          placeholder="Who is it about and what do they want?"
-          accessibilityLabel="One-line summary"
+          placeholder={t('Who is it about and what do they want?')}
+          accessibilityLabel={t('One-line summary')}
         />
         <Text variant="caption" tone="muted" className="self-end">
           {logline.length}/{LIMITS.logline}
         </Text>
-        <Button title="Save" onPress={save} disabled={!title.trim()} />
+        <Button title={t('Save')} onPress={save} disabled={!title.trim()} />
       </View>
     </Sheet>
   );

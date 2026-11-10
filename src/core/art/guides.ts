@@ -1,3 +1,4 @@
+import { msg } from '../i18n';
 import type { Stroke } from '../model/types';
 import { isFillTool, isShapeTool, type Box } from './artMath';
 
@@ -17,9 +18,9 @@ export type Guide =
   | { kind: 'twoPoint'; a: Point; b: Point };
 
 export const GUIDES: { id: GuideKind; label: string; hint: string }[] = [
-  { id: 'symmetry', label: 'Symmetry', hint: 'Each stroke repeats across the line. Drag the dot to move it.' },
-  { id: 'onePoint', label: '1-point perspective', hint: 'Strokes run to the vanishing point. Drag the dot to move it.' },
-  { id: 'twoPoint', label: '2-point perspective', hint: 'Strokes run to either point, or straight up. Drag a dot to move it.' },
+  { id: 'symmetry', label: msg('Symmetry'), hint: msg('Each stroke repeats across the line. Drag the dot to move it.') },
+  { id: 'onePoint', label: msg('1-point perspective'), hint: msg('Strokes run to the vanishing point. Drag the dot to move it.') },
+  { id: 'twoPoint', label: msg('2-point perspective'), hint: msg('Strokes run to either point, or straight up. Drag a dot to move it.') },
 ];
 
 const HORIZON = 0.4;

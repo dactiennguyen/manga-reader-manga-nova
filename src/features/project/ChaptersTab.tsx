@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon, WarningIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { CHAPTER_STATUS_LABEL, LIMITS } from '../../core/model/constants';
 import { chapterIdsOf, chapterName, chapterProgress, chapterStatus, scriptOutdated } from '../../core/model/selectors';
 import type { ID, Project, StoryData } from '../../core/model/types';
@@ -47,7 +48,7 @@ function ChapterRow({
   const name = chapterName(chapter.title, number);
   return (
     <Card
-      accessibilityLabel={`${name}, ${CHAPTER_STATUS_LABEL[status]}`}
+      accessibilityLabel={`${name}, ${t(CHAPTER_STATUS_LABEL[status])}`}
       onPress={() =>
         hasPages ? navigation.navigate('Storyboard', { chapterId }) : navigation.navigate('Script', { chapterId })
       }
@@ -64,16 +65,16 @@ function ChapterRow({
           {name}
         </Text>
         {status === 'done' ? (
-          <Badge text={CHAPTER_STATUS_LABEL[status]} tone="success" />
+          <Badge text={t(CHAPTER_STATUS_LABEL[status])} tone="success" />
         ) : (
-          <Tag label={CHAPTER_STATUS_LABEL[status]} />
+          <Tag label={t(CHAPTER_STATUS_LABEL[status])} />
         )}
       </View>
       {scriptOutdated(chapter) && (
         <View className="flex-row items-center gap-1">
           <Icon icon={WarningIcon} size={ICON.xs} color="warning" />
           <Text variant="caption" tone="warning">
-            Script changed
+            {t('Script changed')}
           </Text>
         </View>
       )}
@@ -83,14 +84,14 @@ function ChapterRow({
             <ProgressBar value={progress.total ? progress.done / progress.total : 0} />
           </View>
           <Text variant="caption" tone="muted">
-            {progress.done}/{progress.total} pages
+            {t('{done}/{total} pages', { done: progress.done, total: progress.total })}
           </Text>
         </View>
       )}
       <View className="flex-row gap-2">
-        <Button title="Script" variant="ghost" small onPress={() => navigation.navigate('Script', { chapterId })} />
+        <Button title={t('Script')} variant="ghost" small onPress={() => navigation.navigate('Script', { chapterId })} />
         <Button
-          title="Storyboard"
+          title={t('Storyboard')}
           variant="ghost"
           small
           onPress={() => navigation.navigate('Storyboard', { chapterId })}
@@ -116,7 +117,7 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
     }
     useStory.getState().moveChapter(chapterId, step.toActId, step.toIndex);
     if (step.crossedInto) {
-      toast(`Moved to ${step.crossedInto}`);
+      toast(t('Moved to {act}', { act: step.crossedInto }));
     }
   };
 
@@ -124,24 +125,24 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
 
   const menuItems: MenuItem[] = target
     ? [
-        { label: 'Rename', icon: EditIcon, onPress: () => setOpen('rename') },
-        { label: 'Move up', icon: ArrowUpIcon, disabled: !canMoveChapterUp(acts, target), onPress: () => move(target, -1) },
+        { label: t('Rename'), icon: EditIcon, onPress: () => setOpen('rename') },
+        { label: t('Move up'), icon: ArrowUpIcon, disabled: !canMoveChapterUp(acts, target), onPress: () => move(target, -1) },
         {
-          label: 'Move down',
+          label: t('Move down'),
           icon: ArrowDownIcon,
           disabled: !canMoveChapterDown(acts, target),
           onPress: () => move(target, 1),
         },
         {
-          label: 'Duplicate',
+          label: t('Duplicate'),
           icon: CopyIcon,
           onPress: () => {
             if (useStory.getState().duplicateChapter(target)) {
-              toast('Chapter duplicated');
+              toast(t('Chapter duplicated'));
             }
           },
         },
-        { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => setOpen('delete') },
+        { label: t('Delete'), icon: DeleteIcon, destructive: true, onPress: () => setOpen('delete') },
       ]
     : [];
   const targetName = target ? nameOf(target) : '';
@@ -152,13 +153,13 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
       return;
     }
     if (value.trim().toLocaleLowerCase('vi') !== targetName.toLocaleLowerCase('vi')) {
-      toast('Chapter title does not match. Nothing was deleted');
+      toast(t('Chapter title does not match. Nothing was deleted'));
       return;
     }
     useStory.getState().removeChapter(target);
     snackbar({
-      message: 'Chapter deleted',
-      actionLabel: 'Undo',
+      message: t('Chapter deleted'),
+      actionLabel: t('Undo'),
       onAction: () => undoStory(`project:${project.id}`),
     });
   };
@@ -166,16 +167,16 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
   return (
     <View className="gap-3">
       <View className="flex-row justify-end">
-        <Button title="Add chapter" icon={PlusIcon} small onPress={addChapter} />
+        <Button title={t('Add chapter')} icon={PlusIcon} small onPress={addChapter} />
       </View>
 
-      {flat.length === 0 && <EmptyState title="No chapters yet." message="Add the first one!" />}
+      {flat.length === 0 && <EmptyState title={t('No chapters yet.')} message={t('Add the first one!')} />}
 
       {acts.map(act =>
         act.chapterIds.length === 0 ? null : (
           <View key={act.id} className="gap-2">
             <Text variant="caption" tone="muted">
-              {act.title}
+              {t(act.title)}
             </Text>
             {act.chapterIds.map(chapterId => (
               <ChapterRow
@@ -197,9 +198,9 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
       <PromptDialog
         visible={open === 'rename'}
         onClose={() => setOpen(null)}
-        title="Rename chapter"
+        title={t('Rename chapter')}
         initialValue={target ? state.chapters[target]?.title ?? '' : ''}
-        placeholder="Chapter title"
+        placeholder={t('Chapter title')}
         maxLength={LIMITS.chapterTitle}
         onSubmit={value => {
           setOpen(null);
@@ -211,10 +212,12 @@ export function ChaptersTab({ state, project }: { state: StoryData; project: Pro
       <PromptDialog
         visible={open === 'delete'}
         onClose={() => setOpen(null)}
-        title="Delete chapter?"
-        message={`The script and all pages of this chapter will be deleted. You can undo this right after. Type "${targetName}" to confirm.`}
+        title={t('Delete chapter?')}
+        message={t('The script and all pages of this chapter will be deleted. You can undo this right after. Type "{name}" to confirm.', {
+          name: targetName,
+        })}
         placeholder={targetName}
-        confirmText="Delete"
+        confirmText={t('Delete')}
         onSubmit={confirmDelete}
       />
     </View>

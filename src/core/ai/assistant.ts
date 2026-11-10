@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { AiMessage } from './port';
 import { freeText } from './writing';
 
@@ -24,24 +25,25 @@ export function assistantMessages(context: AssistantContext, history: AssistantT
   ];
 }
 
+/** `where` comes from whereOf, which starts with the translated screen name in every language. */
 export function quickPrompts(where: string, hasStory: boolean): string[] {
   if (!hasStory) {
     return [
-      'How many panels fit on a manga page?',
-      'How do I plan a 20-page chapter?',
-      'Tips for drawing expressive faces',
+      t('How many panels fit on a manga page?'),
+      t('How do I plan a 20-page chapter?'),
+      t('Tips for drawing expressive faces'),
     ];
   }
-  if (where.startsWith('Script')) {
-    return ['Is this scene dragging?', 'Give me a stronger opening line', 'What should happen next?'];
+  if (where.startsWith(t('Script'))) {
+    return [t('Is this scene dragging?'), t('Give me a stronger opening line'), t('What should happen next?')];
   }
-  if (where.startsWith('Storyboard') || where.startsWith('Panel')) {
-    return ['Which panels deserve more space?', 'How do I pace this page?', 'Suggest camera angles for this scene'];
+  if (where.startsWith(t('Storyboard')) || where.startsWith(t('Panel layout'))) {
+    return [t('Which panels deserve more space?'), t('How do I pace this page?'), t('Suggest camera angles for this scene')];
   }
-  if (where.startsWith('Outline')) {
-    return ['Where is the weakest chapter?', 'Suggest a plot twist', 'Does the ending pay off the setup?'];
+  if (where.startsWith(t('Outline'))) {
+    return [t('Where is the weakest chapter?'), t('Suggest a plot twist'), t('Does the ending pay off the setup?')];
   }
-  return ['Summarize my story so far', 'What is my protagonist missing?', 'Suggest a title'];
+  return [t('Summarize my story so far'), t('What is my protagonist missing?'), t('Suggest a title')];
 }
 
 export async function askAssistant(

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
 import { useStory } from '../../state/useStory';
@@ -21,11 +22,11 @@ export function ProfileTab({ character }: { character: Character }) {
       return;
     }
     if (full) {
-      toast(`Up to ${LIMITS.characterTraits} traits`);
+      toast(t('Up to {n} traits', { n: LIMITS.characterTraits }));
       return;
     }
     if (character.traits.some(item => item.toLowerCase() === value.toLowerCase())) {
-      toast('This trait is already added');
+      toast(t('This trait is already added'));
       setTrait('');
       return;
     }
@@ -40,7 +41,7 @@ export function ProfileTab({ character }: { character: Character }) {
   return (
     <View>
       <View className="mb-4 gap-1">
-        <FieldLabel>{`Traits (${character.traits.length}/${LIMITS.characterTraits})`}</FieldLabel>
+        <FieldLabel>{t('Traits ({count}/{max})', { count: character.traits.length, max: LIMITS.characterTraits })}</FieldLabel>
         {character.traits.length > 0 && (
           <ChipRow>
             {character.traits.map(item => (
@@ -53,66 +54,66 @@ export function ProfileTab({ character }: { character: Character }) {
             value={trait}
             onChangeText={setTrait}
             onSubmitEditing={addTrait}
-            placeholder={full ? 'Trait limit reached' : 'e.g. hot-headed, kind'}
-            accessibilityLabel="New trait"
+            placeholder={full ? t('Trait limit reached') : t('e.g. hot-headed, kind')}
+            accessibilityLabel={t('New trait')}
             maxLength={TRAIT_MAX_LENGTH}
             editable={!full}
             returnKeyType="done"
             submitBehavior="submit"
             className="flex-1"
           />
-          <IconButton icon={PlusIcon} onPress={addTrait} disabled={full || !trait.trim()} accessibilityLabel="Add trait" />
+          <IconButton icon={PlusIcon} onPress={addTrait} disabled={full || !trait.trim()} accessibilityLabel={t('Add trait')} />
         </View>
         <Text variant="caption" tone="muted">
-          Tap a trait to remove it.
+          {t('Tap a trait to remove it.')}
         </Text>
       </View>
 
       <AutoField
-        label="Goal"
+        label={t('Goal')}
         value={character.goal}
         onCommit={goal => update(character.id, { goal })}
-        placeholder="What does this character want?"
+        placeholder={t('What does this character want?')}
         maxLength={200}
       />
       <AutoField
-        label="Weakness"
+        label={t('Weakness')}
         value={character.weakness}
         onCommit={weakness => update(character.id, { weakness })}
-        placeholder="What holds this character back?"
+        placeholder={t('What holds this character back?')}
         maxLength={200}
       />
       <AutoField
-        label="Way of speaking"
+        label={t('Way of speaking')}
         value={character.voice}
         onCommit={voice => update(character.id, { voice })}
-        placeholder="Catchphrases, tone, fast or slow talker…"
+        placeholder={t('Catchphrases, tone, fast or slow talker…')}
         multiline
         maxLength={400}
         minHeight={80}
       />
       <AutoField
-        label="Backstory"
+        label={t('Backstory')}
         value={character.bio}
         onCommit={bio => update(character.id, { bio })}
-        placeholder="Origins, past, key turning points…"
+        placeholder={t('Origins, past, key turning points…')}
         multiline
         maxLength={LIMITS.bio}
         showCount
         minHeight={140}
       />
       <AutoField
-        label="Gender"
+        label={t('Gender')}
         value={character.gender}
         onCommit={gender => update(character.id, { gender })}
-        placeholder="Male, female or describe"
+        placeholder={t('Male, female or describe')}
         maxLength={30}
       />
       <AutoField
-        label="Notes"
+        label={t('Notes')}
         value={character.notes}
         onCommit={notes => update(character.id, { notes })}
-        placeholder="Your private notes about this character"
+        placeholder={t('Your private notes about this character')}
         multiline
         maxLength={1000}
       />

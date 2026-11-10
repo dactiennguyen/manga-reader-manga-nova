@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { CaretDownIcon, CaretRightIcon, CloseIcon, IdeaIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { activeProjects, projectProgress } from '../../core/model/selectors';
 import { tipOfDay } from '../../core/story/ideas';
 import { resumeTarget } from '../../core/story/resume';
@@ -12,6 +13,7 @@ import { ART, ArtBanner, Card, ICON, Icon, IconButton, ListItem, Screen, Section
 import { ContinueCard } from './ContinueCard';
 import { IdeaCard } from './IdeaCard';
 import { RecentStories } from './RecentStories';
+import { SampleCard } from './SampleCard';
 import { StartTiles } from './StartTiles';
 
 export function HomeScreen() {
@@ -32,17 +34,17 @@ export function HomeScreen() {
       <ArtBanner source={ART.homeHero} ratio={3 / 2}>
         <View className="absolute left-4 top-3 w-1/2">
           <Text variant="display" tone="onPaper" accessibilityRole="header" numberOfLines={1}>
-            {penName ? `Hi ${penName}` : 'Hi there'}
+            {penName ? t('Hi {name}', { name: penName }) : t('Hi there')}
           </Text>
           <Text variant="bodySmall" tone="onPaper" numberOfLines={2}>
-            {empty ? 'Start your first comic.' : 'What are we drawing today?'}
+            {empty ? t('Start your first comic.') : t('What are we drawing today?')}
           </Text>
         </View>
       </ArtBanner>
 
       {!!current && (
         <View className="gap-2">
-          <SectionHeader>Continue</SectionHeader>
+          <SectionHeader>{t('Continue')}</SectionHeader>
           <ContinueCard
             project={current}
             resume={resumeTarget(state, current)}
@@ -52,13 +54,15 @@ export function HomeScreen() {
       )}
 
       <View className="gap-2">
-        <SectionHeader>Start creating</SectionHeader>
+        <SectionHeader>{t('Start creating')}</SectionHeader>
         <StartTiles />
       </View>
 
+      {empty && <SampleCard />}
+
       <Card>
         <ListItem
-          title="Start from an idea"
+          title={t('Start from an idea')}
           icon={IdeaIcon}
           right={<Icon icon={ideaOpen ? CaretDownIcon : CaretRightIcon} size={ICON.md} color="text-secondary" />}
           onPress={() => setIdeaOpen(open => !open)}
@@ -75,12 +79,12 @@ export function HomeScreen() {
               <IconButton
                 icon={CloseIcon}
                 size={ICON.md}
-                accessibilityLabel="Hide today's tip"
+                accessibilityLabel={t("Hide today's tip")}
                 onPress={() => useSettings.getState().set({ tipDismissedDay: today })}
               />
             }
           >
-            Tip of the day
+            {t('Tip of the day')}
           </SectionHeader>
           <Card className="flex-row items-start gap-2 p-3">
             <Icon icon={IdeaIcon} size={ICON.md} color="accent" />

@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { chapterName } from '../../core/model/selectors';
 import type { Chapter, ChapterStatus } from '../../core/model/types';
 import { STATUS_TEXT } from '../../core/story/outlineTools';
@@ -32,8 +33,8 @@ export function OutlineCard({
   const name = chapterName(chapter.title, number);
   return (
     <Pressable
-      accessibilityLabel={`Chapter ${number}, ${name}, ${STATUS_TEXT[status]}`}
-      accessibilityActions={[{ name: 'longpress', label: 'Chapter options' }]}
+      accessibilityLabel={t('Chapter {n}, {name}, {status}', { n: number, name, status: t(STATUS_TEXT[status]) })}
+      accessibilityActions={[{ name: 'longpress', label: t('Chapter options') }]}
       onAccessibilityAction={event => {
         if (event.nativeEvent.actionName === 'longpress') {
           onMenu();
@@ -59,18 +60,18 @@ export function OutlineCard({
         </Text>
       ) : (
         <Text variant="bodySmall" tone="muted">
-          Tap to add a summary.
+          {t('Tap to add a summary.')}
         </Text>
       )}
       {!!chapter.goal && (
         <Text variant="caption" tone="muted" numberOfLines={2}>
-          Goal: {chapter.goal}
+          {t('Goal: {goal}', { goal: chapter.goal })}
         </Text>
       )}
       <View className="flex-row items-center gap-1">
         <View className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[status]}`} />
         <Text variant="caption" tone="muted">
-          {STATUS_TEXT[status]}
+          {t(STATUS_TEXT[status])}
         </Text>
       </View>
     </Pressable>
@@ -80,7 +81,7 @@ export function OutlineCard({
 export function AddActButton({ board, onPress }: { board: boolean; onPress: () => void }) {
   return (
     <Pressable
-      accessibilityLabel="Add act"
+      accessibilityLabel={t('Add act')}
       onPress={onPress}
       className={`flex-row items-center justify-center gap-1 overflow-hidden rounded-lg bg-surface py-4 ${
         board ? 'h-30 w-30 self-start' : ''
@@ -88,7 +89,7 @@ export function AddActButton({ board, onPress }: { board: boolean; onPress: () =
     >
       <Icon icon={PlusIcon} color="text-secondary" />
       <Text variant="label" tone="secondary">
-        Act
+        {t('Act')}
       </Text>
     </Pressable>
   );

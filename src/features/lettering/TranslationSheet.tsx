@@ -4,16 +4,16 @@ import { AiIcon, CheckIcon, CircleIcon, DoneIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { translateLines } from '../../core/ai/translate';
+import { msg, t, tn } from '../../core/i18n';
 import { bubblesInOrder, coalesceTag } from '../../core/lettering/bubbleEdit';
 import { hasTranslation, setTranslation, translatableBubbles } from '../../core/lettering/translation';
 import { groupProposals, translationTargets, type Proposal, type TranslateMode } from '../../core/lettering/translationPlan';
 import { BUBBLE_TYPE_LABEL } from '../../core/model/constants';
 import type { Bubble, Chapter, ID, Project } from '../../core/model/types';
-import { plural } from '../../core/util/format';
 import { buildPageContext } from '../../render/drawPage';
 import { useAppNavigation } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
-import { useAiConfigured } from '../../state/useSettings';
+import { useAiServerSet } from '../../state/useSettings';
 import { undoable, useStory } from '../../state/useStory';
 import { AiErrorBox, AiLoading, AiNote, AiPanel, Button, Card, ICON, Icon, Segmented, Sheet, Text, TextField, toast } from '../../ui';
 import { progressLabel } from './Languages';
@@ -21,8 +21,8 @@ import { progressLabel } from './Languages';
 type Section = { pageId: ID; number: number; bubbles: Bubble[] };
 
 const SCOPES = [
-  { value: 'page', label: 'This page' },
-  { value: 'chapter', label: 'Whole chapter' },
+  { value: 'page', label: msg('This page') },
+  { value: 'chapter', label: msg('Whole chapter') },
 ] as const;
 
 function writeOtherPage(pageId: ID, entries: Record<ID, string>, lang: string, tag?: string): void {
@@ -58,7 +58,7 @@ export function TranslationSheet({
   onApplyCurrent: (entries: Record<ID, string>) => void;
 }) {
   const navigation = useAppNavigation();
-  const configured = useAiConfigured();
+  const configured = useAiServerSet();
   const [scope, setScope] = useState<'page' | 'chapter'>('page');
   const [proposals, setProposals] = useState<Proposal[] | null>(null);
   const [busyCount, setBusyCount] = useState(0);
@@ -107,7 +107,7 @@ export function TranslationSheet({
   const translate = (mode: TranslateMode) => {
     const items = translationTargets(sections, lang, mode);
     if (!items.length) {
-      toast(mode === 'missing' ? 'Every bubble here is already translated' : 'Nothing to translate');
+      toast(mode === 'missing' ? t('Every bubble here is already translated') : t('Nothing to translate'));
       return;
     }
     lastMode.current = mode;
@@ -143,7 +143,7 @@ export function TranslationSheet({
     Object.entries(others).forEach(([otherPageId, entries]) => writeOtherPage(otherPageId, entries, lang));
     const count = currentIds.length + Object.values(others).reduce((sum, entries) => sum + Object.keys(entries).length, 0);
     setProposals(null);
-    toast(count ? `Applied ${plural(count, 'translation')}` : 'Nothing to apply');
+    toast(count ? tn(count, 'Applied {count} translation', 'Applied {count} translations') : t('Nothing to apply'));
   };
 
   const openProfile = () => {
@@ -160,16 +160,16 @@ export function TranslationSheet({
     if (!configured) {
       return (
         <View className="gap-2">
-          <AiNote text="Translate with AI" />
+          <AiNote text={t('Translate with AI')} />
           <Text variant="caption" tone="secondary" className="text-center">
-            Set the AI server address in Profile to translate bubbles automatically.
+            {t('Set the AI server address in Profile to translate bubbles automatically.')}
           </Text>
-          <Button title="Open Profile" variant="secondary" small onPress={openProfile} />
+          <Button title={t('Open Profile')} variant="secondary" small onPress={openProfile} />
         </View>
       );
     }
     if (ai.status === 'loading') {
-      return <AiLoading label={`Translating ${plural(busyCount, 'bubble')} into ${lang}…`} onCancel={cancel} />;
+      return <AiLoading label={tn(busyCount, 'Translating {count} bubble into {lang}…', 'Translating {count} bubbles into {lang}…', { lang })} onCancel={cancel} />;
     }
     if (ai.status === 'error') {
       return <AiErrorBox message={ai.message} onRetry={() => translate(lastMode.current)} onCancel={reset} />;
@@ -177,42 +177,42 @@ export function TranslationSheet({
     return (
       <View className="gap-2">
         <Button
-          title={missing ? `Translate missing with AI (${missing})` : 'Translate missing with AI'}
+          title={missing ? t('Translate missing with AI ({count})', { count: missing }) : t('Translate missing with AI')}
           icon={AiIcon}
           variant="ai"
           disabled={missing === 0}
           onPress={() => translate('missing')}
         />
-        <Button title={`Translate all (${translatable})`} variant="ghost" small onPress={() => translate('all')} className="self-center" />
+        <Button title={t('Translate all ({count})', { count: translatable })} variant="ghost" small onPress={() => translate('all')} className="self-center" />
       </View>
     );
   };
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={`Translate to ${lang}`} subtitle={progressLabel(all, lang)}>
+    <Sheet visible={visible} onClose={onClose} title={t('Translate to {lang}', { lang })} subtitle={progressLabel(all, lang)}>
       <View className="gap-3 p-4">
-        {chapter.pageIds.length > 1 && !proposals && <Segmented options={SCOPES} value={scope} onChange={setScope} />}
+        {chapter.pageIds.length > 1 && !proposals && <Segmented options={SCOPES.map(option => ({ ...option, label: t(option.label) }))} value={scope} onChange={setScope} />}
         {all.length === 0 && (
           <Text variant="caption" tone="secondary" className="text-center">
-            There is no text to translate here yet. Add bubbles first.
+            {t('There is no text to translate here yet. Add bubbles first.')}
           </Text>
         )}
         {proposals ? (
-          <AiPanel title={plural(proposals.length, 'proposed translation')}>
+          <AiPanel title={tn(proposals.length, '{count} proposed translation', '{count} proposed translations')}>
             <Text variant="caption" tone="secondary">
-              Edit anything below. Nothing is written to the page until you apply.
+              {t('Edit anything below. Nothing is written to the page until you apply.')}
             </Text>
             {proposals.map((item, index) => (
               <Card key={item.bubbleId} className="gap-2 p-3">
                 <Text variant="caption" tone="secondary">
-                  {scope === 'chapter' ? `Page ${pageNumber(item.pageId)} · ${index + 1}` : `${index + 1}`}
+                  {scope === 'chapter' ? t('Page {n} · {index}', { n: pageNumber(item.pageId), index: index + 1 }) : `${index + 1}`}
                 </Text>
                 <Text>{item.original}</Text>
-                <TextField multiline value={item.text} placeholder={`${lang} text`} onChangeText={text => editProposal(index, text)} />
+                <TextField multiline value={item.text} placeholder={t('{lang} text', { lang })} onChangeText={text => editProposal(index, text)} />
               </Card>
             ))}
-            <Button title="Apply" icon={CheckIcon} variant="ai" onPress={apply} />
-            <Button title="Discard" variant="ghost" onPress={() => setProposals(null)} />
+            <Button title={t('Apply')} icon={CheckIcon} variant="ai" onPress={apply} />
+            <Button title={t('Discard')} variant="ghost" onPress={() => setProposals(null)} />
           </AiPanel>
         ) : (
           renderAi()
@@ -220,7 +220,7 @@ export function TranslationSheet({
         {!proposals &&
           sections.map(section => (
             <View key={section.pageId} className="gap-2">
-              {scope === 'chapter' && section.bubbles.length > 0 && <Text variant="label">{`Page ${section.number}`}</Text>}
+              {scope === 'chapter' && section.bubbles.length > 0 && <Text variant="label">{t('Page {n}', { n: section.number })}</Text>}
               {section.bubbles.map((bubble, index) => (
                 <Card key={bubble.id} className="gap-2 p-3">
                   <View className="flex-row items-center gap-2">
@@ -230,21 +230,21 @@ export function TranslationSheet({
                       color={hasTranslation(bubble, lang) ? 'success' : 'warning'}
                     />
                     <Text variant="caption" tone="secondary">
-                      {`${index + 1} · ${BUBBLE_TYPE_LABEL[bubble.type]}`}
+                      {`${index + 1} · ${t(BUBBLE_TYPE_LABEL[bubble.type])}`}
                     </Text>
                   </View>
-                  <Text>{bubble.text.trim() || '(no original text)'}</Text>
+                  <Text>{bubble.text.trim() || t('(no original text)')}</Text>
                   <TextField
                     multiline
                     value={bubble.translations?.[lang] ?? ''}
-                    placeholder={`${lang} text`}
+                    placeholder={t('{lang} text', { lang })}
                     onChangeText={text => change(section, bubble.id, text)}
                   />
                 </Card>
               ))}
             </View>
           ))}
-        <Button title="Done" onPress={onClose} />
+        <Button title={t('Done')} onPress={onClose} />
       </View>
     </Sheet>
   );

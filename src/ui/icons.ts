@@ -81,6 +81,7 @@ export { ListNumbersIcon as OrderIcon } from 'phosphor-react-native/src/icons/Li
 export { PaletteIcon as PaletteIcon } from 'phosphor-react-native/src/icons/Palette';
 export { FrameCornersIcon as PanelFrameIcon } from 'phosphor-react-native/src/icons/FrameCorners';
 export { LayoutIcon as PanelsIcon } from 'phosphor-react-native/src/icons/Layout';
+export { PauseIcon as PauseIcon } from 'phosphor-react-native/src/icons/Pause';
 export { PencilLineIcon as PenLineIcon } from 'phosphor-react-native/src/icons/PencilLine';
 export { PencilIcon as PencilToolIcon } from 'phosphor-react-native/src/icons/Pencil';
 export { MapPinIcon as PlaceIcon } from 'phosphor-react-native/src/icons/MapPin';
@@ -92,6 +93,7 @@ export { RectangleIcon as RectIcon } from 'phosphor-react-native/src/icons/Recta
 export { ArrowUUpRightIcon as RedoIcon } from 'phosphor-react-native/src/icons/ArrowUUpRight';
 export { ArrowsClockwiseIcon as RefreshIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
 export { RepeatIcon as RepeatIcon } from 'phosphor-react-native/src/icons/Repeat';
+export { FilmStripIcon as ReplayIcon } from 'phosphor-react-native/src/icons/FilmStrip';
 export { ArrowCounterClockwiseIcon as RestoreIcon } from 'phosphor-react-native/src/icons/ArrowCounterClockwise';
 export { ArrowClockwiseIcon as RotateIcon } from 'phosphor-react-native/src/icons/ArrowClockwise';
 export { FloppyDiskIcon as SaveIcon } from 'phosphor-react-native/src/icons/FloppyDisk';

@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PlusIcon } from './icons';
 
 import { Icon, type IconGlyph } from './Icon';
+import { t } from '../core/i18n';
 import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { Text } from './Text';
@@ -44,7 +45,7 @@ export function Dock({ items, onCreate }: { items: DockItem[]; onCreate: () => v
   const create = (
     <Pressable
       key="create"
-      accessibilityLabel="New story"
+      accessibilityLabel={t('New story')}
       hapticOnPress
       onPress={onCreate}
       className="h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-accent"

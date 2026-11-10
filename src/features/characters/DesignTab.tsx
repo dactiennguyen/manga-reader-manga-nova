@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Image, Pressable as RNPressable, View } from 'react-native';
 import { AddImageIcon, DeleteIcon, LockIcon, PlusIcon, UnlockIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { EXPRESSIONS, LIMITS } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
 import { slotLabel, slotPath, withSlot, type SheetSlot as Slot } from '../../core/story/designSheet';
@@ -34,7 +35,7 @@ function SheetSlot({
       <Pressable
         onPress={onPress}
         onLongPress={onLongPress}
-        accessibilityLabel={path ? `View ${label} image` : `Upload ${label} image`}
+        accessibilityLabel={path ? t('View {label} image', { label }) : t('Upload {label} image', { label })}
         className="items-center justify-center overflow-hidden rounded-md bg-surface"
         style={small ? SMALL_FRAME : BIG_FRAME}
       >
@@ -60,7 +61,7 @@ export function DesignTab({ character }: { character: Character }) {
   const menuTitle = useSticky(menuSlot);
   const { sheet, locked } = character;
   const canLock = !!sheet.face && !!sheet.body;
-  const displayName = character.name.trim() || 'this character';
+  const displayName = character.name.trim() || t('this character');
 
   const upload = async (slot: Slot) => {
     try {
@@ -73,13 +74,13 @@ export function DesignTab({ character }: { character: Character }) {
         update(character.id, { sheet: withSlot(current.sheet, slot, path) });
       }
     } catch {
-      toast('Could not load the image');
+      toast(t('Could not load the image'));
     }
   };
 
   const clear = async (slot: Slot) => {
-    const ok = await confirm(`Delete the ${slotLabel(slot)} image?`, undefined, {
-      confirmText: 'Delete',
+    const ok = await confirm(t('Delete the {slot} image?', { slot: t(slotLabel(slot)) }), undefined, {
+      confirmText: t('Delete'),
       destructive: true,
     });
     if (!ok) {
@@ -95,7 +96,7 @@ export function DesignTab({ character }: { character: Character }) {
     if (slotPath(sheet, slot)) {
       setViewSlot(slot);
     } else if (locked) {
-      toast('Unlock to edit the design sheet');
+      toast(t('Unlock to edit the design sheet'));
     } else {
       upload(slot);
     }
@@ -103,7 +104,7 @@ export function DesignTab({ character }: { character: Character }) {
 
   const longPressSlot = (slot: Slot) => {
     if (locked) {
-      toast('Unlock to edit the design sheet');
+      toast(t('Unlock to edit the design sheet'));
     } else if (slotPath(sheet, slot)) {
       setMenuSlot(slot);
     } else {
@@ -113,9 +114,9 @@ export function DesignTab({ character }: { character: Character }) {
 
   const lock = async () => {
     const ok = await confirm(
-      'Lock as reference?',
-      `These images become the reference for ${displayName}: look at them while drawing to keep the character consistent. While locked, the appearance and design sheet cannot be edited.`,
-      { confirmText: 'Lock' },
+      t('Lock as reference?'),
+      t('These images become the reference for {name}: look at them while drawing to keep the character consistent. While locked, the appearance and design sheet cannot be edited.', { name: displayName }),
+      { confirmText: t('Lock') },
     );
     if (ok) {
       update(character.id, { locked: true });
@@ -125,7 +126,7 @@ export function DesignTab({ character }: { character: Character }) {
   const renderSlot = (slot: Slot, small?: boolean) => (
     <SheetSlot
       key={slot}
-      label={slotLabel(slot)}
+      label={t(slotLabel(slot))}
       path={slotPath(sheet, slot)}
       small={small}
       locked={locked}
@@ -136,21 +137,21 @@ export function DesignTab({ character }: { character: Character }) {
 
   return (
     <View className="gap-3">
-      {locked && <Banner tone="info" icon={LockIcon} text="Locked as reference. Unlock to edit the appearance and images." />}
+      {locked && <Banner tone="info" icon={LockIcon} text={t('Locked as reference. Unlock to edit the appearance and images.')} />}
       <RNPressable
         accessible={locked}
         accessibilityRole="button"
-        accessibilityLabel="Appearance, locked"
-        onPress={locked ? () => toast('Unlock to edit the appearance') : undefined}
+        accessibilityLabel={t('Appearance, locked')}
+        onPress={locked ? () => toast(t('Unlock to edit the appearance')) : undefined}
         disabled={!locked}
       >
         <View pointerEvents={locked ? 'none' : 'auto'}>
           <AutoField
-            label="Appearance"
+            label={t('Appearance')}
             value={character.appearance}
             onCommit={appearance => update(character.id, { appearance })}
-            placeholder="Short messy black hair, big eyes, orange delivery jacket…"
-            hint="Worth covering: hair, eyes, build, outfit, distinguishing features."
+            placeholder={t('Short messy black hair, big eyes, orange delivery jacket…')}
+            hint={t('Worth covering: hair, eyes, build, outfit, distinguishing features.')}
             multiline
             maxLength={LIMITS.appearance}
             showCount
@@ -160,38 +161,37 @@ export function DesignTab({ character }: { character: Character }) {
         </View>
       </RNPressable>
 
-      <SectionHeader>Design sheet</SectionHeader>
+      <SectionHeader>{t('Design sheet')}</SectionHeader>
       <View className="flex-row gap-3">
         {renderSlot('face')}
         {renderSlot('body')}
       </View>
 
-      <SectionHeader>Expressions</SectionHeader>
+      <SectionHeader>{t('Expressions')}</SectionHeader>
       <View className="flex-row flex-wrap gap-2">{EXPRESSIONS.map(expression => renderSlot(expression, true))}</View>
 
       <Text variant="caption" tone="muted" className="my-1">
-        Tap an empty slot to upload an image from your device; long-press a filled slot to replace or delete it. Reference
-        images are what you look at while drawing so the character stays the same in every panel.
+        {t('Tap an empty slot to upload an image from your device; long-press a filled slot to replace or delete it. Reference images are what you look at while drawing so the character stays the same in every panel.')}
       </Text>
 
       {locked ? (
-        <Button title="Unlock to edit" icon={UnlockIcon} variant="secondary" onPress={() => update(character.id, { locked: false })} />
+        <Button title={t('Unlock to edit')} icon={UnlockIcon} variant="secondary" onPress={() => update(character.id, { locked: false })} />
       ) : (
-        <Button title="Lock as reference" icon={LockIcon} disabled={!canLock} onPress={lock} />
+        <Button title={t('Lock as reference')} icon={LockIcon} disabled={!canLock} onPress={lock} />
       )}
       {!locked && !canLock && (
         <Text variant="caption" tone="muted" className="text-center">
-          Add Face and Full body images to lock them as reference.
+          {t('Add {face} and {body} images to lock them as reference.', { face: t(slotLabel('face')), body: t(slotLabel('body')) })}
         </Text>
       )}
 
       <Menu
         visible={!!menuSlot}
         onClose={() => setMenuSlot(null)}
-        title={menuTitle ? slotLabel(menuTitle) : undefined}
+        title={menuTitle ? t(slotLabel(menuTitle)) : undefined}
         items={[
           {
-            label: 'Replace image',
+            label: t('Replace image'),
             icon: AddImageIcon,
             onPress: () => {
               if (menuSlot) {
@@ -200,7 +200,7 @@ export function DesignTab({ character }: { character: Character }) {
             },
           },
           {
-            label: 'Delete image',
+            label: t('Delete image'),
             icon: DeleteIcon,
             destructive: true,
             onPress: () => {
@@ -213,7 +213,7 @@ export function DesignTab({ character }: { character: Character }) {
       />
       <ImageViewer
         path={viewSlot ? slotPath(sheet, viewSlot) : null}
-        title={viewSlot ? `${displayName} · ${slotLabel(viewSlot)}` : undefined}
+        title={viewSlot ? `${displayName} · ${t(slotLabel(viewSlot))}` : undefined}
         onClose={() => setViewSlot(null)}
       />
     </View>

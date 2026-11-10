@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { chapterNumber, pageNumber } from '../model/selectors';
 import type { ID, Project, StoryData } from '../model/types';
 
@@ -14,8 +15,8 @@ export type ResumeTarget = { where: string; action: string; route: StoryRoute };
 export function resumeTarget(state: StoryData, project: Project): ResumeTarget {
   const projectId = project.id;
   const fallback: ResumeTarget = {
-    where: 'Story overview',
-    action: 'Open story',
+    where: t('Story overview'),
+    action: t('Open story'),
     route: { name: 'Project', params: { projectId } },
   };
   const last = project.lastOpened;
@@ -23,7 +24,7 @@ export function resumeTarget(state: StoryData, project: Project): ResumeTarget {
     return fallback;
   }
   if (last.screen === 'Outline') {
-    return { where: 'Outline', action: 'Keep writing', route: { name: 'Outline', params: { projectId } } };
+    return { where: t('Outline'), action: t('Keep writing'), route: { name: 'Outline', params: { projectId } } };
   }
   if (last.screen === 'Script' || last.screen === 'Storyboard') {
     const chapterId = last.chapterId;
@@ -32,10 +33,10 @@ export function resumeTarget(state: StoryData, project: Project): ResumeTarget {
     }
     const number = chapterNumber(project, chapterId);
     return last.screen === 'Script'
-      ? { where: `Chapter ${number} script`, action: 'Keep writing', route: { name: 'Script', params: { chapterId } } }
+      ? { where: t('Chapter {n} script', { n: number }), action: t('Keep writing'), route: { name: 'Script', params: { chapterId } } }
       : {
-          where: `Chapter ${number} storyboard`,
-          action: 'Keep drawing',
+          where: t('Chapter {n} storyboard', { n: number }),
+          action: t('Keep drawing'),
           route: { name: 'Storyboard', params: { chapterId } },
         };
   }
@@ -44,16 +45,19 @@ export function resumeTarget(state: StoryData, project: Project): ResumeTarget {
   if (!pageId || !page) {
     return fallback;
   }
-  const where = `Chapter ${chapterNumber(project, page.chapterId)} · Page ${pageNumber(state, pageId).index}`;
+  const where = t('Chapter {n} · Page {page}', {
+    n: chapterNumber(project, page.chapterId),
+    page: pageNumber(state, pageId).index,
+  });
   if (last.screen === 'PanelLayout') {
-    return { where, action: 'Keep paneling', route: { name: 'PanelLayout', params: { pageId } } };
+    return { where, action: t('Keep paneling'), route: { name: 'PanelLayout', params: { pageId } } };
   }
   if (last.screen === 'Lettering') {
-    return { where, action: 'Keep lettering', route: { name: 'Lettering', params: { pageId } } };
+    return { where, action: t('Keep lettering'), route: { name: 'Lettering', params: { pageId } } };
   }
   const panelId = last.panelId;
   if (!panelId || !page.panels[panelId]) {
-    return { where, action: 'Keep drawing', route: { name: 'PanelLayout', params: { pageId, mode: 'art' } } };
+    return { where, action: t('Keep drawing'), route: { name: 'PanelLayout', params: { pageId, mode: 'art' } } };
   }
-  return { where, action: 'Keep drawing', route: { name: 'Canvas', params: { pageId, panelId } } };
+  return { where, action: t('Keep drawing'), route: { name: 'Canvas', params: { pageId, panelId } } };
 }

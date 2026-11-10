@@ -2,10 +2,10 @@ import { ScrollView, View } from 'react-native';
 import { CheckIcon, RefreshIcon } from '../../ui/icons';
 
 import type { BlockDraft } from '../../core/ai/writing';
+import { t, tn } from '../../core/i18n';
 import { BLOCK_LABEL, LIMITS } from '../../core/model/constants';
 import type { Block, Character, ID } from '../../core/model/types';
 import { pairRewrite, type AiAction, type BlockLocation, type TextChange } from '../../core/script/aiDrafts';
-import { plural } from '../../core/util/format';
 import { AiNote, Button, Pressable, Text } from '../../ui';
 import { BeforeAfter, DraftBlockView, Footer } from './AiDraftViews';
 
@@ -18,8 +18,8 @@ export type AiResult =
 function RetryRow({ onRetry, onDiscard }: { onRetry: () => void; onDiscard: () => void }) {
   return (
     <View className="flex-row gap-2">
-      <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={onRetry} className="flex-1" />
-      <Button title="Discard" variant="ghost" onPress={onDiscard} className="flex-1" />
+      <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={onRetry} className="flex-1" />
+      <Button title={t('Discard')} variant="ghost" onPress={onDiscard} className="flex-1" />
     </View>
   );
 }
@@ -52,14 +52,14 @@ export function AiResultView({
     return (
       <>
         <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
-          <AiNote text={location ? 'Inserted after the focused block' : 'Inserted at the end of the script'} />
+          <AiNote text={location ? t('Inserted after the focused block') : t('Inserted at the end of the script')} />
           {result.drafts.map((draft, index) => (
             <DraftBlockView key={index} draft={draft} character={draft.characterId ? charactersById[draft.characterId] : undefined} />
           ))}
         </ScrollView>
         <Footer>
           <Button
-            title={`Insert ${plural(result.drafts.length, 'block')}`}
+            title={tn(result.drafts.length, 'Insert {count} block', 'Insert {count} blocks')}
             icon={CheckIcon}
             onPress={() => onInsert(location?.block.id ?? null, result.drafts)}
           />
@@ -75,11 +75,19 @@ export function AiResultView({
     return (
       <>
         <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
-          <AiNote text={instruction.trim() ? `Rewritten to be ${instruction.trim()}` : 'Rewritten for rhythm and clarity'} />
+          <AiNote
+            text={
+              instruction.trim()
+                ? t('Rewritten to be {instruction}', { instruction: instruction.trim() })
+                : t('Rewritten for rhythm and clarity')
+            }
+          />
           {mismatch && (
             <Text variant="caption" tone="warning">
-              The AI answered with {plural(result.drafts.length, 'block')} for {plural(result.targets.length, 'block')}. Blocks
-              without a match keep their text.
+              {t('The AI answered with {got} for {wanted}. Blocks without a match keep their text.', {
+                got: tn(result.drafts.length, '{count} block', '{count} blocks'),
+                wanted: tn(result.targets.length, '{count} block', '{count} blocks'),
+              })}
             </Text>
           )}
           {pairs.map(pair => {
@@ -88,17 +96,17 @@ export function AiResultView({
             return (
               <BeforeAfter
                 key={pair.id}
-                label={target ? `${BLOCK_LABEL[target.type]}${name ? ` · ${name}` : ''}` : undefined}
+                label={target ? `${t(BLOCK_LABEL[target.type])}${name ? ` · ${name}` : ''}` : undefined}
                 before={target?.text ?? ''}
                 after={pair.text}
               />
             );
           })}
-          {!pairs.length && <Text tone="muted">The AI returned nothing usable.</Text>}
+          {!pairs.length && <Text tone="muted">{t('The AI returned nothing usable.')}</Text>}
         </ScrollView>
         <Footer>
           <Button
-            title={pairs.length > 1 ? `Replace ${plural(pairs.length, 'block')}` : 'Replace'}
+            title={pairs.length > 1 ? t('Replace {count} blocks', { count: pairs.length }) : t('Replace')}
             icon={CheckIcon}
             disabled={!pairs.length}
             onPress={() => onReplace(pairs)}
@@ -112,23 +120,25 @@ export function AiResultView({
     const length = result.text.length;
     const note =
       action === 'voice'
-        ? `In ${speaker?.name || 'the character'}'s voice`
+        ? speaker?.name
+          ? t("In {name}'s voice", { name: speaker.name })
+          : t("In the character's voice")
         : length <= LIMITS.longDialogue
-        ? `${length} characters, fits a bubble`
-        : `${length} characters, still over ${LIMITS.longDialogue}`;
+        ? t('{count} characters, fits a bubble', { count: length })
+        : t('{count} characters, still over {max}', { count: length, max: LIMITS.longDialogue });
     return (
       <>
         <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
           <AiNote text={note} />
           <BeforeAfter
-            label={speaker ? `${BLOCK_LABEL.dialogue} · ${speaker.name}` : BLOCK_LABEL.dialogue}
+            label={speaker ? `${t(BLOCK_LABEL.dialogue)} · ${speaker.name}` : t(BLOCK_LABEL.dialogue)}
             before={location?.block.text ?? ''}
             after={result.text}
           />
         </ScrollView>
         <Footer>
           <Button
-            title="Replace"
+            title={t('Replace')}
             icon={CheckIcon}
             disabled={!location}
             onPress={() => location && onReplace([{ id: location.block.id, text: result.text }])}
@@ -141,13 +151,13 @@ export function AiResultView({
   return (
     <>
       <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
-        <AiNote text="Tap a sound to add it after the action" />
+        <AiNote text={t('Tap a sound to add it after the action')} />
         <Text tone="secondary">{location?.block.text}</Text>
         <View className="flex-row flex-wrap gap-2">
           {result.words.map(word => (
             <Pressable
               key={word}
-              accessibilityLabel={`Add ${word}`}
+              accessibilityLabel={t('Add {word}', { word })}
               onPress={() => location && onInsert(location.block.id, [{ type: 'sfx', text: word }])}
               className="min-h-12 justify-center overflow-hidden rounded-md bg-surface px-4"
             >

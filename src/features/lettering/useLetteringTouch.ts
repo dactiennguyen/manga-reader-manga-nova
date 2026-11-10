@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 
+import { t } from '../../core/i18n';
 import { hitTestPanel, type Pt } from '../../core/layout/layout';
 import { insidePage } from '../../core/layout/pageView';
 import {
@@ -65,7 +66,7 @@ export function useLetteringTouch(c: LetteringController): LetteringGestureHandl
     } else if (pending?.kind === 'effect') {
       const panelId = hitTestPanel(ctx.shapes, p);
       if (!panelId) {
-        toast('Tap inside a panel to apply the effect');
+        toast(t('Tap inside a panel to apply the effect'));
         return;
       }
       const created = createEffect(pending.type, panelId);

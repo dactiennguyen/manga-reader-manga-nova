@@ -1,6 +1,7 @@
 import { CommonActions } from '@react-navigation/native';
 
 import { buildProjectBundle, mapBundleImages } from '../../core/archive/bundle';
+import { t } from '../../core/i18n';
 import type { ID, Project } from '../../core/model/types';
 import type { StoryRoute } from '../../core/story/resume';
 import { toAbsolute } from '../../core/util/paths';
@@ -26,36 +27,36 @@ export async function changeProjectCover(projectId: ID): Promise<void> {
     if (previous && previous !== path) {
       removeFile(previous).catch(() => undefined);
     }
-    toast('Cover changed');
+    toast(t('Cover changed'));
   } catch {
-    toast('Could not open this image');
+    toast(t('Could not open this image'));
   }
 }
 
 export async function exportProjectFile(projectId: ID): Promise<void> {
-  const title = useStory.getState().projects[projectId]?.title || 'Story';
+  const title = useStory.getState().projects[projectId]?.title || t('Story');
   try {
-    toast('Packing project…');
+    toast(t('Packing project…'));
     const path = await appServices().exportProject(projectId);
-    await shareFile(path, MIME.archive, `${title} project`);
+    await shareFile(path, MIME.archive, t('{title} project', { title }));
   } catch {
-    toast('Could not export the project. Try again later');
+    toast(t('Could not export the project. Try again later'));
   }
 }
 
 export async function trashProjectWithConfirm(project: Project): Promise<boolean> {
   const ok = await confirm(
-    `Delete "${project.title || 'Untitled'}"?`,
-    'The story stays in Trash for 30 days and can be restored during that time.',
-    { confirmText: 'Delete', destructive: true },
+    t('Delete "{title}"?', { title: project.title || t('Untitled') }),
+    t('The story stays in Trash for 30 days and can be restored during that time.'),
+    { confirmText: t('Delete'), destructive: true },
   );
   if (!ok) {
     return false;
   }
   useStory.getState().trashProject(project.id);
   snackbar({
-    message: 'Moved to trash',
-    actionLabel: 'Undo',
+    message: t('Moved to trash'),
+    actionLabel: t('Undo'),
     onAction: () => useStory.getState().restoreProject(project.id),
   });
   return true;
@@ -92,12 +93,12 @@ export async function duplicateStory(projectId: ID, onOpen?: (copyId: ID) => voi
     copied.forEach(dest => {
       removeFile(dest).catch(() => undefined);
     });
-    toast('Could not duplicate this story');
+    toast(t('Could not duplicate this story'));
     return null;
   }
   snackbar({
-    message: 'Story duplicated',
-    actionLabel: onOpen ? 'Open' : undefined,
+    message: t('Story duplicated'),
+    actionLabel: onOpen ? t('Open') : undefined,
     onAction: onOpen ? () => onOpen(copyId) : undefined,
   });
   return copyId;

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { BackHandler, ScrollView, View } from 'react-native';
 import { BrushIcon, PenLineIcon, StarIcon } from '../../ui/icons';
 
+import { msg, t } from '../../core/i18n';
 import { GENRES, LIMITS } from '../../core/model/constants';
 import type { ScreenProps } from '../../state/navigation';
 import { DEFAULT_SETTINGS, useSettings, type CreatorRole } from '../../state/useSettings';
@@ -14,15 +15,15 @@ const STEP_COUNT = 3;
 const STEP_OFFSET = 2;
 
 const ROLES: { id: CreatorRole; label: string; hint: string; icon: IconGlyph }[] = [
-  { id: 'draw', label: 'Draw', hint: 'I want to open a canvas and start drawing', icon: BrushIcon },
-  { id: 'write', label: 'Write stories', hint: 'I have ideas and want to turn them into a script', icon: PenLineIcon },
-  { id: 'both', label: 'Both', hint: 'I write and draw my own stories', icon: StarIcon },
+  { id: 'draw', label: msg('Draw'), hint: msg('I want to open a canvas and start drawing'), icon: BrushIcon },
+  { id: 'write', label: msg('Write stories'), hint: msg('I have ideas and want to turn them into a script'), icon: PenLineIcon },
+  { id: 'both', label: msg('Both'), hint: msg('I write and draw my own stories'), icon: StarIcon },
 ];
 
 const QUESTIONS = [
-  { title: 'What do you want to do?', hint: 'Pick one.' },
-  { title: 'Which genres do you like?', hint: `Pick up to ${LIMITS.favoriteGenres}.` },
-  { title: 'Which art style do you like?', hint: 'Pick one. It becomes the default for new stories.' },
+  { title: msg('What do you want to do?'), hint: msg('Pick one.') },
+  { title: msg('Which genres do you like?'), hint: msg('Pick up to {max}.') },
+  { title: msg('Which art style do you like?'), hint: msg('Pick one. It becomes the default for new stories.') },
 ];
 
 function clampStep(step: number): number {
@@ -116,7 +117,7 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
       return;
     }
     if (favoriteGenres.length >= LIMITS.favoriteGenres) {
-      toast(`Up to ${LIMITS.favoriteGenres} genres`);
+      toast(t('Up to {max} genres', { max: LIMITS.favoriteGenres }));
       return;
     }
     useSettings.getState().set({ favoriteGenres: [...favoriteGenres, genre] });
@@ -128,7 +129,7 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
     <Screen padded={false}>
       <AppBar
         onBack={onBack}
-        right={edit ? undefined : <Button title="Skip" variant="ghost" small onPress={() => finish(true)} />}
+        right={edit ? undefined : <Button title={t('Skip')} variant="ghost" small onPress={() => finish(true)} />}
       >
         <View className="flex-row items-center gap-3 pr-2">
           <View className="flex-1">
@@ -142,9 +143,9 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
       <ScrollView className="flex-1" contentContainerClassName="w-full max-w-[560px] gap-4 self-center p-4">
         <View className="gap-1">
           <Text variant="display" accessibilityRole="header">
-            {question.title}
+            {t(question.title)}
           </Text>
-          <Text tone="secondary">{question.hint}</Text>
+          <Text tone="secondary">{t(question.hint, { max: LIMITS.favoriteGenres })}</Text>
         </View>
 
         {step === 0 && (
@@ -152,8 +153,8 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
             {ROLES.map(item => (
               <OptionCard
                 key={item.id}
-                label={item.label}
-                hint={item.hint}
+                label={t(item.label)}
+                hint={t(item.hint)}
                 selected={role === item.id}
                 onPress={() => useSettings.getState().set({ role: item.id })}
                 left={<Icon icon={item.icon} size={ICON.lg} color={role === item.id ? 'accent' : 'text'} />}
@@ -168,14 +169,14 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
               {GENRES.map(genre => (
                 <Chip
                   key={genre}
-                  label={genre}
+                  label={t(genre)}
                   selected={favoriteGenres.includes(genre)}
                   onPress={() => toggleGenre(genre)}
                 />
               ))}
             </ChipGroup>
             <Text variant="caption" tone="muted">
-              {favoriteGenres.length}/{LIMITS.favoriteGenres} selected
+              {t('{count}/{max} selected', { count: favoriteGenres.length, max: LIMITS.favoriteGenres })}
             </Text>
           </View>
         )}
@@ -185,7 +186,7 @@ export function PreferencesScreen({ navigation, route }: ScreenProps<'Preference
         )}
       </ScrollView>
       <View className="p-4">
-        <Button title={step < STEP_COUNT - 1 ? 'Next' : 'Done'} onPress={onNext} />
+        <Button title={step < STEP_COUNT - 1 ? t('Next') : t('Done')} onPress={onNext} />
       </View>
     </Screen>
   );

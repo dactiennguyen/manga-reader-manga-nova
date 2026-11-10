@@ -1,3 +1,4 @@
+#import <AVFoundation/AVFoundation.h>
 #import <LinkPresentation/LinkPresentation.h>
 #import <ManganovaSpecs/ManganovaSpecs.h>
 #import <React/RCTUtils.h>
@@ -32,7 +33,7 @@
 }
 @end
 
-/** Implements specs/NativeFiles.ts on iOS: zip/unzip, images to PDF, sharing and clipboard. */
+/** Implements specs/NativeFiles.ts on iOS: zip/unzip, images to PDF or video, sharing and clipboard. */
 @interface NativeFilesModule : NSObject <NativeFilesSpec>
 @end
 
@@ -221,6 +222,116 @@ static void makeParent(NSString *path)
                           completion:^{
                             resolve(nil);
                           }];
+  });
+}
+
+- (void)framesToVideo:(NSArray *)framePaths
+              outPath:(NSString *)outPath
+                  fps:(double)fps
+              resolve:(RCTPromiseResolveBlock)resolve
+               reject:(RCTPromiseRejectBlock)reject
+{
+  NSArray<NSString *> *paths = [framePaths copy];
+  int32_t rate = (int32_t)MAX(1, MIN(60, fps));
+  dispatch_async(_queue, ^{
+    UIImage *first = [UIImage imageWithContentsOfFile:paths.firstObject];
+    // H.264 needs even sides.
+    size_t width = first ? CGImageGetWidth(first.CGImage) & ~(size_t)1 : 0;
+    size_t height = first ? CGImageGetHeight(first.CGImage) & ~(size_t)1 : 0;
+    if (width == 0 || height == 0) {
+      reject(@"E_VIDEO", @"The first frame can't be read.", nil);
+      return;
+    }
+    NSFileManager *files = [NSFileManager defaultManager];
+    [files createDirectoryAtPath:[outPath stringByDeletingLastPathComponent]
+        withIntermediateDirectories:YES
+                         attributes:nil
+                              error:nil];
+    [files removeItemAtPath:outPath error:nil];
+
+    NSError *error = nil;
+    AVAssetWriter *writer = [AVAssetWriter assetWriterWithURL:[NSURL fileURLWithPath:outPath]
+                                                     fileType:AVFileTypeMPEG4
+                                                        error:&error];
+    if (!writer) {
+      reject(@"E_VIDEO", error.localizedDescription, error);
+      return;
+    }
+    AVAssetWriterInput *input =
+        [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                           outputSettings:@{
+                                             AVVideoCodecKey : AVVideoCodecTypeH264,
+                                             AVVideoWidthKey : @(width),
+                                             AVVideoHeightKey : @(height),
+                                           }];
+    input.expectsMediaDataInRealTime = NO;
+    AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor
+        assetWriterInputPixelBufferAdaptorWithAssetWriterInput:input
+                                   sourcePixelBufferAttributes:@{
+                                     (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
+                                     (id)kCVPixelBufferWidthKey : @(width),
+                                     (id)kCVPixelBufferHeightKey : @(height),
+                                     (id)kCVPixelBufferCGBitmapContextCompatibilityKey : @YES,
+                                   }];
+    [writer addInput:input];
+    if (![writer startWriting]) {
+      reject(@"E_VIDEO", writer.error.localizedDescription, writer.error);
+      return;
+    }
+    [writer startSessionAtSourceTime:kCMTimeZero];
+
+    CGColorSpaceRef space = CGColorSpaceCreateDeviceRGB();
+    NSString *lastPath = nil;
+    UIImage *image = nil;
+    BOOL failed = NO;
+    for (NSUInteger i = 0; i < paths.count && !failed; i++) {
+      @autoreleasepool {
+        if (![paths[i] isEqualToString:lastPath]) {
+          image = [UIImage imageWithContentsOfFile:paths[i]];
+          lastPath = paths[i];
+        }
+        while (!input.readyForMoreMediaData && writer.status == AVAssetWriterStatusWriting) {
+          [NSThread sleepForTimeInterval:0.005];
+        }
+        CVPixelBufferRef buffer = NULL;
+        if (!image || writer.status != AVAssetWriterStatusWriting ||
+            CVPixelBufferPoolCreatePixelBuffer(NULL, adaptor.pixelBufferPool, &buffer) != kCVReturnSuccess) {
+          failed = YES;
+        } else {
+          CVPixelBufferLockBaseAddress(buffer, 0);
+          CGContextRef context = CGBitmapContextCreate(
+              CVPixelBufferGetBaseAddress(buffer), width, height, 8, CVPixelBufferGetBytesPerRow(buffer), space,
+              (CGBitmapInfo)kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Little);
+          CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
+          CGContextRelease(context);
+          CVPixelBufferUnlockBaseAddress(buffer, 0);
+          failed = ![adaptor appendPixelBuffer:buffer withPresentationTime:CMTimeMake((int64_t)i, rate)];
+        }
+        CVPixelBufferRelease(buffer);
+      }
+    }
+    CGColorSpaceRelease(space);
+
+    if (failed) {
+      [writer cancelWriting];
+      [files removeItemAtPath:outPath error:nil];
+      reject(@"E_VIDEO", writer.error.localizedDescription ?: @"A frame can't be read.", writer.error);
+      return;
+    }
+    [input markAsFinished];
+    // Gives the last frame its full length.
+    [writer endSessionAtSourceTime:CMTimeMake((int64_t)paths.count, rate)];
+    dispatch_semaphore_t done = dispatch_semaphore_create(0);
+    [writer finishWritingWithCompletionHandler:^{
+      dispatch_semaphore_signal(done);
+    }];
+    dispatch_semaphore_wait(done, DISPATCH_TIME_FOREVER);
+    if (writer.status == AVAssetWriterStatusCompleted) {
+      resolve(nil);
+    } else {
+      [files removeItemAtPath:outPath error:nil];
+      reject(@"E_VIDEO", writer.error.localizedDescription, writer.error);
+    }
   });
 }
 

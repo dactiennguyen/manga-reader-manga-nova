@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { BoldIcon, CircleIcon, DeleteIcon, DoneIcon, PenLineIcon, UserIcon } from '../../ui/icons';
 
+import { msg, t } from '../../core/i18n';
 import { clampFontSize } from '../../core/lettering/bubbleEdit';
 import { SFX_STYLES } from '../../core/lettering/bubbles';
 import { hasTranslation, translationOf } from '../../core/lettering/translation';
@@ -14,13 +15,13 @@ const SPEECH_TYPES: BubbleType[] = ['speak', 'think', 'shout', 'whisper', 'machi
 const FONTS = Object.keys(FONT_LABEL) as BubbleFont[];
 const EFFECT_TYPES = Object.keys(EFFECT_LABEL) as EffectType[];
 const NARRATION_STYLES: { value: NonNullable<Bubble['narrationStyle']>; label: string }[] = [
-  { value: 'box', label: 'Border' },
-  { value: 'inverse', label: 'Black' },
-  { value: 'plain', label: 'No border' },
+  { value: 'box', label: msg('Border') },
+  { value: 'inverse', label: msg('Black') },
+  { value: 'plain', label: msg('No border') },
 ];
 const OUTLINE_COLORS: { value: NonNullable<Bubble['outlineColor']>; label: string }[] = [
-  { value: 'white', label: 'White outline' },
-  { value: 'black', label: 'Black outline' },
+  { value: 'white', label: msg('White outline') },
+  { value: 'black', label: msg('Black outline') },
 ];
 
 function Row({ label, children }: { label?: string; children: ReactNode }) {
@@ -96,10 +97,10 @@ export function BubbleCard({
     <ToolPanel className="gap-0 py-1">
       <View className="flex-row items-center gap-1">
         <Text variant="caption" tone="secondary" numberOfLines={1} className="min-w-14 flex-1">
-          {BUBBLE_TYPE_LABEL[bubble.type]}
+          {t(BUBBLE_TYPE_LABEL[bubble.type])}
         </Text>
         <Stepper
-          label="font size"
+          label={t('font size')}
           value={bubble.fontSize}
           min={clampFontSize(bubble.type, 0)}
           max={clampFontSize(bubble.type, Infinity)}
@@ -113,30 +114,30 @@ export function BubbleCard({
             size={ICON.md}
             active={bubble.bold}
             onPress={() => onChange({ bold: !bubble.bold })}
-            accessibilityLabel="Bold"
+            accessibilityLabel={t('Bold')}
           />
         )}
-        <IconButton icon={PenLineIcon} size={ICON.md} onPress={onEdit} accessibilityLabel="Edit text" />
-        <IconButton icon={DeleteIcon} size={ICON.md} color="danger" onPress={onDelete} accessibilityLabel="Delete" />
+        <IconButton icon={PenLineIcon} size={ICON.md} onPress={onEdit} accessibilityLabel={t('Edit text')} />
+        <IconButton icon={DeleteIcon} size={ICON.md} color="danger" onPress={onDelete} accessibilityLabel={t('Delete')} />
       </View>
       {!!lang && (
         <Pressable
-          accessibilityLabel={translated ? `Edit ${lang} text` : `Add ${lang} text`}
+          accessibilityLabel={translated ? t('Edit {lang} text', { lang }) : t('Add {lang} text', { lang })}
           onPress={onEdit}
           className="min-h-12 flex-row items-center gap-2"
         >
           <Icon icon={translated ? DoneIcon : CircleIcon} size={ICON.xs} color={translated ? 'success' : 'warning'} />
           <Text variant="caption" tone="secondary" numberOfLines={1} className="flex-1">
-            {translated ? `${lang}: ${translationOf(bubble, lang)}` : `No ${lang} text yet · showing the original`}
+            {translated ? `${lang}: ${translationOf(bubble, lang)}` : t('No {lang} text yet · showing the original', { lang })}
           </Text>
         </Pressable>
       )}
       {speech && (
-        <Row label="Style">
+        <Row label={t('Style')}>
           {SPEECH_TYPES.map(type => (
             <Chip
               key={type}
-              label={BUBBLE_TYPE_LABEL[type]}
+              label={t(BUBBLE_TYPE_LABEL[type])}
               selected={bubble.type === type}
               onPress={() => onChange({ type, bold: type === 'shout' ? true : bubble.bold })}
             />
@@ -144,11 +145,11 @@ export function BubbleCard({
         </Row>
       )}
       {narration && (
-        <Row label="Box">
+        <Row label={t('Box')}>
           {NARRATION_STYLES.map(style => (
             <Chip
               key={style.value}
-              label={style.label}
+              label={t(style.label)}
               selected={(bubble.narrationStyle ?? 'box') === style.value}
               onPress={() => onChange({ narrationStyle: style.value })}
             />
@@ -157,18 +158,18 @@ export function BubbleCard({
       )}
       {sfx ? (
         <>
-          <Row label="Style">
+          <Row label={t('Style')}>
             {SFX_STYLES.map((style, index) => (
               <Chip
                 key={style.label}
-                label={style.label}
+                label={t(style.label)}
                 selected={(bubble.sfxStyle ?? 0) === index}
                 onPress={() => onChange({ sfxStyle: index, skew: style.skew })}
               />
             ))}
           </Row>
           <SliderRow
-            label="Rotate"
+            label={t('Rotate')}
             value={Math.round(bubble.rotation)}
             min={-180}
             max={180}
@@ -177,7 +178,7 @@ export function BubbleCard({
             onChange={rotation => onChange({ rotation }, 'rotation')}
           />
           <SliderRow
-            label="Skew"
+            label={t('Skew')}
             value={skew}
             min={-60}
             max={60}
@@ -186,7 +187,7 @@ export function BubbleCard({
             onChange={value => onChange({ skew: value / 100 }, 'skew')}
           />
           <SliderRow
-            label="Outline"
+            label={t('Edge')}
             value={bubble.outline ?? 0}
             min={0}
             max={16}
@@ -196,23 +197,23 @@ export function BubbleCard({
           />
           <View className="py-1">
             <Segmented
-              options={OUTLINE_COLORS}
+              options={OUTLINE_COLORS.map(option => ({ ...option, label: t(option.label) }))}
               value={bubble.outlineColor ?? 'white'}
               onChange={outlineColor => onChange({ outlineColor })}
             />
           </View>
         </>
       ) : (
-        <Row label="Font">
+        <Row label={t('Font')}>
           {FONTS.map(key => (
-            <Chip key={key} label={FONT_LABEL[key]} selected={bubble.font === key} onPress={() => onChange({ font: key })} />
+            <Chip key={key} label={t(FONT_LABEL[key])} selected={bubble.font === key} onPress={() => onChange({ font: key })} />
           ))}
         </Row>
       )}
       {speech && (
         <Row>
-          <Chip label="Tail" selected={!!bubble.tail} onPress={onToggleTail} />
-          <Chip label={speaker ?? 'Speaker'} icon={UserIcon} selected={!!speaker} onPress={onPickSpeaker} />
+          <Chip label={t('Tail')} selected={!!bubble.tail} onPress={onToggleTail} />
+          <Chip label={speaker ?? t('Speaker')} icon={UserIcon} selected={!!speaker} onPress={onPickSpeaker} />
         </Row>
       )}
     </ToolPanel>
@@ -234,16 +235,16 @@ export function EffectCard({
   return (
     <ToolPanel className="gap-0 py-1">
       <View className="flex-row items-center gap-1">
-        <Text variant="label" className="flex-1">{`Effect · Panel ${panelNumber}`}</Text>
-        <IconButton icon={DeleteIcon} size={ICON.md} color="danger" onPress={onDelete} accessibilityLabel="Delete effect" />
+        <Text variant="label" className="flex-1">{t('Effect · Panel {n}', { n: panelNumber })}</Text>
+        <IconButton icon={DeleteIcon} size={ICON.md} color="danger" onPress={onDelete} accessibilityLabel={t('Delete effect')} />
       </View>
-      <Row label="Type">
+      <Row label={t('Type')}>
         {EFFECT_TYPES.map(type => (
-          <Chip key={type} label={EFFECT_LABEL[type]} selected={effect.type === type} onPress={() => onChange({ type })} />
+          <Chip key={type} label={t(EFFECT_LABEL[type])} selected={effect.type === type} onPress={() => onChange({ type })} />
         ))}
       </Row>
       <SliderRow
-        label="Density"
+        label={t('Density')}
         value={Math.round(effect.density * 100)}
         min={0}
         max={100}
@@ -253,7 +254,7 @@ export function EffectCard({
       />
       {angled && (
         <SliderRow
-          label="Angle"
+          label={t('Angle')}
           value={Math.round(effect.angle)}
           min={0}
           max={345}
@@ -263,7 +264,7 @@ export function EffectCard({
         />
       )}
       <SliderRow
-        label="Opacity"
+        label={t('Opacity')}
         value={Math.round(effect.opacity * 100)}
         min={10}
         max={100}
@@ -273,7 +274,7 @@ export function EffectCard({
       />
       {effect.type === 'focus' && (
         <Text variant="caption" tone="secondary" className="py-1">
-          Drag the dot inside the panel to set the center.
+          {t('Drag the dot inside the panel to set the center.')}
         </Text>
       )}
     </ToolPanel>

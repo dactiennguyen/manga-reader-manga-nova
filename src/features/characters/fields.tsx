@@ -3,6 +3,7 @@ import { Image, Modal, Pressable as RNPressable, ScrollView, View, useWindowDime
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CloseIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { fileUri } from '../../core/util/paths';
 import { FieldLabel, IconButton, Text, TextField } from '../../ui';
 
@@ -123,7 +124,7 @@ export function ImageViewer({ path, title, onClose }: { path: string | null | un
             showsVerticalScrollIndicator={false}
             contentContainerClassName="grow items-center justify-center"
           >
-            <RNPressable accessibilityRole="button" accessibilityLabel="Close image" onPress={onClose}>
+            <RNPressable accessibilityRole="button" accessibilityLabel={t('Close image')} onPress={onClose}>
               <Image
                 accessibilityIgnoresInvertColors
                 source={{ uri: fileUri(path) }}
@@ -137,7 +138,7 @@ export function ImageViewer({ path, title, onClose }: { path: string | null | un
           <Text variant="label" numberOfLines={1} className="flex-1">
             {title ?? ''}
           </Text>
-          <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close" className="bg-overlay" />
+          <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel={t('Close')} className="bg-overlay" />
         </View>
       </View>
     </Modal>

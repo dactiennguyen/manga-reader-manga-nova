@@ -1,3 +1,4 @@
+import { tn } from '../i18n';
 import { panelOrder } from '../layout/layout';
 import { DIALOGUE_KINDS } from '../model/constants';
 import type { Block, BlockType, ID, Page, Scene } from '../model/types';
@@ -145,5 +146,5 @@ export function hasScriptText(scenes: Scene[]): boolean {
 }
 
 export function pagesText(value: number): string {
-  return `~${Number.isInteger(value) ? value : value.toFixed(1)} ${value === 1 ? 'page' : 'pages'}`;
+  return tn(value, '~{count} page', '~{count} pages', { count: Number.isInteger(value) ? value : value.toFixed(1) });
 }

@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { SaveIcon, ShareIcon } from '../../ui/icons';
 
 import type { ExportRecord } from '../../core/export/history';
+import { t } from '../../core/i18n';
 import { formatBytes } from '../../core/util/format';
 import { Button, ProgressBar, Text } from '../../ui';
 import { FORMAT_LABEL } from './ExportParts';
@@ -24,10 +25,10 @@ export function ExportStatus({
     return (
       <View accessibilityLiveRegion="polite" className="gap-2 rounded-lg bg-surface p-3">
         <Text variant="label">
-          Exporting page {Math.min(phase.done + 1, phase.total)}/{phase.total}
+          {t('Exporting page {n}/{total}', { n: Math.min(phase.done + 1, phase.total), total: phase.total })}
         </Text>
         <ProgressBar value={phase.total ? phase.done / phase.total : 0} />
-        <Button title="Cancel" variant="secondary" small onPress={onCancel} />
+        <Button title={t('Cancel')} variant="secondary" small onPress={onCancel} />
       </View>
     );
   }
@@ -35,16 +36,16 @@ export function ExportStatus({
     return (
       <View accessibilityLiveRegion="polite" className="gap-2 rounded-lg bg-surface p-3">
         <Text variant="caption" tone="success">
-          Export complete
+          {t('Export complete')}
         </Text>
         <Text variant="heading">{phase.result.fileName}</Text>
         <Text variant="caption" tone="secondary">
-          {FORMAT_LABEL[phase.result.format]} · {formatBytes(phase.result.size)}
+          {t(FORMAT_LABEL[phase.result.format])} · {formatBytes(phase.result.size)}
         </Text>
         <View className="mt-1 flex-row gap-2">
-          <Button title="Share" icon={ShareIcon} className="flex-1" onPress={() => onShare(phase.result)} />
+          <Button title={t('Share')} icon={ShareIcon} className="flex-1" onPress={() => onShare(phase.result)} />
           <Button
-            title="Save to device"
+            title={t('Save to device')}
             icon={SaveIcon}
             variant="secondary"
             className="flex-1"
@@ -58,10 +59,10 @@ export function ExportStatus({
     return (
       <View accessibilityLiveRegion="assertive" className="gap-2 rounded-lg bg-danger/15 p-3">
         <Text variant="caption" tone="danger">
-          Export failed
+          {t('Export failed')}
         </Text>
         <Text>{phase.message}</Text>
-        <Button title="Try again" variant="secondary" small onPress={onRetry} />
+        <Button title={t('Try again')} variant="secondary" small onPress={onRetry} />
       </View>
     );
   }

@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import type { Act, Block, Chapter } from '../../model/types';
 import { uid } from '../../util/id';
 import { moveItem, omit, touchProject } from './helpers';
@@ -16,7 +17,7 @@ export function createChapterActions(set: StorySet, get: StoryGet): ChapterActio
         if (!project) {
           return state;
         }
-        const act: Act = { id: actId, title: title ?? `Act ${project.acts.length + 1}`, chapterIds: [] };
+        const act: Act = { id: actId, title: title ?? t('Act {n}', { n: project.acts.length + 1 }), chapterIds: [] };
         return {
           projects: {
             ...state.projects,
@@ -149,7 +150,7 @@ export function createChapterActions(set: StorySet, get: StoryGet): ChapterActio
       const newId = get().addChapter(project.id, {
         actId: act?.id,
         index: act ? act.chapterIds.indexOf(chapterId) + 1 : undefined,
-        title: `${source.title} (copy)`,
+        title: t('{title} (copy)', { title: source.title }),
         summary: source.summary,
         goal: source.goal,
       });

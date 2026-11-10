@@ -1,6 +1,7 @@
 import { View, useWindowDimensions } from 'react-native';
 import { CheckIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { ART_STYLES } from '../../core/model/constants';
 import type { ArtStyle } from '../../core/model/types';
 import { ICON, Icon, Pressable, Text } from '../../ui';
@@ -16,7 +17,7 @@ export function StylePicker({ value, onChange }: { value: ArtStyle; onChange: (s
           <Pressable
             key={item.id}
             accessibilityRole="radio"
-            accessibilityLabel={`${item.label}, ${item.hint}`}
+            accessibilityLabel={`${t(item.label)}, ${t(item.hint)}`}
             accessibilityState={{ selected }}
             onPress={() => onChange(item.id)}
             className={`grow overflow-hidden rounded-lg ${wide ? 'w-[30%]' : 'w-[47%]'} ${
@@ -26,10 +27,10 @@ export function StylePicker({ value, onChange }: { value: ArtStyle; onChange: (s
             <StyleSample style={item.id} />
             <View className="gap-0.5 p-2">
               <Text variant="label" tone={selected ? 'accent' : 'text'}>
-                {item.label}
+                {t(item.label)}
               </Text>
               <Text variant="caption" tone="muted" numberOfLines={2}>
-                {item.hint}
+                {t(item.hint)}
               </Text>
             </View>
             {selected && (

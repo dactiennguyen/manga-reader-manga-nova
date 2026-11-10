@@ -1,16 +1,17 @@
+import { msg, t, tn } from '../i18n';
 import { CHAPTER_STATUS_LABEL } from '../model/constants';
 import { chapterName } from '../model/selectors';
 import type { Act, Chapter, ChapterStatus, ID, Project } from '../model/types';
 
 export function chapterCount(count: number): string {
-  return `${count} ${count === 1 ? 'chapter' : 'chapters'}`;
+  return tn(count, '{count} chapter', '{count} chapters');
 }
 
 export const STATUS_TEXT: Record<ChapterStatus, string> = {
-  unwritten: 'No script yet',
-  writing: 'Script written',
+  unwritten: msg('No script yet'),
+  writing: msg('Script written'),
   drawing: CHAPTER_STATUS_LABEL.drawing,
-  done: 'Fully drawn',
+  done: msg('Fully drawn'),
 };
 
 export type ChapterSpot = { actIndex: number; act: Act | undefined; index: number };
@@ -65,12 +66,12 @@ export function outlineText(
       if (!chapter) {
         continue;
       }
-      lines.push(`Chapter ${numbers[id]}. ${chapterName(chapter.title, numbers[id])}`);
+      lines.push(t('Chapter {n}. {title}', { n: numbers[id], title: chapterName(chapter.title, numbers[id]) }));
       if (chapter.summary) {
         lines.push(`  ${chapter.summary}`);
       }
       if (chapter.goal) {
-        lines.push(`  Goal: ${chapter.goal}`);
+        lines.push(`  ${t('Goal: {goal}', { goal: chapter.goal })}`);
       }
     }
   }

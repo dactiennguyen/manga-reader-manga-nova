@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } 
 import { BackHandler, Keyboard, type ScrollView } from 'react-native';
 
 import { suggestStory, type StoryIdea } from '../../core/ai/story';
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { ArtStyle } from '../../core/model/types';
 import { FORMATS, genresFavoritesFirst, knownGenres, titleTaken, type FormatKey } from '../../core/story/newProject';
@@ -47,8 +48,8 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
   const close = useCallback(async () => {
     if (
       dirty &&
-      !(await confirm('Discard this new story?', 'What you entered will not be saved.', {
-        confirmText: 'Discard',
+      !(await confirm(t('Discard this new story?'), t('What you entered will not be saved.'), {
+        confirmText: t('Discard'),
         destructive: true,
       }))
     ) {
@@ -90,7 +91,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
       setGenres(genres.filter(item => item !== genre));
       setAiFilled(false);
     } else if (genres.length >= LIMITS.genresPerProject) {
-      toast(`Pick up to ${LIMITS.genresPerProject} genres`);
+      toast(t('Pick up to {max} genres', { max: LIMITS.genresPerProject }));
     } else {
       setGenres([...genres, genre]);
       setAiFilled(false);
@@ -120,7 +121,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
 
   const next = () => {
     if (step === 0 && !name) {
-      toast('Give your story a title');
+      toast(t('Give your story a title'));
       return;
     }
     if (ai.status === 'loading') {

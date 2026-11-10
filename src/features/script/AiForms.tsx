@@ -1,20 +1,21 @@
 import { ScrollView, View } from 'react-native';
 import { AiIcon, CutIcon, PenLineIcon, RepeatIcon, SfxIcon, VoiceIcon } from '../../ui/icons';
 
+import { msg, t } from '../../core/i18n';
 import { BLOCK_LABEL, LIMITS } from '../../core/model/constants';
 import { MAX_SCENE_REWRITE, type AiAction, type BlockLocation, type RewriteScope } from '../../core/script/aiDrafts';
 import { Button, Chip, ChipGroup, FieldLabel, ListItem, Text, TextField } from '../../ui';
 import { Footer } from './AiDraftViews';
 
 export const AI_TITLE: Record<AiAction, string> = {
-  continue: 'Continue writing',
-  rewrite: 'Rewrite',
-  voice: 'Change voice',
-  shorten: 'Shorten',
-  sfx: 'SFX ideas',
+  continue: msg('Continue writing'),
+  rewrite: msg('Rewrite'),
+  voice: msg('Change voice'),
+  shorten: msg('Shorten'),
+  sfx: msg('SFX ideas'),
 };
 
-const QUICK_INSTRUCTIONS = ['more dramatic', 'funnier', 'shorter', 'clearer'];
+const QUICK_INSTRUCTIONS = [msg('more dramatic'), msg('funnier'), msg('shorter'), msg('clearer')];
 
 const INSTRUCTION_MAX = 120;
 
@@ -35,43 +36,49 @@ export function AiActionMenu({
       <View className="px-4 pb-2">
         <Text variant="caption" tone="muted">
           {location
-            ? `Working on the focused ${BLOCK_LABEL[
-                location.block.type
-              ].toLowerCase()} block. Nothing is changed until you accept a preview.`
-            : 'No block is focused, so new text goes to the end of the script. Nothing is changed until you accept a preview.'}
+            ? t('Working on the focused {type} block. Nothing is changed until you accept a preview.', {
+                type: t(BLOCK_LABEL[location.block.type]).toLowerCase(),
+              })
+            : t('No block is focused, so new text goes to the end of the script. Nothing is changed until you accept a preview.')}
         </Text>
       </View>
       <ListItem
-        title={AI_TITLE.continue}
-        subtitle={location ? 'Write the next 3 to 5 blocks after this one' : 'Write the next 3 to 5 blocks at the end'}
+        title={t(AI_TITLE.continue)}
+        subtitle={location ? t('Write the next 3 to 5 blocks after this one') : t('Write the next 3 to 5 blocks at the end')}
         icon={PenLineIcon}
         iconColor="ai"
         onPress={() => onChoose('continue')}
       />
       <ListItem
-        title={AI_TITLE.rewrite}
-        subtitle={available.rewrite ? 'This block or the whole scene, with an optional instruction' : 'Focus a written block first'}
+        title={t(AI_TITLE.rewrite)}
+        subtitle={available.rewrite ? t('This block or the whole scene, with an optional instruction') : t('Focus a written block first')}
         icon={RepeatIcon}
         iconColor="ai"
         disabled={!available.rewrite}
         onPress={() => onChoose('rewrite')}
       />
       <ListItem
-        title={AI_TITLE.voice}
-        subtitle={available.voice ? `Make the line sound like ${speakerName || 'the character'}` : 'Dialogue with a character only'}
+        title={t(AI_TITLE.voice)}
+        subtitle={
+          available.voice
+            ? speakerName
+              ? t('Make the line sound like {name}', { name: speakerName })
+              : t('Make the line sound like the character')
+            : t('Dialogue with a character only')
+        }
         icon={VoiceIcon}
         iconColor="ai"
         disabled={!available.voice}
         onPress={() => onChoose('voice')}
       />
       <ListItem
-        title={AI_TITLE.shorten}
+        title={t(AI_TITLE.shorten)}
         subtitle={
           available.shorten
             ? length > LIMITS.longDialogue
-              ? `${length} characters, too long for one bubble`
-              : 'Make the line fit one speech bubble'
-            : 'Dialogue only'
+              ? t('{count} characters, too long for one bubble', { count: length })
+              : t('Make the line fit one speech bubble')
+            : t('Dialogue only')
         }
         icon={CutIcon}
         iconColor="ai"
@@ -79,8 +86,8 @@ export function AiActionMenu({
         onPress={() => onChoose('shorten')}
       />
       <ListItem
-        title={AI_TITLE.sfx}
-        subtitle={available.sfx ? 'Three sound effects for this action' : 'Action blocks only'}
+        title={t(AI_TITLE.sfx)}
+        subtitle={available.sfx ? t('Three sound effects for this action') : t('Action blocks only')}
         icon={SfxIcon}
         iconColor="ai"
         disabled={!available.sfx}
@@ -110,23 +117,23 @@ export function AiRewriteForm({
   return (
     <>
       <ScrollView contentContainerClassName="gap-3 px-4 pb-4" keyboardShouldPersistTaps="handled">
-        <FieldLabel>What to rewrite</FieldLabel>
+        <FieldLabel>{t('What to rewrite')}</FieldLabel>
         <ChipGroup>
-          {blockHasText && <Chip label="This block" selected={scope === 'block'} onPress={() => onScope('block')} />}
-          {!sceneTooBig && <Chip label="Whole scene" selected={scope === 'scene'} onPress={() => onScope('scene')} />}
+          {blockHasText && <Chip label={t('This block')} selected={scope === 'block'} onPress={() => onScope('block')} />}
+          {!sceneTooBig && <Chip label={t('Whole scene')} selected={scope === 'scene'} onPress={() => onScope('scene')} />}
         </ChipGroup>
         {sceneTooBig && (
           <Text variant="caption" tone="muted">
-            This scene has more than {MAX_SCENE_REWRITE} blocks, so only the focused block is rewritten.
+            {t('This scene has more than {max} blocks, so only the focused block is rewritten.', { max: MAX_SCENE_REWRITE })}
           </Text>
         )}
-        <FieldLabel>Instruction (optional)</FieldLabel>
+        <FieldLabel>{t('Instruction (optional)')}</FieldLabel>
         <TextField
           value={instruction}
           onChangeText={onInstruction}
           onClear={() => onInstruction('')}
-          placeholder="e.g. more tension, fewer words"
-          accessibilityLabel="Instruction"
+          placeholder={t('e.g. more tension, fewer words')}
+          accessibilityLabel={t('Instruction')}
           returnKeyType="go"
           onSubmitEditing={onSubmit}
           maxLength={INSTRUCTION_MAX}
@@ -135,7 +142,7 @@ export function AiRewriteForm({
           {QUICK_INSTRUCTIONS.map(label => (
             <Chip
               key={label}
-              label={label}
+              label={t(label)}
               selected={instruction === label}
               onPress={() => onInstruction(instruction === label ? '' : label)}
             />
@@ -143,7 +150,7 @@ export function AiRewriteForm({
         </ChipGroup>
       </ScrollView>
       <Footer>
-        <Button title={scope === 'scene' ? 'Rewrite scene' : 'Rewrite block'} icon={AiIcon} variant="ai" onPress={onSubmit} />
+        <Button title={scope === 'scene' ? t('Rewrite scene') : t('Rewrite block')} icon={AiIcon} variant="ai" onPress={onSubmit} />
       </Footer>
     </>
   );

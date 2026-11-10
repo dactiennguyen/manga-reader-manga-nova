@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 
+import { t } from '../../core/i18n';
 import type { Project } from '../../core/model/types';
 import type { ResumeTarget } from '../../core/story/resume';
 import { formatRelative } from '../../core/util/time';
@@ -17,7 +18,7 @@ export function ContinueCard({
   progress: { done: number; total: number; ratio: number };
 }) {
   const navigation = useAppNavigation();
-  const title = project.title || 'Untitled';
+  const title = project.title || t('Untitled');
   return (
     <Card
       accessibilityLabel={`${title}, ${resume.where}`}
@@ -33,11 +34,13 @@ export function ContinueCard({
           {resume.where}
         </Text>
         <Text variant="caption" tone="muted">
-          Edited {formatRelative(project.updatedAt)}
+          {t('Edited {when}', { when: formatRelative(project.updatedAt) })}
         </Text>
         <ProgressBar value={progress.ratio} />
         <Text variant="caption" tone="muted">
-          {progress.total ? `${progress.done}/${progress.total} pages` : 'No pages yet'}
+          {progress.total
+            ? t('{done}/{total} pages', { done: progress.done, total: progress.total })
+            : t('No pages yet')}
         </Text>
         <Button title={resume.action} small className="mt-1 self-start" onPress={() => openRoute(navigation, resume.route)} />
       </View>

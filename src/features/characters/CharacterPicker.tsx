@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { AddUserIcon, LockIcon, PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { ROLE_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
 import { useCharacters } from '../../state/hooks';
@@ -20,7 +21,7 @@ export function CharacterPicker({
   onPick,
   selectedIds = [],
   excludeIds = [],
-  title = 'Pick a character',
+  title = t('Pick a character'),
   allowClear,
   allowCreate = true,
 }: {
@@ -80,20 +81,20 @@ export function CharacterPicker({
     >
       <View className="gap-2 px-4">
         {characters.length > SEARCH_FROM && (
-          <SearchField value={query} onChangeText={setQuery} placeholder="Search characters" onClear={() => setQuery('')} />
+          <SearchField value={query} onChangeText={setQuery} placeholder={t('Search characters')} onClear={() => setQuery('')} />
         )}
         {!shown.length && !creating && (
           <Text tone="muted" className="py-3">
-            {characters.length ? 'No characters match.' : 'This story has no characters yet.'}
+            {characters.length ? t('No characters match.') : t('This story has no characters yet.')}
           </Text>
         )}
       </View>
-      {allowClear && <ListItem title="No character" onPress={() => choose(undefined)} />}
+      {allowClear && <ListItem title={t('No character')} onPress={() => choose(undefined)} />}
       {shown.map(character => (
         <ListItem
           key={character.id}
-          title={character.name || 'Unnamed'}
-          subtitle={ROLE_LABEL[character.role]}
+          title={character.name || t('Unnamed')}
+          subtitle={t(ROLE_LABEL[character.role])}
           left={<Avatar character={character} size={40} />}
           selected={selectedIds.includes(character.id)}
           right={character.locked ? <Icon icon={LockIcon} size={ICON.sm} color="text-muted" /> : undefined}
@@ -107,15 +108,15 @@ export function CharacterPicker({
               autoFocus
               value={name}
               onChangeText={setName}
-              placeholder="New character name"
+              placeholder={t('New character name')}
               maxLength={NAME_MAX}
               onSubmitEditing={create}
               className="flex-1"
             />
-            <Button title="Create" icon={PlusIcon} small onPress={create} disabled={!name.trim()} />
+            <Button title={t('Create')} icon={PlusIcon} small onPress={create} disabled={!name.trim()} />
           </View>
         ) : (
-          <ListItem title="Quick-create a character" icon={AddUserIcon} onPress={() => setCreating(true)} />
+          <ListItem title={t('Quick-create a character')} icon={AddUserIcon} onPress={() => setCreating(true)} />
         ))}
     </Sheet>
   );

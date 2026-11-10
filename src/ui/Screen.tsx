@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackIcon } from './icons';
 
 import { Icon, type IconGlyph } from './Icon';
+import { t } from '../core/i18n';
 import { IconButton } from './IconButton';
 import { Pressable } from './Pressable';
 import { FAB_SHADOW } from './shadows';
@@ -82,7 +83,7 @@ export function AppBar({
 }) {
   return (
     <View className="min-h-14 flex-row items-center gap-1 px-1">
-      {!hideBack && <IconButton icon={BackIcon} onPress={onBack} accessibilityLabel="Go back" />}
+      {!hideBack && <IconButton icon={BackIcon} onPress={onBack} accessibilityLabel={t('Go back')} />}
       <View className={`flex-1 ${hideBack ? 'px-3' : ''}`}>
         {children ?? (
           <>

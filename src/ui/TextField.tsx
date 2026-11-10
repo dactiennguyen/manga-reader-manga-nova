@@ -3,6 +3,7 @@ import { TextInput, View, type TextInputProps } from 'react-native';
 import { CloseIcon, SearchIcon } from './icons';
 
 import { Icon, type IconGlyph } from './Icon';
+import { t } from '../core/i18n';
 import { IconButton } from './IconButton';
 import { ModalShownContext } from './modalShown';
 import { Text } from './Text';
@@ -54,7 +55,7 @@ export function TextField({ ref, icon, onClear, className, inputClassName, multi
         }}
         className={`flex-1 p-0 text-body font-inter text-text ${inputClassName ?? ''}`}
       />
-      {!!onClear && !!props.value && <IconButton icon={CloseIcon} size={ICON.md} onPress={onClear} accessibilityLabel="Clear" color="text-muted" />}
+      {!!onClear && !!props.value && <IconButton icon={CloseIcon} size={ICON.md} onPress={onClear} accessibilityLabel={t('Clear')} color="text-muted" />}
     </View>
   );
 }

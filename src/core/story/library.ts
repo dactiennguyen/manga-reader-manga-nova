@@ -1,3 +1,4 @@
+import { msg } from '../i18n';
 import { activeProjects, chapterIdsOf, projectProgress, projectStatus } from '../model/selectors';
 import type { Project, ProjectStatus, StoryData } from '../model/types';
 
@@ -19,9 +20,9 @@ export type LibraryRow = {
 export const LIBRARY_FILTERS: LibraryFilter[] = ['all', 'draft', 'active', 'done'];
 
 export const LIBRARY_SORT_LABEL: Record<LibrarySort, string> = {
-  updated: 'Last edited',
-  title: 'Title',
-  created: 'Date created',
+  updated: msg('Last edited'),
+  title: msg('Title'),
+  created: msg('Date created'),
 };
 
 const WIDE = 600;

@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TONE_DENSITIES } from '../../core/art/artMath';
 import { SIZE_MAX, SIZE_MIN, supportsTone } from '../../core/art/tools';
+import { t } from '../../core/i18n';
 import { Chip, IconButton, Pressable, Slider, Text, ToolPanel } from '../../ui';
 import type { CanvasTools } from './useCanvasTools';
 
@@ -13,7 +14,7 @@ function Swatch({ color, selected, onPick }: { color: string; selected: boolean;
   return (
     <Pressable
       onPress={() => onPick(color)}
-      accessibilityLabel={`Color ${color}`}
+      accessibilityLabel={t('Color {color}', { color })}
       accessibilityState={{ selected }}
       className="h-12 w-12 items-center justify-center"
     >
@@ -28,7 +29,7 @@ function Swatch({ color, selected, onPick }: { color: string; selected: boolean;
 function TonePicker({ value, onChange }: { value: number | null; onChange: (value: number | null) => void }) {
   return (
     <View className="flex-row items-center gap-2 pr-2">
-      <Chip label="Solid" selected={value === null} onPress={() => onChange(null)} />
+      <Chip label={t('Solid')} selected={value === null} onPress={() => onChange(null)} />
       {TONE_DENSITIES.map(density => (
         <Chip
           key={density}
@@ -84,7 +85,7 @@ export function CanvasToolPanel({
           <View className="flex-1">
             {tool === 'move' ? (
               <Text variant="bodySmall" tone="secondary" className="px-1">
-                Drag to move the layer. Pinch or drag a corner handle to scale it.
+                {t('Drag to move the layer. Pinch or drag a corner handle to scale it.')}
               </Text>
             ) : (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="items-center">
@@ -103,15 +104,15 @@ export function CanvasToolPanel({
             icon={open ? CaretDownIcon : CaretUpIcon}
             color="text-muted"
             onPress={() => setOpen(value => !value)}
-            accessibilityLabel={open ? 'Collapse tool panel' : 'Expand tool panel'}
+            accessibilityLabel={open ? t('Collapse tool panel') : t('Expand tool panel')}
           />
         </View>
         {open && tool !== 'move' ? (
           <View className="flex-row gap-3">
             {tool === 'fill' ? null : (
-              <LabeledSlider label="Size" value={`${Math.round(size)}`}>
+              <LabeledSlider label={t('Size')} value={`${Math.round(size)}`}>
                 <Slider
-                  label="Size"
+                  label={t('Size')}
                   value={size}
                   min={SIZE_MIN}
                   max={SIZE_MAX}
@@ -123,8 +124,8 @@ export function CanvasToolPanel({
                 />
               </LabeledSlider>
             )}
-            <LabeledSlider label="Opacity" value={`${Math.round(opacity * 100)}%`}>
-              <Slider label="Opacity" value={opacity} min={0.05} max={1} onChange={tools.setOpacity} />
+            <LabeledSlider label={t('Opacity')} value={`${Math.round(opacity * 100)}%`}>
+              <Slider label={t('Opacity')} value={opacity} min={0.05} max={1} onChange={tools.setOpacity} />
             </LabeledSlider>
           </View>
         ) : null}

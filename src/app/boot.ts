@@ -1,4 +1,6 @@
+import { createDemoClient } from '../core/ai/demo';
 import { configureAi } from '../core/ai/port';
+import { t } from '../core/i18n';
 import { createAiClient, testConnection } from '../data/aiClient';
 import { exportProjectArchive, importProjectArchive, type ArchiveStory } from '../data/archive';
 import { createArtRepo } from '../data/artRepo';
@@ -16,7 +18,7 @@ import { usePage, useProjectOfPage } from '../state/hooks';
 import { connectScriptHistory } from '../state/scriptHistory';
 import { configureServices } from '../state/services';
 import { connectAssistant } from '../state/useAssistant';
-import { connectSettings, useSettings } from '../state/useSettings';
+import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
 import { connectStory, importEntities, useStory } from '../state/useStory';
 import { setHapticsEnabled, toast } from '../ui';
 
@@ -27,6 +29,18 @@ const archiveStory: ArchiveStory = {
   importArt,
 };
 
+const SAMPLE_NOTE_GAP_MS = 20000;
+let sampleNotedAt = 0;
+
+/** Sample answers must never pass for real ones, but a toast on every answer is noise. */
+function noteSampleAnswer(): void {
+  const now = Date.now();
+  if (now - sampleNotedAt > SAMPLE_NOTE_GAP_MS) {
+    sampleNotedAt = now;
+    toast(t('Sample answer. Add an AI server in Profile for real ones'));
+  }
+}
+
 export async function boot(): Promise<void> {
   const db = await openDatabase();
   const meta = createMetaRepo(db);
@@ -34,19 +48,22 @@ export async function boot(): Promise<void> {
   connectArt(createArtRepo(db));
   connectStory(
     createStoryRepo(db),
-    () => toast("Couldn't save. Will retry with your next change."),
+    () => toast(t("Couldn't save. Will retry with your next change.")),
     projectId => {
       removeProjectExports(projectId).catch(() => {});
     },
   );
   connectAssistant(createThreadRepo(db));
   connectScriptHistory(createScriptVersionRepo(db));
-  configureAi(
-    createAiClient(() => {
-      const { aiBaseUrl, aiApiKey, aiModel } = useSettings.getState();
-      return { baseUrl: aiBaseUrl, apiKey: aiApiKey, model: aiModel };
-    }),
-  );
+  const server = createAiClient(() => {
+    const { aiBaseUrl, aiApiKey, aiModel } = useSettings.getState();
+    return { baseUrl: aiBaseUrl, apiKey: aiApiKey, model: aiModel };
+  });
+  const demo = createDemoClient(noteSampleAnswer);
+  configureAi({
+    complete: (request, signal) =>
+      (aiServerSet() || !useSettings.getState().aiDemo ? server : demo).complete(request, signal),
+  });
   configureServices({
     exportProject: projectId => exportProjectArchive(archiveStory, projectId),
     importProject: path => importProjectArchive(archiveStory, path),

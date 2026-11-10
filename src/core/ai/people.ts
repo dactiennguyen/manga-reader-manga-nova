@@ -1,3 +1,4 @@
+import { msg, t } from '../i18n';
 import { LIMITS } from '../model/constants';
 import type { Character, CharacterRole, WorldType } from '../model/types';
 import { AiError, type AiMessage } from './port';
@@ -14,7 +15,7 @@ const EDITOR =
   'You are a manga story editor helping an author with their own story. Write in the same language as the author. Answer with JSON only: no markdown fences, no commentary.';
 
 const ROLES: CharacterRole[] = ['main', 'support', 'villain', 'extra'];
-const FORMAT_ERROR = 'The AI answer was not in the expected format. Try again.';
+const FORMAT_ERROR = msg('The AI answer was not in the expected format. Try again.');
 
 function text(value: unknown, max: number): string {
   return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, max).trim() : '';
@@ -37,7 +38,7 @@ function field(value: unknown, key: string): unknown {
 export function parseCharacterDraft(value: unknown): CharacterDraft {
   const name = text(field(value, 'name'), LIMITS.characterName);
   if (!name) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   const rawRole = text(field(value, 'role'), 12).toLowerCase();
   const rawTraits = field(value, 'traits');
@@ -84,7 +85,7 @@ function worldMessages(brief: string, type: WorldType, title: string, existing: 
 export function parseWorldBody(value: unknown): string {
   const body = long(field(value, 'body'), 2000);
   if (!body) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return body;
 }
@@ -113,7 +114,7 @@ export function parsePlotHoles(value: unknown): PlotHole[] {
     }))
     .filter(item => item.issue);
   if (!issues.length) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return issues.slice(0, 6);
 }

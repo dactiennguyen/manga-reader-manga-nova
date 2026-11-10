@@ -4,6 +4,7 @@ import { CaretDownIcon, CheckIcon } from './icons';
 
 import { Icon, type IconGlyph } from './Icon';
 import { Pressable } from './Pressable';
+import { t } from '../core/i18n';
 import { POPOVER_SHADOW } from './shadows';
 import { Sheet } from './Sheet';
 import { Text } from './Text';
@@ -106,7 +107,7 @@ export function Dropdown<T extends string>({
         <Icon icon={CaretDownIcon} size={ICON.sm} color="text-secondary" />
       </Pressable>
       <Modal visible={!!menu} transparent animationType="fade" onRequestClose={() => setMenu(null)} statusBarTranslucent>
-        <RNPressable accessibilityLabel="Close" className="flex-1" onPress={() => setMenu(null)}>
+        <RNPressable accessibilityLabel={t('Close')} className="flex-1" onPress={() => setMenu(null)}>
           <View
             className="absolute min-w-40 overflow-hidden rounded-md bg-overlay py-1"
             style={{ top: menu?.top ?? 0, right: menu?.right ?? 0, boxShadow: POPOVER_SHADOW }}

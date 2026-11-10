@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
+import { t, tn } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
-import { plural } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
 import { listScriptVersions, type ScriptVersion } from '../../state/scriptHistory';
 import { Button, Divider, Sheet, Text } from '../../ui';
@@ -20,11 +20,11 @@ export function VersionsSheet({
 }) {
   const versions = useMemo(() => (visible ? listScriptVersions(chapterId) : []), [visible, chapterId]);
   return (
-    <Sheet visible={visible} onClose={onClose} title="Version history" subtitle="Saved each time you open or leave the script">
+    <Sheet visible={visible} onClose={onClose} title={t('Version history')} subtitle={t('Saved each time you open or leave the script')}>
       <View className="px-4 pb-6">
         {versions.length === 0 && (
           <Text tone="muted" className="py-4">
-            No versions yet. One is saved each time you open or leave the script.
+            {t('No versions yet. One is saved each time you open or leave the script.')}
           </Text>
         )}
         {versions.map((version, index) => {
@@ -37,7 +37,7 @@ export function VersionsSheet({
                 <View className="flex-1 gap-0.5">
                   <Text variant="label">{formatRelative(version.at)}</Text>
                   <Text variant="caption" tone="muted">
-                    {plural(version.scenes.length, 'scene')} · {plural(blocks, 'block')}
+                    {tn(version.scenes.length, '{count} scene', '{count} scenes')} · {tn(blocks, '{count} block', '{count} blocks')}
                   </Text>
                   {first && (
                     <Text variant="caption" tone="secondary" numberOfLines={2}>
@@ -45,7 +45,7 @@ export function VersionsSheet({
                     </Text>
                   )}
                 </View>
-                <Button title="Restore" variant="secondary" small onPress={() => onRestore(version)} />
+                <Button title={t('Restore')} variant="secondary" small onPress={() => onRestore(version)} />
               </View>
             </View>
           );

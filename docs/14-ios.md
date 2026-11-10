@@ -34,6 +34,7 @@ Mở bằng Xcode thì mở `ios/Manganova.xcworkspace`, không mở file `.xcod
 | Thanh hệ thống | `setSystemBarsDarkIcons` đổi màu icon | Component `StatusBar` lo. iOS không có thanh điều hướng |
 | Lùi màn | Nút Back cứng, chặn bằng `BackHandler` | Vuốt từ mép trái. Đã tắt ở các màn vẽ và màn nhiều bước, vì `BackHandler` không chạy trên iOS |
 | Mở file truyện | intent-filter | Khai `com.manganova.project` (`.manganova`) và `com.manganova.legacy-project` (`.mangaka`) trong `Info.plist`. iOS chép file vào `Documents/Inbox` rồi mở bằng URL `file://`. App xóa bản chép đó sau khi nhập |
+| Truyện mẫu | Asset `sample/lantern.manganova` | Cùng file đó, Xcode trỏ tới thư mục của Android và đóng vào bundle |
 | Phông giao diện | `android/app/src/main/assets/fonts` | Cùng các file đó, Xcode trỏ tới thư mục của Android và khai ở `UIAppFonts` |
 
 ## Module native
@@ -42,7 +43,7 @@ Mở bằng Xcode thì mở `ios/Manganova.xcworkspace`, không mở file `.xcod
 
 | File | Việc |
 | --- | --- |
-| `ios/Manganova/NativeFilesModule.mm` | Zip theo thứ tự tên (đọc CBZ cần đúng thứ tự), unzip, ghép ảnh thành PDF, bảng chia sẻ có tiêu đề, clipboard. `mimeType` của `shareFile` chỉ dùng trên Android, iOS lấy loại file từ đuôi |
+| `ios/Manganova/NativeFilesModule.mm` | Zip theo thứ tự tên (đọc CBZ cần đúng thứ tự), unzip, ghép ảnh thành PDF, ghép ảnh thành video MP4, bảng chia sẻ có tiêu đề, clipboard. `mimeType` của `shareFile` chỉ dùng trên Android, iOS lấy loại file từ đuôi |
 | `ios/Manganova/NativeScreenModule.mm` | Khóa xoay màn, giữ màn hình sáng. Các hàm còn lại không làm gì trên iOS. Trên iPad, iPadOS bỏ qua khóa xoay khi app đang chạy đa nhiệm |
 
 Đổi chữ ký hàm trong `specs/` thì phải sửa cả hai bản. Tên hàm Objective-C phải khớp file sinh ra ở `ios/build/generated/ios/ReactCodegen/ManganovaSpecs/ManganovaSpecs.h` sau khi chạy `pod install`.

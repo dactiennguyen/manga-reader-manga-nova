@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import { FlatList, View } from 'react-native';
 import { DeleteIcon, RestoreIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import { trashedProjects } from '../../core/model/selectors';
 import type { Project } from '../../core/model/types';
 import { trashCountdown, trashDaysLeft } from '../../core/story/stats';
-import { plural } from '../../core/util/format';
 import { useStoryData } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
@@ -21,17 +21,17 @@ export function TrashScreen() {
   const onRestore = (project: Project) => {
     useStory.getState().restoreProject(project.id);
     snackbar({
-      message: `Restored "${project.title || 'Untitled'}"`,
-      actionLabel: 'Open',
+      message: t('Restored "{title}"', { title: project.title || t('Untitled') }),
+      actionLabel: t('Open'),
       onAction: () => navigation.navigate('Project', { projectId: project.id }),
     });
   };
 
   const onDelete = async (project: Project) => {
     const ok = await confirm(
-      `Delete "${project.title}" forever?`,
-      'The story and all of its pages and images will be gone for good.',
-      { confirmText: 'Delete forever', destructive: true },
+      t('Delete "{title}" forever?', { title: project.title }),
+      t('The story and all of its pages and images will be gone for good.'),
+      { confirmText: t('Delete forever'), destructive: true },
     );
     if (ok) {
       useStory.getState().deleteProjectForever(project.id);
@@ -40,24 +40,24 @@ export function TrashScreen() {
 
   const onDeleteAll = async () => {
     const ok = await confirm(
-      `Delete ${plural(items.length, 'story', 'stories')} in the trash forever?`,
-      'This cannot be undone.',
-      { confirmText: 'Delete all', destructive: true },
+      tn(items.length, 'Delete {count} story in the trash forever?', 'Delete {count} stories in the trash forever?'),
+      t('This cannot be undone.'),
+      { confirmText: t('Delete all'), destructive: true },
     );
     if (ok) {
       const { deleteProjectForever } = useStory.getState();
       items.forEach(project => deleteProjectForever(project.id));
-      toast('Trash emptied');
+      toast(t('Trash emptied'));
     }
   };
 
   return (
     <Screen padded={false}>
       <AppBar
-        title="Trash"
+        title={t('Trash')}
         onBack={navigation.goBack}
         right={
-          items.length > 0 ? <IconButton icon={DeleteIcon} onPress={onDeleteAll} accessibilityLabel="Delete all" /> : undefined
+          items.length > 0 ? <IconButton icon={DeleteIcon} onPress={onDeleteAll} accessibilityLabel={t('Delete all')} /> : undefined
         }
       />
       <FlatList
@@ -68,15 +68,15 @@ export function TrashScreen() {
         ListHeaderComponent={
           items.length > 0 ? (
             <Text variant="caption" tone="muted">
-              Stories in the trash are deleted forever after {LIMITS.trashDays} days.
+              {t('Stories in the trash are deleted forever after {days} days.', { days: LIMITS.trashDays })}
             </Text>
           ) : undefined
         }
         ListEmptyComponent={
           <EmptyState
             art={ART.emptyTrash}
-            title="Trash is empty"
-            message={`Stories you delete stay here for ${LIMITS.trashDays} days before they are gone for good.`}
+            title={t('Trash is empty')}
+            message={t('Stories you delete stay here for {days} days before they are gone for good.', { days: LIMITS.trashDays })}
           />
         }
         renderItem={({ item }) => {
@@ -93,13 +93,13 @@ export function TrashScreen() {
                 </Text>
                 <View className="mt-3 flex-row flex-wrap gap-2">
                   <Button
-                    title="Restore"
+                    title={t('Restore')}
                     icon={RestoreIcon}
                     variant="secondary"
                     small
                     onPress={() => onRestore(item)}
                   />
-                  <Button title="Delete forever" variant="danger" small onPress={() => onDelete(item)} />
+                  <Button title={t('Delete forever')} variant="danger" small onPress={() => onDelete(item)} />
                 </View>
               </View>
             </Card>

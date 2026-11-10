@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { Bubble } from '../model/types';
 
 export const MAX_LANGUAGES = 5;
@@ -15,19 +16,19 @@ function sameLanguage(a: string, b: string): boolean {
 export function languageNameError(languages: string[], name: string, renaming?: string): string | null {
   const clean = cleanLanguageName(name);
   if (!clean) {
-    return 'Enter a language name';
+    return t('Enter a language name');
   }
   if (clean in Object.prototype) {
-    return 'Choose a different name';
+    return t('Choose a different name');
   }
   if (sameLanguage(clean, 'Original')) {
-    return '"Original" is reserved for the source text';
+    return t('"Original" is reserved for the source text');
   }
   if (languages.some(item => item !== renaming && sameLanguage(item, clean))) {
-    return 'That language already exists';
+    return t('That language already exists');
   }
   if (!renaming && languages.length >= MAX_LANGUAGES) {
-    return `A story can have up to ${MAX_LANGUAGES} extra languages`;
+    return t('A story can have up to {max} extra languages', { max: MAX_LANGUAGES });
   }
   return null;
 }

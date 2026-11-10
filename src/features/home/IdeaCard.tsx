@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Keyboard, View } from 'react-native';
 import { AiIcon, PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { suggestStory, type StoryIdea } from '../../core/ai/story';
 import { LIMITS } from '../../core/model/constants';
 import { pickIdeas } from '../../core/story/ideas';
@@ -40,9 +41,9 @@ export function IdeaCard({ empty }: { empty: boolean }) {
     }
     if (!aiConfigured()) {
       const go = await confirm(
-        'Set up AI first',
-        'Shaping an idea needs an AI server. Add its address in Profile, then come back and try again.',
-        { confirmText: 'Open Profile' },
+        t('Set up AI first'),
+        t('Shaping an idea needs an AI server. Add its address in Profile, then come back and try again.'),
+        { confirmText: t('Open Profile') },
       );
       if (go) {
         openProfile();
@@ -64,8 +65,8 @@ export function IdeaCard({ empty }: { empty: boolean }) {
       <TextField
         value={idea}
         onChangeText={setIdea}
-        placeholder="E.g. A girl finds a pen that makes whatever she draws real…"
-        accessibilityLabel="Story idea"
+        placeholder={t('E.g. A girl finds a pen that makes whatever she draws real…')}
+        accessibilityLabel={t('Story idea')}
         maxLength={LIMITS.logline}
         multiline
         textAlignVertical="top"
@@ -76,7 +77,7 @@ export function IdeaCard({ empty }: { empty: boolean }) {
       </Text>
       <View className="flex-row flex-wrap gap-2">
         <Button
-          title="Shape with AI"
+          title={t('Shape with AI')}
           variant="ai"
           icon={AiIcon}
           onPress={() => shapeWithAi(trimmed)}
@@ -85,7 +86,7 @@ export function IdeaCard({ empty }: { empty: boolean }) {
           className="grow"
         />
         <Button
-          title="Create story"
+          title={t('Create story')}
           icon={PlusIcon}
           onPress={startFromIdea}
           disabled={!trimmed}
@@ -93,11 +94,11 @@ export function IdeaCard({ empty }: { empty: boolean }) {
           className="grow"
         />
       </View>
-      {aiLoading && <AiLoading label="Shaping your idea…" onCancel={cancel} />}
+      {aiLoading && <AiLoading label={t('Shaping your idea…')} onCancel={cancel} />}
       {ai.status === 'error' && (
         <>
           <AiErrorBox message={ai.message} onRetry={() => shapeWithAi(aiIdea.current)} onCancel={reset} />
-          {ai.code === 'not-configured' && <Button title="Open Profile" variant="secondary" small onPress={openProfile} />}
+          {ai.code === 'not-configured' && <Button title={t('Open Profile')} variant="secondary" small onPress={openProfile} />}
         </>
       )}
       <ChipRow>

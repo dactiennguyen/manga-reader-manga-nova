@@ -1,3 +1,4 @@
+import { t } from '../../core/i18n';
 import { chapterIdsOf } from '../../core/model/selectors';
 import type { ArtStyle, Page } from '../../core/model/types';
 import { QUICK_START_TITLE, unusedQuickStart } from '../../core/story/quickStart';
@@ -37,7 +38,7 @@ export function openBlankCanvas(navigation: AppNavigation, style: ArtStyle): voi
   }
   const panelId = Object.keys(page.panels)[0];
   if (!panelId) {
-    toast('Could not open the canvas. Lay out the page first');
+    toast(t('Could not open the canvas. Lay out the page first'));
     navigation.navigate('PanelLayout', { pageId: page.id });
     return;
   }

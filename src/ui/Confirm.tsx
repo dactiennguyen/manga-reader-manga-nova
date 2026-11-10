@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
+import { t } from '../core/i18n';
 import { Dialog } from './Dialog';
 import { haptic } from './haptics';
 
@@ -46,9 +47,9 @@ export function ConfirmHost() {
       title={current?.title}
       message={current?.message}
       actions={[
-        { label: current?.options.cancelText ?? 'Cancel', onPress: () => answer(false), variant: 'ghost' },
+        { label: current?.options.cancelText ?? t('Cancel'), onPress: () => answer(false), variant: 'ghost' },
         {
-          label: current?.options.confirmText ?? 'OK',
+          label: current?.options.confirmText ?? t('OK'),
           onPress: () => answer(true),
           variant: current?.options.destructive ? 'danger' : 'primary',
         },

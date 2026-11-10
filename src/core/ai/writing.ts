@@ -1,3 +1,4 @@
+import { msg, t } from '../i18n';
 import { LIMITS } from '../model/constants';
 import type { Block, BlockType, Character, DialogueKind, ID } from '../model/types';
 import { AiError, chat, type AiMessage } from './port';
@@ -16,7 +17,7 @@ const WRITER =
 
 const BLOCK_TYPES: BlockType[] = ['setting', 'action', 'dialogue', 'narration', 'sfx'];
 const KINDS: DialogueKind[] = ['speak', 'think', 'shout', 'whisper'];
-const FORMAT_ERROR = 'The AI answer was not in the expected format. Try again.';
+const FORMAT_ERROR = msg('The AI answer was not in the expected format. Try again.');
 
 function text(value: unknown, max: number): string {
   return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, max).trim() : '';
@@ -51,7 +52,7 @@ export function parseBlockDrafts(value: unknown, characters: Character[], exact?
     const body = text(field(item, 'text'), type === 'dialogue' ? 240 : 400);
     if (!type || !body) {
       if (exact !== undefined) {
-        throw new AiError('format', FORMAT_ERROR);
+        throw new AiError('format', t(FORMAT_ERROR));
       }
       continue;
     }
@@ -67,7 +68,7 @@ export function parseBlockDrafts(value: unknown, characters: Character[], exact?
     drafts.push(draft);
   }
   if (!drafts.length || (exact !== undefined && drafts.length !== exact)) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return exact === undefined ? drafts.slice(0, 8) : drafts;
 }
@@ -160,7 +161,7 @@ function sfxMessages(action: string): AiMessage[] {
 export function parseLine(value: unknown): string {
   const line = text(field(value, 'text'), 400).replace(/^["“]|["”]$/g, '');
   if (!line) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return line;
 }
@@ -180,7 +181,7 @@ export function parseSfx(value: unknown): string[] {
     .filter(word => word.length >= 2);
   const unique = [...new Set(words)].slice(0, 3);
   if (!unique.length) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return unique;
 }
@@ -219,7 +220,7 @@ export async function suggestSfx(action: string, signal?: AbortSignal) {
 export async function freeText(messages: AiMessage[], signal?: AbortSignal): Promise<string> {
   const answer = (await chat(messages, { signal })).trim();
   if (!answer) {
-    throw new AiError('empty', 'The AI returned an empty answer. Try again.');
+    throw new AiError('empty', t('The AI returned an empty answer. Try again.'));
   }
   return answer;
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { CloseIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { ART_STYLE_LABEL } from '../../core/model/constants';
 import type { Project } from '../../core/model/types';
 import type { NextStep } from '../../core/story/nextStep';
@@ -21,17 +22,17 @@ export function ProjectSummary({
   const [expanded, setExpanded] = useState(false);
   return (
     <View className="flex-row gap-3 p-4">
-      <Pressable accessibilityLabel="Change cover" onPress={() => changeProjectCover(project.id)} className="self-start">
+      <Pressable accessibilityLabel={t('Change cover')} onPress={() => changeProjectCover(project.id)} className="self-start">
         <Cover project={project} width={96} />
       </Pressable>
       <View className="flex-1 gap-2">
-        <Text variant="title">{project.title || 'Untitled'}</Text>
+        <Text variant="title">{project.title || t('Untitled')}</Text>
         <View className="flex-row flex-wrap gap-1">
           {project.genres.map(genre => (
-            <Tag key={genre} label={genre} />
+            <Tag key={genre} label={t(genre)} />
           ))}
-          <Tag label={ART_STYLE_LABEL[project.style]} />
-          {project.done && <Badge text="Completed" tone="success" />}
+          <Tag label={t(ART_STYLE_LABEL[project.style])} />
+          {project.done && <Badge text={t('Completed')} tone="success" />}
         </View>
         {project.logline ? (
           <Pressable
@@ -45,15 +46,15 @@ export function ProjectSummary({
             </Text>
           </Pressable>
         ) : (
-          <Pressable accessibilityLabel="Add a one-line summary" onPress={onAddSummary} className="min-h-12 justify-center">
+          <Pressable accessibilityLabel={t('Add a one-line summary')} onPress={onAddSummary} className="min-h-12 justify-center">
             <Text variant="bodySmall" tone="muted">
-              Add a one-line summary…
+              {t('Add a one-line summary…')}
             </Text>
           </Pressable>
         )}
         <ProgressBar value={progress.ratio} />
         <Text variant="caption" tone="muted">
-          {progress.total ? `${progress.done}/${progress.total} pages` : 'No pages yet'}
+          {progress.total ? t('{done}/{total} pages', { done: progress.done, total: progress.total }) : t('No pages yet')}
         </Text>
       </View>
     </View>
@@ -66,16 +67,16 @@ export function NextStepCard({ step, onHide }: { step: NextStep; onHide: () => v
     <Card className="gap-2 p-3">
       <View className="flex-row items-center">
         <Text variant="label" tone="accent" className="flex-1">
-          Next step
+          {t('Next step')}
         </Text>
-        <IconButton icon={CloseIcon} size={ICON.md} accessibilityLabel="Hide suggestion" onPress={onHide} />
+        <IconButton icon={CloseIcon} size={ICON.md} accessibilityLabel={t('Hide suggestion')} onPress={onHide} />
       </View>
-      <Text>{step.text}</Text>
+      <Text>{t(step.text)}</Text>
       <View className="flex-row flex-wrap gap-2">
         {step.actions.map((action, index) => (
           <Button
             key={action.label}
-            title={action.label}
+            title={t(action.label)}
             small
             variant={index === 0 ? 'primary' : 'secondary'}
             onPress={() => openRoute(navigation, action.route)}

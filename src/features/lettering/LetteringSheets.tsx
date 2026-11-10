@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { ArrowDownIcon, ArrowUpIcon, BubbleIcon, CheckIcon, ChecklistIcon, CopyIcon, DeleteIcon, DoneIcon, HiddenIcon, OrderIcon, PreviewIcon, ScriptIcon, TranslateIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import type { PageBlock } from '../../core/lettering/script';
 import { bubbleText } from '../../core/lettering/translation';
 import { BUBBLE_TYPE_LABEL, EFFECT_LABEL } from '../../core/model/constants';
@@ -21,21 +22,21 @@ function EditorSheet({ c }: { c: LetteringController }) {
     <Sheet
       visible={state.sheet === 'editor' && !!stored}
       onClose={c.closeEditor}
-      title={lang ? `Edit ${lang} text` : 'Edit text'}
-      subtitle={lang ? 'Leave it empty to show the original' : undefined}
+      title={lang ? t('Edit {lang} text', { lang }) : t('Edit text')}
+      subtitle={lang ? t('Leave it empty to show the original') : undefined}
     >
       <View className="gap-3 p-4">
         {!!lang &&
           (state.originalOpen || noOriginal ? (
             <>
               <Text variant="caption" tone="secondary">
-                Original
+                {t('Original')}
               </Text>
               <TextField
                 autoFocus={noOriginal}
                 multiline
                 value={stored?.text ?? ''}
-                placeholder={stored?.type === 'sfx' ? 'Original sound effect' : 'Original text'}
+                placeholder={stored?.type === 'sfx' ? t('Original sound effect') : t('Original text')}
                 onFocus={() => dispatch({ type: 'editOriginal' })}
                 onChangeText={text => stored && c.changeBubble(stored.id, { text }, 'text')}
               />
@@ -45,12 +46,12 @@ function EditorSheet({ c }: { c: LetteringController }) {
             </>
           ) : (
             <Pressable
-              accessibilityLabel="Edit the original text"
+              accessibilityLabel={t('Edit the original text')}
               onPress={() => dispatch({ type: 'editOriginal' })}
               className="gap-1 rounded-md bg-surface p-3"
             >
               <Text variant="caption" tone="secondary">
-                Original · tap to edit
+                {t('Original · tap to edit')}
               </Text>
               <Text>{stored?.text}</Text>
             </Pressable>
@@ -60,12 +61,12 @@ function EditorSheet({ c }: { c: LetteringController }) {
           autoFocus={!lang || !noOriginal}
           multiline
           value={lang ? stored?.translations?.[lang] ?? '' : stored?.text ?? ''}
-          placeholder={lang && !noOriginal ? stored?.text : stored?.type === 'sfx' ? 'Sound effect' : 'Type the text'}
+          placeholder={lang && !noOriginal ? stored?.text : stored?.type === 'sfx' ? t('Sound effect') : t('Type the text')}
           onChangeText={text => stored && (lang ? c.changeTranslation(stored.id, text) : c.changeBubble(stored.id, { text }, 'text'))}
           inputClassName="min-h-24"
           textAlignVertical="top"
         />
-        <Button title="Done" onPress={c.closeEditor} />
+        <Button title={t('Done')} onPress={c.closeEditor} />
       </View>
     </Sheet>
   );
@@ -75,16 +76,16 @@ function EffectsSheet({ c }: { c: LetteringController }) {
   const { state, dispatch, page } = c;
   const close = () => dispatch({ type: 'closeSheet' });
   return (
-    <Sheet visible={state.sheet === 'effects'} onClose={close} title="Effects">
+    <Sheet visible={state.sheet === 'effects'} onClose={close} title={t('Effects')}>
       <View className="gap-2 p-4">
         <Text variant="caption" tone="secondary">
-          Pick a type, then tap a panel
+          {t('Pick a type, then tap a panel')}
         </Text>
         <ChipRow>
           {EFFECT_TYPES.map(type => (
             <Chip
               key={type}
-              label={EFFECT_LABEL[type]}
+              label={t(EFFECT_LABEL[type])}
               onPress={() => dispatch({ type: 'pend', pending: { kind: 'effect', type } })}
             />
           ))}
@@ -93,15 +94,15 @@ function EffectsSheet({ c }: { c: LetteringController }) {
       {page.effects.map(effect => (
         <ListItem
           key={effect.id}
-          title={EFFECT_LABEL[effect.type]}
-          subtitle={`Panel ${c.panelNumber(effect.panelId)}`}
+          title={t(EFFECT_LABEL[effect.type])}
+          subtitle={t('Panel {n}', { n: c.panelNumber(effect.panelId) })}
           selected={state.selection?.id === effect.id}
           onPress={() => {
             dispatch({ type: 'select', selection: { kind: 'effect', id: effect.id } });
             close();
           }}
           right={
-            <IconButton icon={DeleteIcon} color="danger" onPress={() => c.removeEffect(effect.id)} accessibilityLabel="Delete effect" />
+            <IconButton icon={DeleteIcon} color="danger" onPress={() => c.removeEffect(effect.id)} accessibilityLabel={t('Delete effect')} />
           }
         />
       ))}
@@ -131,22 +132,26 @@ function DialogueListSheet({ c }: { c: LetteringController }) {
     <Sheet
       visible={state.sheet === 'list'}
       onClose={() => dispatch({ type: 'closeSheet' })}
-      title="Page dialogue list"
-      subtitle={`${pageBlocks.length - unplaced.length} / ${pageBlocks.length} placed`}
+      title={t('Page dialogue list')}
+      subtitle={t('{placed} / {total} placed', { placed: pageBlocks.length - unplaced.length, total: pageBlocks.length })}
     >
       {pageBlocks.length === 0 && (
         <Text tone="secondary" className="p-4 text-center">
-          No script lines are linked to this page.
+          {t('No script lines are linked to this page.')}
         </Text>
       )}
       {pageBlocks.map(item => (
         <ListItem
           key={item.block.id}
-          title={item.block.text || '(empty)'}
+          title={item.block.text || t('(empty)')}
           titleLines={2}
-          subtitle={`Panel ${item.panelIndex + 1} · ${
-            !item.placed ? 'Tap to place' : differs(item) ? 'Differs from script · Tap to update' : 'Placed'
-          }`}
+          subtitle={
+            !item.placed
+              ? t('Panel {n} · Tap to place', { n: item.panelIndex + 1 })
+              : differs(item)
+                ? t('Panel {n} · Differs from script · Tap to update', { n: item.panelIndex + 1 })
+                : t('Panel {n} · Placed', { n: item.panelIndex + 1 })
+          }
           icon={item.placed ? DoneIcon : BubbleIcon}
           iconColor={item.placed ? 'success' : 'text-secondary'}
           onPress={() => press(item)}
@@ -172,38 +177,38 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
         visible={state.sheet === 'menu'}
         onClose={close}
         items={[
-          { label: 'Page dialogue list', icon: ChecklistIcon, onPress: () => open('list') },
+          { label: t('Page dialogue list'), icon: ChecklistIcon, onPress: () => open('list') },
           {
-            label: 'Language versions',
-            subtitle: lang ? `Showing ${lang}` : 'Showing the original',
+            label: t('Language versions'),
+            subtitle: lang ? t('Showing {lang}', { lang }) : t('Showing the original'),
             icon: TranslateIcon,
             onPress: () => open(languages.length ? 'language' : 'manage'),
           },
           {
-            label: state.showOrder ? 'Hide reading order' : 'Show reading order',
+            label: state.showOrder ? t('Hide reading order') : t('Show reading order'),
             icon: OrderIcon,
             onPress: () => dispatch({ type: 'toggleOrder' }),
           },
           {
-            label: state.hideBubbles ? 'Show all bubbles' : 'Hide all bubbles',
+            label: state.hideBubbles ? t('Show all bubbles') : t('Hide all bubbles'),
             icon: state.hideBubbles ? PreviewIcon : HiddenIcon,
             onPress: () => dispatch({ type: 'toggleBubbles' }),
           },
-          { label: 'View script', icon: ScriptIcon, onPress: () => navigation.navigate('Script', { chapterId: page.chapterId }) },
+          { label: t('View script'), icon: ScriptIcon, onPress: () => navigation.navigate('Script', { chapterId: page.chapterId }) },
         ]}
       />
       <Menu
         visible={state.sheet === 'item' && !!item}
         onClose={close}
-        title={item ? BUBBLE_TYPE_LABEL[item.type] : undefined}
+        title={item ? t(BUBBLE_TYPE_LABEL[item.type]) : undefined}
         subtitle={item ? bubbleText(item, lang) || undefined : undefined}
         items={
           item
             ? [
-                { label: 'Duplicate', icon: CopyIcon, onPress: () => c.duplicate(item.id) },
-                { label: 'Bring forward', icon: ArrowUpIcon, onPress: () => c.reorder(item.id, 1) },
-                { label: 'Send backward', icon: ArrowDownIcon, onPress: () => c.reorder(item.id, -1) },
-                { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => c.removeBubble(item.id) },
+                { label: t('Duplicate'), icon: CopyIcon, onPress: () => c.duplicate(item.id) },
+                { label: t('Bring forward'), icon: ArrowUpIcon, onPress: () => c.reorder(item.id, 1) },
+                { label: t('Send backward'), icon: ArrowDownIcon, onPress: () => c.reorder(item.id, -1) },
+                { label: t('Delete'), icon: DeleteIcon, destructive: true, onPress: () => c.removeBubble(item.id) },
               ]
             : []
         }
@@ -211,17 +216,17 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
       <Menu
         visible={state.sheet === 'language'}
         onClose={close}
-        title="Language"
+        title={t('Language')}
         items={[
-          { label: 'Original', icon: lang ? undefined : CheckIcon, onPress: () => setLang(null) },
+          { label: t('Original'), icon: lang ? undefined : CheckIcon, onPress: () => setLang(null) },
           ...languages.map(name => ({
             label: name,
             subtitle: progressLabel(page.bubbles, name),
             icon: lang === name ? CheckIcon : undefined,
             onPress: () => setLang(name),
           })),
-          ...(lang ? [{ label: 'Translation list', icon: ChecklistIcon, onPress: () => open('translate') }] : []),
-          { label: 'Manage languages…', icon: TranslateIcon, onPress: () => open('manage') },
+          ...(lang ? [{ label: t('Translation list'), icon: ChecklistIcon, onPress: () => open('translate') }] : []),
+          { label: t('Manage languages…'), icon: TranslateIcon, onPress: () => open('manage') },
         ]}
       />
       <ManageLanguagesSheet
@@ -247,7 +252,7 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
         visible={state.sheet === 'speaker'}
         onClose={close}
         projectId={project.id}
-        title="Speaker"
+        title={t('Speaker')}
         allowClear
         selectedIds={stored?.characterId ? [stored.characterId] : []}
         onPick={characterId => {

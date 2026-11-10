@@ -15,11 +15,12 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
+import { t } from '../core/i18n';
 import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
 import type { RootStackParamList } from '../state/navigation';
 import { appServices } from '../state/services';
-import { useSettings } from '../state/useSettings';
+import { useAppLocale, useSettings } from '../state/useSettings';
 import { flushStory } from '../state/useStory';
 import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
 import { boot } from './boot';
@@ -41,9 +42,9 @@ async function openArchive(url: string | null | undefined): Promise<void> {
     if (navigationRef.isReady()) {
       navigationRef.navigate('Project', { projectId });
     }
-    toast('Story imported');
+    toast(t('Story imported'));
   } catch (error) {
-    toast(error instanceof Error ? error.message : "This file can't be read.");
+    toast(error instanceof Error ? error.message : t("This file can't be read."));
   } finally {
     // iOS copies a file opened from another app into Documents/Inbox and leaves it there.
     if (url.startsWith('file://') && url.includes('/Documents/Inbox/')) {
@@ -82,6 +83,7 @@ function useThemeMode() {
 }
 
 function Shell() {
+  const locale = useAppLocale();
   const { theme } = useUniwind();
   const dark = theme === 'dark';
   const [route, setRoute] = useState<string | undefined>();
@@ -135,7 +137,8 @@ function Shell() {
         }}
         onStateChange={state => setRoute(rootRoute(state))}
       >
-        <RootNavigator />
+        {/* The key redraws every screen when the language changes. The navigation state lives in the container. */}
+        <RootNavigator key={locale} />
       </NavigationContainer>
       {route === 'Canvas' ? null : <NavBarBacking />}
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
@@ -163,12 +166,12 @@ export function AppRoot() {
             ) : state === 'failed' ? (
               <View className="flex-1 items-center justify-center gap-3 p-6">
                 <Text variant="title" className="text-center">
-                  Couldn't open your stories
+                  {t("Couldn't open your stories")}
                 </Text>
                 <Text tone="secondary" className="text-center">
-                  Your data was not changed.
+                  {t('Your data was not changed.')}
                 </Text>
-                <Button title="Try again" onPress={retry} />
+                <Button title={t('Try again')} onPress={retry} />
               </View>
             ) : null}
           </ErrorBoundary>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { t } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { pickToCache, pickerTypes } from '../../native/files';
 import { appServices } from '../../state/services';
@@ -13,7 +14,7 @@ export function useLibraryImport(onImported: (projectId: ID) => void) {
     try {
       picked = await pickToCache(pickerTypes.allFiles);
     } catch {
-      toast('Could not open this file');
+      toast(t('Could not open this file'));
       return;
     }
     if (!picked) {
@@ -22,9 +23,9 @@ export function useLibraryImport(onImported: (projectId: ID) => void) {
     setImporting(true);
     try {
       onImported(await appServices().importProject(picked.path));
-      toast('Project imported');
+      toast(t('Project imported'));
     } catch {
-      toast('This file is unreadable or is not a Manganova project');
+      toast(t('This file is unreadable or is not a Manganova project'));
     } finally {
       setImporting(false);
     }

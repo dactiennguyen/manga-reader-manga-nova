@@ -1,5 +1,7 @@
 import Svg, { G, Path, Rect } from 'react-native-svg';
 
+import { t } from '../core/i18n';
+
 /** Brand art, the same in both themes, so these colours are not interface tokens. Source: assets/icon. */
 const TILE = '#F15A3C';
 const PAPER = '#F6EFE3';
@@ -9,7 +11,7 @@ const MARK =
 
 export function BrandMark({ size = 64 }: { size?: number }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 1024 1024" accessibilityLabel="App logo">
+    <Svg width={size} height={size} viewBox="0 0 1024 1024" accessibilityLabel={t('App logo')}>
       <Rect width={1024} height={1024} rx={228} fill={TILE} />
       <G transform="translate(512 512) scale(.92) translate(-508.5 -523.5)">
         <Path fill={PAPER} d={MARK} />

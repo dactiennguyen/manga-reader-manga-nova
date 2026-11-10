@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ExportRecord } from '../../core/export/history';
 import { extraPageCount, resolveOptions, type ExportOptions } from '../../core/export/plan';
+import { t, tn } from '../../core/i18n';
 import { translationProgress } from '../../core/lettering/translation';
 import type { ID } from '../../core/model/types';
 import { toAbsolute } from '../../core/util/paths';
@@ -49,6 +50,7 @@ export function useExportScreen(projectId: ID, chapterId: ID | undefined, onDone
     longWidth: 800,
     autoCut: true,
     gap: 0,
+    socialShape: 'square',
     lang: null,
   }));
   const [phase, setPhase] = useState<ExportPhase>({ kind: 'idle' });
@@ -99,14 +101,18 @@ export function useExportScreen(projectId: ID, chapterId: ID | undefined, onDone
 
   const start = async () => {
     if (pageIds.length === 0) {
-      toast('Pick at least one chapter');
+      toast(t('Pick at least one chapter'));
       return;
     }
     if (unfinished > 0) {
       const ok = await confirm(
-        'Export unfinished pages?',
-        `${unfinished} ${unfinished === 1 ? 'page is' : 'pages are'} not done and will still be exported.`,
-        { confirmText: 'Export anyway' },
+        t('Export unfinished pages?'),
+        tn(
+          unfinished,
+          '{count} page is not done and will still be exported.',
+          '{count} pages are not done and will still be exported.',
+        ),
+        { confirmText: t('Export anyway') },
       );
       if (!ok) {
         return;
@@ -128,9 +134,9 @@ export function useExportScreen(projectId: ID, chapterId: ID | undefined, onDone
     } catch (error) {
       if (cancelRef.current || error instanceof ExportCancelled) {
         setPhase({ kind: 'idle' });
-        toast('Export cancelled');
+        toast(t('Export cancelled'));
       } else {
-        setPhase({ kind: 'error', message: error instanceof Error && error.message ? error.message : 'Unknown error' });
+        setPhase({ kind: 'error', message: error instanceof Error && error.message ? error.message : t('Unknown error') });
       }
     }
   };
@@ -140,24 +146,24 @@ export function useExportScreen(projectId: ID, chapterId: ID | undefined, onDone
   };
 
   const share = (item: ExportRecord) =>
-    shareFile(item.path, item.mime, project?.title ?? item.fileName).catch(() => toast("Couldn't share the file"));
+    shareFile(item.path, item.mime, project?.title ?? item.fileName).catch(() => toast(t("Couldn't share the file")));
 
   const save = async (item: ExportRecord) => {
     try {
       if (await saveToDevice(item.path, item.fileName, item.mime)) {
-        toast('Saved to device');
+        toast(t('Saved to device'));
       }
     } catch {
-      toast("Couldn't save the file");
+      toast(t("Couldn't save the file"));
     }
   };
 
   const remove = async (item: ExportRecord) => {
     const gone = !!missing[item.path];
     const ok = await confirm(
-      gone ? 'Remove from history?' : `Delete ${item.fileName}?`,
-      gone ? undefined : 'The exported file will be removed from this device.',
-      { confirmText: gone ? 'Remove' : 'Delete', destructive: true },
+      gone ? t('Remove from history?') : t('Delete {name}?', { name: item.fileName }),
+      gone ? undefined : t('The exported file will be removed from this device.'),
+      { confirmText: gone ? t('Remove') : t('Delete'), destructive: true },
     );
     if (!ok) {
       return;

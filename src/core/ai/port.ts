@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+
 export type AiMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 
 export type AiErrorCode = 'not-configured' | 'network' | 'timeout' | 'server' | 'empty' | 'format' | 'cancelled';
@@ -31,7 +33,7 @@ export function configureAi(next: AiClient | null): void {
 
 export function chat(messages: AiMessage[], options: { signal?: AbortSignal } = {}): Promise<string> {
   if (!client) {
-    return Promise.reject(new AiError('not-configured', 'Set the AI server address in Profile first.'));
+    return Promise.reject(new AiError('not-configured', t('Set the AI server address in Profile first.')));
   }
   return client.complete({ messages }, options.signal);
 }
@@ -52,7 +54,7 @@ export function aiErrorMessage(error: unknown): string {
   if (error instanceof AiError) {
     return error.message;
   }
-  return 'Something went wrong. Try again.';
+  return t('Something went wrong. Try again.');
 }
 
 function repairJson(source: string): string {
@@ -121,7 +123,7 @@ export function extractJson(text: string): unknown {
   const source = (fenced ? fenced[1] : text).trim();
   const starts = [source.indexOf('{'), source.indexOf('[')].filter(index => index >= 0);
   if (!starts.length) {
-    throw new AiError('format', 'The AI answer was not in the expected format. Try again.');
+    throw new AiError('format', t('The AI answer was not in the expected format. Try again.'));
   }
   const start = Math.min(...starts);
   const end = Math.max(source.lastIndexOf('}'), source.lastIndexOf(']'));
@@ -135,5 +137,5 @@ export function extractJson(text: string): unknown {
       return JSON.parse(candidate);
     } catch {}
   }
-  throw new AiError('format', 'The AI answer was not in the expected format. Try again.');
+  throw new AiError('format', t('The AI answer was not in the expected format. Try again.'));
 }

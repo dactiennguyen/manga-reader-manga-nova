@@ -17,7 +17,7 @@ Thư mục này chứa mọi thứ cần đưa lên Play Console. Từng ô ph�
 | Ảnh điện thoại | `screenshots/phone/01–07*.png`, ảnh dự phòng ở `extra/` | 1080×1920 (9:16) | Tối đa 8 ảnh |
 | Ảnh máy tính bảng 10" | `screenshots/tablet-10/01–07*.png`, ảnh dự phòng ở `extra/` | 1440×2560 (9:16) | Dùng được cho cả ô 7" và 10" |
 | Mô tả | `descriptions.txt` | Tên 22/30, mô tả ngắn 80/80, mô tả đầy đủ 3571/4000 | 30 / 80 / 4000 ký tự |
-| Truyện mẫu | `sample/lantern.manganova` | | Để chụp lại ảnh, không tải lên Play |
+| Truyện mẫu | `android/app/src/main/assets/sample/lantern.manganova` | | Nằm sẵn trong app, mở từ Home để chụp lại ảnh |
 
 Không tải cả thư mục `extra/` cùng 7 ảnh chính. Đó chỉ là ảnh thay thế.
 
@@ -65,7 +65,7 @@ Khi app đã lên store, đổi nút "Coming soon" trên website theo [13-websit
 
 ## 5. Cách chụp lại bộ ảnh
 
-Truyện mẫu sinh bằng `__tests__/sampleStory.test.ts`, bỏ qua khi chạy test thường. File đã đóng gói nằm ở `sample/lantern.manganova`.
+Truyện mẫu sinh bằng `__tests__/sampleStory.test.ts`, bỏ qua khi chạy test thường. File đã đóng gói nằm ở `android/app/src/main/assets/sample/lantern.manganova` và đi kèm app ([16-tinh-nang-bo-sung.md](../16-tinh-nang-bo-sung.md)).
 
 - Chụp từ bản debug, vì bản release chặn chụp màn hình. Máy ảo `mangaka_test` chạy với `-no-window`: `wm size 1080x1920` với `wm density 420` cho điện thoại, `wm size 1440x2560` với `wm density 340` cho máy tính bảng.
 - Nạp truyện: đẩy file vào thư mục cache của app rồi mở bằng intent `VIEW`.

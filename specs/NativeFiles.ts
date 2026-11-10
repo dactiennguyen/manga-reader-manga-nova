@@ -11,6 +11,8 @@ export interface Spec extends TurboModule {
     rtl: boolean,
     pageWidthPt: number,
   ): Promise<void>;
+  /** Same-sized images in, an MP4 out: one image per frame. */
+  framesToVideo(framePaths: Array<string>, outPath: string, fps: number): Promise<void>;
   shareFile(path: string, mimeType: string, title: string): Promise<void>;
   copyText(text: string): void;
 }

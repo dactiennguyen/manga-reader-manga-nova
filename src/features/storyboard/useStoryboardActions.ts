@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
+import { t, tn } from '../../core/i18n';
 import type { PagePlan } from '../../core/model/paginate';
 import type { ID, Page, Project } from '../../core/model/types';
-import { plural } from '../../core/util/format';
 import { useAppNavigation } from '../../state/navigation';
 import { undoStory, undoable, useStory } from '../../state/useStory';
 import { confirm, snackbar, toast } from '../../ui';
@@ -26,7 +26,7 @@ export function useStoryboardActions({
   const story = () => useStory.getState();
   const scope = `project:${project?.id}` as const;
   const offerUndo = (message: string) =>
-    snackbar({ message, actionLabel: 'Undo', onAction: () => undoStory(scope) });
+    snackbar({ message, actionLabel: t('Undo'), onAction: () => undoStory(scope) });
 
   const openPage = (pageId: ID) => navigation.navigate('PanelLayout', { pageId });
   const addPage = (index?: number) => {
@@ -42,9 +42,9 @@ export function useStoryboardActions({
     });
     if (hasContent) {
       const ok = await confirm(
-        ids.length > 1 ? `Delete ${ids.length} pages?` : `Delete page ${pageIds.indexOf(ids[0]) + 1}?`,
-        'Panels, art and lettering go with it. Undo brings them back.',
-        { confirmText: 'Delete', destructive: true },
+        ids.length > 1 ? t('Delete {count} pages?', { count: ids.length }) : t('Delete page {n}?', { n: pageIds.indexOf(ids[0]) + 1 }),
+        t('Panels, art and lettering go with it. Undo brings them back.'),
+        { confirmText: t('Delete'), destructive: true },
       );
       if (!ok) {
         return;
@@ -52,12 +52,12 @@ export function useStoryboardActions({
     }
     undoable({ undoScope: scope }, () => ids.forEach(id => story().removePage(id)));
     setSelection(null);
-    offerUndo(ids.length > 1 ? `${ids.length} pages deleted` : 'Page deleted');
+    offerUndo(ids.length > 1 ? t('{count} pages deleted', { count: ids.length }) : t('Page deleted'));
   };
   const applyPlans = (plans: PagePlan[]) => {
     const created = story().applyPagination(chapterId, plans, 'append');
     setPaginating(false);
-    toast(`${plural(created.length, 'page')} added from script`);
+    toast(tn(created.length, '{count} page added from script', '{count} pages added from script'));
   };
   const toggleSelect = (pageId: ID) =>
     setSelection(prev => {

@@ -1,6 +1,7 @@
 import { ScrollView, View } from 'react-native';
 import { CloseIcon, ForwardIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import type { ScreenProps } from '../../state/navigation';
 import { AppBar, Button, IconButton, Screen } from '../../ui';
 import { FormatStep, StoryStep, StyleStep } from './NewProjectSteps';
@@ -12,10 +13,10 @@ export function NewProjectScreen(props: ScreenProps<'NewProject'>) {
   return (
     <Screen padded={false} keyboard>
       <AppBar
-        title="New story"
-        subtitle={`Step ${step + 1}/3`}
+        title={t('New story')}
+        subtitle={t('Step {n}/{total}', { n: step + 1, total: 3 })}
         onBack={form.back}
-        right={<IconButton icon={CloseIcon} onPress={form.close} accessibilityLabel="Close" />}
+        right={<IconButton icon={CloseIcon} onPress={form.close} accessibilityLabel={t('Close')} />}
       />
       <View className="flex-row gap-1 px-4 pt-2">
         {[0, 1, 2].map(index => (
@@ -33,11 +34,11 @@ export function NewProjectScreen(props: ScreenProps<'NewProject'>) {
         {step === 2 && <StyleStep form={form} />}
       </ScrollView>
       <View className="flex-row gap-3 p-4">
-        {step > 0 && <Button title="Back" variant="secondary" onPress={form.back} />}
+        {step > 0 && <Button title={t('Back')} variant="secondary" onPress={form.back} />}
         {step < 2 ? (
-          <Button title="Next" icon={ForwardIcon} onPress={form.next} disabled={step === 0 && !name} className="flex-1" />
+          <Button title={t('Next')} icon={ForwardIcon} onPress={form.next} disabled={step === 0 && !name} className="flex-1" />
         ) : (
-          <Button title="Create story" onPress={form.create} disabled={!name} className="flex-1" />
+          <Button title={t('Create story')} onPress={form.create} disabled={!name} className="flex-1" />
         )}
       </View>
     </Screen>

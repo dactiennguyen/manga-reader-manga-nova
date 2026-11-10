@@ -1,5 +1,6 @@
 import { AddPageIcon, ArrowDownIcon, ArrowUpIcon, BackIcon, ChecklistIcon, CopyIcon, DeleteIcon, DoneIcon, FlagIcon, ForwardIcon, ListIcon, ScriptIcon, TemplatesIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import type { Chapter, ID, Page } from '../../core/model/types';
 import { moveArrows, type MoveArrow } from '../../core/reorder/storyboardGrid';
 import { useAppNavigation } from '../../state/navigation';
@@ -45,12 +46,12 @@ export function StoryboardMenus({
         visible={menuOpen}
         onClose={onCloseMenu}
         items={[
-          { label: 'View script', icon: ScriptIcon, onPress: () => navigation.navigate('Script', { chapterId: chapter.id }) },
+          { label: t('View script'), icon: ScriptIcon, onPress: () => navigation.navigate('Script', { chapterId: chapter.id }) },
           listView
-            ? { label: 'View: Grid', icon: TemplatesIcon, onPress: onToggleList }
-            : { label: 'View: List', icon: ListIcon, onPress: onToggleList },
+            ? { label: t('View: Grid'), icon: TemplatesIcon, onPress: onToggleList }
+            : { label: t('View: List'), icon: ListIcon, onPress: onToggleList },
           chapter.pageIds.length > 0 && {
-            label: 'Select multiple',
+            label: t('Select multiple'),
             icon: ChecklistIcon,
             onPress: () => actions.setSelection([]),
           },
@@ -59,33 +60,33 @@ export function StoryboardMenus({
       <Menu
         visible={!!pageMenu?.open && !!page}
         onClose={actions.closePageMenu}
-        title={page ? `Page ${index + 1}` : undefined}
+        title={page ? t('Page {n}', { n: index + 1 }) : undefined}
         items={
           page
             ? [
                 {
-                  label: page.done ? 'Mark not done' : 'Mark done',
+                  label: page.done ? t('Mark not done') : t('Mark done'),
                   icon: DoneIcon,
                   onPress: () => setPagesDone([page.id], !page.done),
                 },
-                { label: 'Duplicate', icon: CopyIcon, onPress: () => story.duplicatePage(page.id) },
-                { label: 'Insert page before', icon: AddPageIcon, onPress: () => actions.addPage(index) },
-                { label: 'Insert page after', icon: AddPageIcon, onPress: () => actions.addPage(index + 1) },
+                { label: t('Duplicate'), icon: CopyIcon, onPress: () => story.duplicatePage(page.id) },
+                { label: t('Insert page before'), icon: AddPageIcon, onPress: () => actions.addPage(index) },
+                { label: t('Insert page after'), icon: AddPageIcon, onPress: () => actions.addPage(index + 1) },
                 {
-                  label: 'Move earlier',
+                  label: t('Move earlier'),
                   icon: ARROW[arrows.earlier],
                   disabled: index <= 0,
                   onPress: () => story.movePage(chapter.id, index, index - 1),
                 },
                 {
-                  label: 'Move later',
+                  label: t('Move later'),
                   icon: ARROW[arrows.later],
                   disabled: index >= chapter.pageIds.length - 1,
                   onPress: () => story.movePage(chapter.id, index, index + 1),
                 },
-                !!page.flag && { label: 'View flag note', icon: FlagIcon, onPress: () => actions.setFlagNote(page.id) },
-                !!page.flag && { label: 'Remove flag', icon: FlagIcon, onPress: () => clearPageFlag(page.id) },
-                { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => actions.removePages([page.id]) },
+                !!page.flag && { label: t('View flag note'), icon: FlagIcon, onPress: () => actions.setFlagNote(page.id) },
+                !!page.flag && { label: t('Remove flag'), icon: FlagIcon, onPress: () => clearPageFlag(page.id) },
+                { label: t('Delete'), icon: DeleteIcon, destructive: true, onPress: () => actions.removePages([page.id]) },
               ]
             : []
         }
@@ -93,10 +94,10 @@ export function StoryboardMenus({
       <Dialog
         visible={!!flagPage?.flag}
         onClose={() => actions.setFlagNote(null)}
-        title="Flag note"
-        actions={[{ label: 'Close', onPress: () => actions.setFlagNote(null) }]}
+        title={t('Flag note')}
+        actions={[{ label: t('Close'), onPress: () => actions.setFlagNote(null) }]}
       >
-        <Text>{[flagPage?.flag?.note, ...(flagPage?.flag?.reasons ?? [])].filter(Boolean).join('\n') || 'No note.'}</Text>
+        <Text>{[flagPage?.flag?.note, ...(flagPage?.flag?.reasons ?? [])].filter(Boolean).join('\n') || t('No note.')}</Text>
       </Dialog>
     </>
   );

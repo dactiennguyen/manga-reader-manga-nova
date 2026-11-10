@@ -1,6 +1,7 @@
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import { errorCodes, isErrorWithCode, keepLocalCopy, pick, saveDocuments, types } from '@react-native-documents/picker';
 
+import { t } from '../core/i18n';
 import { filesRoot, setFilesRoot, toAbsolute, toRelative, fileUri } from '../core/util/paths';
 import { uid } from '../core/util/id';
 import NativeFiles from '../../specs/NativeFiles';
@@ -21,6 +22,7 @@ export const MIME = {
   jpg: 'image/jpeg',
   pdf: 'application/pdf',
   zip: 'application/zip',
+  mp4: 'video/mp4',
   cbz: 'application/vnd.comicbook+zip',
   archive: 'application/octet-stream',
   text: 'text/plain',
@@ -155,7 +157,7 @@ export async function saveToDevice(path: string, fileName: string, mimeType: str
 
 function native() {
   if (!NativeFiles) {
-    throw new Error('File operations are not supported on this device.');
+    throw new Error(t('File operations are not supported on this device.'));
   }
   return NativeFiles;
 }
@@ -181,6 +183,11 @@ export function imagesToPdf(
   pageWidthPt: number,
 ): Promise<void> {
   return native().imagesToPdf(imagePaths.map(toAbsolute), outPath, spread, rtl, pageWidthPt);
+}
+
+/** Frames must share one size. A repeated path holds that frame longer. */
+export function framesToVideo(framePaths: string[], outPath: string, fps: number): Promise<void> {
+  return native().framesToVideo(framePaths.map(toAbsolute), outPath, fps);
 }
 
 export function copyText(text: string): void {

@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AiIcon, HomeIcon, LibraryIcon, UserIcon } from '../ui/icons';
 import { useWindowDimensions } from 'react-native';
 
+import { msg, t } from '../core/i18n';
 import { AssistantScreen } from '../features/assistant/AssistantScreen';
 import { CanvasScreen } from '../features/canvas/CanvasScreen';
 import { CharacterScreen } from '../features/characters/CharacterScreen';
@@ -32,10 +33,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
 const TAB_META: Record<keyof TabParamList, { label: string; icon: IconGlyph }> = {
-  Home: { label: 'Home', icon: HomeIcon },
-  Library: { label: 'Library', icon: LibraryIcon },
-  Assistant: { label: 'Assistant', icon: AiIcon },
-  Profile: { label: 'Profile', icon: UserIcon },
+  Home: { label: msg('Home'), icon: HomeIcon },
+  Library: { label: msg('Library'), icon: LibraryIcon },
+  Assistant: { label: msg('Assistant'), icon: AiIcon },
+  Profile: { label: msg('Profile'), icon: UserIcon },
 };
 
 function AppDock({ state, navigation }: BottomTabBarProps) {
@@ -48,7 +49,7 @@ function AppDock({ state, navigation }: BottomTabBarProps) {
         const selected = state.index === index;
         return {
           key: route.key,
-          label: meta.label,
+          label: t(meta.label),
           icon: meta.icon,
           selected,
           onPress: () => {

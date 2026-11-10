@@ -1,4 +1,5 @@
 import type { CharacterDraft } from '../ai/people';
+import { msg, t } from '../i18n';
 import { ROLE_LABEL } from '../model/constants';
 import type { Character } from '../model/types';
 
@@ -20,16 +21,16 @@ const FILL_KEYS: readonly FillKey[] = [
 ];
 
 const FILL_LABEL: Record<FillKey, string> = {
-  name: 'Name',
-  role: 'Role',
-  age: 'Age',
-  gender: 'Gender',
-  traits: 'Traits',
-  goal: 'Goal',
-  weakness: 'Weakness',
-  voice: 'Way of speaking',
-  bio: 'Backstory',
-  appearance: 'Appearance',
+  name: msg('Name'),
+  role: msg('Role'),
+  age: msg('Age'),
+  gender: msg('Gender'),
+  traits: msg('Traits'),
+  goal: msg('Goal'),
+  weakness: msg('Weakness'),
+  voice: msg('Way of speaking'),
+  bio: msg('Backstory'),
+  appearance: msg('Appearance'),
 };
 
 export type FillRow = { key: FillKey; label: string; value: string; applied: boolean };
@@ -39,7 +40,7 @@ export function fillValueText(key: FillKey, draft: CharacterDraft): string {
     return draft.traits.join(', ');
   }
   if (key === 'role') {
-    return ROLE_LABEL[draft.role];
+    return t(ROLE_LABEL[draft.role]);
   }
   return draft[key];
 }
@@ -76,7 +77,7 @@ export function fillRows(character: Character, draft: CharacterDraft, mode: Fill
   return FILL_KEYS.map(key => {
     const value = fillValueText(key, draft);
     const applied = !!value && (mode === 'all' || fieldEmpty(character, key));
-    return { key, label: FILL_LABEL[key], value, applied };
+    return { key, label: t(FILL_LABEL[key]), value, applied };
   });
 }
 

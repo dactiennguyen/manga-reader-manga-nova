@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { ForwardIcon } from '../../ui/icons';
 
 import type { BlockDraft } from '../../core/ai/writing';
+import { t } from '../../core/i18n';
 import { BLOCK_LABEL, DIALOGUE_KIND_LABEL } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
 import { Avatar, ICON, Icon, Text } from '../../ui';
@@ -16,19 +17,19 @@ export function DraftBlockView({ draft, character }: { draft: BlockDraft; charac
           <View className="shrink flex-row items-center gap-2">
             <Avatar character={character} size={24} />
             <Text variant="caption" tone={character ? 'secondary' : 'warning'} numberOfLines={1} className="shrink">
-              {character ? character.name || 'Unnamed' : draft.characterName || 'No character'}
+              {character ? character.name || t('Unnamed') : draft.characterName || t('No character')}
             </Text>
           </View>
           <Text variant="caption" tone="secondary">
-            {DIALOGUE_KIND_LABEL[draft.kind ?? 'speak']}
+            {t(DIALOGUE_KIND_LABEL[draft.kind ?? 'speak'])}
           </Text>
         </View>
         <Text>{draft.text}</Text>
         {!character && (
           <Text variant="caption" tone="warning">
             {draft.characterName
-              ? `"${draft.characterName}" is not in your cast. The line is inserted without a character.`
-              : 'The line is inserted without a character.'}
+              ? t('"{name}" is not in your cast. The line is inserted without a character.', { name: draft.characterName })
+              : t('The line is inserted without a character.')}
           </Text>
         )}
       </View>
@@ -38,7 +39,7 @@ export function DraftBlockView({ draft, character }: { draft: BlockDraft; charac
     <View className={draft.type === 'narration' || draft.type === 'sfx' ? 'ml-4' : ''}>
       {draft.type !== 'action' && (
         <Text variant="caption" tone="muted">
-          {BLOCK_LABEL[draft.type]}
+          {t(BLOCK_LABEL[draft.type])}
         </Text>
       )}
       <Text variant={draft.type === 'sfx' ? 'title' : draft.type === 'setting' ? 'heading' : 'body'}>{draft.text}</Text>
@@ -57,14 +58,14 @@ export function BeforeAfter({ label, before, after }: { label?: string; before: 
       <View className="flex-row items-start gap-2">
         <View className="flex-1 gap-0.5">
           <Text variant="caption" tone="muted">
-            Before
+            {t('Before')}
           </Text>
           <Text tone="secondary">{before}</Text>
         </View>
         <Icon icon={ForwardIcon} size={ICON.sm} color="ai" />
         <View className="flex-1 gap-0.5">
           <Text variant="caption" tone="ai">
-            After
+            {t('After')}
           </Text>
           <Text>{after}</Text>
         </View>

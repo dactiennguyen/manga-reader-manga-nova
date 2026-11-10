@@ -13,6 +13,8 @@ import {
   padNumber,
   pageImageWidth,
   resolveOptions,
+  socialPageWidth,
+  socialPlacement,
   type ExportOptions,
 } from '../src/core/export/plan';
 
@@ -26,6 +28,7 @@ const form: ExportOptions = {
   longWidth: 800,
   autoCut: true,
   gap: 0,
+  socialShape: 'square',
   lang: null,
 };
 
@@ -136,5 +139,32 @@ describe('export history', () => {
     expect(parseExportHistory('not json')).toEqual([]);
     expect(parseExportHistory('[{"path":1}]')).toEqual([]);
     expect(parseExportHistory('{"a":1}')).toEqual([]);
+  });
+});
+
+describe('social frames', () => {
+  const square = { w: 1080, h: 1080 };
+
+  it('fits a wide panel to the frame width and centres it', () => {
+    const place = socialPlacement({ x: 44, y: 44, w: 912, h: 400 }, square);
+    expect(place.w).toBeCloseTo(984);
+    expect(place.x).toBeCloseTo(48);
+    expect(place.y).toBeCloseTo((1080 - place.h) / 2);
+  });
+
+  it('fits a tall panel to the frame height', () => {
+    const place = socialPlacement({ x: 0, y: 0, w: 300, h: 900 }, square);
+    expect(place.h).toBeCloseTo(984);
+    expect(place.x).toBeCloseTo((1080 - place.w) / 2);
+  });
+
+  it('draws the page wide enough for its most enlarged panel, up to a cap', () => {
+    const panels = [
+      { x: 0, y: 0, w: 912, h: 600 },
+      { x: 0, y: 0, w: 450, h: 450 },
+    ];
+    expect(socialPageWidth(panels, 1000, square)).toBe(Math.ceil((984 / 450) * 1000));
+    expect(socialPageWidth([{ x: 0, y: 0, w: 40, h: 40 }], 1000, square)).toBe(3600);
+    expect(extraPageCount({ format: 'social', cover: true, info: true })).toBe(0);
   });
 });

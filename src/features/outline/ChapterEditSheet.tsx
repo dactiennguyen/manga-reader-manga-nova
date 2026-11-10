@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { DeleteIcon, ForwardIcon, PlusIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
 import { useChapter } from '../../state/hooks';
@@ -59,14 +60,20 @@ export function ChapterEditSheet({
   const remove = async () => {
     const pages = chapter.pageIds.length;
     const ok = await confirm(
-      `Delete chapter ${number}?`,
-      `Its script${pages ? ` and ${pages} ${pages === 1 ? 'page' : 'pages'}` : ''} will be deleted too. This cannot be undone.`,
-      { confirmText: 'Delete chapter', destructive: true },
+      t('Delete chapter {n}?', { n: number }),
+      pages
+        ? tn(
+            pages,
+            'Its script and {count} page will be deleted too. This cannot be undone.',
+            'Its script and {count} pages will be deleted too. This cannot be undone.',
+          )
+        : t('Its script will be deleted too. This cannot be undone.'),
+      { confirmText: t('Delete chapter'), destructive: true },
     );
     if (ok) {
       sheet.closeThen(() => {
         useStory.getState().removeChapter(chapter.id);
-        toast('Chapter deleted');
+        toast(t('Chapter deleted'));
       });
     }
   };
@@ -75,20 +82,20 @@ export function ChapterEditSheet({
 
   return (
     <>
-      <Sheet visible={sheet.visible} onClose={sheet.close} onClosed={sheet.onClosed} title={`Chapter ${number}`}>
+      <Sheet visible={sheet.visible} onClose={sheet.close} onClosed={sheet.onClosed} title={t('Chapter {n}', { n: number })}>
         <View className="gap-2 px-4 pb-6">
-          <FieldLabel>Chapter title</FieldLabel>
+          <FieldLabel>{t('Chapter title')}</FieldLabel>
           <TextField
             value={title}
             maxLength={LIMITS.chapterTitle}
-            placeholder="Chapter title"
+            placeholder={t('Chapter title')}
             onChangeText={value => {
               setTitle(value);
               update(chapter.id, { title: value });
             }}
           />
           <View className="flex-row items-center justify-between">
-            <FieldLabel>Summary</FieldLabel>
+            <FieldLabel>{t('Summary')}</FieldLabel>
             <Text variant="caption" tone="muted">
               {summary.length}/{LIMITS.chapterSummary}
             </Text>
@@ -97,7 +104,7 @@ export function ChapterEditSheet({
             value={summary}
             multiline
             maxLength={LIMITS.chapterSummary}
-            placeholder="What happens in this chapter?"
+            placeholder={t('What happens in this chapter?')}
             textAlignVertical="top"
             inputClassName="min-h-24"
             onChangeText={value => {
@@ -105,30 +112,30 @@ export function ChapterEditSheet({
               update(chapter.id, { summary: value });
             }}
           />
-          <FieldLabel>Chapter goal</FieldLabel>
+          <FieldLabel>{t('Chapter goal')}</FieldLabel>
           <TextField
             value={goal}
             maxLength={GOAL_MAX}
-            placeholder="What should the reader learn or feel?"
+            placeholder={t('What should the reader learn or feel?')}
             onChangeText={value => {
               setGoal(value);
               update(chapter.id, { goal: value });
             }}
           />
-          <FieldLabel>Characters</FieldLabel>
+          <FieldLabel>{t('Characters')}</FieldLabel>
           <ChipRow>
             {cast.map(id => (
-              <Chip key={id} label={characters[id].name || 'Unnamed'} selected onPress={() => toggleCharacter(id)} />
+              <Chip key={id} label={characters[id].name || t('Unnamed')} selected onPress={() => toggleCharacter(id)} />
             ))}
-            <Chip label="Add" icon={PlusIcon} onPress={() => setPicking(true)} />
+            <Chip label={t('Add')} icon={PlusIcon} onPress={() => setPicking(true)} />
           </ChipRow>
           {cast.length > 0 && (
             <Text variant="caption" tone="muted">
-              Tap a name to remove it from the chapter.
+              {t('Tap a name to remove it from the chapter.')}
             </Text>
           )}
-          <Button title="Write script" icon={ForwardIcon} onPress={openScript} className="mt-3" />
-          <Button title="Delete chapter" icon={DeleteIcon} variant="danger" onPress={remove} />
+          <Button title={t('Write script')} icon={ForwardIcon} onPress={openScript} className="mt-3" />
+          <Button title={t('Delete chapter')} icon={DeleteIcon} variant="danger" onPress={remove} />
         </View>
       </Sheet>
       <CharacterPicker
@@ -136,7 +143,7 @@ export function ChapterEditSheet({
         onClose={() => setPicking(false)}
         projectId={chapter.projectId}
         selectedIds={cast}
-        title="Characters"
+        title={t('Characters')}
         onPick={toggleCharacter}
       />
     </>

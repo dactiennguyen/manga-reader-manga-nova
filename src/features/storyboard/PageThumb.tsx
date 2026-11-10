@@ -1,6 +1,7 @@
 import { Image, View } from 'react-native';
 import { CheckIcon, CircleIcon, DoneIcon, FlagIcon, PanelsIcon, PenLineIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { PAGE_STATUS_LABEL } from '../../core/model/constants';
 import { pageStatus } from '../../core/model/selectors';
 import type { ID, PageStatus } from '../../core/model/types';
@@ -56,9 +57,9 @@ export function PageThumb({
   const status = pageStatus(page, panelHasArt);
   return (
     <Pressable
-      accessibilityLabel={pageLabel(number, Object.keys(page.panels).length, PAGE_STATUS_LABEL[status], !!page.flag)}
+      accessibilityLabel={pageLabel(number, Object.keys(page.panels).length, t(PAGE_STATUS_LABEL[status]), !!page.flag)}
       accessibilityState={{ selected: !!selected }}
-      accessibilityActions={onMenu ? [{ name: MENU_ACTION, label: 'Page menu' }] : undefined}
+      accessibilityActions={onMenu ? [{ name: MENU_ACTION, label: t('Page menu') }] : undefined}
       onAccessibilityAction={event => {
         if (event.nativeEvent.actionName === MENU_ACTION) {
           onMenu?.();
