@@ -15,7 +15,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
-import { copyUriToCache } from '../native/files';
+import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
 import type { RootStackParamList } from '../state/navigation';
 import { appServices } from '../state/services';
@@ -44,6 +44,11 @@ async function openArchive(url: string | null | undefined): Promise<void> {
     toast('Story imported');
   } catch (error) {
     toast(error instanceof Error ? error.message : "This file can't be read.");
+  } finally {
+    // iOS copies a file opened from another app into Documents/Inbox and leaves it there.
+    if (url.startsWith('file://') && url.includes('/Documents/Inbox/')) {
+      removeFile(stripFileScheme(url)).catch(() => undefined);
+    }
   }
 }
 

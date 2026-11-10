@@ -93,9 +93,14 @@ export function RootNavigator() {
       screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: bg } }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ animation: 'fade' }} />
-      <Stack.Screen name="Preferences" component={PreferencesScreen} />
+      {/* Step-by-step screens go back one step at a time. The iOS swipe would close them and drop the input. */}
+      <Stack.Screen name="Preferences" component={PreferencesScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="Tabs" component={Tabs} options={{ animation: 'fade' }} />
-      <Stack.Screen name="NewProject" component={NewProjectScreen} options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen
+        name="NewProject"
+        component={NewProjectScreen}
+        options={{ animation: 'slide_from_bottom', gestureEnabled: false }}
+      />
       <Stack.Screen name="Project" component={ProjectScreen} />
       <Stack.Screen name="Outline" component={OutlineScreen} />
       <Stack.Screen name="Script" component={ScriptScreen} />
