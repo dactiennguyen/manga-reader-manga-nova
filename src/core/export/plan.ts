@@ -20,6 +20,8 @@ export type ExportOptions = {
   autoCut: boolean;
   gap: number;
   socialShape: SocialShape;
+  /** Stamps the pen name in the corner of every exported image. */
+  signature: boolean;
   lang?: string | null;
 };
 
@@ -49,6 +51,7 @@ export function resolveOptions(form: ExportOptions, languages: readonly string[]
   return {
     ...form,
     info: form.format === 'pdf' && form.info,
+    signature: form.signature && form.penName.trim() !== '',
     lang: form.lang && languages.includes(form.lang) ? form.lang : null,
   };
 }

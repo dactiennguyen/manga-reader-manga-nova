@@ -1,5 +1,5 @@
 import { ScrollView, View } from 'react-native';
-import { BubbleIcon, CheckIcon, DoneIcon, EffectIcon, MoreIcon, NoteIcon, RedoIcon, SfxIcon, UndoIcon } from '../../ui/icons';
+import { BubbleIcon, CheckIcon, DoneIcon, EffectIcon, MoreIcon, NoteIcon, PresetsIcon, RedoIcon, SfxIcon, UndoIcon } from '../../ui/icons';
 
 import { t } from '../../core/i18n';
 import { BLOCK_LABEL } from '../../core/model/constants';
@@ -60,6 +60,7 @@ function LetteringBody({ ctx, chapter, onBack }: { ctx: PageContext; chapter: Ch
         className="grow-0"
         contentContainerClassName="grow items-center justify-around gap-2 px-2 py-2"
       >
+        <Chip label={t('Presets')} icon={PresetsIcon} onPress={() => dispatch({ type: 'openSheet', sheet: 'presets' })} />
         {ADD_BUTTONS.map(item => {
           const picked = pending?.kind === 'bubble' && pending.type === item.type;
           return (

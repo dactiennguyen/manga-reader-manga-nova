@@ -2,28 +2,21 @@ import { Skia, type SkTypefaceFontProvider } from '@shopify/react-native-skia';
 import { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 
-import { msg } from '../core/i18n';
+import { FONT_FAMILY } from '../core/lettering/fonts';
 import type { BubbleFont } from '../core/model/types';
 
-export const FONT_FAMILY: Record<BubbleFont, string> = {
-  hand: 'PatrickHand',
-  sans: 'BeVietnamPro',
-  sansBold: 'BeVietnamProBold',
-  display: 'Anton',
-};
-
-export const FONT_LABEL: Record<BubbleFont, string> = {
-  hand: msg('Handwritten'),
-  sans: msg('Sans'),
-  sansBold: msg('Sans bold'),
-  display: msg('Display'),
-};
+export { FONT_FAMILY, FONT_LABEL } from '../core/lettering/fonts';
 
 const SOURCES: Record<BubbleFont, number> = {
   hand: require('../assets/fonts/PatrickHand-Regular.ttf'),
   sans: require('../assets/fonts/BeVietnamPro-Regular.ttf'),
   sansBold: require('../assets/fonts/BeVietnamPro-Bold.ttf'),
   display: require('../assets/fonts/Anton-Regular.ttf'),
+  comic: require('../assets/fonts/Bangers-Regular.ttf'),
+  casual: require('../assets/fonts/Mali-Medium.ttf'),
+  rounded: require('../assets/fonts/MPLUSRounded1c-Medium.ttf'),
+  marker: require('../assets/fonts/YuseiMagic-Regular.ttf'),
+  heavy: require('../assets/fonts/DelaGothicOne-Regular.ttf'),
 };
 
 let provider: SkTypefaceFontProvider | null = null;

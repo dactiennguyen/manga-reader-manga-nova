@@ -16,6 +16,7 @@
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
 		784CEAA1ACC1C5F09521FEC6 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5231BB6E1456161C48C1C6D8 /* Inter-Medium.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8BDE3D8F6771DB2ACCBCA461 /* NativeReminderModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = D1F0B210EF4808D2473FA108 /* NativeReminderModule.mm */; };
 		8E48FCAF6E79520905D839E4 /* NativeScreenModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = A6D8D20D49AF56133590D654 /* NativeScreenModule.mm */; };
 		A0C1E90F71A4118DEBF4057D /* LinkPresentation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C1E0F365EC2A25C73CD7F9 /* LinkPresentation.framework */; };
 		A81C0E96CF0DA64DD3BDD93D /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A1193224514E4E2688BE307 /* Inter-SemiBold.ttf */; };
@@ -42,6 +43,7 @@
 		9AB430CC482E58B9DE437B40 /* NativeFilesModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeFilesModule.mm; path = Manganova/NativeFilesModule.mm; sourceTree = "<group>"; };
 		A2C1E0F365EC2A25C73CD7F9 /* LinkPresentation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LinkPresentation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/LinkPresentation.framework; sourceTree = DEVELOPER_DIR; };
 		A6D8D20D49AF56133590D654 /* NativeScreenModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeScreenModule.mm; path = Manganova/NativeScreenModule.mm; sourceTree = "<group>"; };
+		D1F0B210EF4808D2473FA108 /* NativeReminderModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeReminderModule.mm; path = Manganova/NativeReminderModule.mm; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F87F75DA6B05D3A18DFA001A /* Manganova-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "Manganova-Bridging-Header.h"; path = "Manganova/Manganova-Bridging-Header.h"; sourceTree = "<group>"; };
 		FB533DA9115CACD99C92368D /* NativeScreenModule.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NativeScreenModule.h; path = Manganova/NativeScreenModule.h; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
 				09FF6398133CFD1C342290EE /* Fonts */,
 				4B6B358A749F7DD9C731A022 /* lantern.manganova */,
+				D1F0B210EF4808D2473FA108 /* NativeReminderModule.mm */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */,
 				8E48FCAF6E79520905D839E4 /* NativeScreenModule.mm in Sources */,
 				0B5CE951E65065E58E476AE0 /* NativeFilesModule.mm in Sources */,
+				8BDE3D8F6771DB2ACCBCA461 /* NativeReminderModule.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

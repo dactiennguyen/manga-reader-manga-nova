@@ -114,6 +114,16 @@ export function useCanvasHandlers({
       case 'toggleChrome':
         toggleChrome();
         break;
+      case 'lassoCommit':
+        doc.selection.lasso(effect.points);
+        break;
+      case 'selectionMatrix':
+        doc.selection.setMatrix(effect.m);
+        break;
+      case 'selectionDismiss':
+        // A tap outside keeps the work. Only Cancel throws a transform away.
+        doc.selection.end(true);
+        break;
     }
   };
 

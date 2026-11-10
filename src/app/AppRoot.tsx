@@ -18,8 +18,10 @@ import { Uniwind, useUniwind } from 'uniwind';
 import { t } from '../core/i18n';
 import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
+import { syncReminder } from '../features/profile/reminder';
 import type { RootStackParamList } from '../state/navigation';
 import { appServices } from '../state/services';
+import { flushActivity } from '../state/useActivity';
 import { useAppLocale, useSettings } from '../state/useSettings';
 import { flushStory } from '../state/useStory';
 import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
@@ -108,6 +110,7 @@ function Shell() {
     const flush = AppState.addEventListener('change', next => {
       if (next !== 'active') {
         flushStory();
+        flushActivity();
       }
     });
     Linking.getInitialURL().then(openArchive);
@@ -124,6 +127,11 @@ function Shell() {
   useEffect(() => {
     setSystemBarsDarkIcons(!darkBars);
   }, [darkBars]);
+
+  // The reminder text is fixed when it is scheduled, so it is set again in the current language.
+  useEffect(() => {
+    syncReminder().catch(() => undefined);
+  }, [locale]);
 
   return (
     <>

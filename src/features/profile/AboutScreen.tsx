@@ -11,6 +11,11 @@ const CREDITS = [
   { name: 'Anton', license: 'SIL Open Font License 1.1', use: msg('Display typeface') },
   { name: 'Be Vietnam Pro', license: 'SIL Open Font License 1.1', use: msg('Lettering typeface') },
   { name: 'Patrick Hand', license: 'SIL Open Font License 1.1', use: msg('Handwriting typeface') },
+  { name: 'Bangers', license: 'SIL Open Font License 1.1', use: msg('Display typeface') },
+  { name: 'Mali', license: 'SIL Open Font License 1.1', use: msg('Handwriting typeface') },
+  { name: 'M PLUS Rounded 1c', license: 'SIL Open Font License 1.1', use: msg('Lettering typeface') },
+  { name: 'Yusei Magic', license: 'SIL Open Font License 1.1', use: msg('Handwriting typeface') },
+  { name: 'Dela Gothic One', license: 'SIL Open Font License 1.1', use: msg('Display typeface') },
   { name: 'Lucide', license: 'ISC License', use: msg('Icons') },
 ];
 

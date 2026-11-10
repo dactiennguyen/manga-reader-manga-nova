@@ -7,6 +7,7 @@ import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { ArtStyle } from '../../core/model/types';
 import { FORMATS, genresFavoritesFirst, knownGenres, titleTaken, type FormatKey } from '../../core/story/newProject';
+import { applyStarter, starterFits, starterOf, type StarterKey } from '../../core/story/starters';
 import type { ScreenProps } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
 import { useSettings } from '../../state/useSettings';
@@ -25,6 +26,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
   const [logline, setLogline] = useState(() => (draft?.logline?.trim() || idea).slice(0, LIMITS.logline));
   const [aiFilled, setAiFilled] = useState(!!draft);
   const [formatKey, setFormatKey] = useState<FormatKey>('manga-B5');
+  const [starterKey, setStarterKey] = useState<StarterKey>('blank');
   const [style, setStyle] = useState<ArtStyle>(defaultStyle);
   const [color, setColor] = useState(false);
   const { state: ai, start, cancel, reset } = useAiTask<StoryIdea>();
@@ -119,6 +121,22 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
     reset();
   };
 
+  /** Picking a starter also picks the format it was laid out for. */
+  const pickStarter = (key: StarterKey) => {
+    const starter = starterOf(key);
+    setStarterKey(key);
+    if (starter.formatKey && !starterFits(starter, formatKey)) {
+      setFormatKey(starter.formatKey);
+    }
+  };
+
+  const pickFormat = (key: FormatKey) => {
+    setFormatKey(key);
+    if (!starterFits(starterOf(starterKey), key)) {
+      setStarterKey('blank');
+    }
+  };
+
   const next = () => {
     if (step === 0 && !name) {
       toast(t('Give your story a title'));
@@ -140,6 +158,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
       style,
       color,
     });
+    applyStarter(() => useStory.getState(), projectId, starterOf(starterKey));
     navigation.replace('Project', { projectId });
   };
 
@@ -158,10 +177,12 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
     ai,
     format,
     formatKey,
+    starterKey,
     style,
     color,
     scroller,
-    setFormatKey,
+    setFormatKey: pickFormat,
+    pickStarter,
     setStyle,
     setColor,
     editTitle,

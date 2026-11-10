@@ -1,9 +1,10 @@
 import { useMemo, useReducer, useRef } from 'react';
 
 import { bubblesInOrder, bubblesInPanel, coalesceTag, duplicateBubble, moveInStack, patchItem, scriptSync } from '../../core/lettering/bubbleEdit';
-import { tn } from '../../core/i18n';
+import { t, tn } from '../../core/i18n';
 import { fitBubbleText, fitTranslatedText } from '../../core/lettering/fit';
 import { INITIAL_LETTERING, letteringReducer, stageOf } from '../../core/lettering/letteringState';
+import { presetBubble, presetTarget, type LetteringPreset } from '../../core/lettering/presets';
 import { autoPlace, blockMapOf, pageBlocksOf, placeBlock, type PageBlock } from '../../core/lettering/script';
 import { hasTranslation, localizeBubble, setTranslation, translatableBubbles } from '../../core/lettering/translation';
 import type { Bubble, Chapter, Effect, ID, Page } from '../../core/model/types';
@@ -171,6 +172,12 @@ export function useLetteringController({ ctx, chapter }: { ctx: PageContext; cha
     dispatch({ type: 'select', selection: { kind: 'bubble', id: created.id } });
     dispatch({ type: 'closeSheet' });
   };
+  const presetPlace = presetTarget(shapes, size, stored, selectedEffect?.panelId);
+  const addPreset = (preset: LetteringPreset) => {
+    const created = presetBubble(preset, t(preset.text), presetPlace.box, { measure, taken: current()?.bubbles ?? bubbles });
+    addBubbles([created]);
+    dispatch({ type: 'placedPreset', id: created.id });
+  };
   const runAutoPlace = () => {
     const created = autoPlace(pageBlocks, shapes, rtl, measure);
     if (created.length) {
@@ -238,6 +245,8 @@ export function useLetteringController({ ctx, chapter }: { ctx: PageContext; cha
     applyTranslations,
     closeEditor,
     placeFromList,
+    presetPanelId: presetPlace.panelId,
+    addPreset,
     runAutoPlace,
     panelNumber,
   };

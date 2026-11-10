@@ -26,7 +26,8 @@ import { pageContext, renderPageImage } from '../../render/drawPage';
 import { PAPER } from '../../render/ink';
 import { useStory } from '../../state/useStory';
 import { ensureProjectExportDir } from './exportFiles';
-import { renderCover, renderInfo } from './exportSheets';
+import { loadFonts } from '../../render/fonts';
+import { drawSignature, renderCover, renderInfo, signImage } from './exportSheets';
 
 export class ExportCancelled extends Error {}
 
@@ -83,6 +84,7 @@ async function exportLong({ pageIds, options, lang, tmpDir, outDir, base, step, 
   }
   let done = 0;
   const files: string[] = [];
+  const fonts = options.signature ? await loadFonts() : null;
   for (let s = 0; s < segments.length; s++) {
     const segment = segments[s];
     const surface = Skia.Surface.Make(width, segment.height);
@@ -99,6 +101,9 @@ async function exportLong({ pageIds, options, lang, tmpDir, outDir, base, step, 
       }
       canvas.drawImage(image, 0, y);
       image.dispose();
+      if (fonts) {
+        drawSignature(canvas, fonts, options.penName, { x: 0, y, w: width, h: heights[index] });
+      }
       y += heights[index] + options.gap;
       done++;
       await step(done);
@@ -125,6 +130,7 @@ async function exportLong({ pageIds, options, lang, tmpDir, outDir, base, step, 
 async function exportSocial({ pageIds, options, lang, tmpDir, outDir, base, step, claim }: Job): Promise<Output> {
   const frame = SOCIAL_SIZE[options.socialShape];
   const files: string[] = [];
+  const fonts = options.signature ? await loadFonts() : null;
   for (let i = 0; i < pageIds.length; i++) {
     const ctx = pageContext(pageIds[i]);
     const ordered = ctx
@@ -156,6 +162,9 @@ async function exportSocial({ pageIds, options, lang, tmpDir, outDir, base, step
           1 / 3,
           1 / 3,
         );
+        if (fonts) {
+          drawSignature(canvas, fonts, options.penName, { x: 0, y: 0, w: frame.w, h: frame.h });
+        }
         surface.flush();
         const file = `${tmpDir}/${padNumber(files.length + 1)}.png`;
         await writeAndFree(surface.makeImageSnapshot(), file, 'png');
@@ -187,6 +196,7 @@ async function exportPaged({ project, pageIds, options, lang, tmpDir, outDir, ba
   const sheet = pageSize({ format: 'manga', pageSize: project.pageSize });
   const sheetH = Math.round((width * sheet.h) / sheet.w);
   const paths: string[] = [];
+  const fonts = options.signature ? await loadFonts() : null;
   if (options.cover) {
     const cover = await renderCover(project, options.penName, width, sheetH);
     if (cover) {
@@ -201,7 +211,7 @@ async function exportPaged({ project, pageIds, options, lang, tmpDir, outDir, ba
       throw new Error(t("Page {n} couldn't be rendered.", { n: i + 1 }));
     }
     const file = `${tmpDir}/${padNumber(i + 1)}.${imageFormat}`;
-    await writeAndFree(image, file, imageFormat);
+    await writeAndFree(fonts ? signImage(image, fonts, options.penName) : image, file, imageFormat);
     paths.push(file);
     await step(i + 1);
   }

@@ -40,7 +40,7 @@ Phần tốt của app cũ được giữ: logic thuần có test, định dạn
 - Sao chép vào clipboard. App cũ phải mở bảng chia sẻ.
 - Giao diện cho máy tính bảng ở mức tối thiểu.
 
-**Không làm ở bản này:** AI tạo ảnh (màn 15), tài khoản, credit, máy chủ trung gian AI, đồng bộ đám mây, nhiều ngôn ngữ giao diện, chọn một phần lớp và xoay lớp ở Canvas.
+**Không làm ở bản này:** AI tạo ảnh (màn 15), tài khoản, credit, máy chủ trung gian AI, đồng bộ đám mây. Nhiều ngôn ngữ giao diện và chọn một phần lớp đã làm sau ([16-tinh-nang-bo-sung.md](16-tinh-nang-bo-sung.md)).
 
 ## Việc bạn cần quyết hoặc tự làm
 

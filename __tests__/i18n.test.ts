@@ -63,3 +63,16 @@ describe('a word with two meanings', () => {
     expect(t('Unknown word|context')).toBe('Unknown word');
   });
 });
+
+describe('quick start title', () => {
+  const { isQuickStartTitle, QUICK_START_TITLE } = require('../src/core/story/quickStart');
+
+  it('recognises the quick start in every interface language, and nothing else', () => {
+    expect(isQuickStartTitle(QUICK_START_TITLE)).toBe(true);
+    setLocale('vi');
+    expect(isQuickStartTitle(t(QUICK_START_TITLE))).toBe(true);
+    setLocale('ja');
+    expect(isQuickStartTitle(t(QUICK_START_TITLE))).toBe(true);
+    expect(isQuickStartTitle('My story')).toBe(false);
+  });
+});

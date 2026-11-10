@@ -29,6 +29,7 @@ const form: ExportOptions = {
   autoCut: true,
   gap: 0,
   socialShape: 'square',
+  signature: false,
   lang: null,
 };
 
@@ -166,5 +167,12 @@ describe('social frames', () => {
     expect(socialPageWidth(panels, 1000, square)).toBe(Math.ceil((984 / 450) * 1000));
     expect(socialPageWidth([{ x: 0, y: 0, w: 40, h: 40 }], 1000, square)).toBe(3600);
     expect(extraPageCount({ format: 'social', cover: true, info: true })).toBe(0);
+  });
+});
+
+describe('signature', () => {
+  it('needs a pen name', () => {
+    expect(resolveOptions({ ...form, signature: true, penName: '  ' }, []).signature).toBe(false);
+    expect(resolveOptions({ ...form, signature: true, penName: 'Aki' }, []).signature).toBe(true);
   });
 });

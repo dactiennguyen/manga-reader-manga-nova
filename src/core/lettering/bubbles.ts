@@ -13,6 +13,10 @@ export const SFX_STYLES: { label: string; font: Bubble['font']; letterSpacing: n
   { label: msg('Hand'), font: 'hand', letterSpacing: 2, skew: -0.12 },
   { label: msg('Block'), font: 'sansBold', letterSpacing: 1, skew: 0 },
   { label: msg('Shake'), font: 'sansBold', letterSpacing: 6, skew: 0.2 },
+  // A bubble stores the index, so new styles only go at the end.
+  { label: msg('Comic'), font: 'comic', letterSpacing: 2, skew: 0 },
+  { label: msg('Heavy'), font: 'heavy', letterSpacing: 0, skew: 0 },
+  { label: msg('Marker'), font: 'marker', letterSpacing: 2, skew: -0.1 },
 ];
 
 type BubbleBox = Pick<Bubble, 'x' | 'y' | 'w' | 'h'>;

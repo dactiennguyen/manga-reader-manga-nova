@@ -1,4 +1,12 @@
-import { artAtStep, replayFps, replayFrames, replaySteps, replayVideoSize } from '../src/core/art/replay';
+import {
+  artAtStep,
+  replayFps,
+  replayFrames,
+  replaySteps,
+  replayVideoSize,
+  sceneAtStep,
+  sceneSteps,
+} from '../src/core/art/replay';
 import type { ArtLayer, PanelArt, Stroke } from '../src/core/model/types';
 
 const stroke = (n: number): Stroke => ({ tool: 'gpen', color: '#000', size: n, opacity: 1, points: [0, 0, n, n] });
@@ -73,5 +81,23 @@ describe('replay frames', () => {
   it('gives the video even sides with the longer one at the limit', () => {
     expect(replayVideoSize({ w: 912, h: 437 })).toEqual({ w: 1080, h: 518 });
     expect(replayVideoSize({ w: 300, h: 901 })).toEqual({ w: 360, h: 1080 });
+  });
+});
+
+describe('replaying several panels', () => {
+  const first: PanelArt = { layers: [layer('a', 2)] };
+  const second: PanelArt = { layers: [layer('b', 3)] };
+
+  it('adds up the steps and skips a panel with no drawing', () => {
+    expect(sceneSteps([first, null, second])).toBe(5);
+  });
+
+  it('finishes one panel before starting the next', () => {
+    const count = (step: number) => sceneAtStep([first, null, second], step).map(art => art.layers[0]?.strokes.length ?? 0);
+    expect(count(0)).toEqual([0, 0, 0]);
+    expect(count(1)).toEqual([1, 0, 0]);
+    expect(count(2)).toEqual([2, 0, 0]);
+    expect(count(4)).toEqual([2, 0, 2]);
+    expect(count(99)).toEqual([2, 0, 3]);
   });
 });

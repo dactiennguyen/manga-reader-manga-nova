@@ -107,6 +107,41 @@ This Font Software is licensed under the SIL Open Font License, Version 1.1.
 The full license text is included in the Patrick Hand section above and at
 https://openfontlicense.org
 
+===== bangers =====
+Copyright 2010 The Bangers Project Authors (https://github.com/googlefonts/bangers)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
+===== mali =====
+Copyright 2018 The Mali Project Authors (https://github.com/cadsondemak/Mali)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
+===== mplusrounded1c =====
+Copyright 2016 The Rounded M+ Project Authors.
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
+===== yuseimagic =====
+Copyright 2020 The Yusei Magic Project Authors (https://github.com/tanukifont/YuseiMagic)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
+===== delagothicone =====
+Copyright 2020 The Dela Gothic Project Authors (https://github.com/syakuzen/DelaGothic)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
 ===== Material Icons (Apache License 2.0) =====
 
                                  Apache License

@@ -1,6 +1,22 @@
 import { msg } from '../i18n';
 import type { Stroke, StrokeTool, ID } from '../model/types';
 import {
+  HIT_INSIDE,
+  HIT_NONE,
+  HIT_ROTATE,
+  IDENTITY_AFFINE,
+  applySelectionOp,
+  composeAffine,
+  dragRotate,
+  dragScale,
+  frameCorner,
+  hitFrame,
+  isIdentityAffine,
+  moveBy,
+  type Affine,
+  type SelectionOp,
+} from './affine';
+import {
   IDENTITY_TRANSFORM,
   appendPressurePoint,
   composeTransform,
@@ -57,6 +73,10 @@ const MOVE_SLOP = 6;
 const PINCH_SLOP = 8;
 const VIEW_SLOP = 10;
 const HANDLE_REACH = 28;
+/** How far the turn handle stands above the selection frame, in screen points. */
+export const ROTATE_STEM = 36;
+/** Screen points between two lasso points. The lasso only has to enclose, so it can be coarse. */
+const LASSO_GAP = 3;
 /** A finger-sized target. Any wider and strokes started beside a vanishing point would drag it instead. */
 const GUIDE_REACH = 24;
 /** How far the pen travels before a ruler line is chosen. The first few pixels are mostly jitter. */
@@ -88,7 +108,17 @@ type Pair = { a: number; b: number; cx: number; cy: number; dist: number; angle:
 
 type PagePair = { a: number; b: number; cx: number; cy: number; dist: number };
 
-export type SessionMode = 'idle' | 'draw' | 'view' | 'pick' | 'blocked' | 'move' | 'pan' | 'guide';
+export type SessionMode =
+  | 'idle'
+  | 'draw'
+  | 'view'
+  | 'pick'
+  | 'blocked'
+  | 'move'
+  | 'pan'
+  | 'guide'
+  | 'lasso'
+  | 'select';
 
 export type SessionState = {
   ids: number[];
@@ -124,6 +154,12 @@ export type SessionState = {
   guideGrab: Point;
   /** The line the current stroke settled on. */
   snap: Point | null;
+  /** The selected strokes' box as it was picked, and the transform waiting to be applied to them. */
+  sel: { box: Box; m: Affine } | null;
+  /** The lasso being drawn, as x, y pairs in page units. */
+  lasso: number[] | null;
+  /** What the finger holds on the selection frame, and the transform to return to if the drag is dropped. */
+  drag: { hit: number; base: Affine; start: Point; grab: Point } | null;
 };
 
 export type SessionEvent =
@@ -136,7 +172,9 @@ export type SessionEvent =
   | { type: 'tapTimeout' }
   | { type: 'setView'; view: ViewState }
   | { type: 'fit'; flip: boolean }
-  | { type: 'setGuide'; guide: Guide | null };
+  | { type: 'setGuide'; guide: Guide | null }
+  | { type: 'setSelection'; box: Box | null }
+  | { type: 'selectionOp'; op: SelectionOp };
 
 export type SessionEffect =
   | { kind: 'toast'; message: string }
@@ -157,7 +195,12 @@ export type SessionEffect =
   | { kind: 'redo' }
   | { kind: 'toggleChrome' }
   | { kind: 'view' }
-  | { kind: 'guide' };
+  | { kind: 'guide' }
+  | { kind: 'lasso' }
+  | { kind: 'lassoCommit'; points: number[] }
+  | { kind: 'selection' }
+  | { kind: 'selectionMatrix'; m: Affine }
+  | { kind: 'selectionDismiss' };
 
 export type SessionResult = { state: SessionState; effects: SessionEffect[] };
 
@@ -204,6 +247,9 @@ export function createSession(view: ViewState): SessionState {
     handle: -1,
     guideGrab: { x: 0, y: 0 },
     snap: null,
+    sel: null,
+    lasso: null,
+    drag: null,
   };
 }
 
@@ -297,6 +343,41 @@ function pinchedView(base: Pair & { view: ViewState }, cur: Pair, turn: number, 
   };
 }
 
+/** Lets go of a lasso or a held frame without keeping what the gesture did. */
+function dropSelectGesture(s: SessionState, effects: SessionEffect[]): void {
+  'worklet';
+  if (s.lasso) {
+    s.lasso = null;
+    effects.push({ kind: 'lasso' });
+  }
+  if (s.drag) {
+    if (s.sel) {
+      s.sel = { box: s.sel.box, m: s.drag.base };
+      effects.push({ kind: 'selection' });
+    }
+    s.drag = null;
+  }
+}
+
+/** A touch on the frame holds it. Anywhere else starts a new lasso, which is also how a tap outside is read. */
+function startSelect(s: SessionState, p: Point, effects: SessionEffect[]): void {
+  'worklet';
+  const sel = s.sel;
+  if (sel) {
+    const unit = 1 / Math.max(0.0001, s.view.scale);
+    const hit = hitFrame(sel.box, sel.m, p.x, p.y, HANDLE_REACH * unit, ROTATE_STEM * unit);
+    if (hit !== HIT_NONE) {
+      const corner = hit < HIT_ROTATE ? frameCorner(sel.box, sel.m, hit) : p;
+      s.mode = 'select';
+      s.drag = { hit, base: sel.m, start: p, grab: { x: corner.x - p.x, y: corner.y - p.y } };
+      return;
+    }
+  }
+  s.mode = 'lasso';
+  s.lasso = [Math.round(p.x * 10) / 10, Math.round(p.y * 10) / 10];
+  effects.push({ kind: 'lasso' });
+}
+
 function startDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv, effects: SessionEffect[]): void {
   'worklet';
   s.snap = null;
@@ -318,6 +399,10 @@ function startDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv,
     return;
   }
   const p = screenToPage(s.view, env.pageW, t.x, t.y);
+  if (env.tool === 'select') {
+    startSelect(s, p, effects);
+    return;
+  }
   if (env.tool === 'move') {
     const bounds = layer.bounds;
     if (!bounds) {
@@ -389,6 +474,8 @@ function onDown(
     s.base = null;
     s.pan = null;
     s.xf = null;
+    s.lasso = null;
+    s.drag = null;
     s.token = s.token + 1;
     s.pen = e.pointer === 'stylus';
     if (s.pen && !env.stylusMode) {
@@ -423,7 +510,11 @@ function onDown(
     return s;
   }
   // A palm landing beside the pen: the pen keeps drawing and the palm never existed.
-  if ((s.mode === 'draw' || s.mode === 'guide') && s.pen && e.pointer === 'touch') {
+  if (
+    (s.mode === 'draw' || s.mode === 'guide' || s.mode === 'lasso' || s.mode === 'select') &&
+    s.pen &&
+    e.pointer === 'touch'
+  ) {
     s.ids = ids.filter(id => !e.changed.some(t => t.id === id));
     return s;
   }
@@ -431,6 +522,8 @@ function onDown(
   if (s.mode === 'draw') {
     cancelStroke(s, effects);
   }
+  // A second finger always means the view, so the selection goes back to where this drag found it.
+  dropSelectGesture(s, effects);
   if (s.mode === 'move' && s.xf) {
     s.xf = {
       ...s.xf,
@@ -547,6 +640,45 @@ function moveLayer(s: SessionState, touches: Touch[], env: SessionEnv, effects: 
   }
 }
 
+function moveLasso(s: SessionState, t: Touch, env: SessionEnv, effects: SessionEffect[]): void {
+  'worklet';
+  const lasso = s.lasso as number[];
+  if (!s.moved && Math.hypot(t.x - s.startX, t.y - s.startY) > DRAW_SLOP) {
+    s.moved = true;
+  }
+  if (lasso.length / 2 >= STROKE_POINT_LIMIT) {
+    return;
+  }
+  const p = screenToPage(s.view, env.pageW, t.x, t.y);
+  if (appendPoint(lasso, p.x, p.y, Math.max(0.3, LASSO_GAP / s.view.scale))) {
+    effects.push({ kind: 'lasso' });
+  }
+}
+
+function moveSelection(s: SessionState, t: Touch, env: SessionEnv, effects: SessionEffect[]): void {
+  'worklet';
+  const sel = s.sel;
+  const drag = s.drag;
+  if (!sel || !drag) {
+    return;
+  }
+  if (!s.moved && Math.hypot(t.x - s.startX, t.y - s.startY) <= MOVE_SLOP) {
+    return;
+  }
+  s.moved = true;
+  const p = screenToPage(s.view, env.pageW, t.x, t.y);
+  let m: Affine;
+  if (drag.hit === HIT_INSIDE) {
+    m = composeAffine(drag.base, moveBy(p.x - drag.start.x, p.y - drag.start.y));
+  } else if (drag.hit === HIT_ROTATE) {
+    m = dragRotate(sel.box, drag.base, drag.start.x, drag.start.y, p.x, p.y);
+  } else {
+    m = dragScale(sel.box, drag.base, drag.hit, p.x + drag.grab.x, p.y + drag.grab.y);
+  }
+  s.sel = { box: sel.box, m };
+  effects.push({ kind: 'selection' });
+}
+
 function moveView(s: SessionState, touches: Touch[], env: SessionEnv, effects: SessionEffect[]): void {
   'worklet';
   const cur = pair(touches);
@@ -586,6 +718,16 @@ function onMove(
   if (state.mode === 'move' && state.xf) {
     const s = { ...state };
     moveLayer(s, touches, env, effects);
+    return s;
+  }
+  if (state.mode === 'lasso' && state.lasso && touches.length === 1) {
+    const s = { ...state };
+    moveLasso(s, touches[0], env, effects);
+    return s;
+  }
+  if (state.mode === 'select' && touches.length === 1) {
+    const s = { ...state };
+    moveSelection(s, touches[0], env, effects);
     return s;
   }
   if (state.mode === 'guide' && state.guide && touches.length === 1) {
@@ -653,6 +795,27 @@ function isEmptyTap(s: SessionState, time: number, env: SessionEnv): boolean {
   return !insidePoly(env.poly, p.x, p.y);
 }
 
+/** A closed lasso picks strokes. A tap outside the frame lets the selection go. */
+function finishLasso(s: SessionState, time: number, env: SessionEnv, effects: SessionEffect[]): void {
+  'worklet';
+  const points = s.lasso;
+  s.lasso = null;
+  if (points && s.moved && points.length >= 6) {
+    effects.push({ kind: 'lassoCommit', points });
+    return;
+  }
+  effects.push({ kind: 'lasso' });
+  if (s.moved) {
+    return;
+  }
+  if (s.sel) {
+    effects.push({ kind: 'selectionDismiss' });
+  }
+  if (isEmptyTap(s, time, env)) {
+    emptyTap(s, time, effects);
+  }
+}
+
 function onUp(
   state: SessionState,
   e: Extract<SessionEvent, { type: 'up' }>,
@@ -685,6 +848,13 @@ function onUp(
       }
     }
     s.xf = null;
+  } else if (s.mode === 'lasso') {
+    finishLasso(s, e.time, env, effects);
+  } else if (s.mode === 'select') {
+    if (s.drag && s.moved && s.sel) {
+      effects.push({ kind: 'selectionMatrix', m: s.sel.m });
+    }
+    s.drag = null;
   } else if (s.mode === 'pick') {
     const t = e.changed[0];
     const p = screenToPage(s.view, env.pageW, t ? t.x : s.startX, t ? t.y : s.startY);
@@ -707,6 +877,7 @@ function onCancel(state: SessionState, effects: SessionEffect[]): SessionState {
     s.xf = null;
     effects.push({ kind: 'transformCancel' });
   }
+  dropSelectGesture(s, effects);
   s.pan = null;
   s.mode = 'idle';
   return s;
@@ -772,7 +943,14 @@ export function reduceSession(state: SessionState, event: SessionEvent, env: Ses
     case 'tapTimeout':
       if (state.tapPending) {
         next = { ...state, tapPending: false };
-        effects.push({ kind: 'undo' });
+        if (state.sel && !isIdentityAffine(state.sel.m)) {
+          // Nothing is stored yet, so undo takes back the transform and leaves the history alone.
+          next.sel = { box: state.sel.box, m: IDENTITY_AFFINE };
+          effects.push({ kind: 'selection' });
+          effects.push({ kind: 'selectionMatrix', m: IDENTITY_AFFINE });
+        } else {
+          effects.push({ kind: 'undo' });
+        }
       }
       break;
     case 'setView':
@@ -786,6 +964,18 @@ export function reduceSession(state: SessionState, event: SessionEvent, env: Ses
     case 'setGuide':
       next = { ...state, guide: event.guide };
       effects.push({ kind: 'guide' });
+      break;
+    case 'setSelection':
+      next = { ...state, sel: event.box ? { box: event.box, m: IDENTITY_AFFINE } : null, drag: null };
+      effects.push({ kind: 'selection' });
+      break;
+    case 'selectionOp':
+      if (state.sel && !state.drag) {
+        const m = applySelectionOp(state.sel.box, state.sel.m, event.op);
+        next = { ...state, sel: { box: state.sel.box, m } };
+        effects.push({ kind: 'selection' });
+        effects.push({ kind: 'selectionMatrix', m });
+      }
       break;
   }
   return { state: next, effects };

@@ -1,3 +1,4 @@
+import type { SkTypefaceFontProvider } from '@shopify/react-native-skia';
 import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { BoldIcon, CircleIcon, DeleteIcon, DoneIcon, PenLineIcon, UserIcon } from '../../ui/icons';
@@ -7,12 +8,11 @@ import { clampFontSize } from '../../core/lettering/bubbleEdit';
 import { SFX_STYLES } from '../../core/lettering/bubbles';
 import { hasTranslation, translationOf } from '../../core/lettering/translation';
 import { BUBBLE_TYPE_LABEL, EFFECT_LABEL } from '../../core/model/constants';
-import type { Bubble, BubbleFont, BubbleType, Effect, EffectType } from '../../core/model/types';
-import { FONT_LABEL } from '../../render/fonts';
+import type { Bubble, BubbleType, Effect, EffectType } from '../../core/model/types';
 import { Chip, ICON, Icon, IconButton, Pressable, Segmented, Slider, Stepper, Text, ToolPanel } from '../../ui';
+import { FontChoices } from './FontPicker';
 
 const SPEECH_TYPES: BubbleType[] = ['speak', 'think', 'shout', 'whisper', 'machine'];
-const FONTS = Object.keys(FONT_LABEL) as BubbleFont[];
 const EFFECT_TYPES = Object.keys(EFFECT_LABEL) as EffectType[];
 const NARRATION_STYLES: { value: NonNullable<Bubble['narrationStyle']>; label: string }[] = [
   { value: 'box', label: msg('Border') },
@@ -73,6 +73,7 @@ export function BubbleCard({
   bubble,
   speaker,
   lang,
+  fonts,
   onChange,
   onEdit,
   onDelete,
@@ -82,6 +83,7 @@ export function BubbleCard({
   bubble: Bubble;
   speaker?: string;
   lang?: string | null;
+  fonts?: SkTypefaceFontProvider | null;
   onChange: (patch: Partial<Bubble>, tag?: string) => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -205,9 +207,7 @@ export function BubbleCard({
         </>
       ) : (
         <Row label={t('Font')}>
-          {FONTS.map(key => (
-            <Chip key={key} label={t(FONT_LABEL[key])} selected={bubble.font === key} onPress={() => onChange({ font: key })} />
-          ))}
+          <FontChoices value={bubble.font} fonts={fonts ?? null} onChange={font => onChange({ font })} />
         </Row>
       )}
       {speech && (

@@ -26,9 +26,9 @@ import {
   toBubbleLocal,
 } from '../core/lettering/bubbles';
 import { fitBubbleText, fitTranslatedText, type TextMeasure } from '../core/lettering/fit';
+import { fontFamilies } from '../core/lettering/fonts';
 import { localizeBubble } from '../core/lettering/translation';
 import type { Bubble } from '../core/model/types';
-import { FONT_FAMILY } from './fonts';
 import { INK, PAPER } from './ink';
 
 function polygon(points: Pt[]): SkPath {
@@ -101,7 +101,7 @@ function buildParagraph(
   const font = sfxStyle ? sfxStyle.font : bubble.bold && bubble.font === 'sans' ? 'sansBold' : bubble.font;
   const textStyle = {
     color: Skia.Color(color),
-    fontFamilies: [FONT_FAMILY[font]],
+    fontFamilies: fontFamilies(font),
     fontSize,
     heightMultiplier: sfxStyle ? 1 : 1.15,
     letterSpacing: sfxStyle ? sfxStyle.letterSpacing : 0,

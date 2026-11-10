@@ -1,5 +1,13 @@
 import { useCallback } from 'react';
 
+import {
+  POSE_COLOR,
+  POSE_GRAY,
+  POSE_LAYER_OPACITY,
+  buildPoseStrokes,
+  fitPoseBox,
+  type Pose,
+} from '../../core/art/poses';
 import { coverImageRect, fitImageRect } from '../../core/art/strokes';
 import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
@@ -92,5 +100,25 @@ export function useLayerActions(
     [active, panelId, shape],
   );
 
-  return { importImage, clearActive, addReference, placeMaterial };
+  /** The mannequin gets its own layer just under the one being drawn on, which stays the active layer. */
+  const placePose = useCallback(
+    (pose: Pose, colored: boolean): boolean => {
+      const layers = loadArt(panelId)?.layers ?? [];
+      if (layers.length >= LIMITS.layers) {
+        toast(t('A panel can hold {max} layers. Merge or delete one first', { max: LIMITS.layers }));
+        return false;
+      }
+      const strokes = buildPoseStrokes(pose, fitPoseBox(pose, shape.bbox), colored ? POSE_COLOR : POSE_GRAY);
+      const below = layers.findIndex(layer => layer.id === active?.id);
+      // The name is translated here: from now on it is the person's layer, and they can rename it.
+      addLayer(panelId, t(pose.label), { strokes, opacity: POSE_LAYER_OPACITY }, Math.max(0, below));
+      if (active) {
+        setActiveLayer(panelId, active.id);
+      }
+      return true;
+    },
+    [active, panelId, shape],
+  );
+
+  return { importImage, clearActive, addReference, placeMaterial, placePose };
 }

@@ -1,7 +1,8 @@
-import { useRef } from 'react';
-import { CopyIcon, DeleteIcon, DoneIcon, EditIcon, ExpandIcon, FitIcon, PanelFrameIcon, ScriptIcon, SelectionIcon } from '../../ui/icons';
+import { useRef, useState } from 'react';
+import { CopyIcon, DeleteIcon, DoneIcon, EditIcon, ExpandIcon, FitIcon, PanelFrameIcon, ReplayIcon, ScriptIcon, SelectionIcon } from '../../ui/icons';
 
 import { t } from '../../core/i18n';
+import { panelOrder } from '../../core/layout/layout';
 import { copyLayout, hasLayoutClipboard } from '../../core/layout/pageEdit';
 import { HOME_VIEW } from '../../core/layout/pageView';
 import { SHOTS, SHOT_LABEL } from '../../core/model/constants';
@@ -9,12 +10,14 @@ import { panelHasArt } from '../../state/artStore';
 import { useAppNavigation } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
 import { ListItem, Menu, PromptDialog, Sheet, toast } from '../../ui';
+import { ReplaySheet } from '../canvas/ReplaySheet';
 import { TemplateSheet } from './TemplateSheet';
 import type { PanelController } from './usePanelController';
 
 export function PanelSheets({ c }: { c: PanelController }) {
   const navigation = useAppNavigation();
   const jumpTo = useRef<number | null>(null);
+  const [replaying, setReplaying] = useState(false);
   const { ctx, chapter, page, pageId, selected, layout, sheet, panelMenu } = c;
   const { project, size, rtl, shapes } = ctx;
   const selectedPanel = selected ? page.panels[selected] : undefined;
@@ -26,10 +29,20 @@ export function PanelSheets({ c }: { c: PanelController }) {
       useStory.getState().updatePanel(pageId, selected, { shot });
     }
   };
+  const replayPanels = panelOrder(page, rtl).flatMap(panelId => {
+    const shape = shapes.find(item => item.id === panelId);
+    return shape ? [{ panelId, shape }] : [];
+  });
   const scriptBlockId = shapes.map(shape => page.panels[shape.id]?.blockIds[0]).find(Boolean);
 
   return (
     <>
+      <ReplaySheet
+        visible={replaying}
+        panels={replayPanels}
+        page={{ x: 0, y: 0, w: size.w, h: size.h }}
+        onClose={() => setReplaying(false)}
+      />
       <TemplateSheet
         visible={c.templatesOpen}
         format={project.format}
@@ -62,6 +75,7 @@ export function PanelSheets({ c }: { c: PanelController }) {
               toast(t('Layout copied'));
             },
           },
+          { label: t('Replay page drawing'), icon: ReplayIcon, disabled: !layout, onPress: () => setReplaying(true) },
           { label: t('Paste layout'), icon: SelectionIcon, disabled: !hasLayoutClipboard(), onPress: c.paste },
           { label: t('Clear all panels'), icon: DeleteIcon, destructive: true, disabled: !layout, onPress: c.clearPanels },
         ]}

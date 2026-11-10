@@ -70,6 +70,7 @@
     "ios": {
       "modulesProvider": {
         "NativeFiles": "NativeFilesModule",
+        "NativeReminder": "NativeReminderModule",
         "NativeScreen": "NativeScreenModule"
       }
     }

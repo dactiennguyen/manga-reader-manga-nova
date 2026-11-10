@@ -10,6 +10,7 @@ import { useAppNavigation } from '../../state/navigation';
 import { Button, Chip, ChipRow, IconButton, ListItem, Menu, Pressable, Sheet, Text, TextField } from '../../ui';
 import { CharacterPicker } from '../characters/CharacterPicker';
 import { ManageLanguagesSheet, progressLabel } from './Languages';
+import { PresetSheet } from './PresetSheet';
 import { TranslationSheet } from './TranslationSheet';
 import type { LetteringController } from './useLetteringController';
 
@@ -172,6 +173,7 @@ export function LetteringSheets({ c }: { c: LetteringController }) {
     <>
       <EditorSheet c={c} />
       <EffectsSheet c={c} />
+      <PresetSheet c={c} />
       <DialogueListSheet c={c} />
       <Menu
         visible={state.sheet === 'menu'}

@@ -27,12 +27,20 @@ export type AppSettings = {
   libraryLayout: 'grid' | 'list';
   librarySort: 'updated' | 'title' | 'created';
   canvasTipsSeen: boolean;
+  /** Colours drawn with lately, newest first, and the palette the person saved. Rules are in core/art/palette. */
+  recentColors: string[];
+  savedColors: string[];
   tipDismissedDay: string;
   aiBaseUrl: string;
   aiModel: string;
   aiApiKey: string;
   /** Sample answers while no server is set, so the AI tools can be tried. */
   aiDemo: boolean;
+  /** Strokes to draw each day. 0 turns the goal off. */
+  dailyGoal: number;
+  reminderOn: boolean;
+  /** Hour of the day, 0 to 23. */
+  reminderHour: number;
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -50,11 +58,16 @@ export const DEFAULT_SETTINGS: AppSettings = {
   libraryLayout: 'grid',
   librarySort: 'updated',
   canvasTipsSeen: false,
+  recentColors: [],
+  savedColors: [],
   tipDismissedDay: '',
   aiBaseUrl: '',
   aiModel: 'gemini-3.6-flash',
   aiApiKey: '',
   aiDemo: true,
+  dailyGoal: 100,
+  reminderOn: false,
+  reminderHour: 20,
 };
 
 const KEY = 'settings';

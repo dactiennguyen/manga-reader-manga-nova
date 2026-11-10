@@ -14,7 +14,7 @@ function blankPage(navigation: AppNavigation, style: ArtStyle): Page | undefined
   }
   const story = useStory.getState();
   const projectId = story.createProject({
-    title: QUICK_START_TITLE,
+    title: t(QUICK_START_TITLE),
     genres: [],
     logline: '',
     format: 'manga',

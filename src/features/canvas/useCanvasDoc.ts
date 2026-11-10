@@ -7,10 +7,12 @@ import { t } from '../../core/i18n';
 import type { ArtLayer, ID, PanelArt, Stroke } from '../../core/model/types';
 import { useImageCacheRev } from '../../render/images';
 import { appendToScene, syncLayerScene, type LayerScene } from '../../render/layerScene';
+import type { SelectionScene } from '../../render/selectionScene';
 import { artHasContent, artRev, commitStroke, emptyArt, loadArt, rewriteLayer, saveArt } from '../../state/artStore';
 import { useStory } from '../../state/useStory';
 import { toast } from '../../ui';
 import type { CanvasEngine, ScenePictures, StrokeMeta } from './useCanvasEngine';
+import { useCanvasSelection, type CanvasSelection } from './useCanvasSelection';
 
 export type CanvasDoc = {
   art: PanelArt;
@@ -19,6 +21,7 @@ export type CanvasDoc = {
   hadArt: boolean;
   commit: (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number, mirror: number | null) => void;
   applyTransform: (layerId: ID, t: LayerTransform) => void;
+  selection: CanvasSelection;
   /** The art store moved. Strokes this hook wrote itself are recognised and skipped. */
   onArtRev: () => void;
   /** Call when leaving: thumbnails and page views follow the page's art revision. */
@@ -56,16 +59,28 @@ export function useCanvasDoc(panelId: ID, pageId: ID, engine: CanvasEngine): Can
   }, []);
 
   const refresh = useCallback(
-    (clearTransform: boolean) => {
+    (clearTransform: boolean, selection?: SelectionScene | null) => {
       const next = loadArt(panelId);
       if (next) {
         syncScenes(next);
         setArt(next);
-        publish(pictures(), null, clearTransform);
+        publish(pictures(), null, clearTransform, selection);
       }
     },
     [panelId, pictures, publish, syncScenes],
   );
+
+  const selection = useCanvasSelection(panelId, {
+    show: scene => publish(pictures(), null, false, scene),
+    // The new strokes and the closed selection reach the screen in one update.
+    rewrite: (layerId, strokes) => {
+      rewriteLayer(panelId, layerId, strokes);
+      handledRev.current = artRev(panelId);
+      dirty.current = true;
+      refresh(false, null);
+    },
+  });
+  const { drop: dropSelection, end: endSelection } = selection;
 
   useEffect(() => {
     // Not during render: saving notifies the store's listeners, and it gives the layers their real ids.
@@ -81,9 +96,9 @@ export function useCanvasDoc(panelId: ID, pageId: ID, engine: CanvasEngine): Can
     if (rev !== handledRev.current) {
       handledRev.current = rev;
       dirty.current = true;
-      refresh(false);
+      refresh(false, dropSelection());
     }
-  }, [panelId, refresh]);
+  }, [dropSelection, panelId, refresh]);
 
   const commit = useCallback(
     (layerId: ID, meta: StrokeMeta, points: Float32Array, seq: number, mirror: number | null) => {
@@ -127,13 +142,14 @@ export function useCanvasDoc(panelId: ID, pageId: ID, engine: CanvasEngine): Can
   );
 
   const leave = useCallback(() => {
+    endSelection(true);
     if (dirty.current) {
       dirty.current = false;
       useStory.getState().bumpArt(pageId);
     }
-  }, [pageId]);
+  }, [endSelection, pageId]);
 
   const active = useMemo(() => activeLayerOf(art), [art]);
 
-  return { art, active, hadArt: initial.hadArt, commit, applyTransform, onArtRev, leave };
+  return { art, active, hadArt: initial.hadArt, commit, applyTransform, selection, onArtRev, leave };
 }

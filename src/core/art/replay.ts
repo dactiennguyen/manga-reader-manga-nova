@@ -40,6 +40,24 @@ export function artAtStep(art: PanelArt, step: number): PanelArt {
   return { layers };
 }
 
+/** Several panels play one after another, in the order given: a page replays in reading order. */
+export function sceneSteps(parts: readonly (PanelArt | null)[]): number {
+  return parts.reduce((sum, art) => sum + replaySteps(art), 0);
+}
+
+/** Each panel as it was after `step` steps of the whole scene. Panels not reached yet are empty. */
+export function sceneAtStep(parts: readonly (PanelArt | null)[], step: number): PanelArt[] {
+  let left = Math.max(0, Math.floor(step));
+  return parts.map(art => {
+    if (!art) {
+      return { layers: [] };
+    }
+    const shown = artAtStep(art, left);
+    left = Math.max(0, left - replaySteps(art));
+    return shown;
+  });
+}
+
 /** The step shown by each frame: every step when they fit, evenly spread when they do not. Ends on the full drawing. */
 export function replayFrames(total: number, maxFrames = REPLAY_MAX_FRAMES): number[] {
   if (total <= 0) {

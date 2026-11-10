@@ -1,14 +1,16 @@
-import { AddImageIcon, CharactersIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon, MaterialsIcon, ReplayIcon } from '../../ui/icons';
+import { AddImageIcon, CharactersIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon, MaterialsIcon, PoseIcon, ReplayIcon } from '../../ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, View, type LayoutChangeEvent } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScopedTheme } from 'uniwind';
 
+import type { SelectionOp } from '../../core/art/affine';
 import type { Box } from '../../core/art/artMath';
 import { GUIDES, defaultGuide, type GuideKind } from '../../core/art/guides';
+import type { Pose } from '../../core/art/poses';
 import type { SessionEnv } from '../../core/art/session';
-import { DEFAULT_OPACITY, DEFAULT_SIZES, GRAYS } from '../../core/art/tools';
+import { DEFAULT_OPACITY, DEFAULT_SIZES, GRAYS, type CanvasTool } from '../../core/art/tools';
 import { t } from '../../core/i18n';
 import type { PanelShape } from '../../core/layout/layout';
 import type { Character, ID } from '../../core/model/types';
@@ -35,6 +37,7 @@ import { CharacterRefSheet, characterReference } from './CharacterRefSheet';
 import { LayerPanel } from './LayerPanel';
 import type { Material } from './materials';
 import { MaterialsSheet } from './MaterialsSheet';
+import { PosesSheet } from './PosesSheet';
 import { ReplaySheet } from './ReplaySheet';
 import { useCanvasDoc } from './useCanvasDoc';
 import { useCanvasEngine, type EngineHandlers } from './useCanvasEngine';
@@ -89,7 +92,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
   const [sizing, setSizing] = useState(false);
   const [reference, setReference] = useState<CanvasReference | null>(null);
   const [guide, setGuide] = useState<GuideKind | null>(null);
-  const [sheet, setSheet] = useState<'characters' | 'materials' | 'replay' | null>(null);
+  const [sheet, setSheet] = useState<'characters' | 'materials' | 'poses' | 'replay' | null>(null);
   const [opacityPreview, setOpacityPreview] = useState<{ id: ID; value: number } | null>(null);
   const [banner, setBanner] = useState(false);
 
@@ -121,7 +124,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
   useCanvasEnv({ engine, doc, tools, panelId, shape, pageW: ctx.size.w, stylusMode, area });
 
   const { send, chromeRects, faded, view, env } = engine;
-  const { art, active, leave, onArtRev } = doc;
+  const { art, active, leave, onArtRev, selection } = doc;
 
   const done = useCallback(() => {
     leave();
@@ -142,13 +145,15 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (layersOpen) {
         setLayersOpen(false);
+      } else if (selection.count) {
+        selection.end(true);
       } else {
         done();
       }
       return true;
     });
     return () => sub.remove();
-  }, [done, layersOpen]);
+  }, [done, layersOpen, selection]);
 
   useEffect(() => {
     if (!doc.hadArt && panel?.description) {
@@ -183,7 +188,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
     opacity: withTiming(faded.value ? FADED_OPACITY : 1, { duration: MOTION.fast }),
   }));
 
-  const { importImage, clearActive, addReference, placeMaterial } = useLayerActions(panelId, active, shape, setReference);
+  const { importImage, clearActive, addReference, placeMaterial, placePose } = useLayerActions(panelId, active, shape, setReference);
   const characters = useCharacters(ctx.project.id);
 
   const closeReference = useCallback(() => setReference(null), []);
@@ -208,6 +213,27 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
       }
       toast(material.kind === 'pattern' ? t('Drag to place it, pinch to resize') : t('Background added under your drawing'));
     }
+  };
+
+  const addPose = (pose: Pose) => {
+    setSheet(null);
+    if (placePose(pose, colored)) {
+      toast(t('Pose added under your drawing. Hide or delete its layer when you are done'));
+    }
+  };
+
+  // Leaving the Select tool, or tapping it again, closes the selection and keeps what was done to it.
+  const chooseTool = (next: CanvasTool) => {
+    selection.end(true);
+    tools.chooseTool(next);
+  };
+  const selectionControls = {
+    count: selection.count,
+    onAll: selection.all,
+    onOp: (op: SelectionOp) => send({ type: 'selectionOp', op }),
+    onDelete: selection.remove,
+    onCancel: () => selection.end(false),
+    onApply: () => selection.end(true),
   };
   const closeLayers = useCallback(() => setLayersOpen(false), []);
   const railTop = insets.top + TOP_BAR_HEIGHT + 8;
@@ -252,7 +278,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
             top={railTop}
             maxHeight={Math.max(120, area.h - railTop - insets.bottom - PANEL_CLEARANCE)}
             fade={fade}
-            onTool={tools.chooseTool}
+            onTool={chooseTool}
             onPick={() => tools.setPicking(value => !value)}
             onGuide={chooseGuide}
             onToggle={() => setCollapsed(value => !value)}
@@ -261,6 +287,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
           <CanvasToolPanel
             tools={tools}
             colored={colored}
+            selection={selectionControls}
             fade={fade}
             onPreview={setSizing}
             onLayout={trackers.panel}
@@ -293,6 +320,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
         title={t('Panel {n}', { n: shape.index + 1 })}
         items={[
           { label: t('Materials'), icon: MaterialsIcon, onPress: () => setSheet('materials') },
+          { label: t('Poses'), icon: PoseIcon, onPress: () => setSheet('poses') },
           { label: t('Character reference'), icon: CharactersIcon, onPress: () => setSheet('characters') },
           { label: t('Flip view horizontally'), icon: FlipIcon, onPress: () => setFlip(value => !value) },
           { label: grid ? t('Hide grid') : t('Show grid'), icon: GridIcon, onPress: () => setGrid(value => !value) },
@@ -309,8 +337,9 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
         onClose={() => setSheet(null)}
         onPick={showCharacter}
       />
-      <ReplaySheet visible={sheet === 'replay'} panelId={panelId} shape={shape} onClose={() => setSheet(null)} />
+      <ReplaySheet visible={sheet === 'replay'} panels={[{ panelId, shape }]} onClose={() => setSheet(null)} />
       <MaterialsSheet visible={sheet === 'materials'} onClose={() => setSheet(null)} onPick={addMaterial} />
+      <PosesSheet visible={sheet === 'poses'} onClose={() => setSheet(null)} onPick={addPose} />
       {tipsSeen ? null : <TipsOverlay onClose={() => useSettings.getState().set({ canvasTipsSeen: true })} />}
     </View>
   );

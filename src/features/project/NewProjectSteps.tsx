@@ -4,6 +4,7 @@ import { AiIcon, CheckIcon, RefreshIcon } from '../../ui/icons';
 import { t } from '../../core/i18n';
 import { ART_STYLE_LABEL, LIMITS } from '../../core/model/constants';
 import { FORMATS, type FormatKey } from '../../core/story/newProject';
+import { STARTERS, starterOf } from '../../core/story/starters';
 import {
   AiErrorBox,
   AiLoading,
@@ -13,6 +14,7 @@ import {
   Card,
   Chip,
   ChipGroup,
+  ChipRow,
   FieldLabel,
   SwitchRow,
   Text,
@@ -175,6 +177,22 @@ export function FormatStep({ form }: { form: NewProjectForm }) {
       <Text variant="caption" tone="muted">
         {t('Note: the format cannot be changed after you draw the first page.')}
       </Text>
+      <StepTitle>{t('Start with')}</StepTitle>
+      <Card className="gap-2 p-3">
+        <ChipRow>
+          {STARTERS.map(item => (
+            <Chip
+              key={item.key}
+              label={t(item.label)}
+              selected={item.key === form.starterKey}
+              onPress={() => form.pickStarter(item.key)}
+            />
+          ))}
+        </ChipRow>
+        <Text variant="caption" tone="secondary">
+          {t(starterOf(form.starterKey).hint)}
+        </Text>
+      </Card>
     </>
   );
 }

@@ -51,6 +51,7 @@ export function useExportScreen(projectId: ID, chapterId: ID | undefined, onDone
     autoCut: true,
     gap: 0,
     socialShape: 'square',
+    signature: false,
     lang: null,
   }));
   const [phase, setPhase] = useState<ExportPhase>({ kind: 'idle' });

@@ -1,4 +1,4 @@
-import { BrushIcon, CircleIcon, EraserIcon, FillIcon, GPenIcon, LineIcon, MoveIcon, PencilToolIcon, PerspectiveIcon, RectIcon, ShapesIcon, SymmetryIcon, TwoPointIcon } from '../../ui/icons';
+import { BrushIcon, CircleIcon, EraserIcon, FillIcon, GPenIcon, LassoIcon, LineIcon, MoveIcon, PencilToolIcon, PerspectiveIcon, RectIcon, ShapesIcon, SymmetryIcon, TwoPointIcon } from '../../ui/icons';
 
 import type { GuideKind } from '../../core/art/guides';
 import type { CanvasTool, ShapeTool } from '../../core/art/tools';
@@ -10,6 +10,7 @@ export const TOOL_ICONS: Record<Exclude<CanvasTool, ShapeTool>, IconGlyph> = {
   brush: BrushIcon,
   eraser: EraserIcon,
   fill: FillIcon,
+  select: LassoIcon,
   move: MoveIcon,
 };
 

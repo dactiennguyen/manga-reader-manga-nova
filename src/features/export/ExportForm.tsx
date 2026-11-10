@@ -141,6 +141,38 @@ export function LanguagePicker({
   );
 }
 
+function SignatureRows({
+  form,
+  withAuthor,
+  onChange,
+}: {
+  form: ExportOptions;
+  withAuthor: boolean;
+  onChange: (patch: Partial<ExportOptions>) => void;
+}) {
+  return (
+    <>
+      <SwitchRow
+        title={t('Sign every image')}
+        subtitle={t('Puts your pen name in the bottom corner')}
+        value={form.signature}
+        onValueChange={signature => onChange({ signature })}
+      />
+      {withAuthor && (
+        <OptionRow label={t('Author')}>
+          <TextField
+            value={form.penName}
+            onChangeText={penName => onChange({ penName })}
+            placeholder={t('Pen name')}
+            accessibilityLabel={t('Pen name')}
+            maxLength={60}
+          />
+        </OptionRow>
+      )}
+    </>
+  );
+}
+
 export function OptionsForm({
   project,
   form,
@@ -182,6 +214,7 @@ export function OptionsForm({
           value={form.autoCut}
           onValueChange={autoCut => onChange({ autoCut })}
         />
+        <SignatureRows form={form} withAuthor={form.signature} onChange={onChange} />
       </Section>
     );
   }
@@ -199,6 +232,7 @@ export function OptionsForm({
             onChange={socialShape => onChange({ socialShape })}
           />
         </OptionRow>
+        <SignatureRows form={form} withAuthor={form.signature} onChange={onChange} />
       </Section>
     );
   }
@@ -240,17 +274,7 @@ export function OptionsForm({
           onValueChange={info => onChange({ info })}
         />
       )}
-      {(form.cover || withInfo) && (
-        <OptionRow label={t('Author')}>
-          <TextField
-            value={form.penName}
-            onChangeText={penName => onChange({ penName })}
-            placeholder={t('Pen name')}
-            accessibilityLabel={t('Pen name')}
-            maxLength={60}
-          />
-        </OptionRow>
-      )}
+      <SignatureRows form={form} withAuthor={form.cover || withInfo || form.signature} onChange={onChange} />
     </Section>
   );
 }

@@ -2,7 +2,7 @@ import { msg } from '../i18n';
 import type { LayerTransform } from './artMath';
 import type { ArtLayer, ID, PanelArt, Stroke, StrokeTool } from '../model/types';
 
-export type CanvasTool = StrokeTool | 'move';
+export type CanvasTool = StrokeTool | 'move' | 'select';
 
 export type ShapeTool = 'line' | 'rect' | 'ellipse';
 
@@ -12,6 +12,7 @@ export const TOOLS: { id: CanvasTool; label: string }[] = [
   { id: 'brush', label: msg('Brush') },
   { id: 'eraser', label: msg('Eraser') },
   { id: 'fill', label: msg('Lasso fill') },
+  { id: 'select', label: msg('Select strokes') },
   { id: 'move', label: msg('Move and scale layer') },
 ];
 
@@ -33,7 +34,7 @@ export function supportsTone(tool: CanvasTool): boolean {
 
 export function strokeToolOf(tool: CanvasTool): StrokeTool {
   'worklet';
-  return tool === 'move' ? 'gpen' : tool;
+  return tool === 'move' || tool === 'select' ? 'gpen' : tool;
 }
 
 export const SIZE_MIN = 2;

@@ -146,7 +146,7 @@ export type Panel = {
 
 export type BubbleType = 'speak' | 'think' | 'shout' | 'whisper' | 'machine' | 'narration' | 'sfx';
 
-export type BubbleFont = 'hand' | 'sans' | 'sansBold' | 'display';
+export type BubbleFont = 'hand' | 'sans' | 'sansBold' | 'display' | 'comic' | 'casual' | 'rounded' | 'marker' | 'heavy';
 
 export type Bubble = {
   id: ID;

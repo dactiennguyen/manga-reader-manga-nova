@@ -5,7 +5,7 @@ import { imagesToPdf, removeFile, zipDir } from '../src/native/files';
 import { renderPageImage } from '../src/render/drawPage';
 import { useStory } from '../src/state/useStory';
 
-const fakeImage = () => ({ dispose: jest.fn(), encodeToBase64: () => 'b64', width: () => 2000 });
+const fakeImage = () => ({ dispose: jest.fn(), encodeToBase64: () => 'b64', width: () => 2000, height: () => 2824 });
 
 jest.mock('@shopify/react-native-skia', () => {
   const image = () => ({ dispose: jest.fn(), encodeToBase64: () => 'b64' });
@@ -13,7 +13,7 @@ jest.mock('@shopify/react-native-skia', () => {
   const paragraph = { layout: jest.fn(), getHeight: () => 40, paint: jest.fn() };
   return {
     ImageFormat: { PNG: 'png', JPEG: 'jpeg' },
-    TextAlign: { Center: 'center' },
+    TextAlign: { Center: 'center', Right: 'right' },
     Skia: {
       Color: (value: string) => value,
       Paint: () => ({ setColor: jest.fn() }),
@@ -79,6 +79,7 @@ const base: ExportOptions = {
   autoCut: true,
   gap: 0,
   socialShape: 'square',
+  signature: false,
   lang: null,
 };
 
@@ -153,6 +154,33 @@ describe('social posts', () => {
 
   it('fails when no page has panels', async () => {
     await expect(run({ format: 'social' }, ['empty'])).rejects.toThrow('no panels');
+  });
+});
+
+describe('signature', () => {
+  const { Skia } = require('@shopify/react-native-skia');
+  const paragraph = () => Skia.ParagraphBuilder.Make().build();
+
+  it('stamps the pen name on every page image', async () => {
+    await run({ format: 'png', signature: true, penName: 'Aki' });
+    expect(paragraph().paint).toHaveBeenCalledTimes(2);
+    const [, x, y] = paragraph().paint.mock.calls[0];
+    // Bottom right of a 2000 x 2824 page: inside a 3% margin, above the bottom edge.
+    expect(x).toBeCloseTo(60);
+    expect(y).toBeCloseTo(2824 - 60 - 40);
+  });
+
+  it('stamps each social frame and each page of a long image', async () => {
+    await run({ format: 'social', signature: true, penName: 'Aki' }, ['a']);
+    expect(paragraph().paint).toHaveBeenCalledTimes(2);
+    paragraph().paint.mockClear();
+    await run({ format: 'long', signature: true, penName: 'Aki' });
+    expect(paragraph().paint).toHaveBeenCalledTimes(2);
+  });
+
+  it('draws nothing when the option is off', async () => {
+    await run({ format: 'png', signature: false, penName: 'Aki' });
+    expect(paragraph().paint).not.toHaveBeenCalled();
   });
 });
 

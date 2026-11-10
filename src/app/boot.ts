@@ -17,6 +17,7 @@ import { connectArt, exportArt, importArt, loadArt } from '../state/artStore';
 import { usePage, useProjectOfPage } from '../state/hooks';
 import { connectScriptHistory } from '../state/scriptHistory';
 import { configureServices } from '../state/services';
+import { connectActivity } from '../state/useActivity';
 import { connectAssistant } from '../state/useAssistant';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
 import { connectStory, importEntities, useStory } from '../state/useStory';
@@ -45,6 +46,7 @@ export async function boot(): Promise<void> {
   const db = await openDatabase();
   const meta = createMetaRepo(db);
   connectSettings(meta);
+  connectActivity(meta);
   connectArt(createArtRepo(db));
   connectStory(
     createStoryRepo(db),

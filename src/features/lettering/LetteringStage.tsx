@@ -161,6 +161,7 @@ export function LetteringStage({ c }: { c: LetteringController }) {
             bubble={stored}
             speaker={speaker}
             lang={lang}
+            fonts={c.fonts}
             onChange={(patch, tag) => c.changeBubble(stored.id, patch, tag)}
             onEdit={() => dispatch({ type: 'openEditor' })}
             onDelete={() => c.removeBubble(stored.id)}

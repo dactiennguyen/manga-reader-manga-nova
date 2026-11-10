@@ -89,7 +89,7 @@ export function WelcomeScreen() {
               <Text variant="display" accessibilityRole="header">
                 {t(slide.title)}
               </Text>
-              <Text tone="secondary" numberOfLines={2}>
+              <Text tone="secondary" numberOfLines={3}>
                 {t(slide.text)}
               </Text>
             </View>

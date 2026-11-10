@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import type { ArtRepo, LayerRow } from '../core/ports';
 import type { ArtLayer, ID, PanelArt, Stroke } from '../core/model/types';
 import { uid } from '../core/util/id';
+import { noteStrokes } from './useActivity';
 
 /** Panels kept in memory. Art is the largest thing the app holds. */
 const CACHE_PANELS = 3;
@@ -160,6 +161,7 @@ export function commitStroke(panelId: ID, layerId: ID, ...strokes: Stroke[]): vo
     ),
   }));
   record(panelId, [{ before, after: { ...before, ...state } }]);
+  noteStrokes(strokes.length);
 }
 
 /** Replaces a layer's strokes as a new generation, so undo only has to point back at the old one. */
@@ -190,11 +192,15 @@ export function editLayer(panelId: ID, layerId: ID, edit: LayerEdit): void {
 
 /** Inserts at `at` in the stack, the end by default. Layers above it move up in the same undo step. */
 export function addLayer(panelId: ID, name: string, init: Partial<ArtLayer> = {}, at?: number): ID {
-  const layer: ArtLayer = { ...newLayer(name), ...init, gen: 0, head: 0 };
+  const layer: ArtLayer = { ...newLayer(name), ...init, gen: 0, head: init.strokes?.length ?? 0 };
   const current = loadArt(panelId)?.layers ?? [];
   const pos = Math.max(0, Math.min(at ?? current.length, current.length));
   const after = rowOf(panelId, layer, pos);
-  repo?.putLayer(after);
+  // Strokes the layer starts with are appended to an empty row, so they belong to this same undo step.
+  repo?.putLayer({ ...after, head: 0 });
+  if (layer.strokes.length) {
+    repo?.appendStrokes(layer.id, layer.strokes);
+  }
   const patches: LayerPatch[] = [{ before: null, after }];
   current.slice(pos).forEach((above, index) => {
     const before = rowOf(panelId, above, pos + index);

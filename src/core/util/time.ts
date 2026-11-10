@@ -16,6 +16,11 @@ export function dayKeyToDate(key: string): Date {
 
 const WEEKDAYS = [msg('Sun'), msg('Mon'), msg('Tue'), msg('Wed'), msg('Thu'), msg('Fri'), msg('Sat')];
 
+/** Sun is 0, as in Date.getDay(). */
+export function weekdayName(index: number): string {
+  return t(WEEKDAYS[index] ?? '');
+}
+
 function formatDate(time: number, withWeekday = false): string {
   const d = new Date(time);
   const date = t('{day}/{month}/{year}', {

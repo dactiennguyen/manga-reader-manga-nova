@@ -3,6 +3,7 @@ import { canvas } from './canvas';
 import { common } from './common';
 import { core } from './core';
 import { exporting } from './exporting';
+import { extras } from './extras';
 import { home } from './home';
 import { lettering } from './lettering';
 import { outline } from './outline';
@@ -24,6 +25,7 @@ export const CATALOG_PARTS: Record<string, CatalogPart> = {
   canvas,
   lettering,
   exporting,
+  extras,
 };
 
 export const CATALOG: CatalogPart = Object.assign({}, ...Object.values(CATALOG_PARTS));

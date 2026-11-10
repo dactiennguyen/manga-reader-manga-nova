@@ -51,6 +51,15 @@ function makeRecorder() {
     drawRect() {},
     drawImageRect() {},
     drawCircle() {},
+    save() {
+      draws.push({ save: true });
+    },
+    restore() {
+      draws.push({ restore: true });
+    },
+    concat(matrix: unknown) {
+      draws.push({ concat: matrix });
+    },
   };
   return {
     beginRecording: () => canvas,
@@ -81,6 +90,7 @@ export const Skia = {
   Path: { Oval: () => ({ verbs: [] }), Rect: () => ({ verbs: [] }) },
   PictureRecorder: makeRecorder,
   Paint: makePaint,
+  Matrix: (values?: readonly number[]) => ({ values }),
   Color: (value: string) => value,
   XYWHRect: (x: number, y: number, width: number, height: number) => ({ x, y, width, height }),
 };

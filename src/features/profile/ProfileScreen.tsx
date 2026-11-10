@@ -28,6 +28,8 @@ import {
   useDockInset,
 } from '../../ui';
 import { AiServerSheet } from './AiServerSheet';
+import { ReminderRows } from './ReminderRows';
+import { StreakCard } from './StreakCard';
 import { useImportArchive } from './useImportArchive';
 
 const PEN_NAME_MAX = 30;
@@ -150,6 +152,8 @@ export function ProfileScreen() {
         ))}
       </View>
 
+      <StreakCard />
+
       <Section title={t('Appearance|settings')}>
         <ListItem
           icon={PaletteIcon}
@@ -195,6 +199,7 @@ export function ProfileScreen() {
           value={haptics}
           onValueChange={value => set({ haptics: value })}
         />
+        <ReminderRows />
       </Section>
 
       <Section title="AI">

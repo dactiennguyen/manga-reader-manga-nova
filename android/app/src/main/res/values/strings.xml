@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Manganova</string>
+    <string name="reminder_channel">Drawing reminder</string>
 </resources>
