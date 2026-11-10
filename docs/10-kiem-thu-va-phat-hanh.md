@@ -41,12 +41,13 @@ Chỉ so sánh nội dung trang. Giao diện app đổi hoàn toàn nên không 
 
 ## CI
 
-GitHub Actions, chỉ build Android. Có hai workflow:
+GitHub Actions. Có ba workflow:
 
 | Workflow | Chạy khi nào | Làm gì |
 | --- | --- | --- |
 | `check.yml` | Mỗi lần đẩy code hoặc mở PR | `tsc`, `eslint`, `jest` |
 | `build-android.yml` | Bấm tay ở tab Actions, chọn **Build Android (manual)** | Kiểm tra như trên, rồi build APK hoặc AAB |
+| `build-ios.yml` | Bấm tay, chọn **Build iOS (manual)** | Build cho simulator, hoặc ký và đẩy lên TestFlight. Xem [14-ios.md](14-ios.md) |
 
 Tham số của `build-android.yml`:
 

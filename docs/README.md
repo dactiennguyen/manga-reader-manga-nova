@@ -21,6 +21,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 11 | [Hướng dẫn chuyển màn hình](11-huong-dan-chuyen-man.md) | Bảng tra import và thành phần khi chuyển một màn |
 | 12 | [Phong cách Studio](12-phong-cach-studio.md) | Giới thiệu style bằng hình ảnh: logo, màu, chữ, icon, màn hình thật |
 | 13 | [Website](13-website.md) | Link trang giới thiệu và chính sách, cách deploy |
+| 14 | [iOS](14-ios.md) | Chạy, build và phát hành bản iOS, khác biệt với Android |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
 

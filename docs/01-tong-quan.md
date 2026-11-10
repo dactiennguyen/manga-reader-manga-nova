@@ -20,7 +20,7 @@ Phần tốt của app cũ được giữ: logic thuần có test, định dạn
 | --- | --- |
 | Hướng làm | Project mới trong `manga-reader-ai`, không sửa repo cũ |
 | Nền tảng build | React Native CLI thuần, 0.88.1, không dùng Expo |
-| Hệ điều hành | Chỉ Android. Xóa thư mục `ios/` của template |
+| Hệ điều hành | Android trước. iOS thêm sau, cùng một code TypeScript ([14-ios.md](14-ios.md)) |
 | Giao diện | "Studio": tối là mặc định, có bản sáng ([05-design-system.md](05-design-system.md)). Viết style bằng Tailwind qua Uniwind |
 | Package id | `com.manganova.manga.reader.org`, không dùng lại id cũ |
 | Icon | Vẽ mới theo Studio (`assets/icon/`, `scripts/gen-icons.sh`). Không lấy tài sản hình ảnh của app cũ |
@@ -40,7 +40,7 @@ Phần tốt của app cũ được giữ: logic thuần có test, định dạn
 - Sao chép vào clipboard. App cũ phải mở bảng chia sẻ.
 - Giao diện cho máy tính bảng ở mức tối thiểu.
 
-**Không làm ở bản này:** AI tạo ảnh (màn 15), tài khoản, credit, máy chủ trung gian AI, đồng bộ đám mây, iOS, nhiều ngôn ngữ giao diện, chọn một phần lớp và xoay lớp ở Canvas.
+**Không làm ở bản này:** AI tạo ảnh (màn 15), tài khoản, credit, máy chủ trung gian AI, đồng bộ đám mây, nhiều ngôn ngữ giao diện, chọn một phần lớp và xoay lớp ở Canvas.
 
 ## Việc bạn cần quyết hoặc tự làm
 

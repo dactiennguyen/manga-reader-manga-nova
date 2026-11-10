@@ -1,0 +1,230 @@
+name: Build iOS (manual)
+
+run-name: iOS ${{ inputs.mode }} · ${{ inputs.version_name }} (${{ inputs.build_number || github.run_number }}) · ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'simulator: chỉ kiểm tra build, không cần tài khoản Apple. testflight: ký và đẩy lên TestFlight, cần Secrets của Apple'
+        required: true
+        type: choice
+        default: simulator
+        options:
+          - simulator
+          - testflight
+      version_name:
+        description: 'Version hiển thị cho người dùng, ví dụ 1.0.1'
+        required: true
+        type: string
+        default: '1.0.0'
+      build_number:
+        description: 'Build number, phải tăng mỗi lần đẩy lên TestFlight. Để trống thì dùng số lần chạy workflow'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build iOS ${{ inputs.mode }}
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      CI: 'true'
+      NODE_OPTIONS: --max-old-space-size=4096
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check Apple secrets
+        if: inputs.mode == 'testflight'
+        env:
+          CERT: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          TEAM: ${{ secrets.IOS_TEAM_ID }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+          KEY: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          missing=''
+          for name in CERT CERT_PASSWORD PROFILE TEAM KEY_ID ISSUER KEY; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "Thiếu Secrets cho TestFlight:$missing. Xem docs/14-ios.md" >&2
+            exit 1
+          fi
+
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check TypeScript
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test -- --runInBand
+
+      - name: Resolve version
+        id: version
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          name="$(echo "$VERSION_NAME" | tr -d '[:space:]')"
+          build="$(echo "$BUILD_NUMBER" | tr -d '[:space:]')"
+          if [ -z "$build" ]; then build="$RUN_NUMBER"; fi
+          if ! [[ "$name" =~ ^[0-9]+(\.[0-9]+){0,2}$ ]]; then
+            echo "version_name phải có dạng 1, 1.0 hoặc 1.0.1: '$name'" >&2; exit 1
+          fi
+          if ! [[ "$build" =~ ^[1-9][0-9]*$ ]]; then
+            echo "build_number phải là số nguyên dương: '$build'" >&2; exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "Building iOS $name ($build)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v5
+        with:
+          path: ios/Pods
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+
+      - name: Install pods
+        working-directory: ios
+        run: pod install
+
+      - name: Build for the simulator
+        if: inputs.mode == 'simulator'
+        working-directory: ios
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace Manganova.xcworkspace \
+            -scheme Manganova \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO \
+            MARKETING_VERSION="$VERSION_NAME" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            build
+
+      - name: Install signing certificate and profile
+        if: inputs.mode == 'testflight'
+        env:
+          CERT: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          keychain_password="$(uuidgen)"
+          printf '%s' "$CERT" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          printf '%s' "$PROFILE" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$RUNNER_TEMP/cert.p12" -P "$CERT_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          uuid="$(/usr/libexec/PlistBuddy -c 'Print UUID' "$RUNNER_TEMP/profile.plist")"
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$uuid.mobileprovision"
+          echo "PROFILE_UUID=$uuid" >> "$GITHUB_ENV"
+
+      - name: Archive and export IPA
+        if: inputs.mode == 'testflight'
+        working-directory: ios
+        env:
+          TEAM: ${{ secrets.IOS_TEAM_ID }}
+          VERSION_NAME: ${{ steps.version.outputs.name }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+        run: |
+          set -o pipefail
+          # Signing goes in the app target's own xcconfig. On the command line it would reach every Pods
+          # target too, and those refuse a provisioning profile.
+          cat >> 'Pods/Target Support Files/Pods-Manganova/Pods-Manganova.release.xcconfig' <<XCCONFIG
+          CODE_SIGN_STYLE = Manual
+          DEVELOPMENT_TEAM = $TEAM
+          CODE_SIGN_IDENTITY = Apple Distribution
+          CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER = $PROFILE_UUID
+          XCCONFIG
+          xcodebuild \
+            -workspace Manganova.xcworkspace \
+            -scheme Manganova \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Manganova.xcarchive" \
+            MARKETING_VERSION="$VERSION_NAME" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            archive
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict><key>com.manganova.manga.reader.org</key><string>$PROFILE_UUID</string></dict>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Manganova.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export"
+
+      - name: Upload to TestFlight
+        if: inputs.mode == 'testflight'
+        env:
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+          KEY: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          printf '%s' "$KEY" | base64 --decode > "$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8"
+          xcrun altool --upload-app -t ios -f "$RUNNER_TEMP"/export/*.ipa --apiKey "$KEY_ID" --apiIssuer "$ISSUER"
+          echo 'Uploaded to TestFlight. Processing on Apple takes a few minutes.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload IPA
+        if: inputs.mode == 'testflight'
+        uses: actions/upload-artifact@v7
+        with:
+          name: manganova-ios-${{ steps.version.outputs.name }}-${{ steps.version.outputs.build }}
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+      - name: Remove signing files
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/cert.p12" "$RUNNER_TEMP/profile.mobileprovision" "$HOME/.appstoreconnect/private_keys/"*.p8
