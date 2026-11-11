@@ -23,6 +23,7 @@ export const MIME = {
   pdf: 'application/pdf',
   zip: 'application/zip',
   mp4: 'video/mp4',
+  m4a: 'audio/mp4',
   cbz: 'application/vnd.comicbook+zip',
   archive: 'application/octet-stream',
   text: 'text/plain',
@@ -188,6 +189,16 @@ export function imagesToPdf(
 /** Frames must share one size. A repeated path holds that frame longer. */
 export function framesToVideo(framePaths: string[], outPath: string, fps: number): Promise<void> {
   return native().framesToVideo(framePaths.map(toAbsolute), outPath, fps);
+}
+
+/** Joins AAC clips into one .m4a with silence between; resolves with how many clips went in. */
+export function concatAudio(paths: string[], outPath: string, gapMs: number): Promise<number> {
+  return native().concatAudio(paths.map(toAbsolute), outPath, gapMs);
+}
+
+/** Lays an audio file under an MP4; the audio stops where the video ends. */
+export function addAudioToVideo(videoPath: string, audioPath: string, outPath: string): Promise<void> {
+  return native().addAudioToVideo(toAbsolute(videoPath), toAbsolute(audioPath), outPath);
 }
 
 export function copyText(text: string): void {

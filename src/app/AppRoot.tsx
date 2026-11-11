@@ -18,6 +18,8 @@ import { Uniwind, useUniwind } from 'uniwind';
 import { t } from '../core/i18n';
 import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
+import { handleNearbyLink } from '../features/nearby/deepLink';
+import { RoomFollower } from '../features/nearby/RoomFollower';
 import { syncReminder } from '../features/profile/reminder';
 import type { RootStackParamList } from '../state/navigation';
 import { appServices } from '../state/services';
@@ -113,9 +115,15 @@ function Shell() {
         flushActivity();
       }
     });
-    Linking.getInitialURL().then(openArchive);
+    // manganova:// links (room QR codes, mangaka cards) first; anything else is a file to import.
+    const openUrl = (url: string | null | undefined) => {
+      if (!handleNearbyLink(url, navigationRef)) {
+        openArchive(url);
+      }
+    };
+    Linking.getInitialURL().then(openUrl);
     const link = Linking.addEventListener('url', (event: { url: string }) => {
-      openArchive(event.url);
+      openUrl(event.url);
     });
     return () => {
       flush.remove();
@@ -148,6 +156,7 @@ function Shell() {
         {/* The key redraws every screen when the language changes. The navigation state lives in the container. */}
         <RootNavigator key={locale} />
       </NavigationContainer>
+      <RoomFollower navigationRef={navigationRef} />
       {route === 'Canvas' ? null : <NavBarBacking />}
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
       <ConfirmHost />

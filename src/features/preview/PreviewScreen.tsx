@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, View, useWindowDimensions } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
@@ -12,8 +12,11 @@ import type { PageDrawOptions } from '../../render/drawPage';
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
 import { useStory } from '../../state/useStory';
 import { Button, EmptyState } from '../../ui';
+import { FriendNotesSheet, placedOn, useChapterNotes } from '../nearby/share/FriendNotesSheet';
+import { StickerLayer } from '../nearby/share/Stickers';
+import type { ReviewNote } from '../../core/nearby/reviewNotes';
 import { PageCounter, ReaderBottomBar, ReaderTopBar } from './PreviewControls';
-import { EndCard, PreviewPage } from './PreviewParts';
+import { EndCard, PreviewPage, type PageOverlay } from './PreviewParts';
 import { FlagListSheet, FlagSheet, ReaderMenus, type ReaderSheet } from './PreviewSheets';
 import { usePreviewReader, type ReaderItem } from './usePreviewReader';
 import { useReaderChrome } from './useReaderChrome';
@@ -32,6 +35,20 @@ export function PreviewScreen() {
   const [flagPageId, setFlagPageId] = useState<ID | null>(null);
   const [lang, setLang] = useState<string | undefined>(undefined);
   const openFlag = useCallback((pageId: ID) => setFlagPageId(pageId), []);
+  const friendNotes = useChapterNotes(reader.chapterId);
+  // The note picked in "Notes from friends", drawn on its page for a moment so the panel is easy to find.
+  const [lifted, setLifted] = useState<ReviewNote | null>(null);
+  useEffect(() => {
+    if (!lifted) {
+      return;
+    }
+    const timer = setTimeout(() => setLifted(null), 6000);
+    return () => clearTimeout(timer);
+  }, [lifted]);
+  const overlay = useCallback<PageOverlay>(
+    (pageId, w, h) => (lifted ? <StickerLayer notes={placedOn([lifted], pageId)} width={w} height={h} highlight={lifted.id} /> : null),
+    [lifted],
+  );
 
   const languages = useMemo(() => project?.languages ?? [], [project]);
   const activeLang = lang && languages.includes(lang) ? lang : undefined;
@@ -104,6 +121,7 @@ export function PreviewScreen() {
         onPinchChange={manga ? reader.onPagePinch : undefined}
         outerGesture={manga ? reader.pagerGesture : undefined}
         onDoubleTap={manga ? undefined : reader.toggleListZoom}
+        overlay={overlay}
       />
     );
   };
@@ -193,6 +211,16 @@ export function PreviewScreen() {
         onToggleAwake={() => chrome.setAwake(value => !value)}
         onRotate={() => chrome.rotateTo(reader.landscape ? 'portrait' : 'landscape')}
         onLanguage={setLang}
+        noteCount={friendNotes.length}
+      />
+      <FriendNotesSheet
+        visible={sheet === 'notes'}
+        chapterId={chapterId}
+        onClose={() => setSheet(null)}
+        onJump={note => {
+          setLifted(note);
+          reader.jumpTo(note.pageId);
+        }}
       />
       <FlagListSheet
         visible={sheet === 'flags'}

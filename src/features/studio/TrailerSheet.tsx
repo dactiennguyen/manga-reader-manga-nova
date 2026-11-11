@@ -7,8 +7,9 @@ import type { ID } from '../../core/model/types';
 import { trailerSeconds, type TrailerPlan } from '../../core/studio/trailer';
 import { MIME, saveToDevice, shareFile } from '../../native/files';
 import { recordPicture } from '../../render/drawArt';
-import { Button, EmptyState, LoadingView, ProgressBar, Sheet, Text, toast } from '../../ui';
+import { Button, Chip, EmptyState, LoadingView, ProgressBar, Sheet, Text, toast } from '../../ui';
 import { PauseIcon, PlayIcon, ReplayIcon, SaveIcon, ShareIcon, TrailerIcon } from '../../ui/icons';
+import { voicedChapterOf, voicesTrackFor } from '../nearby/dub/dubExport';
 import { disposeTrailerAssets, drawTrailerFrame, loadTrailerAssets, type TrailerAssets } from './trailerFrame';
 import { TrailerCancelled, makeTrailerVideo, trailerPlanFor, type TrailerVideo } from './trailerVideo';
 
@@ -25,13 +26,16 @@ const PREVIEW_MAX_HEIGHT = 400;
 type Run = { cancelled: boolean };
 
 /** Plays the trailer live with Skia from the same frames the video is made of, so watching costs no wait. */
-function Player({ plan }: { plan: TrailerPlan }) {
+function Player({ plan, projectId }: { plan: TrailerPlan; projectId: ID }) {
   const [assets, setAssets] = useState<TrailerAssets | null>(null);
   const [frame, setFrame] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [width, setWidth] = useState(0);
   const [video, setVideo] = useState<VideoState>({ kind: 'idle' });
   const run = useRef<Run | null>(null);
+  /** A chapter dubbed in Dub together lends its voices to the video. */
+  const voicedChapter = useMemo(() => voicedChapterOf(projectId), [projectId]);
+  const [withVoices, setWithVoices] = useState(true);
 
   useEffect(() => {
     let alive = true;
@@ -108,6 +112,7 @@ function Player({ plan }: { plan: TrailerPlan }) {
     setPlaying(false);
     setVideo({ kind: 'making', done: 0, total: plan.totalFrames });
     try {
+      const audio = voicedChapter && withVoices ? await voicesTrackFor(voicedChapter) : null;
       const result = await makeTrailerVideo(
         plan,
         (done, total) => {
@@ -117,9 +122,13 @@ function Player({ plan }: { plan: TrailerPlan }) {
         },
         () => mine.cancelled,
         assets ?? undefined,
+        audio,
       );
       if (!mine.cancelled) {
         setVideo({ kind: 'ready', video: result });
+        if (voicedChapter && withVoices && !result.voiced) {
+          toast(t("Couldn't add the voices. The video has no sound."));
+        }
       }
     } catch (error) {
       if (!mine.cancelled) {
@@ -210,6 +219,11 @@ function Player({ plan }: { plan: TrailerPlan }) {
           )}
         </View>
       )}
+      {voicedChapter && (video.kind === 'idle' || video.kind === 'stopping') && (
+        <View className="flex-row">
+          <Chip label={t('With recorded voices')} selected={withVoices} onPress={() => setWithVoices(value => !value)} />
+        </View>
+      )}
       {video.kind === 'ready' && (
         <View className="flex-row gap-3">
           <Button title={t('Share')} icon={ShareIcon} onPress={() => share(video.video)} className="flex-1" />
@@ -235,7 +249,7 @@ export function TrailerSheet({ projectId, visible, onClose }: { projectId: ID; v
       subtitle={plan ? t('{seconds} seconds, made from your panels', { seconds: Math.round(trailerSeconds(plan)) }) : undefined}
     >
       {plan ? (
-        <Player plan={plan} />
+        <Player plan={plan} projectId={projectId} />
       ) : (
         <EmptyState
           icon={TrailerIcon}

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, View, useWindowDimensions, type ScrollViewInstance } from 'react-native';
+import { Image, ScrollView, View, useWindowDimensions, type ScrollViewInstance } from 'react-native';
 
 import { t } from '../../core/i18n';
 import { chapterLabel } from '../../core/model/selectors';
 import type { ID } from '../../core/model/types';
 import type { Utterance } from '../../core/studio/tableRead';
+import { useThumb } from '../../render/thumbs';
 import { useStory } from '../../state/useStory';
 import { Button, Chip, EmptyState, IconButton, LoadingView, Pressable, Segmented, Sheet, Text } from '../../ui';
 import { ListenIcon, NextLineIcon, PauseIcon, PlayIcon, PreviousLineIcon, ScriptIcon } from '../../ui/icons';
@@ -24,7 +25,21 @@ function speakerOf(line: Utterance): string {
   return line.speaker ?? t('Someone');
 }
 
+/** The page of the line being played, while playing with voices. */
+function PageShown({ pageId, height }: { pageId: ID; height: number }) {
+  const uri = useThumb(pageId);
+  if (!uri) {
+    return null;
+  }
+  return (
+    <View className="items-center overflow-hidden rounded-lg bg-surface" style={{ height }}>
+      <Image accessibilityIgnoresInvertColors source={{ uri }} className="w-full" style={{ height }} resizeMode="contain" />
+    </View>
+  );
+}
+
 function Line({ line, current, onPress }: { line: Utterance; current: boolean; onPress: () => void }) {
+  const voiced = 'source' in line && (line as { source: { kind: string } }).source.kind === 'clip';
   return (
     <Pressable
       accessibilityLabel={`${speakerOf(line)}: ${line.text}`}
@@ -34,7 +49,7 @@ function Line({ line, current, onPress }: { line: Utterance; current: boolean; o
       className={`min-h-12 gap-0.5 rounded-md px-3 py-2 ${current ? 'bg-accent/15' : ''}`}
     >
       <Text variant="caption" tone={current ? 'accent' : 'muted'} numberOfLines={1}>
-        {speakerOf(line)}
+        {voiced ? `${speakerOf(line)} · ${t('Recorded voice')}` : speakerOf(line)}
       </Text>
       <Text variant={line.narrator ? 'bodySmall' : 'body'} tone={line.narrator ? 'secondary' : 'text'}>
         {line.text}
@@ -46,11 +61,16 @@ function Line({ line, current, onPress }: { line: Utterance; current: boolean; o
 function Player({ chapterId }: { chapterId: ID }) {
   const [directions, setDirections] = useState(true);
   const [sfx, setSfx] = useState(false);
-  const read = useTableRead(chapterId, true, { directions, sfx });
+  const [voices, setVoices] = useState(true);
+  const read = useTableRead(chapterId, true, { directions, sfx }, voices);
+  const playingVoices = voices && read.canVoice;
   const scroll = useRef<ScrollViewInstance>(null);
   const offsets = useRef<number[]>([]);
   const window = useWindowDimensions();
-  const listHeight = Math.min(LIST_HEIGHT.max, Math.max(LIST_HEIGHT.min, window.height * 0.85 - LIST_HEIGHT.controls));
+  const room = Math.min(LIST_HEIGHT.max, Math.max(LIST_HEIGHT.min, window.height * 0.85 - LIST_HEIGHT.controls));
+  // With voices, the page takes part of the list's room so both fit.
+  const pageHeight = playingVoices ? Math.round(room * 0.55) : 0;
+  const listHeight = playingVoices ? Math.max(LIST_HEIGHT.min, room - pageHeight) : room;
 
   useEffect(() => {
     const y = offsets.current[read.index];
@@ -80,8 +100,10 @@ function Player({ chapterId }: { chapterId: ID }) {
   }
 
   const line = read.lines[read.index];
+  const pageId = line && 'pageId' in line ? line.pageId : null;
   return (
     <View className="gap-3 px-4 pb-2">
+      {playingVoices && pageId && <PageShown pageId={pageId} height={pageHeight} />}
       <ScrollView ref={scroll} style={{ maxHeight: listHeight }} className="rounded-lg bg-surface">
         <View className="gap-1 p-1">
           {read.lines.map((item, index) => (
@@ -145,8 +167,13 @@ function Player({ chapterId }: { chapterId: ID }) {
       </View>
 
       <View className="flex-row flex-wrap gap-2">
-        <Chip label={t('Settings and actions')} selected={directions} onPress={() => setDirections(value => !value)} />
-        <Chip label={t('Sound effects')} selected={sfx} onPress={() => setSfx(value => !value)} />
+        {read.canVoice && <Chip label={t('Play with voices')} selected={voices} onPress={() => setVoices(value => !value)} />}
+        {!playingVoices && (
+          <>
+            <Chip label={t('Settings and actions')} selected={directions} onPress={() => setDirections(value => !value)} />
+            <Chip label={t('Sound effects')} selected={sfx} onPress={() => setSfx(value => !value)} />
+          </>
+        )}
       </View>
     </View>
   );

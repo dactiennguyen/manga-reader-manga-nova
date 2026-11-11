@@ -36,6 +36,17 @@ export type RootStackParamList = {
   Mailbox: undefined;
   Cards: { characterId?: ID } | undefined;
   Magazine: undefined;
+  // Play together nearby
+  Nearby: undefined;
+  Room: undefined;
+  CoDraw: { pageId?: ID } | undefined;
+  Relay: undefined;
+  Battle: undefined;
+  ReadTogether: { projectId: ID } | undefined;
+  Dub: { chapterId?: ID } | undefined;
+  CardSwap: undefined;
+  MangakaCard: undefined;
+  SendStory: undefined;
 };
 
 export type AppNavigation = NativeStackNavigationProp<RootStackParamList>;

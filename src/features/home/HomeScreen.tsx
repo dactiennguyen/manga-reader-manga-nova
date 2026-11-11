@@ -14,6 +14,7 @@ import { IdeaSection } from './IdeaSection';
 import { JourneyCard } from './JourneyCard';
 import { LettersCard } from './LettersCard';
 import { MagazineCard } from './MagazineCard';
+import { PlayTogetherCard } from './PlayTogetherCard';
 import { ProgressCard } from './ProgressCard';
 import { PromptCard } from './PromptCard';
 import { RecentStories } from './RecentStories';
@@ -28,6 +29,7 @@ function StartCreating() {
     <View className="gap-2">
       <SectionHeader>{t('Start creating')}</SectionHeader>
       <StartTiles />
+      <PlayTogetherCard />
     </View>
   );
 }

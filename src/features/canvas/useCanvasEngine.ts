@@ -72,6 +72,8 @@ export type CanvasEngine = {
   /** Screen rects of the floating panels. A stroke entering one fades them. */
   chromeRects: SharedValue<Record<string, Box>>;
   faded: SharedValue<boolean>;
+  /** Where the pen is while a stroke is drawn, in page units, for others to follow in a shared page. */
+  cursor: SharedValue<{ x: number; y: number } | null>;
   send: (event: SessionEvent) => void;
   /**
    * One UI-thread update, so a finished stroke never leaves the screen for a frame. `selection` opens or
@@ -109,6 +111,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   const pressureSeen = useSharedValue(false);
   const chromeRects = useSharedValue<Record<string, Box>>({});
   const faded = useSharedValue(false);
+  const cursor = useSharedValue<{ x: number; y: number } | null>(null);
 
   const js = useMemo(
     () => ({
@@ -263,12 +266,19 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         } else if (faded.value) {
           faded.value = false;
         }
+        const drawing = session.value.stroke;
+        if (drawing && drawing.points.length >= 2) {
+          const stride = drawing.pressure ? 3 : 2;
+          const at = drawing.points.length - stride;
+          cursor.value = { x: drawing.points[at], y: drawing.points[at + 1] };
+        }
       },
       onTouchesUp: (e: GestureTouchEvent) => {
         'worklet';
         dispatch({ type: 'up', changed: e.changedTouches, time: Date.now() });
         if (session.value.ids.length === 0) {
           faded.value = false;
+          cursor.value = null;
           GestureStateManager.deactivate(e.handlerTag);
         }
       },
@@ -279,7 +289,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         GestureStateManager.fail(e.handlerTag);
       },
     };
-  }, [chromeRects, dispatch, faded, pressure, pressureSeen, session]);
+  }, [chromeRects, cursor, dispatch, faded, pressure, pressureSeen, session]);
 
   const panConfig = useMemo(() => {
     const read = (e: { stylusData?: { pressure: number } }) => {
@@ -346,6 +356,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
     blank,
     chromeRects,
     faded,
+    cursor,
     send,
     publish,
   };

@@ -11,7 +11,7 @@ import { createScriptVersionRepo } from '../data/scriptVersions';
 import { createStoryRepo } from '../data/storyRepo';
 import { createThreadRepo } from '../data/threads';
 import { removeProjectExports } from '../features/export/exportFiles';
-import { RNFS } from '../native/files';
+import { RNFS, removeFile } from '../native/files';
 import { configureRender } from '../render/config';
 import { connectArt, exportArt, importArt, loadArt } from '../state/artStore';
 import { usePage, useProjectOfPage } from '../state/hooks';
@@ -19,7 +19,9 @@ import { connectScriptHistory } from '../state/scriptHistory';
 import { configureServices } from '../state/services';
 import { connectActivity } from '../state/useActivity';
 import { connectAssistant } from '../state/useAssistant';
+import { connectDubClips } from '../state/useDubClips';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
+import { connectNearbyShare, dropBorrowedStories } from '../state/useNearbyShare';
 import { connectStory, importEntities, useStory } from '../state/useStory';
 import { connectStudio } from '../state/useStudio';
 import { setHapticsEnabled, toast } from '../ui';
@@ -49,6 +51,7 @@ export async function boot(): Promise<void> {
   connectSettings(meta);
   connectActivity(meta);
   connectStudio(meta);
+  connectDubClips(meta);
   connectArt(createArtRepo(db));
   connectStory(
     createStoryRepo(db),
@@ -57,6 +60,10 @@ export async function boot(): Promise<void> {
       removeProjectExports(projectId).catch(() => {});
     },
   );
+  connectNearbyShare(meta, path => {
+    removeFile(path).catch(() => {});
+  });
+  dropBorrowedStories();
   connectAssistant(createThreadRepo(db));
   connectScriptHistory(createScriptVersionRepo(db));
   const server = createAiClient(() => {

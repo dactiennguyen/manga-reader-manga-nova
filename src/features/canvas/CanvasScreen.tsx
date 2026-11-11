@@ -1,5 +1,5 @@
 import { AddImageIcon, CharactersIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon, MaterialsIcon, PoseIcon, ReplayIcon } from '../../ui/icons';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BackHandler, View, type LayoutChangeEvent } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,7 +40,7 @@ import { MaterialsSheet } from './MaterialsSheet';
 import { PosesSheet } from './PosesSheet';
 import { ReplaySheet } from './ReplaySheet';
 import { useCanvasDoc } from './useCanvasDoc';
-import { useCanvasEngine, type EngineHandlers } from './useCanvasEngine';
+import { useCanvasEngine, type CanvasEngine, type EngineHandlers } from './useCanvasEngine';
 import { useCanvasEnv, useCanvasHandlers } from './useCanvasHandlers';
 import { useCanvasTools } from './useCanvasTools';
 import { useLayerActions } from './useLayerActions';
@@ -69,7 +69,27 @@ export function CanvasScreen() {
 
 const NO_HANDLERS: EngineHandlers = { onStroke: () => {}, onTransform: () => {}, onEffect: () => {} };
 
-function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape: PanelShape; pageId: ID; panelId: ID }) {
+/** For a canvas shown inside another screen, such as drawing together nearby. */
+export type CanvasEmbed = {
+  /** Replaces going back. */
+  onDone?: () => void;
+  /** Drawn over the stage and under the tools. */
+  renderOverlay?: (engine: CanvasEngine) => ReactNode;
+};
+
+export function CanvasEditor({
+  ctx,
+  shape,
+  pageId,
+  panelId,
+  embed,
+}: {
+  ctx: PageContext;
+  shape: PanelShape;
+  pageId: ID;
+  panelId: ID;
+  embed?: CanvasEmbed;
+}) {
   const navigation = useAppNavigation();
   const insets = useSafeAreaInsets();
   const handedness = useSettings(s => s.handedness);
@@ -126,10 +146,15 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
   const { send, chromeRects, faded, view, env } = engine;
   const { art, active, leave, onArtRev, selection } = doc;
 
+  const onDone = embed?.onDone;
   const done = useCallback(() => {
     leave();
-    navigation.goBack();
-  }, [leave, navigation]);
+    if (onDone) {
+      onDone();
+    } else {
+      navigation.goBack();
+    }
+  }, [leave, navigation, onDone]);
 
   useEffect(() => leave, [leave]);
 
@@ -254,6 +279,7 @@ function CanvasEditor({ ctx, shape, pageId, panelId }: { ctx: PageContext; shape
         engine={engine}
         onLayout={onStageLayout}
       />
+      {embed?.renderOverlay?.(engine)}
       {sizing ? <BrushPreview size={tools.size} view={view} /> : null}
       {banner && panel?.description ? <DescriptionBanner text={panel.description} top={railTop} /> : null}
       {reference ? (

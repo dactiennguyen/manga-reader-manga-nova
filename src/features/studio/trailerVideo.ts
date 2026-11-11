@@ -5,7 +5,7 @@ import type { ID } from '../../core/model/types';
 import { inkOf, isStillFrame, planTrailer, type TrailerPlan } from '../../core/studio/trailer';
 import { uid } from '../../core/util/id';
 import { dayKey } from '../../core/util/time';
-import { DIRS, RNFS, ensureDirs, framesToVideo, removeFile, resetDir } from '../../native/files';
+import { DIRS, RNFS, addAudioToVideo, ensureDirs, framesToVideo, removeFile, resetDir } from '../../native/files';
 import { loadArt } from '../../state/artStore';
 import { useSettings } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
@@ -19,7 +19,8 @@ import {
 
 export { TrailerCancelled };
 
-export type TrailerVideo = { path: string; fileName: string };
+/** `voiced`: the recorded voices were laid under the video. */
+export type TrailerVideo = { path: string; fileName: string; voiced?: boolean };
 
 /** Read when a video is made, not when the module loads: Home imports this file just to show the sheet. */
 const trailerDir = () => `${DIRS.tmp}/trailers`;
@@ -47,6 +48,8 @@ export async function makeTrailerVideo(
   isCancelled: () => boolean,
   /** Panels already cut for the preview. They stay with the caller. */
   ready?: TrailerAssets,
+  /** An audio file (the chapter's recorded voices) to lay under the video; cut where the video ends. */
+  audioPath?: string | null,
 ): Promise<TrailerVideo> {
   await ensureDirs();
   const assets = ready ?? (await loadTrailerAssets(plan, isCancelled));
@@ -90,10 +93,28 @@ export async function makeTrailerVideo(
     await resetDir(trailerDir());
     const fileName = `manganova-trailer-${dayKey()}.mp4`;
     const path = `${trailerDir()}/${fileName}`;
-    await framesToVideo(paths, path, plan.fps);
+    // With voices, the silent video is a step on the way: the mix writes straight to the final path, so
+    // the silent one is only deleted once a complete voiced file is in place.
+    const silent = audioPath ? `${trailerDir()}/silent-${fileName}` : path;
+    await framesToVideo(paths, silent, plan.fps);
     if (isCancelled()) {
-      await removeFile(path);
+      await removeFile(silent);
       throw new TrailerCancelled();
+    }
+    if (audioPath) {
+      try {
+        await addAudioToVideo(silent, audioPath, path);
+        await removeFile(silent);
+        return { path, fileName, voiced: true };
+      } catch {
+        // A failed mix keeps the silent video rather than losing the whole trailer.
+        await removeFile(path);
+        try {
+          await RNFS.moveFile(silent, path);
+        } catch {
+          return { path: silent, fileName };
+        }
+      }
     }
     return { path, fileName };
   } finally {

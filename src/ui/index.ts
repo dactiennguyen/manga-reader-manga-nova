@@ -12,6 +12,7 @@ export * from './Menu';
 export { ModalShownContext } from './modalShown';
 export * from './NumberControls';
 export * from './Pressable';
+export * from './QrCode';
 export * from './Screen';
 export * from './Sheet';
 export * from './Sortable';

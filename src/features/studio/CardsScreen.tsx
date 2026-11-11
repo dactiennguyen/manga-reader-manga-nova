@@ -10,6 +10,7 @@ import { useStudioState } from '../../state/useMetrics';
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
 import { EmptyState, Pressable, SectionHeader, Text } from '../../ui';
 import { STUDIO_ART } from '../../ui/studioArt';
+import { FriendCardsSection } from '../nearby/share/FriendCardsSection';
 import { CardSheet } from './cards/CardSheet';
 import { CharacterCardView, cardLabel } from './parts';
 import { StudioPage } from './StudioPage';
@@ -75,6 +76,7 @@ export function CardsScreen() {
           </View>
         ))
       )}
+      <FriendCardsSection cardWidth={cardWidth} gap={GAP} bigWidth={Math.min(320, width - 64)} />
       {total > 0 && (
         <Text variant="caption" tone="muted">
           {t('Rarity rises as you fill in a profile: traits, a face drawing, expressions and relationships all count.')}

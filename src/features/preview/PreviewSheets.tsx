@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { AwakeIcon, FlagIcon, HiddenIcon, PreviewIcon, RotateIcon, TranslateIcon } from '../../ui/icons';
+import { AwakeIcon, FlagIcon, HiddenIcon, PreviewIcon, RotateIcon, StickerIcon, TranslateIcon } from '../../ui/icons';
 
 import { t, tn } from '../../core/i18n';
 import { chapterLabel } from '../../core/model/selectors';
@@ -11,7 +11,7 @@ import { usePage } from '../../state/hooks';
 import { useStory } from '../../state/useStory';
 import { Button, Chip, ChipGroup, Menu, Pressable, Sheet, Text, TextField, confirm } from '../../ui';
 
-export type ReaderSheet = 'chapters' | 'menu' | 'flags' | 'language' | null;
+export type ReaderSheet = 'chapters' | 'menu' | 'flags' | 'language' | 'notes' | null;
 
 function FlagEditor({ pageId, flag, onClose }: { pageId: ID; flag: PageFlag | undefined; onClose: () => void }) {
   const [note, setNote] = useState(flag?.note ?? '');
@@ -145,6 +145,7 @@ export function ReaderMenus({
   onToggleAwake,
   onRotate,
   onLanguage,
+  noteCount = 0,
 }: {
   sheet: ReaderSheet;
   onSheet: (sheet: ReaderSheet) => void;
@@ -161,6 +162,8 @@ export function ReaderMenus({
   onToggleAwake: () => void;
   onRotate: () => void;
   onLanguage: (lang: string | undefined) => void;
+  /** Notes friends left while reading this chapter together; the menu offers them when there are any. */
+  noteCount?: number;
 }) {
   const state = useStory.getState();
   const close = () => onSheet(null);
@@ -191,6 +194,12 @@ export function ReaderMenus({
             subtitle: tn(flagCount, '{count} flagged page', '{count} flagged pages'),
             icon: FlagIcon,
             onPress: () => onSheet('flags'),
+          },
+          noteCount > 0 && {
+            label: t('Notes from friends'),
+            subtitle: tn(noteCount, '{count} note', '{count} notes'),
+            icon: StickerIcon,
+            onPress: () => onSheet('notes'),
           },
           { label: t('Keep screen on'), subtitle: awake ? t('On') : t('Off'), icon: AwakeIcon, onPress: onToggleAwake },
           manga &&

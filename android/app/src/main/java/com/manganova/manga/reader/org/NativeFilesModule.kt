@@ -143,6 +143,28 @@ class NativeFilesModule(reactContext: ReactApplicationContext) : NativeFilesSpec
     }
   }
 
+  override fun concatAudio(paths: ReadableArray, outPath: String, gapMs: Double, promise: Promise) {
+    val list = (0 until paths.size()).mapNotNull { paths.getString(it) }
+    executor.execute {
+      try {
+        promise.resolve(AudioJoiner.concat(list, outPath, gapMs.toLong().coerceIn(0, 5000)).toDouble())
+      } catch (e: Throwable) {
+        promise.reject("E_AUDIO", e.message, e)
+      }
+    }
+  }
+
+  override fun addAudioToVideo(videoPath: String, audioPath: String, outPath: String, promise: Promise) {
+    executor.execute {
+      try {
+        AudioJoiner.addAudio(videoPath, audioPath, outPath)
+        promise.resolve(null)
+      } catch (e: Throwable) {
+        promise.reject("E_VIDEO", e.message, e)
+      }
+    }
+  }
+
   override fun shareFile(path: String, mimeType: String, title: String, promise: Promise) {
     try {
       val context = reactApplicationContext

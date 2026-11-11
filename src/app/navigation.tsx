@@ -19,6 +19,16 @@ import { PreviewScreen } from '../features/preview/PreviewScreen';
 import { AboutScreen } from '../features/profile/AboutScreen';
 import { ProfileScreen } from '../features/profile/ProfileScreen';
 import { TrashScreen } from '../features/profile/TrashScreen';
+import { BattleScreen } from '../features/nearby/BattleScreen';
+import { CardSwapScreen } from '../features/nearby/CardSwapScreen';
+import { CoDrawScreen } from '../features/nearby/CoDrawScreen';
+import { DubScreen } from '../features/nearby/DubScreen';
+import { MangakaCardScreen } from '../features/nearby/MangakaCardScreen';
+import { NearbyScreen } from '../features/nearby/NearbyScreen';
+import { ReadTogetherScreen } from '../features/nearby/ReadTogetherScreen';
+import { RelayScreen } from '../features/nearby/RelayScreen';
+import { RoomScreen } from '../features/nearby/RoomScreen';
+import { SendStoryScreen } from '../features/nearby/SendStoryScreen';
 import { NewProjectScreen } from '../features/project/NewProjectScreen';
 import { ProjectScreen } from '../features/project/ProjectScreen';
 import { ScriptScreen } from '../features/script/ScriptScreen';
@@ -126,6 +136,16 @@ export function RootNavigator() {
       <Stack.Screen name="Mailbox" component={MailboxScreen} />
       <Stack.Screen name="Cards" component={CardsScreen} />
       <Stack.Screen name="Magazine" component={MagazineScreen} />
+      <Stack.Screen name="Nearby" component={NearbyScreen} />
+      <Stack.Screen name="Room" component={RoomScreen} />
+      <Stack.Screen name="CoDraw" component={CoDrawScreen} options={{ gestureEnabled: false, animation: 'fade' }} />
+      <Stack.Screen name="Relay" component={RelayScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="Battle" component={BattleScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ReadTogether" component={ReadTogetherScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="Dub" component={DubScreen} />
+      <Stack.Screen name="CardSwap" component={CardSwapScreen} />
+      <Stack.Screen name="MangakaCard" component={MangakaCardScreen} />
+      <Stack.Screen name="SendStory" component={SendStoryScreen} />
     </Stack.Navigator>
   );
 }

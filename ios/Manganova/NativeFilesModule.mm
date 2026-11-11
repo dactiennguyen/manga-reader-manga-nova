@@ -335,6 +335,120 @@ static void makeParent(NSString *path)
   });
 }
 
+/** Runs an export to the end on the calling (background) queue. */
+static NSError *runExport(AVAssetExportSession *session)
+{
+  dispatch_semaphore_t done = dispatch_semaphore_create(0);
+  [session exportAsynchronouslyWithCompletionHandler:^{
+    dispatch_semaphore_signal(done);
+  }];
+  dispatch_semaphore_wait(done, DISPATCH_TIME_FOREVER);
+  if (session.status == AVAssetExportSessionStatusCompleted) {
+    return nil;
+  }
+  return session.error ?: [NSError errorWithDomain:@"NativeFiles"
+                                              code:1
+                                          userInfo:@{NSLocalizedDescriptionKey : @"The export did not finish."}];
+}
+
+- (void)concatAudio:(NSArray *)paths
+            outPath:(NSString *)outPath
+              gapMs:(double)gapMs
+            resolve:(RCTPromiseResolveBlock)resolve
+             reject:(RCTPromiseRejectBlock)reject
+{
+  NSArray<NSString *> *clips = [paths copy];
+  dispatch_async(_queue, ^{
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    AVMutableCompositionTrack *track = [composition addMutableTrackWithMediaType:AVMediaTypeAudio
+                                                                preferredTrackID:kCMPersistentTrackID_Invalid];
+    CMTime cursor = kCMTimeZero;
+    CMTime gap = CMTimeMakeWithSeconds(MAX(0, gapMs) / 1000.0, 44100);
+    NSInteger used = 0;
+    for (NSString *path in clips) {
+      AVURLAsset *asset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:plainPath(path)] options:nil];
+      AVAssetTrack *source = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+      if (!source) {
+        continue;
+      }
+      if (used > 0 && CMTimeCompare(gap, kCMTimeZero) > 0) {
+        [track insertEmptyTimeRange:CMTimeRangeMake(cursor, gap)];
+        cursor = CMTimeAdd(cursor, gap);
+      }
+      CMTimeRange range = CMTimeRangeMake(kCMTimeZero, asset.duration);
+      if ([track insertTimeRange:range ofTrack:source atTime:cursor error:nil]) {
+        cursor = CMTimeAdd(cursor, asset.duration);
+        used += 1;
+      }
+    }
+    if (used == 0) {
+      reject(@"E_AUDIO", @"No clip could be read.", nil);
+      return;
+    }
+    makeParent(outPath);
+    [[NSFileManager defaultManager] removeItemAtPath:outPath error:nil];
+    AVAssetExportSession *session = [AVAssetExportSession exportSessionWithAsset:composition
+                                                                      presetName:AVAssetExportPresetAppleM4A];
+    session.outputURL = [NSURL fileURLWithPath:outPath];
+    session.outputFileType = AVFileTypeAppleM4A;
+    NSError *error = runExport(session);
+    if (error) {
+      [[NSFileManager defaultManager] removeItemAtPath:outPath error:nil];
+      reject(@"E_AUDIO", error.localizedDescription, error);
+    } else {
+      resolve(@(used));
+    }
+  });
+}
+
+- (void)addAudioToVideo:(NSString *)videoPath
+              audioPath:(NSString *)audioPath
+                outPath:(NSString *)outPath
+                resolve:(RCTPromiseResolveBlock)resolve
+                 reject:(RCTPromiseRejectBlock)reject
+{
+  dispatch_async(_queue, ^{
+    AVURLAsset *video = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:plainPath(videoPath)] options:nil];
+    AVURLAsset *audio = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:plainPath(audioPath)] options:nil];
+    AVAssetTrack *videoSource = [video tracksWithMediaType:AVMediaTypeVideo].firstObject;
+    AVAssetTrack *audioSource = [audio tracksWithMediaType:AVMediaTypeAudio].firstObject;
+    if (!videoSource || !audioSource) {
+      reject(@"E_VIDEO", @"The video or the audio can't be read.", nil);
+      return;
+    }
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    AVMutableCompositionTrack *videoTrack =
+        [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    AVMutableCompositionTrack *audioTrack =
+        [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    CMTime length = video.duration;
+    NSError *error = nil;
+    [videoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, length) ofTrack:videoSource atTime:kCMTimeZero error:&error];
+    CMTime heard = CMTimeMinimum(length, audio.duration);
+    if (!error) {
+      [audioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, heard) ofTrack:audioSource atTime:kCMTimeZero error:&error];
+    }
+    if (error) {
+      reject(@"E_VIDEO", error.localizedDescription, error);
+      return;
+    }
+    videoTrack.preferredTransform = videoSource.preferredTransform;
+    makeParent(outPath);
+    [[NSFileManager defaultManager] removeItemAtPath:outPath error:nil];
+    AVAssetExportSession *session = [AVAssetExportSession exportSessionWithAsset:composition
+                                                                      presetName:AVAssetExportPresetPassthrough];
+    session.outputURL = [NSURL fileURLWithPath:outPath];
+    session.outputFileType = AVFileTypeMPEG4;
+    error = runExport(session);
+    if (error) {
+      [[NSFileManager defaultManager] removeItemAtPath:outPath error:nil];
+      reject(@"E_VIDEO", error.localizedDescription, error);
+    } else {
+      resolve(nil);
+    }
+  });
+}
+
 - (void)copyText:(NSString *)text
 {
   dispatch_async(dispatch_get_main_queue(), ^{

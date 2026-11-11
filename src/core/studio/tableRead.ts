@@ -62,7 +62,7 @@ export function speakableText(text: string): string {
   return /[\p{L}\p{N}]/u.test(clean) ? clean : '';
 }
 
-const KIND_TONE: Record<DialogueKind, { pitch: number; rate: number }> = {
+export const KIND_TONE: Record<DialogueKind, { pitch: number; rate: number }> = {
   speak: { pitch: 0, rate: 1 },
   think: { pitch: -0.02, rate: 0.94 },
   shout: { pitch: 0.05, rate: 1.06 },

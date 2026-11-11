@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlusIcon, ReadIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlayTogetherIcon, PlusIcon, ReadIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
 
 import { t, tn } from '../../core/i18n';
 import { LIMITS, PROJECT_STATUS_LABEL } from '../../core/model/constants';
@@ -120,6 +120,8 @@ export function LibraryScreen() {
         right={
           <>
             {!searching && <IconButton icon={SearchIcon} onPress={() => setSearching(true)} accessibilityLabel={t('Search')} />}
+            {/* Send a story to a friend, or read one together. */}
+            <IconButton icon={PlayTogetherIcon} onPress={() => navigation.navigate('Nearby')} accessibilityLabel={t('Play together')} />
             <IconButton icon={MoreIcon} onPress={() => setOpen('header')} accessibilityLabel={t('More')} />
           </>
         }

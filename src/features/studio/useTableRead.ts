@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { getLocale, type Locale } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
+import { dubLines } from '../../core/nearby/dub';
+import { voicedLines, type VoicedLine } from '../../core/nearby/dubPlay';
 import {
   assignVoiceIds,
   lineAt,
@@ -10,7 +12,10 @@ import {
   type TableReadOptions,
   type Utterance,
 } from '../../core/studio/tableRead';
+import { toAbsolute } from '../../core/util/paths';
+import { playFile, stopPlayback } from '../../native/audio';
 import { speak, speechAvailable, speechVoices, stopSpeech, type SpeechVoice } from '../../native/speech';
+import { useChapterClips } from '../../state/useDubClips';
 import { useStory } from '../../state/useStory';
 
 export type TableReadStatus = 'checking' | 'ready' | 'noVoice' | 'failed';
@@ -20,7 +25,10 @@ export const SPEEDS = [0.75, 1, 1.25] as const;
 export type Speed = (typeof SPEEDS)[number];
 
 export type TableRead = {
-  lines: Utterance[];
+  /** Script lines, or with voices on, the chapter's bubbles (VoicedLine, with `source` and `pageId`). */
+  lines: (Utterance | VoicedLine)[];
+  /** Some bubble of the chapter has a recorded voice, so "Play with voices" can be offered. */
+  canVoice: boolean;
   language: Locale;
   status: TableReadStatus;
   index: number;
@@ -38,21 +46,36 @@ export type TableRead = {
  * Reads a chapter aloud line after line while `active`. Each line resolves before the next starts, so
  * pausing, skipping and closing the sheet only have to stop the engine and move the index.
  */
-export function useTableRead(chapterId: ID, active: boolean, options: TableReadOptions): TableRead {
+export function useTableRead(
+  chapterId: ID,
+  active: boolean,
+  options: TableReadOptions,
+  /** Plays the dub: recorded clips where there are some, the device's voice elsewhere. */
+  playVoices = false,
+): TableRead {
   const chapter = useStory(s => s.chapters[chapterId]);
   const scenes = useStory(s => s.scenes);
   const characters = useStory(s => s.characters);
+  const clips = useChapterClips(chapterId);
+  const canVoice = Object.keys(clips).length > 0;
+  const withVoices = playVoices && canVoice;
+  // Pages are only watched while playing the dub: a table read does not need them.
+  const pages = useStory(s => (withVoices ? s.pages : null));
+  const projects = useStory(s => (withVoices ? s.projects : null));
   const { directions, sfx } = options;
-  const lines = useMemo(
-    () =>
-      active && chapter
-        ? tableRead({ chapters: { [chapterId]: chapter }, scenes, characters }, chapterId, { directions, sfx })
-        : [],
-    [active, chapter, chapterId, scenes, characters, directions, sfx],
-  );
+  const lines = useMemo<(Utterance | VoicedLine)[]>(() => {
+    if (!active || !chapter) {
+      return [];
+    }
+    if (pages && projects) {
+      const dub = dubLines({ projects, chapters: { [chapterId]: chapter }, scenes, pages }, chapterId);
+      return voicedLines(dub, characters, {}, clips);
+    }
+    return tableRead({ chapters: { [chapterId]: chapter }, scenes, characters }, chapterId, { directions, sfx });
+  }, [active, chapter, chapterId, scenes, characters, directions, sfx, pages, projects, clips]);
   const language = useMemo(() => scriptLanguage(lines, getLocale()), [lines]);
 
-  const [status, setStatus] = useState<TableReadStatus>('checking');
+  const [speechStatus, setStatus] = useState<TableReadStatus>('checking');
   const [voices, setVoices] = useState<SpeechVoice[]>([]);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -83,6 +106,10 @@ export function useTableRead(chapterId: ID, active: boolean, options: TableReadO
   }, [active, language]);
 
   const voiceIds = useMemo(() => assignVoiceIds(lines, voices), [lines, voices]);
+  // With voices, a chapter whose every line has a recorded clip needs no device voice: a phone without
+  // text-to-speech can still play it. A failed clip still shows as failed.
+  const onlyClips = withVoices && lines.length > 0 && lines.every(line => 'source' in line && line.source.kind === 'clip');
+  const status: TableReadStatus = onlyClips && speechStatus !== 'failed' ? 'ready' : speechStatus;
 
   // A new script or option starts from the top.
   useEffect(() => {
@@ -101,12 +128,17 @@ export function useTableRead(chapterId: ID, active: boolean, options: TableReadO
       return;
     }
     const mine = ++session.current;
-    speak(line.text, {
-      language,
-      pitch: line.pitch,
-      rate: line.rate * speed,
-      voiceId: line.speakerId ? voiceIds.get(line.speakerId) ?? null : null,
-    })
+    const source = 'source' in line ? line.source : null;
+    const play =
+      source?.kind === 'clip'
+        ? playFile(toAbsolute(source.file), speed)
+        : speak(line.text, {
+            language,
+            pitch: line.pitch,
+            rate: line.rate * speed,
+            voiceId: line.speakerId ? voiceIds.get(line.speakerId) ?? null : null,
+          });
+    play
       .then(finished => {
         if (!finished || session.current !== mine) {
           return;
@@ -131,6 +163,7 @@ export function useTableRead(chapterId: ID, active: boolean, options: TableReadO
       session.current += 1;
       if (!advancing.current) {
         stopSpeech();
+        stopPlayback();
       }
       advancing.current = false;
     };
@@ -138,6 +171,7 @@ export function useTableRead(chapterId: ID, active: boolean, options: TableReadO
 
   return {
     lines,
+    canVoice,
     language,
     status,
     index,

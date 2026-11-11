@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, type ReactNode } from 'react';
 import { View, type AccessibilityActionEvent, type AccessibilityActionInfo } from 'react-native';
 import {
   GestureDetector,
@@ -35,11 +35,27 @@ const TURN_ACTIONS: AccessibilityActionInfo[] = [
   { name: 'previousPage', label: msg('Previous page') },
 ];
 
-function PageSlot({ pageId, width, options }: { pageId: ID; width: number; options: PageDrawOptions }) {
+/** Draws extra marks over a page, such as stickers friends dropped, in that page's own size. */
+export type PageOverlay = (pageId: ID, width: number, height: number) => ReactNode;
+
+function PageSlot({
+  pageId,
+  width,
+  height,
+  options,
+  overlay,
+}: {
+  pageId: ID;
+  width: number;
+  height: number;
+  options: PageDrawOptions;
+  overlay?: PageOverlay;
+}) {
   const page = usePage(pageId);
   return (
     <View style={{ width }}>
       <PageView pageId={pageId} width={width} options={options} />
+      {overlay?.(pageId, width, height)}
       {page && !page.done && (
         <View className="absolute left-2 top-2 rounded-sm bg-raised/80 px-2 py-0.5">
           <Text variant="caption">{t('Not done')}</Text>
@@ -83,6 +99,8 @@ export const PreviewPage = memo(function PreviewPageItem({
   onPinchChange,
   outerGesture,
   onDoubleTap,
+  onLongPressAt,
+  overlay,
 }: {
   pageIds: ID[];
   firstPageNumber: number;
@@ -101,6 +119,9 @@ export const PreviewPage = memo(function PreviewPageItem({
   onPinchChange?: (active: boolean) => void;
   outerGesture?: NativeGesture;
   onDoubleTap?: (x: number, y: number) => void;
+  /** Replaces flagging on long press: where on which page, in page fractions (0 to 1). */
+  onLongPressAt?: (pageId: ID, x: number, y: number) => void;
+  overlay?: PageOverlay;
 }) {
   const contentW = slots * pageWidth;
   const { pinch, pan, style, zoomed, reset, toggleAt, toContent } = useZoom({
@@ -130,7 +151,9 @@ export const PreviewPage = memo(function PreviewPageItem({
         point.x <= left + pageWidth &&
         point.y >= 0 &&
         point.y <= BADGE_ZONE;
-      return { pageId: pageIds[slot], onBadge };
+      const fx = (point.x - left) / pageWidth;
+      const fy = point.y / pageHeight;
+      return { pageId: pageIds[slot], onBadge, fx, fy };
     };
     return {
       tap: {
@@ -169,10 +192,17 @@ export const PreviewPage = memo(function PreviewPageItem({
         minDuration: 450,
         numberOfPointers: 1,
         maxDistance: 12,
-        onActivate: (e: { x: number; y: number }) => onFlag(slotAt(e.x, e.y).pageId),
+        onActivate: (e: { x: number; y: number }) => {
+          const hit = slotAt(e.x, e.y);
+          if (onLongPressAt) {
+            onLongPressAt(hit.pageId, hit.fx, hit.fy);
+          } else {
+            onFlag(hit.pageId);
+          }
+        },
       },
     };
-  }, [zoomed, toggleAt, toContent, pageIds, slots, pageWidth, contentW, rtl, onTap, onFlag, onDoubleTap]);
+  }, [zoomed, toggleAt, toContent, pageIds, slots, pageWidth, pageHeight, contentW, rtl, onTap, onFlag, onDoubleTap, onLongPressAt]);
 
   const tap = useTapGesture(touches.tap);
   const doubleTap = useTapGesture(touches.doubleTap);
@@ -220,7 +250,7 @@ export const PreviewPage = memo(function PreviewPageItem({
             style={[{ width: contentW, height: pageHeight }, zoomable && style]}
           >
             {pageIds.map(id => (
-              <PageSlot key={id} pageId={id} width={pageWidth} options={options} />
+              <PageSlot key={id} pageId={id} width={pageWidth} height={pageHeight} options={options} overlay={overlay} />
             ))}
           </Animated.View>
         </Animated.View>
