@@ -1,6 +1,6 @@
+import { t, tn } from '../i18n';
 import { chapterIdsOf, chapterProgress, chapterStatus } from '../model/selectors';
 import type { Project, StoryData } from '../model/types';
-import { plural } from '../util/format';
 import type { StoryRoute } from './resume';
 
 export type NextStep = { text: string; actions: { label: string; route: StoryRoute }[] };
@@ -10,8 +10,8 @@ export function nextStepOf(state: StoryData, project: Project): NextStep {
   const chapterIds = chapterIdsOf(project);
   if (chapterIds.length === 0) {
     return {
-      text: 'No chapters yet. Outline the story to plan your chapters first.',
-      actions: [{ label: 'Open outline', route: { name: 'Outline', params: { projectId } } }],
+      text: t('No chapters yet. Outline the story to plan your chapters first.'),
+      actions: [{ label: t('Open outline'), route: { name: 'Outline', params: { projectId } } }],
     };
   }
   for (const [index, chapterId] of chapterIds.entries()) {
@@ -21,8 +21,8 @@ export function nextStepOf(state: StoryData, project: Project): NextStep {
     }).length;
     if (flagged > 0) {
       return {
-        text: `Chapter ${index + 1} has ${flagged} flagged pages to fix.`,
-        actions: [{ label: 'Review and fix', route: { name: 'Storyboard', params: { chapterId } } }],
+        text: t('Chapter {n} has {flagged} flagged pages to fix.', { n: index + 1, flagged }),
+        actions: [{ label: t('Review and fix'), route: { name: 'Storyboard', params: { chapterId } } }],
       };
     }
   }
@@ -30,10 +30,10 @@ export function nextStepOf(state: StoryData, project: Project): NextStep {
   const firstOpen = statuses.findIndex(status => status !== 'done');
   if (firstOpen < 0) {
     return {
-      text: 'Every page is done. Preview it once, then export!',
+      text: t('Every page is done. Preview it once, then export!'),
       actions: [
-        { label: 'Preview', route: { name: 'Preview', params: { projectId } } },
-        { label: 'Export', route: { name: 'Export', params: { projectId } } },
+        { label: t('Preview'), route: { name: 'Preview', params: { projectId } } },
+        { label: t('Export'), route: { name: 'Export', params: { projectId } } },
       ],
     };
   }
@@ -43,30 +43,30 @@ export function nextStepOf(state: StoryData, project: Project): NextStep {
   if (status === 'drawing') {
     const { done, total } = chapterProgress(state, chapterId);
     return {
-      text: `Chapter ${number} has ${plural(total - done, 'page')} left.`,
-      actions: [{ label: 'Keep drawing', route: { name: 'Storyboard', params: { chapterId } } }],
+      text: tn(total - done, 'Chapter {n} has {count} page left.', 'Chapter {n} has {count} pages left.', { n: number }),
+      actions: [{ label: t('Keep drawing'), route: { name: 'Storyboard', params: { chapterId } } }],
     };
   }
   if (status === 'writing') {
     return {
-      text: `Chapter ${number} has a script. Split it into pages to start drawing.`,
+      text: t('Chapter {n} has a script. Split it into pages to start drawing.', { n: number }),
       actions: [
-        { label: `Paginate chapter ${number}`, route: { name: 'Storyboard', params: { chapterId } } },
-        { label: 'Keep writing', route: { name: 'Script', params: { chapterId } } },
+        { label: t('Paginate chapter {n}', { n: number }), route: { name: 'Storyboard', params: { chapterId } } },
+        { label: t('Keep writing'), route: { name: 'Script', params: { chapterId } } },
       ],
     };
   }
   if (statuses.every(item => item === 'unwritten')) {
     return {
-      text: `Start with an outline, or go straight to the chapter ${number} script.`,
+      text: t('Start with an outline, or go straight to the chapter {n} script.', { n: number }),
       actions: [
-        { label: 'Outline', route: { name: 'Outline', params: { projectId } } },
-        { label: 'Write script', route: { name: 'Script', params: { chapterId } } },
+        { label: t('Outline'), route: { name: 'Outline', params: { projectId } } },
+        { label: t('Write script'), route: { name: 'Script', params: { chapterId } } },
       ],
     };
   }
   return {
-    text: `Chapter ${number} has no script yet.`,
-    actions: [{ label: `Write chapter ${number}`, route: { name: 'Script', params: { chapterId } } }],
+    text: t('Chapter {n} has no script yet.', { n: number }),
+    actions: [{ label: t('Write chapter {n}', { n: number }), route: { name: 'Script', params: { chapterId } } }],
   };
 }

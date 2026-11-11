@@ -1,4 +1,4 @@
-import { plural } from '../util/format';
+import { t, tn } from '../i18n';
 import type { GridSpec, ItemSize } from './reorder';
 
 /**
@@ -78,6 +78,6 @@ export function moveArrows(webtoon: boolean, rtl: boolean, list: boolean): { ear
 }
 
 export function pageLabel(number: number, panels: number, status: string, flagged: boolean): string {
-  const parts = [`Page ${number}`, plural(panels, 'panel'), status.toLowerCase()];
-  return (flagged ? [...parts, 'flagged'] : parts).join(', ');
+  const params = { n: number, panels: tn(panels, '{count} panel', '{count} panels'), status: t(status).toLowerCase() };
+  return flagged ? t('Page {n}, {panels}, {status}, flagged', params) : t('Page {n}, {panels}, {status}', params);
 }

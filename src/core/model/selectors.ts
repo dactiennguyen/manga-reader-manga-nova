@@ -11,6 +11,7 @@ import type {
   StoryData,
   WorldEntry,
 } from './types';
+import { t } from '../i18n';
 
 export function chapterIdsOf(project: Project | undefined): ID[] {
   return project ? project.acts.flatMap(act => act.chapterIds) : [];
@@ -33,15 +34,16 @@ export function chapterLabel(state: StoryData, chapterId: ID): string {
   }
   const number = chapterNumber(state.projects[chapter.projectId], chapterId);
   const title = chapter.title.trim();
-  return isDefaultChapterTitle(title) ? `Chapter ${number}` : `Chapter ${number} · ${title}`;
+  return isDefaultChapterTitle(title) ? t('Chapter {n}', { n: number }) : t('Chapter {n} · {title}', { n: number, title });
 }
 
+/** New chapters are stored as 'Chapter N' in every language, and shown translated by the two functions around this one. */
 export function isDefaultChapterTitle(title: string): boolean {
   return /^(chapter \d+)?$/i.test(title.trim());
 }
 
 export function chapterName(title: string, number: number): string {
-  return isDefaultChapterTitle(title) ? `Chapter ${number}` : title.trim();
+  return isDefaultChapterTitle(title) ? t('Chapter {n}', { n: number }) : title.trim();
 }
 
 /** `hasArt` comes from the art store, so this file stays free of storage. */

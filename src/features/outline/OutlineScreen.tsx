@@ -3,6 +3,7 @@ import { ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { AiIcon, MoreIcon, PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import { chapterIdsOf, chapterStatus } from '../../core/model/selectors';
 import type { Act, ChapterStatus, ID, Project } from '../../core/model/types';
@@ -34,8 +35,8 @@ export function OutlineScreen({ route, navigation }: ScreenProps<'Outline'>) {
   if (!project) {
     return (
       <Screen>
-        <AppBar title="Outline" onBack={() => navigation.goBack()} />
-        <EmptyState title="Story not found" message="This story may have been deleted." />
+        <AppBar title={t('Outline')} onBack={() => navigation.goBack()} />
+        <EmptyState title={t('Story not found')} message={t('This story may have been deleted.')} />
       </Screen>
     );
   }
@@ -97,8 +98,8 @@ function OutlineBoard({ project }: { project: Project }) {
       openPlotIdeas,
       openPlotHoles: () => setHolesOpen(true),
       shareOutline: () => {
-        Share.share({ title: `${project.title} outline`, message: outlineText(project, chapters, numbers) }).catch(() =>
-          toast('Sharing failed'),
+        Share.share({ title: t('{title} outline', { title: project.title }), message: outlineText(project, chapters, numbers) }).catch(() =>
+          toast(t('Sharing failed')),
         );
       },
       editChapter: setEditingId,
@@ -119,7 +120,7 @@ function OutlineBoard({ project }: { project: Project }) {
       const crossed = !target.chapterIds.includes(chapterId);
       useStory.getState().moveChapter(chapterId, target.id, index);
       if (crossed) {
-        toast(`Moved to ${target.title}`);
+        toast(t('Moved to {act}', { act: t(target.title) }));
       }
     },
     onMenu: chapterId => menu.open({ kind: 'chapter', chapterId }),
@@ -168,7 +169,7 @@ function OutlineBoard({ project }: { project: Project }) {
     const body = (
       <>
         {act.chapterIds.map(id => renderCard(id))}
-        <Button title="Chapter" icon={PlusIcon} variant="secondary" small onPress={() => addChapter(act.id)} />
+        <Button title={t('Chapter')} icon={PlusIcon} variant="secondary" small onPress={() => addChapter(act.id)} />
       </>
     );
     return (
@@ -180,14 +181,14 @@ function OutlineBoard({ project }: { project: Project }) {
         style={board ? { width: columnWidth } : undefined}
       >
         <Pressable
-          accessibilityLabel={`Rename ${act.title}`}
+          accessibilityLabel={t('Rename {name}', { name: t(act.title) })}
           onPress={() => setRenamingActId(act.id)}
           onLongPress={() => menu.open({ kind: 'act', actId: act.id })}
           className="flex-row items-center justify-between gap-2"
           style={{ height: headHeight, paddingHorizontal: columnPad }}
         >
           <Text variant="heading" numberOfLines={1} className="flex-1">
-            {act.title}
+            {t(act.title)}
           </Text>
           <Text variant="caption" tone="muted">
             {chapterCount(act.chapterIds.length)}
@@ -211,10 +212,10 @@ function OutlineBoard({ project }: { project: Project }) {
   return (
     <Screen padded={false}>
       <AppBar
-        title="Outline"
+        title={t('Outline')}
         subtitle={project.title}
         onBack={() => navigation.goBack()}
-        right={<IconButton icon={MoreIcon} onPress={() => menu.open({ kind: 'main' })} accessibilityLabel="More" />}
+        right={<IconButton icon={MoreIcon} onPress={() => menu.open({ kind: 'main' })} accessibilityLabel={t('More')} />}
       />
       <View className="gap-2 px-4 pb-2">
         <TextField
@@ -222,18 +223,18 @@ function OutlineBoard({ project }: { project: Project }) {
           onChangeText={setLogline}
           onBlur={saveLogline}
           onEndEditing={saveLogline}
-          placeholder="Your story in one sentence…"
-          accessibilityLabel="Logline"
+          placeholder={t('Your story in one sentence…')}
+          accessibilityLabel={t('Logline')}
           maxLength={LIMITS.logline}
           multiline
           submitBehavior="blurAndSubmit"
         />
-        {!outlined && <Button title="AI plot ideas" icon={AiIcon} variant="ai" small onPress={openPlotIdeas} className="self-start" />}
+        {!outlined && <Button title={t('AI plot ideas')} icon={AiIcon} variant="ai" small onPress={openPlotIdeas} className="self-start" />}
       </View>
       {total === 0 && (
         <View className="gap-4 px-4 py-3">
-          <Text tone="secondary">Not sure where to start? Add your first chapter and sum it up in one sentence.</Text>
-          <Button title="Add chapter" icon={PlusIcon} onPress={() => addChapter()} className="self-start" />
+          <Text tone="secondary">{t('Not sure where to start? Add your first chapter and sum it up in one sentence.')}</Text>
+          <Button title={t('Add chapter')} icon={PlusIcon} onPress={() => addChapter()} className="self-start" />
         </View>
       )}
       <View className="flex-1">
@@ -263,9 +264,9 @@ function OutlineBoard({ project }: { project: Project }) {
       <PromptDialog
         visible={renamingAct !== undefined}
         onClose={() => setRenamingActId(undefined)}
-        title="Rename act"
+        title={t('Rename act')}
         initialValue={renamingAct?.title ?? ''}
-        placeholder="Act title"
+        placeholder={t('Act title')}
         maxLength={ACT_TITLE_MAX}
         onSubmit={value => {
           if (renamingAct) {

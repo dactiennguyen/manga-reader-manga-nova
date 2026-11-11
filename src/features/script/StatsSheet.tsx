@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
+import { t, tn } from '../../core/i18n';
 import { BLOCK_LABEL, BLOCK_TYPES } from '../../core/model/constants';
 import type { Character, ID, Scene } from '../../core/model/types';
 import { formatDuration, scriptStats } from '../../core/script/scriptTools';
@@ -24,7 +25,7 @@ export function StatsSheet({
   characters: Record<ID, Character>;
 }) {
   return (
-    <Sheet visible={visible} onClose={onClose} title="Script statistics" subtitle={title}>
+    <Sheet visible={visible} onClose={onClose} title={t('Script statistics')} subtitle={title}>
       <StatsBody scenes={scenes} characters={characters} />
     </Sheet>
   );
@@ -33,12 +34,12 @@ export function StatsSheet({
 function StatsBody({ scenes, characters }: { scenes: Scene[]; characters: Record<ID, Character> }) {
   const stats = useMemo(() => scriptStats(scenes, characters), [scenes, characters]);
   const tiles: [string, string][] = [
-    ['Words', String(stats.words)],
-    ['Dialogue lines', String(stats.dialogueLines)],
-    ['Scenes', String(stats.scenes)],
-    ['Est. pages', pagesValue(stats.pages)],
-    ['Reading time', formatDuration(stats.readingSeconds)],
-    ['Written blocks', String(stats.blocks)],
+    [t('Words'), String(stats.words)],
+    [t('Dialogue lines'), String(stats.dialogueLines)],
+    [t('Scenes'), String(stats.scenes)],
+    [t('Est. pages'), pagesValue(stats.pages)],
+    [t('Reading time'), formatDuration(stats.readingSeconds)],
+    [t('Written blocks'), String(stats.blocks)],
   ];
   const topLines = stats.speakers[0]?.lines ?? 0;
   return (
@@ -56,36 +57,36 @@ function StatsBody({ scenes, characters }: { scenes: Scene[]; characters: Record
         ))}
       </View>
       <Text variant="heading" accessibilityRole="header" className="mt-3">
-        Blocks by type
+        {t('Blocks by type')}
       </Text>
       {BLOCK_TYPES.map(type => (
         <View key={type} className="flex-row items-center justify-between gap-3">
           <Text tone="secondary" className="shrink">
-            {BLOCK_LABEL[type]}
+            {t(BLOCK_LABEL[type])}
           </Text>
           <Text variant="label">{stats.byType[type]}</Text>
         </View>
       ))}
       <Text variant="heading" accessibilityRole="header" className="mt-3">
-        Lines per character
+        {t('Lines per character')}
       </Text>
-      {stats.speakers.length === 0 && <Text tone="muted">No dialogue written yet.</Text>}
+      {stats.speakers.length === 0 && <Text tone="muted">{t('No dialogue written yet.')}</Text>}
       {stats.speakers.map((speaker, index) => (
         <View key={speaker.characterId ?? 'unassigned'} className="gap-1">
           <View className="flex-row items-center justify-between gap-3">
             <Text tone="secondary" numberOfLines={1} className="shrink">
-              {speaker.name}
-              {index === 0 && speaker.characterId && stats.speakers.length > 1 ? ' · talks most' : ''}
+              {speaker.characterId && characters[speaker.characterId]?.name.trim() ? speaker.name : t(speaker.name)}
+              {index === 0 && speaker.characterId && stats.speakers.length > 1 ? ` · ${t('talks most')}` : ''}
             </Text>
             <Text variant="label">
-              {speaker.lines} {speaker.lines === 1 ? 'line' : 'lines'} · {speaker.words} {speaker.words === 1 ? 'word' : 'words'}
+              {tn(speaker.lines, '{count} line', '{count} lines')} · {tn(speaker.words, '{count} word', '{count} words')}
             </Text>
           </View>
           <ProgressBar value={topLines ? speaker.lines / topLines : 0} />
         </View>
       ))}
       <Text variant="caption" tone="muted" className="mt-3">
-        Empty blocks are not counted. Reading time assumes 200 words a minute plus 6 seconds of art per page.
+        {t('Empty blocks are not counted. Reading time assumes 200 words a minute plus 6 seconds of art per page.')}
       </Text>
     </View>
   );

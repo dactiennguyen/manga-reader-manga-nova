@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 
+import { t } from '../../core/i18n';
 import {
   canMerge,
   cutFromLine,
@@ -75,7 +76,7 @@ export function usePanelEdits({
     const shape = shapes.find(item => item.id === id);
     const line = shape && cutFromLine(shape, p0, p1);
     if (!layout || !shape || !line) {
-      toast('Draw a longer line across the panel');
+      toast(t('Draw a longer line across the panel'));
       return;
     }
     const newId = uid();
@@ -94,7 +95,7 @@ export function usePanelEdits({
     const next = layout && canMerge(layout, keepId, removeId) ? mergePanels(layout, keepId, removeId) : null;
     clearSelection();
     if (!next) {
-      toast('Only two panels sharing one divider can be merged');
+      toast(t('Only two panels sharing one divider can be merged'));
       return;
     }
     commit({ layout: next, panels: without(removeId), order: page.order?.filter(id => id !== removeId) });
@@ -122,7 +123,7 @@ export function usePanelEdits({
   const deleteArt = async () => {
     const ok =
       !!selected &&
-      (await confirm("Delete this panel's art?", 'This cannot be undone.', { confirmText: 'Delete', destructive: true }));
+      (await confirm(t("Delete this panel's art?"), t('This cannot be undone.'), { confirmText: t('Delete'), destructive: true }));
     if (ok) {
       saveArt(selected, emptyArt());
       useStory.getState().bumpArt(pageId);

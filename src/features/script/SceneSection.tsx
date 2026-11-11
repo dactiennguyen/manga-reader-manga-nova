@@ -2,15 +2,15 @@ import { memo } from 'react';
 import { TextInput, View } from 'react-native';
 import { CaretDownIcon, CaretRightIcon, MoreIcon, PlusIcon } from '../../ui/icons';
 
+import { msg, t, tn } from '../../core/i18n';
 import { estimateScenePages } from '../../core/model/paginate';
 import type { Character, ID, Scene } from '../../core/model/types';
 import { pagesText, type PanelRef } from '../../core/script/blockOps';
-import { plural } from '../../core/util/format';
 import { ICON, Icon, IconButton, Pressable, Text, useColor } from '../../ui';
 import { BlockRow } from './BlockRow';
 import type { BlockApi, SceneApi } from './useScriptController';
 
-const FIRST_PLACEHOLDER = 'Where does the story begin?';
+const FIRST_PLACEHOLDER = msg('Where does the story begin?');
 
 /** One list cell. The list recycles whole scenes, so the inputs inside a scene survive scrolling within it. */
 export const SceneSection = memo(function SceneSectionBase({
@@ -39,22 +39,22 @@ export const SceneSection = memo(function SceneSectionBase({
     <View className="gap-2 px-4 pb-3 md:px-6">
       <View className="flex-row items-center">
         <Pressable
-          accessibilityLabel={`Scene ${number}`}
+          accessibilityLabel={t('Scene {n}', { n: number })}
           accessibilityState={{ expanded: !scene.collapsed }}
           onPress={() => sceneApi.toggle(scene.id)}
           className="min-h-12 flex-1 flex-row items-center gap-2"
         >
           <Icon icon={scene.collapsed ? CaretRightIcon : CaretDownIcon} size={ICON.md} />
-          <Text variant="heading">Scene {number}</Text>
+          <Text variant="heading">{t('Scene {n}', { n: number })}</Text>
           <Text variant="caption" tone="muted" className="shrink" numberOfLines={1}>
-            {pagesText(estimateScenePages(scene))} · {plural(scene.blocks.length, 'block')}
+            {pagesText(estimateScenePages(scene))} · {tn(scene.blocks.length, '{count} block', '{count} blocks')}
           </Text>
         </Pressable>
         <IconButton
           icon={MoreIcon}
           size={ICON.md}
           onPress={() => sceneApi.menu(scene.id)}
-          accessibilityLabel={`Scene ${number} options`}
+          accessibilityLabel={t('Scene {n} options', { n: number })}
         />
       </View>
       {!scene.collapsed && (
@@ -65,11 +65,11 @@ export const SceneSection = memo(function SceneSectionBase({
               onChangeText={value => sceneApi.describe(scene.id, value)}
               multiline
               scrollEnabled={false}
-              placeholder="Scene note from the outline"
+              placeholder={t('Scene note from the outline')}
               placeholderTextColor={muted}
               cursorColor={accent}
               selectionColor={accent}
-              accessibilityLabel="Scene note"
+              accessibilityLabel={t('Scene note')}
               textAlignVertical="top"
               className="rounded-sm bg-surface px-3 py-2 text-body-sm font-inter text-text-secondary"
             />
@@ -90,13 +90,13 @@ export const SceneSection = memo(function SceneSectionBase({
             );
           })}
           <Pressable
-            accessibilityLabel="Add block"
+            accessibilityLabel={t('Add block')}
             onPress={() => sceneApi.append(scene.id)}
             className="min-h-12 flex-row items-center gap-1 self-start"
           >
             <Icon icon={PlusIcon} size={ICON.xs} color="text-muted" />
             <Text variant="caption" tone="muted">
-              add block
+              {t('add block')}
             </Text>
           </Pressable>
         </View>

@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 
+import { t } from '../../core/i18n';
 import { computeDividers, computePanels, hitTestPanel, setSplit, type Pt } from '../../core/layout/layout';
 import { dragSplit, hitHandle, type HandleKind } from '../../core/layout/pageEdit';
 import {
@@ -98,7 +99,7 @@ export function usePanelController({
     if (id) {
       navigation.replace('PanelLayout', { pageId: id, mode });
     } else {
-      toast(target < 0 ? 'This is the first page' : 'This is the last page');
+      toast(target < 0 ? t('This is the first page') : t('This is the last page'));
     }
   };
   const goBack = () =>
@@ -134,7 +135,7 @@ export function usePanelController({
         commit({ order: next });
         setPicked([]);
         setTool('none');
-        toast('Reading order set');
+        toast(t('Reading order set'));
       } else {
         setPicked(next);
       }

@@ -3,14 +3,21 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } 
 import { BackHandler, Keyboard, type ScrollView } from 'react-native';
 
 import { suggestStory, type StoryIdea } from '../../core/ai/story';
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { ArtStyle } from '../../core/model/types';
 import { FORMATS, genresFavoritesFirst, knownGenres, titleTaken, type FormatKey } from '../../core/story/newProject';
+import { applyStarter, starterFits, starterOf, type StarterKey } from '../../core/story/starters';
 import type { ScreenProps } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
 import { useSettings } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import { confirm, toast } from '../../ui';
+
+/** An AI story suggestion as one text, as it is reported. */
+export function storyIdeaText(suggestion: StoryIdea): string {
+  return [suggestion.title, suggestion.genres.join(', '), suggestion.logline].filter(Boolean).join('\n');
+}
 
 export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) {
   const idea = route.params?.idea?.trim() ?? '';
@@ -23,7 +30,10 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
   const [genres, setGenres] = useState<string[]>(() => knownGenres(draft?.genres));
   const [logline, setLogline] = useState(() => (draft?.logline?.trim() || idea).slice(0, LIMITS.logline));
   const [aiFilled, setAiFilled] = useState(!!draft);
+  /** What the AI wrote into the form, for a report while the AI note shows. */
+  const [aiText, setAiText] = useState(() => (draft ? storyIdeaText(draft) : ''));
   const [formatKey, setFormatKey] = useState<FormatKey>('manga-B5');
+  const [starterKey, setStarterKey] = useState<StarterKey>('blank');
   const [style, setStyle] = useState<ArtStyle>(defaultStyle);
   const [color, setColor] = useState(false);
   const { state: ai, start, cancel, reset } = useAiTask<StoryIdea>();
@@ -47,8 +57,8 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
   const close = useCallback(async () => {
     if (
       dirty &&
-      !(await confirm('Discard this new story?', 'What you entered will not be saved.', {
-        confirmText: 'Discard',
+      !(await confirm(t('Discard this new story?'), t('What you entered will not be saved.'), {
+        confirmText: t('Discard'),
         destructive: true,
       }))
     ) {
@@ -90,7 +100,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
       setGenres(genres.filter(item => item !== genre));
       setAiFilled(false);
     } else if (genres.length >= LIMITS.genresPerProject) {
-      toast(`Pick up to ${LIMITS.genresPerProject} genres`);
+      toast(t('Pick up to {max} genres', { max: LIMITS.genresPerProject }));
     } else {
       setGenres([...genres, genre]);
       setAiFilled(false);
@@ -115,12 +125,29 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
       setGenres(picked);
     }
     setAiFilled(true);
+    setAiText(storyIdeaText(suggestion));
     reset();
+  };
+
+  /** Picking a starter also picks the format it was laid out for. */
+  const pickStarter = (key: StarterKey) => {
+    const starter = starterOf(key);
+    setStarterKey(key);
+    if (starter.formatKey && !starterFits(starter, formatKey)) {
+      setFormatKey(starter.formatKey);
+    }
+  };
+
+  const pickFormat = (key: FormatKey) => {
+    setFormatKey(key);
+    if (!starterFits(starterOf(starterKey), key)) {
+      setStarterKey('blank');
+    }
   };
 
   const next = () => {
     if (step === 0 && !name) {
-      toast('Give your story a title');
+      toast(t('Give your story a title'));
       return;
     }
     if (ai.status === 'loading') {
@@ -139,6 +166,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
       style,
       color,
     });
+    applyStarter(() => useStory.getState(), projectId, starterOf(starterKey));
     navigation.replace('Project', { projectId });
   };
 
@@ -153,14 +181,17 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
     genreList,
     logline,
     aiFilled,
+    aiText,
     aiSource,
     ai,
     format,
     formatKey,
+    starterKey,
     style,
     color,
     scroller,
-    setFormatKey,
+    setFormatKey: pickFormat,
+    pickStarter,
     setStyle,
     setColor,
     editTitle,

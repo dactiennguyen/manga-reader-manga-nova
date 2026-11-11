@@ -3,6 +3,7 @@ import { TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { AiIcon, CaretDownIcon, CheckIcon, CopyIcon, DeleteIcon, LockIcon, MoreIcon, ReadIcon } from '../../ui/icons';
 
+import { msg, t } from '../../core/i18n';
 import { LIMITS, ROLE_LABEL } from '../../core/model/constants';
 import { chapterLabel, characterUsage } from '../../core/model/selectors';
 import type { Character, CharacterRole, ID } from '../../core/model/types';
@@ -38,9 +39,9 @@ import { useDraft } from './fields';
 type TabKey = 'profile' | 'design' | 'relations';
 
 const TABS: readonly { key: TabKey; label: string }[] = [
-  { key: 'profile', label: 'Profile' },
-  { key: 'design', label: 'Design' },
-  { key: 'relations', label: 'Relations' },
+  { key: 'profile', label: msg('Profile') },
+  { key: 'design', label: msg('Design') },
+  { key: 'relations', label: msg('Relations') },
 ];
 
 const ROLES = Object.keys(ROLE_LABEL) as CharacterRole[];
@@ -53,8 +54,8 @@ export function CharacterScreen({ route, navigation }: ScreenProps<'Character'>)
   if (!character) {
     return (
       <Screen>
-        <AppBar title="Character" onBack={() => navigation.goBack()} />
-        <EmptyState title="Character not found" message="This character has been deleted." />
+        <AppBar title={t('Character')} onBack={() => navigation.goBack()} />
+        <EmptyState title={t('Character not found')} message={t('This character has been deleted.')} />
       </Screen>
     );
   }
@@ -91,7 +92,7 @@ function CharacterBody({ character }: { character: Character }) {
     name.onBlur();
     const newId = useStory.getState().duplicateCharacter(character.id);
     if (newId) {
-      toast('Character duplicated');
+      toast(t('Character duplicated'));
       navigation.push('Character', { characterId: newId });
     }
   };
@@ -99,9 +100,9 @@ function CharacterBody({ character }: { character: Character }) {
   const remove = async () => {
     const { dialogues, bubbles } = characterUsage(useStory.getState(), character.id);
     const ok = await confirm(
-      `Delete ${character.name.trim() || 'this character'}?`,
-      `${dialogues} dialogue lines and ${bubbles} speech bubbles use this character. They are kept but will no longer be linked to it.`,
-      { confirmText: 'Delete', destructive: true },
+      character.name.trim() ? t('Delete {name}?', { name: character.name.trim() }) : t('Delete this character?'),
+      t('{dialogues} dialogue lines and {bubbles} speech bubbles use this character. They are kept but will no longer be linked to it.', { dialogues, bubbles }),
+      { confirmText: t('Delete'), destructive: true },
     );
     if (ok) {
       navigation.goBack();
@@ -112,9 +113,9 @@ function CharacterBody({ character }: { character: Character }) {
   return (
     <Screen padded={false}>
       <AppBar
-        title="Character"
+        title={t('Character')}
         onBack={() => navigation.goBack()}
-        right={<IconButton icon={MoreIcon} onPress={() => setMenu(true)} accessibilityLabel="More" />}
+        right={<IconButton icon={MoreIcon} onPress={() => setMenu(true)} accessibilityLabel={t('More')} />}
       />
       <KeyboardAwareScrollView
         bottomOffset={24}
@@ -137,11 +138,11 @@ function CharacterBody({ character }: { character: Character }) {
               value={name.text}
               onChangeText={name.onChangeText}
               onBlur={name.onBlur}
-              placeholder="Character name"
+              placeholder={t('Character name')}
               placeholderTextColor={muted}
               selectionColor={accent}
               cursorColor={accent}
-              accessibilityLabel="Character name"
+              accessibilityLabel={t('Character name')}
               maxLength={LIMITS.characterName}
               autoFocus={isNew}
               returnKeyType="done"
@@ -149,13 +150,13 @@ function CharacterBody({ character }: { character: Character }) {
             />
             <View className="mt-2 flex-row items-center gap-2">
               <Pressable
-                accessibilityLabel={`Role: ${ROLE_LABEL[character.role]}`}
+                accessibilityLabel={t('Role: {role}', { role: t(ROLE_LABEL[character.role]) })}
                 hitSlop={6}
                 onPress={() => setRoleMenu(true)}
                 className="h-9 shrink flex-row items-center gap-0.5"
               >
                 <Text variant="label" tone="secondary">
-                  {ROLE_LABEL[character.role]}
+                  {t(ROLE_LABEL[character.role])}
                 </Text>
                 <Icon icon={CaretDownIcon} size={ICON.xs} color="text-muted" />
               </Pressable>
@@ -163,24 +164,24 @@ function CharacterBody({ character }: { character: Character }) {
                 ·
               </Text>
               <Pressable
-                accessibilityLabel={character.age ? `Age: ${character.age}` : 'Add age'}
+                accessibilityLabel={character.age ? t('Age: {age}', { age: character.age }) : t('Add age')}
                 hitSlop={6}
                 onPress={() => setAgeDialog(true)}
                 className="h-9 shrink flex-row items-center"
               >
                 <Text variant="label" tone={character.age ? 'secondary' : 'muted'} numberOfLines={1}>
-                  {character.age ? `Age: ${character.age}` : 'Add age'}
+                  {character.age ? t('Age: {age}', { age: character.age }) : t('Add age')}
                 </Text>
               </Pressable>
             </View>
           </View>
         </View>
         <View className="bg-bg">
-          <Tabs tabs={TABS} value={tab} onChange={setTab} stretch />
+          <Tabs tabs={TABS.map(item => ({ ...item, label: t(item.label) }))} value={tab} onChange={setTab} stretch />
         </View>
         <View className="gap-2 p-4">
-          {isNew && !name.text.trim() && <Banner text="What is this character called? Type a name above to begin." />}
-          {tab === 'profile' && <Button title="Fill with AI" icon={AiIcon} variant="ai" small onPress={openFill} className="mb-2 self-start" />}
+          {isNew && !name.text.trim() && <Banner text={t('What is this character called? Type a name above to begin.')} />}
+          {tab === 'profile' && <Button title={t('Fill with AI')} icon={AiIcon} variant="ai" small onPress={openFill} className="mb-2 self-start" />}
           {tab === 'profile' && <ProfileTab key={fillVersion} character={character} />}
           {tab === 'design' && <DesignTab character={character} />}
           {tab === 'relations' && <RelationsTab character={character} />}
@@ -190,19 +191,19 @@ function CharacterBody({ character }: { character: Character }) {
       <Menu
         visible={menu}
         onClose={() => setMenu(false)}
-        title={character.name.trim() || 'Character'}
+        title={character.name.trim() || t('Character')}
         items={[
-          { label: 'Duplicate', icon: CopyIcon, onPress: duplicate },
-          { label: 'Where they appear', icon: ReadIcon, onPress: () => setUsageSheet(true) },
-          { label: 'Delete character', icon: DeleteIcon, destructive: true, onPress: remove },
+          { label: t('Duplicate'), icon: CopyIcon, onPress: duplicate },
+          { label: t('Where they appear'), icon: ReadIcon, onPress: () => setUsageSheet(true) },
+          { label: t('Delete character'), icon: DeleteIcon, destructive: true, onPress: remove },
         ]}
       />
       <Menu
         visible={roleMenu}
         onClose={() => setRoleMenu(false)}
-        title="Role"
+        title={t('Role')}
         items={ROLES.map(role => ({
-          label: ROLE_LABEL[role],
+          label: t(ROLE_LABEL[role]),
           icon: role === character.role ? CheckIcon : undefined,
           onPress: () => update(character.id, { role }),
         }))}
@@ -210,10 +211,10 @@ function CharacterBody({ character }: { character: Character }) {
       <PromptDialog
         visible={ageDialog}
         onClose={() => setAgeDialog(false)}
-        title="Age"
-        message="A number or words, e.g. 17, around 30."
+        title={t('Age')}
+        message={t('A number or words, e.g. 17, around 30.')}
         initialValue={character.age}
-        placeholder="Around 30"
+        placeholder={t('Around 30')}
         maxLength={AGE_MAX}
         allowEmpty
         onSubmit={age => {
@@ -231,12 +232,12 @@ function CharacterBody({ character }: { character: Character }) {
             navigation.navigate('Script', { chapterId });
           }
         }}
-        title="Where they appear"
-        subtitle={usage ? `${usage.dialogues} dialogue lines · ${usage.bubbles} speech bubbles` : undefined}
+        title={t('Where they appear')}
+        subtitle={usage ? t('{dialogues} dialogue lines · {bubbles} speech bubbles', { dialogues: usage.dialogues, bubbles: usage.bubbles }) : undefined}
       >
         {usage && usage.chapterIds.length === 0 && (
           <Text tone="secondary" className="p-4">
-            This character does not appear in any chapter yet.
+            {t('This character does not appear in any chapter yet.')}
           </Text>
         )}
         {usage?.chapterIds.map(chapterId => (

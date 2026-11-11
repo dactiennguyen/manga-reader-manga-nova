@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanima
 import { scheduleOnRN } from 'react-native-worklets';
 import { MinusIcon, PlusIcon } from './icons';
 
+import { t } from '../core/i18n';
 import { IconButton } from './IconButton';
 import { Text } from './Text';
 import { ICON } from './tokens';
@@ -16,7 +17,7 @@ export function Stepper({
   max,
   step = 1,
   format,
-  label = 'Value',
+  label = t('Value'),
 }: {
   value: number;
   onChange: (value: number) => void;
@@ -28,11 +29,11 @@ export function Stepper({
 }) {
   return (
     <View className="flex-row items-center gap-1">
-      <IconButton icon={MinusIcon} size={ICON.md} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} accessibilityLabel={`Decrease ${label}`} />
+      <IconButton icon={MinusIcon} size={ICON.md} disabled={value <= min} onPress={() => onChange(Math.max(min, value - step))} accessibilityLabel={t('Decrease {label}', { label })} />
       <Text variant="mono" className="min-w-10 text-center">
         {format ? format(value) : value}
       </Text>
-      <IconButton icon={PlusIcon} size={ICON.md} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} accessibilityLabel={`Increase ${label}`} />
+      <IconButton icon={PlusIcon} size={ICON.md} disabled={value >= max} onPress={() => onChange(Math.min(max, value + step))} accessibilityLabel={t('Increase {label}', { label })} />
     </View>
   );
 }
@@ -47,7 +48,7 @@ export function Slider({
   onChange,
   onComplete,
   disabled,
-  label = 'Value',
+  label = t('Value'),
   className,
 }: {
   value: number;

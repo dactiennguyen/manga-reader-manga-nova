@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type ComponentRef } from 'react';
 import { TextInput, View } from 'react-native';
 
+import { msg, t } from '../../core/i18n';
 import { BLOCK_LABEL, DIALOGUE_KIND_LABEL, LIMITS } from '../../core/model/constants';
 import type { Block, BlockType, Character, ID } from '../../core/model/types';
 import { Avatar, Pressable, Text, useColor } from '../../ui';
@@ -12,11 +13,11 @@ const DEBOUNCE_MS = 300;
 const SUBMIT_GUARD_MS = 300;
 
 const PLACEHOLDER: Record<BlockType, string> = {
-  setting: 'Where and when?',
-  action: 'What happens?',
-  dialogue: 'Dialogue…',
-  narration: 'Narration…',
-  sfx: 'BOOM!',
+  setting: msg('Where and when?'),
+  action: msg('What happens?'),
+  dialogue: msg('Dialogue…'),
+  narration: msg('Narration…'),
+  sfx: msg('BOOM!'),
 };
 
 /** Blocks are told apart by margin and a small label, never by a card. */
@@ -156,30 +157,30 @@ function BlockRowBase({
     type === 'dialogue' ? (
       <View className="min-h-9 flex-row items-center justify-between gap-2">
         <Pressable
-          accessibilityLabel={character ? `Speaker: ${character.name || 'Unnamed'}` : 'Pick character'}
+          accessibilityLabel={character ? t('Speaker: {name}', { name: character.name || t('Unnamed') }) : t('Pick character')}
           hitSlop={6}
           onPress={() => api.pickCharacter(id)}
           className="h-9 shrink flex-row items-center gap-2"
         >
           <Avatar character={character} size={24} />
           <Text variant="caption" tone={character ? 'secondary' : 'accent'} numberOfLines={1} className="shrink">
-            {character ? character.name || 'Unnamed' : 'Pick character'}
+            {character ? character.name || t('Unnamed') : t('Pick character')}
           </Text>
         </Pressable>
         <Pressable
-          accessibilityLabel="Change dialogue style"
+          accessibilityLabel={t('Change dialogue style')}
           hitSlop={10}
           onPress={() => api.cycleKind(id)}
           className="h-7 justify-center rounded-full bg-overlay px-2"
         >
           <Text variant="caption" tone="secondary">
-            {DIALOGUE_KIND_LABEL[block.kind ?? 'speak']}
+            {t(DIALOGUE_KIND_LABEL[block.kind ?? 'speak'])}
           </Text>
         </Pressable>
       </View>
     ) : type === 'action' ? null : (
       <Text variant="caption" tone="muted">
-        {BLOCK_LABEL[type]}
+        {t(BLOCK_LABEL[type])}
       </Text>
     );
 
@@ -220,22 +221,22 @@ function BlockRowBase({
           submitBehavior="submit"
           multiline
           scrollEnabled={false}
-          placeholder={placeholder ?? PLACEHOLDER[type]}
+          placeholder={t(placeholder ?? PLACEHOLDER[type])}
           placeholderTextColor={muted}
           cursorColor={accent}
           selectionColor={accent}
-          accessibilityLabel={BLOCK_LABEL[type]}
+          accessibilityLabel={t(BLOCK_LABEL[type])}
           textAlignVertical="top"
           className={`px-0 py-1 text-text ${INPUT[type]} ${long ? 'border-b-2 border-warning' : ''}`}
         />
         {long ? (
           <View className="min-h-9 flex-row items-center gap-2">
             <Text variant="caption" tone="warning" className="flex-1">
-              Too long to fit a bubble
+              {t('Too long to fit a bubble')}
             </Text>
-            <Pressable accessibilityLabel="Shorten with AI" hitSlop={6} onPress={() => api.shorten(id)} className="h-9 justify-center">
+            <Pressable accessibilityLabel={t('Shorten with AI')} hitSlop={6} onPress={() => api.shorten(id)} className="h-9 justify-center">
               <Text variant="caption" tone="ai">
-                Shorten with AI
+                {t('Shorten with AI')}
               </Text>
             </Pressable>
           </View>
@@ -243,7 +244,7 @@ function BlockRowBase({
       </View>
       {panelLabel !== undefined && panelPageId !== undefined && (
         <Pressable
-          accessibilityLabel={`Open panel ${panelLabel}`}
+          accessibilityLabel={t('Open panel {label}', { label: panelLabel })}
           hitSlop={12}
           onPress={() => api.openPanel(panelPageId)}
           className="mt-1 h-6 justify-center rounded-sm bg-surface px-1"

@@ -21,6 +21,10 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 11 | [Hướng dẫn chuyển màn hình](11-huong-dan-chuyen-man.md) | Bảng tra import và thành phần khi chuyển một màn |
 | 12 | [Phong cách Studio](12-phong-cach-studio.md) | Giới thiệu style bằng hình ảnh: logo, màu, chữ, icon, màn hình thật |
 | 13 | [Website](13-website.md) | Link trang giới thiệu và chính sách, cách deploy |
+| 15 | [Ngôn ngữ giao diện](15-ngon-ngu.md) | Tiếng Anh, Việt, Nhật: cách thêm chữ, bảng thuật ngữ |
+| 16 | [Tính năng bổ sung](16-tinh-nang-bo-sung.md) | Truyện mẫu, câu trả lời mẫu của AI, ảnh mạng xã hội, phát lại quá trình vẽ |
+| 17 | [Xưởng vẽ trên Home](17-xuong-ve-tren-home.md) | Hành trình, huy hiệu, biên tập viên, hội đọc thử, thẻ nhân vật, tạp chí, trailer, nghe chương, hộp quà |
+| 18 | [Chơi cùng nhau trên cùng Wi-Fi](18-choi-cung-nhau.md) | 10 hoạt động nhiều người không cần server (có Đoán tranh, Cùng viết kịch bản), quét QR trong app, phòng chỉ vào bằng mã, báo cáo câu trả lời AI |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
 

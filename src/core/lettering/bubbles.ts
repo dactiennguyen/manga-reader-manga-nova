@@ -1,3 +1,4 @@
+import { msg } from '../i18n';
 import type { Pt } from '../layout/layout';
 import type { Bubble, BubbleType } from '../model/types';
 import { hashString, uid } from '../util/id';
@@ -6,12 +7,21 @@ export const MIN_FONT_SIZE = 17;
 export const BUBBLE_STROKE = 3.5;
 
 export const SFX_STYLES: { label: string; font: Bubble['font']; letterSpacing: number; skew: number }[] = [
-  { label: 'Bold', font: 'display', letterSpacing: 1, skew: 0 },
-  { label: 'Slant', font: 'display', letterSpacing: 2, skew: -0.25 },
-  { label: 'Wide', font: 'display', letterSpacing: 10, skew: 0 },
-  { label: 'Hand', font: 'hand', letterSpacing: 2, skew: -0.12 },
-  { label: 'Block', font: 'sansBold', letterSpacing: 1, skew: 0 },
-  { label: 'Shake', font: 'sansBold', letterSpacing: 6, skew: 0.2 },
+  { label: msg('Bold'), font: 'display', letterSpacing: 1, skew: 0 },
+  { label: msg('Slant'), font: 'display', letterSpacing: 2, skew: -0.25 },
+  { label: msg('Wide'), font: 'display', letterSpacing: 10, skew: 0 },
+  { label: msg('Hand'), font: 'hand', letterSpacing: 2, skew: -0.12 },
+  { label: msg('Block'), font: 'sansBold', letterSpacing: 1, skew: 0 },
+  { label: msg('Shake'), font: 'sansBold', letterSpacing: 6, skew: 0.2 },
+  // A bubble stores the index, so new styles only go at the end.
+  { label: msg('Comic'), font: 'comic', letterSpacing: 2, skew: 0 },
+  { label: msg('Heavy'), font: 'heavy', letterSpacing: 0, skew: 0 },
+  { label: msg('Marker'), font: 'marker', letterSpacing: 2, skew: -0.1 },
+  // A face for each script the styles above cannot draw: Korean, Simplified and Traditional Chinese, Thai.
+  { label: msg('Bubbly'), font: 'bubbly', letterSpacing: 1, skew: 0 },
+  { label: msg('Playful'), font: 'playful', letterSpacing: 1, skew: 0 },
+  { label: msg('Soft'), font: 'soft', letterSpacing: 1, skew: 0 },
+  { label: msg('Casual'), font: 'casual', letterSpacing: 1, skew: -0.08 },
 ];
 
 type BubbleBox = Pick<Bubble, 'x' | 'y' | 'w' | 'h'>;

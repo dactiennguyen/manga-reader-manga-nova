@@ -1,3 +1,4 @@
+import { msg, t } from '../i18n';
 import { BLOCK_LABEL, DIALOGUE_KIND_LABEL } from '../model/constants';
 import { estimatePages } from '../model/paginate';
 import type { Block, BlockType, Character, ID, Scene } from '../model/types';
@@ -21,7 +22,7 @@ export type ScriptStats = {
 
 const WORDS_PER_MINUTE = 200;
 const SECONDS_PER_PAGE = 6;
-const UNASSIGNED_SPEAKER = 'Unassigned';
+const UNASSIGNED_SPEAKER = msg('Unassigned');
 
 function matcher(query: string, matchCase: boolean): RegExp {
   return new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), matchCase ? 'g' : 'gi');
@@ -125,7 +126,7 @@ export function scriptStats(scenes: Scene[], characters: Record<ID, Character | 
       const key = character ? character.id : null;
       const entry = speakers.get(key) ?? {
         characterId: key,
-        name: character ? character.name.trim() || 'Unnamed' : UNASSIGNED_SPEAKER,
+        name: character ? character.name.trim() || t('Unnamed') : t(UNASSIGNED_SPEAKER),
         lines: 0,
         words: 0,
       };
@@ -151,17 +152,18 @@ export function scriptStats(scenes: Scene[], characters: Record<ID, Character | 
 
 export function formatDuration(seconds: number): string {
   if (seconds <= 0) {
-    return '0 min';
+    return t('0 min');
   }
   if (seconds < 60) {
-    return 'under 1 min';
+    return t('under 1 min');
   }
   const minutes = Math.round(seconds / 60);
   if (minutes < 60) {
-    return `${minutes} min`;
+    return t('{minutes} min', { minutes });
   }
   const rest = minutes % 60;
-  return rest ? `${Math.floor(minutes / 60)} h ${rest} min` : `${Math.floor(minutes / 60)} h`;
+  const hours = Math.floor(minutes / 60);
+  return rest ? t('{hours} h {minutes} min', { hours, minutes: rest }) : t('{hours} h', { hours });
 }
 
 export function sceneSummary(scene: Scene): string {
@@ -177,10 +179,11 @@ function indent(text: string, pad: string): string {
 }
 
 export function formatScript(title: string, scenes: Scene[], characters: Record<ID, Character | undefined>): string {
-  const heading = title.trim().toUpperCase() || 'UNTITLED';
+  const heading = title.trim().toUpperCase() || t('Untitled').toUpperCase();
   const parts: string[] = [`${heading}\n${'='.repeat(Math.min(heading.length, 60))}`];
   scenes.forEach((scene, index) => {
-    parts.push(`SCENE ${index + 1}\n${'-'.repeat(`SCENE ${index + 1}`.length)}`);
+    const sceneHeading = t('SCENE {n}', { n: index + 1 });
+    parts.push(`${sceneHeading}\n${'-'.repeat(sceneHeading.length)}`);
     for (const block of scene.blocks) {
       const text = block.text.trim();
       if (!text) {
@@ -190,13 +193,13 @@ export function formatScript(title: string, scenes: Scene[], characters: Record<
         parts.push(`[${text.replace(/\s*\n\s*/g, ' ')}]`);
       } else if (block.type === 'dialogue') {
         const character = block.characterId ? characters[block.characterId] : undefined;
-        const name = (character?.name.trim() || 'Unknown').toUpperCase();
-        const kind = block.kind && block.kind !== 'speak' ? ` (${DIALOGUE_KIND_LABEL[block.kind]})` : '';
+        const name = (character?.name.trim() || t('Unknown')).toUpperCase();
+        const kind = block.kind && block.kind !== 'speak' ? ` (${t(DIALOGUE_KIND_LABEL[block.kind])})` : '';
         parts.push(`        ${name}${kind}\n${indent(text, '    ')}`);
       } else if (block.type === 'narration') {
-        parts.push(`${BLOCK_LABEL.narration.toUpperCase()}: ${text}`);
+        parts.push(`${t(BLOCK_LABEL.narration).toUpperCase()}: ${text}`);
       } else if (block.type === 'sfx') {
-        parts.push(`${BLOCK_LABEL.sfx.toUpperCase()}: ${text}`);
+        parts.push(`${t(BLOCK_LABEL.sfx).toUpperCase()}: ${text}`);
       } else {
         parts.push(text);
       }

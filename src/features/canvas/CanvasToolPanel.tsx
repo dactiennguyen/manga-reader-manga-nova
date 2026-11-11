@@ -6,29 +6,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TONE_DENSITIES } from '../../core/art/artMath';
 import { SIZE_MAX, SIZE_MIN, supportsTone } from '../../core/art/tools';
-import { Chip, IconButton, Pressable, Slider, Text, ToolPanel } from '../../ui';
+import { t } from '../../core/i18n';
+import { Chip, IconButton, Slider, Text, ToolPanel } from '../../ui';
+import { CanvasColorRow } from './CanvasColorRow';
+import { CanvasSelectionBar, type SelectionControls } from './CanvasSelectionBar';
 import type { CanvasTools } from './useCanvasTools';
-
-function Swatch({ color, selected, onPick }: { color: string; selected: boolean; onPick: (color: string) => void }) {
-  return (
-    <Pressable
-      onPress={() => onPick(color)}
-      accessibilityLabel={`Color ${color}`}
-      accessibilityState={{ selected }}
-      className="h-12 w-12 items-center justify-center"
-    >
-      <View
-        className={`h-7 w-7 rounded-full ${selected ? 'border-2 border-accent' : 'border border-control-border'}`}
-        style={{ backgroundColor: color }}
-      />
-    </Pressable>
-  );
-}
 
 function TonePicker({ value, onChange }: { value: number | null; onChange: (value: number | null) => void }) {
   return (
     <View className="flex-row items-center gap-2 pr-2">
-      <Chip label="Solid" selected={value === null} onPress={() => onChange(null)} />
+      <Chip label={t('Solid')} selected={value === null} onPress={() => onChange(null)} />
       {TONE_DENSITIES.map(density => (
         <Chip
           key={density}
@@ -58,20 +45,22 @@ function LabeledSlider({ label, value, children }: { label: string; value: strin
 export function CanvasToolPanel({
   tools,
   colored,
+  selection,
   fade,
   onPreview,
   onLayout,
 }: {
   tools: CanvasTools;
   colored: boolean;
+  selection: SelectionControls;
   fade: StyleProp<AnimatedStyle<ViewStyle>>;
   onPreview: (showing: boolean) => void;
   onLayout: (event: LayoutChangeEvent) => void;
 }) {
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(true);
-  const { tool, color, tone, size, opacity, palette, recent } = tools;
-  const recentShown = colored ? recent : [];
+  const { tool, tone, size, opacity } = tools;
+  const plain = tool === 'move' || tool === 'select';
   return (
     <Animated.View
       pointerEvents="box-none"
@@ -84,34 +73,32 @@ export function CanvasToolPanel({
           <View className="flex-1">
             {tool === 'move' ? (
               <Text variant="bodySmall" tone="secondary" className="px-1">
-                Drag to move the layer. Pinch or drag a corner handle to scale it.
+                {t('Drag to move the layer. Pinch or drag a corner handle to scale it.')}
               </Text>
+            ) : tool === 'select' ? (
+              <CanvasSelectionBar selection={selection} />
             ) : (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="items-center">
                 {supportsTone(tool) ? <TonePicker value={tone} onChange={tools.setTone} /> : null}
-                {recentShown.map(item => (
-                  <Swatch key={`r-${item}`} color={item} selected={item === color} onPick={tools.setColor} />
-                ))}
-                {recentShown.length ? <View className="mx-1 h-6 w-0.5 bg-divider" /> : null}
-                {palette.map(item => (
-                  <Swatch key={item} color={item} selected={item === color} onPick={tools.setColor} />
-                ))}
+                <CanvasColorRow tools={tools} colored={colored} />
               </ScrollView>
             )}
           </View>
-          <IconButton
-            icon={open ? CaretDownIcon : CaretUpIcon}
-            color="text-muted"
-            onPress={() => setOpen(value => !value)}
-            accessibilityLabel={open ? 'Collapse tool panel' : 'Expand tool panel'}
-          />
+          {tool === 'select' ? null : (
+            <IconButton
+              icon={open ? CaretDownIcon : CaretUpIcon}
+              color="text-muted"
+              onPress={() => setOpen(value => !value)}
+              accessibilityLabel={open ? t('Collapse tool panel') : t('Expand tool panel')}
+            />
+          )}
         </View>
-        {open && tool !== 'move' ? (
+        {open && !plain ? (
           <View className="flex-row gap-3">
             {tool === 'fill' ? null : (
-              <LabeledSlider label="Size" value={`${Math.round(size)}`}>
+              <LabeledSlider label={t('Size')} value={`${Math.round(size)}`}>
                 <Slider
-                  label="Size"
+                  label={t('Size')}
                   value={size}
                   min={SIZE_MIN}
                   max={SIZE_MAX}
@@ -123,8 +110,8 @@ export function CanvasToolPanel({
                 />
               </LabeledSlider>
             )}
-            <LabeledSlider label="Opacity" value={`${Math.round(opacity * 100)}%`}>
-              <Slider label="Opacity" value={opacity} min={0.05} max={1} onChange={tools.setOpacity} />
+            <LabeledSlider label={t('Opacity')} value={`${Math.round(opacity * 100)}%`}>
+              <Slider label={t('Opacity')} value={opacity} min={0.05} max={1} onChange={tools.setOpacity} />
             </LabeledSlider>
           </View>
         ) : null}

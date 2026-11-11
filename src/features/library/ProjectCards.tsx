@@ -1,9 +1,9 @@
 import { View } from 'react-native';
 import { CheckIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import { PROJECT_STATUS_LABEL } from '../../core/model/constants';
 import type { LibraryRow } from '../../core/story/library';
-import { plural } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
 import { Cover, ICON, Icon, Pressable, ProgressBar, Text } from '../../ui';
 
@@ -18,7 +18,12 @@ function DoneMark() {
 }
 
 function labelOf({ project, status, chapters, total }: LibraryRow): string {
-  return `${project.title || 'Untitled'}, ${PROJECT_STATUS_LABEL[status]}, ${chapters} ch., ${plural(total, 'page')}`;
+  return [
+    project.title || t('Untitled'),
+    t(PROJECT_STATUS_LABEL[status]),
+    t('{count} ch.', { count: chapters }),
+    tn(total, '{count} page', '{count} pages'),
+  ].join(', ');
 }
 
 export function GridCard({ row, highlighted, onPress, onLongPress, width }: CardProps & { width: number }) {
@@ -39,11 +44,11 @@ export function GridCard({ row, highlighted, onPress, onLongPress, width }: Card
       </Cover>
       {!!project.coverUri && (
         <Text variant="label" numberOfLines={2}>
-          {project.title || 'Untitled'}
+          {project.title || t('Untitled')}
         </Text>
       )}
       <Text variant="caption" tone="muted">
-        {row.chapters} ch.
+        {t('{count} ch.', { count: row.chapters })}
       </Text>
     </Pressable>
   );
@@ -65,7 +70,7 @@ export function ListCard({ row, highlighted, onPress, onLongPress }: CardProps) 
       </Cover>
       <View className="flex-1 gap-1">
         <Text variant="heading" numberOfLines={1}>
-          {project.title || 'Untitled'}
+          {project.title || t('Untitled')}
         </Text>
         {!!project.logline && (
           <Text variant="bodySmall" tone="secondary" numberOfLines={1}>
@@ -73,7 +78,7 @@ export function ListCard({ row, highlighted, onPress, onLongPress }: CardProps) 
           </Text>
         )}
         <Text variant="caption" tone="muted">
-          {row.chapters} ch. · {plural(row.total, 'page')} · {formatRelative(project.updatedAt)}
+          {t('{count} ch.', { count: row.chapters })} · {tn(row.total, '{count} page', '{count} pages')} · {formatRelative(project.updatedAt)}
         </Text>
         <ProgressBar value={row.ratio} />
       </View>

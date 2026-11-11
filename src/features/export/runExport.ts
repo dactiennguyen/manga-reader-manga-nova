@@ -5,13 +5,17 @@ import {
   LONG_CUT_HEIGHT,
   LONG_MAX_HEIGHT,
   PDF_PAGE_WIDTH_PT,
+  SOCIAL_SIZE,
   longSegments,
   padNumber,
   pageImageWidth,
+  socialPageWidth,
+  socialPlacement,
   type ExportOptions,
   type ExportProgress,
 } from '../../core/export/plan';
-import { isRtl, pageSize } from '../../core/layout/layout';
+import { t } from '../../core/i18n';
+import { isRtl, pageSize, panelOrder } from '../../core/layout/layout';
 import { languageFileTag } from '../../core/lettering/translation';
 import type { ID, Project } from '../../core/model/types';
 import { slugify, uid } from '../../core/util/id';
@@ -22,7 +26,8 @@ import { pageContext, renderPageImage } from '../../render/drawPage';
 import { PAPER } from '../../render/ink';
 import { useStory } from '../../state/useStory';
 import { ensureProjectExportDir } from './exportFiles';
-import { renderCover, renderInfo } from './exportSheets';
+import { loadFonts } from '../../render/fonts';
+import { drawSignature, renderCover, renderInfo, signImage } from './exportSheets';
 
 export class ExportCancelled extends Error {}
 
@@ -75,15 +80,16 @@ async function exportLong({ pageIds, options, lang, tmpDir, outDir, base, step, 
   const limit = options.autoCut ? LONG_CUT_HEIGHT : LONG_MAX_HEIGHT;
   const segments = longSegments(heights, options.gap, limit);
   if (segments.length === 0) {
-    throw new Error('No pages could be rendered.');
+    throw new Error(t('No pages could be rendered.'));
   }
   let done = 0;
   const files: string[] = [];
+  const fonts = options.signature ? await loadFonts() : null;
   for (let s = 0; s < segments.length; s++) {
     const segment = segments[s];
     const surface = Skia.Surface.Make(width, segment.height);
     if (!surface) {
-      throw new Error('Not enough memory to stitch the long image. Turn on auto-cut or pick a smaller width.');
+      throw new Error(t('Not enough memory to stitch the long image. Turn on auto-cut or pick a smaller width.'));
     }
     const canvas = surface.getCanvas();
     canvas.drawColor(Skia.Color(PAPER));
@@ -91,10 +97,13 @@ async function exportLong({ pageIds, options, lang, tmpDir, outDir, base, step, 
     for (const index of segment.indices) {
       const image = await renderPageImage(pageIds[index], width, { lang });
       if (!image) {
-        throw new Error(`Page ${index + 1} couldn't be rendered.`);
+        throw new Error(t("Page {n} couldn't be rendered.", { n: index + 1 }));
       }
       canvas.drawImage(image, 0, y);
       image.dispose();
+      if (fonts) {
+        drawSignature(canvas, fonts, options.penName, { x: 0, y, w: width, h: heights[index] });
+      }
       y += heights[index] + options.gap;
       done++;
       await step(done);
@@ -117,12 +126,77 @@ async function exportLong({ pageIds, options, lang, tmpDir, outDir, base, step, 
   return { ...out, mime: MIME.zip, pages: files.length };
 }
 
+/** One framed image per panel, in reading order. Each page is drawn once and its panels are cut from it. */
+async function exportSocial({ pageIds, options, lang, tmpDir, outDir, base, step, claim }: Job): Promise<Output> {
+  const frame = SOCIAL_SIZE[options.socialShape];
+  const files: string[] = [];
+  const fonts = options.signature ? await loadFonts() : null;
+  for (let i = 0; i < pageIds.length; i++) {
+    const ctx = pageContext(pageIds[i]);
+    const ordered = ctx
+      ? panelOrder(ctx.page, ctx.rtl)
+          .map(id => ctx.shapes.find(shape => shape.id === id))
+          .filter(shape => shape !== undefined)
+      : [];
+    if (ctx && ordered.length > 0) {
+      const boxes = ordered.map(shape => shape.bbox);
+      const pageWidth = socialPageWidth(boxes, ctx.size.w, frame);
+      const image = await renderPageImage(pageIds[i], pageWidth, { lang });
+      if (!image) {
+        throw new Error(t("Page {n} couldn't be rendered.", { n: i + 1 }));
+      }
+      const pixels = image.width() / ctx.size.w;
+      for (const box of boxes) {
+        const surface = Skia.Surface.Make(frame.w, frame.h);
+        if (!surface) {
+          image.dispose();
+          throw new Error(t('Not enough memory to draw the panels.'));
+        }
+        const canvas = surface.getCanvas();
+        canvas.drawColor(Skia.Color(PAPER));
+        const place = socialPlacement(box, frame);
+        canvas.drawImageRectCubic(
+          image,
+          Skia.XYWHRect(box.x * pixels, box.y * pixels, box.w * pixels, box.h * pixels),
+          Skia.XYWHRect(place.x, place.y, place.w, place.h),
+          1 / 3,
+          1 / 3,
+        );
+        if (fonts) {
+          drawSignature(canvas, fonts, options.penName, { x: 0, y: 0, w: frame.w, h: frame.h });
+        }
+        surface.flush();
+        const file = `${tmpDir}/${padNumber(files.length + 1)}.png`;
+        await writeAndFree(surface.makeImageSnapshot(), file, 'png');
+        surface.dispose();
+        files.push(file);
+      }
+      image.dispose();
+    }
+    await step(i + 1);
+  }
+  if (files.length === 0) {
+    throw new Error(t('These pages have no panels to export.'));
+  }
+  if (files.length === 1) {
+    const out = await freeOutPath(outDir, `${base}-${options.socialShape}`, 'png');
+    claim(out.path);
+    await RNFS.copyFile(files[0], out.path);
+    return { ...out, mime: MIME.png, pages: 1 };
+  }
+  const out = await freeOutPath(outDir, `${base}-${options.socialShape}`, 'zip');
+  claim(out.path);
+  await zipDir(tmpDir, out.path);
+  return { ...out, mime: MIME.zip, pages: files.length };
+}
+
 async function exportPaged({ project, pageIds, options, lang, tmpDir, outDir, base, step, claim }: Job): Promise<Output> {
   const width = pageImageWidth(options.quality);
   const imageFormat = options.format === 'pdf' ? 'jpg' : 'png';
   const sheet = pageSize({ format: 'manga', pageSize: project.pageSize });
   const sheetH = Math.round((width * sheet.h) / sheet.w);
   const paths: string[] = [];
+  const fonts = options.signature ? await loadFonts() : null;
   if (options.cover) {
     const cover = await renderCover(project, options.penName, width, sheetH);
     if (cover) {
@@ -134,10 +208,10 @@ async function exportPaged({ project, pageIds, options, lang, tmpDir, outDir, ba
   for (let i = 0; i < pageIds.length; i++) {
     const image = await renderPageImage(pageIds[i], width, { lang });
     if (!image) {
-      throw new Error(`Page ${i + 1} couldn't be rendered.`);
+      throw new Error(t("Page {n} couldn't be rendered.", { n: i + 1 }));
     }
     const file = `${tmpDir}/${padNumber(i + 1)}.${imageFormat}`;
-    await writeAndFree(image, file, imageFormat);
+    await writeAndFree(fonts ? signImage(image, fonts, options.penName) : image, file, imageFormat);
     paths.push(file);
     await step(i + 1);
   }
@@ -150,7 +224,7 @@ async function exportPaged({ project, pageIds, options, lang, tmpDir, outDir, ba
     }
   }
   if (paths.length === 0) {
-    throw new Error('No pages could be rendered.');
+    throw new Error(t('No pages could be rendered.'));
   }
   if (options.format === 'pdf') {
     const out = await freeOutPath(outDir, base, 'pdf');
@@ -178,7 +252,7 @@ export async function runExport(
 ): Promise<ExportRecord> {
   const project = useStory.getState().projects[projectId];
   if (!project || pageIds.length === 0) {
-    throw new Error('There are no pages to export.');
+    throw new Error(t('There are no pages to export.'));
   }
   const outDir = await ensureProjectExportDir(projectId);
   const tmpDir = `${DIRS.tmp}/export-${uid()}`;
@@ -210,7 +284,12 @@ export async function runExport(
 
   try {
     await step(0);
-    const out = options.format === 'long' ? await exportLong(job) : await exportPaged(job);
+    const out =
+      options.format === 'long'
+        ? await exportLong(job)
+        : options.format === 'social'
+        ? await exportSocial(job)
+        : await exportPaged(job);
     if (isCancelled()) {
       throw new ExportCancelled();
     }

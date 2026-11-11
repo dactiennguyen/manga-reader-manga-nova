@@ -1,10 +1,11 @@
+import { msg, t, tn } from '../i18n';
 import type { Size } from '../layout/layout';
 import { spreadIndexOfPage } from './spreads';
 
 /** Height of the end card in the vertical webtoon list. Manga pages fill the frame. */
 export const END_CARD_HEIGHT = 420;
 
-export const FLAG_REASONS = ['Art', 'Dialogue', 'Layout', 'Reading order'] as const;
+export const FLAG_REASONS = [msg('Art'), msg('Dialogue'), msg('Layout'), msg('Reading order')] as const;
 
 export type ItemMetrics = { lengths: number[]; offsets: number[]; total: number };
 
@@ -58,6 +59,9 @@ export function itemOfSliderValue(value: number, groupCount: number, rtl: boolea
 
 /** Skia pages are invisible to a screen reader, so this is all it gets. */
 export function pageLabel(pageNumber: number, panels: number, done: boolean, flagged: boolean): string {
-  const count = `${panels} ${panels === 1 ? 'panel' : 'panels'}`;
-  return `Page ${pageNumber}, ${count}, ${done ? 'done' : 'not done'}${flagged ? ', flagged' : ''}`;
+  const params = { n: pageNumber, panels: tn(panels, '{count} panel', '{count} panels') };
+  if (done) {
+    return flagged ? t('Page {n}, {panels}, done, flagged', params) : t('Page {n}, {panels}, done', params);
+  }
+  return flagged ? t('Page {n}, {panels}, not done, flagged', params) : t('Page {n}, {panels}, not done', params);
 }

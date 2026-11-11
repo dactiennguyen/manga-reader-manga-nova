@@ -9,7 +9,17 @@ type LetteringPending = { kind: 'bubble'; type: BubbleType } | { kind: 'effect';
 export type LetteringView = { z: number; tx: number; ty: number };
 
 /** One overlay at a time: each opens from the screen or from a menu that has already closed. */
-type LetteringSheet = 'editor' | 'menu' | 'item' | 'list' | 'effects' | 'speaker' | 'language' | 'manage' | 'translate';
+type LetteringSheet =
+  | 'editor'
+  | 'menu'
+  | 'item'
+  | 'list'
+  | 'effects'
+  | 'presets'
+  | 'speaker'
+  | 'language'
+  | 'manage'
+  | 'translate';
 
 export type LetteringState = {
   box: Size;
@@ -33,6 +43,7 @@ export type LetteringAction =
   | { type: 'select'; selection: LetteringSelection }
   | { type: 'pend'; pending: LetteringPending }
   | { type: 'placedBubble'; id: ID }
+  | { type: 'placedPreset'; id: ID }
   | { type: 'placedEffect'; id: ID }
   | { type: 'showBubbles' }
   | { type: 'dragBubble'; draft: Bubble; guides: Guide[] }
@@ -81,6 +92,9 @@ export function letteringReducer(state: LetteringState, action: LetteringAction)
         selection: { kind: 'bubble', id: action.id },
         sheet: 'editor',
       };
+    case 'placedPreset':
+      // A preset arrives with its text, so it is selected and left ready to drag: no editor.
+      return { ...state, pending: null, hideBubbles: false, selection: { kind: 'bubble', id: action.id }, sheet: null };
     case 'placedEffect':
       return { ...state, pending: null, selection: { kind: 'effect', id: action.id } };
     case 'showBubbles':

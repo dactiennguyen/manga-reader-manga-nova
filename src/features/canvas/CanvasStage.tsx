@@ -5,6 +5,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import { useDerivedValue } from 'react-native-reanimated';
 
 import { transformBox } from '../../core/art/artMath';
+import { ROTATE_STEM } from '../../core/art/session';
 import type { PanelShape } from '../../core/layout/layout';
 import type { ArtLayer, ID } from '../../core/model/types';
 import { PANEL_BORDER, polyPath, recordPage, type PageContext } from '../../render/drawPage';
@@ -12,6 +13,7 @@ import { useEngineFonts } from '../../render/fonts';
 import { useImageCacheRev } from '../../render/images';
 import { INK } from '../../render/ink';
 import { recordGuideHandles, recordGuideLines, recordTransformFrame } from '../../render/liveStroke';
+import { recordLasso, recordSelectionFrame, recordSelectionScene } from '../../render/selectionScene';
 import { useColor } from '../../ui';
 import type { CanvasEngine } from './useCanvasEngine';
 
@@ -26,8 +28,14 @@ type LayerNodeProps = {
 };
 
 const LayerNode = memo(function LayerNodeInner({ id, opacity, active, mirrored, engine }: LayerNodeProps) {
-  const { contents, blank, xform, pendingPicture, livePicture, guide } = engine;
-  const picture = useDerivedValue<SkPicture>(() => contents.value[id] ?? blank);
+  const { contents, blank, xform, pendingPicture, livePicture, guide, selScene, selMatrix } = engine;
+  const picture = useDerivedValue<SkPicture>(() => {
+    const scene = selScene.value;
+    if (scene && scene.layerId === id) {
+      return recordSelectionScene(scene, selMatrix.value);
+    }
+    return contents.value[id] ?? blank;
+  });
   const transform = useDerivedValue(() => {
     const t = xform.value;
     return active ? [{ translateX: t.tx }, { translateY: t.ty }, { scale: t.s }] : [];
@@ -81,7 +89,7 @@ export function CanvasStage({
   engine: CanvasEngine;
   onLayout: (event: LayoutChangeEvent) => void;
 }) {
-  const { view, xform, frameBox, blank, gesture, guide } = engine;
+  const { view, xform, frameBox, blank, gesture, guide, selScene, selMatrix, lassoPath } = engine;
   const fonts = useEngineFonts();
   const imageRev = useImageCacheRev();
   const workspace = useColor('bg');
@@ -134,6 +142,13 @@ export function CanvasStage({
   const guideDots = useDerivedValue<SkPicture>(() =>
     guide.value ? recordGuideHandles(guide.value, bbox, unit.value, accent) : blank,
   );
+  const selectionFrame = useDerivedValue<SkPicture>(() => {
+    const scene = selScene.value;
+    return scene ? recordSelectionFrame(scene.box, selMatrix.value, unit.value, ROTATE_STEM, accent) : blank;
+  });
+  const lasso = useDerivedValue<SkPicture>(() =>
+    lassoPath.value ? recordLasso(lassoPath.value, unit.value, accent) : blank,
+  );
 
   return (
     <GestureDetector gesture={gesture}>
@@ -163,6 +178,8 @@ export function CanvasStage({
             )}
             <Picture picture={frame} />
             <Picture picture={guideDots} />
+            <Picture picture={selectionFrame} />
+            <Picture picture={lasso} />
           </Group>
         </Canvas>
       </View>

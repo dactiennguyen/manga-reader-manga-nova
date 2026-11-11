@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { AddUserIcon, CheckIcon, DeleteIcon, PlusIcon, ReadIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import type { Chapter, ID, WorldEntry } from '../../core/model/types';
 import { anchorLabel, entryMentions } from '../../core/world/worldTools';
 import { useAppNavigation } from '../../state/navigation';
@@ -32,27 +33,27 @@ export function EntryTypeFields({ entry, chapters }: { entry: WorldEntry; chapte
     <>
       {entry.type === 'term' && (
         <AutoField
-          label="Reading"
+          label={t('Reading')}
           value={entry.reading ?? ''}
           onCommit={reading => update(entry.id, { reading: reading.trim() || undefined })}
-          placeholder="Pronunciation or phonetic spelling"
+          placeholder={t('Pronunciation or phonetic spelling')}
           maxLength={80}
         />
       )}
       {entry.type === 'event' && (
         <View className="mb-4 gap-1">
-          <FieldLabel>Time anchor</FieldLabel>
+          <FieldLabel>{t('Time anchor')}</FieldLabel>
           <View className="overflow-hidden rounded-md bg-surface">
-            <ListItem title={anchorLabel(activeAnchor, chapters)} icon={WORLD_TYPE_ICON.event} chevron onPress={() => setAnchorMenu(true)} />
+            <ListItem title={t(anchorLabel(activeAnchor, chapters))} icon={WORLD_TYPE_ICON.event} chevron onPress={() => setAnchorMenu(true)} />
           </View>
         </View>
       )}
       {entry.type === 'faction' && (
         <View className="mb-4 gap-1">
-          <FieldLabel>Leader</FieldLabel>
+          <FieldLabel>{t('Leader')}</FieldLabel>
           <View className="overflow-hidden rounded-md bg-surface">
             <ListItem
-              title={leader ? leader.name.trim() || 'Unnamed' : 'Choose a leader'}
+              title={leader ? leader.name.trim() || t('Unnamed') : t('Choose a leader')}
               left={leader ? <Avatar character={leader} size={32} /> : undefined}
               icon={leader ? undefined : AddUserIcon}
               chevron
@@ -64,9 +65,9 @@ export function EntryTypeFields({ entry, chapters }: { entry: WorldEntry; chapte
       <Menu
         visible={anchorMenu}
         onClose={() => setAnchorMenu(false)}
-        title="Time anchor"
+        title={t('Time anchor')}
         items={anchorOptions.map(option => ({
-          label: anchorLabel(option.value, chapters),
+          label: t(anchorLabel(option.value, chapters)),
           icon: activeAnchor === option.value ? CheckIcon : undefined,
           onPress: () => update(entry.id, { anchor: option.value }),
         }))}
@@ -76,7 +77,7 @@ export function EntryTypeFields({ entry, chapters }: { entry: WorldEntry; chapte
         onClose={() => setPicking(false)}
         projectId={entry.projectId}
         selectedIds={entry.leaderId ? [entry.leaderId] : []}
-        title="Choose a leader"
+        title={t('Choose a leader')}
         allowClear
         onPick={characterId => update(entry.id, { leaderId: characterId })}
       />
@@ -102,10 +103,10 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
 
   return (
     <>
-      <SectionHeader>Related characters</SectionHeader>
+      <SectionHeader>{t('Related characters')}</SectionHeader>
       <View className="mt-2 flex-row flex-wrap items-center gap-2">
         {related.map(character => {
-          const name = character.name.trim() || 'Unnamed';
+          const name = character.name.trim() || t('Unnamed');
           return (
             <Pressable
               key={character.id}
@@ -122,21 +123,21 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
             </Pressable>
           );
         })}
-        <Button title="Add" icon={PlusIcon} variant="secondary" small onPress={() => setPicking(true)} />
+        <Button title={t('Add')} icon={PlusIcon} variant="secondary" small onPress={() => setPicking(true)} />
       </View>
       {related.length > 0 && (
         <Text variant="caption" tone="muted" className="mt-2">
-          Long-press a character to remove them from this entry.
+          {t('Long-press a character to remove them from this entry.')}
         </Text>
       )}
 
       <View className="mt-6 gap-2">
-        <SectionHeader>Appears in</SectionHeader>
+        <SectionHeader>{t('Appears in')}</SectionHeader>
         {mentions.length === 0 ? (
           <Text variant="caption" tone="muted">
             {entry.title.trim().length < 2
-              ? 'Give this entry a title of at least 2 characters to find the chapters that mention it.'
-              : 'No chapter script mentions this title yet.'}
+              ? t('Give this entry a title of at least 2 characters to find the chapters that mention it.')
+              : t('No chapter script mentions this title yet.')}
           </Text>
         ) : (
           <View className="overflow-hidden rounded-md bg-surface">
@@ -144,7 +145,7 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
               <ListItem
                 key={item.chapterId}
                 title={item.label}
-                subtitle={item.count === 1 ? '1 mention' : `${item.count} mentions`}
+                subtitle={tn(item.count, '{count} mention', '{count} mentions')}
                 icon={ReadIcon}
                 chevron
                 onPress={() => navigation.navigate('Script', { chapterId: item.chapterId, blockId: item.blockId })}
@@ -157,10 +158,10 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
       <Menu
         visible={!!chipCharacter}
         onClose={() => setChipMenuId(null)}
-        title={chipShown ? chipShown.name.trim() || 'Unnamed' : undefined}
+        title={chipShown ? chipShown.name.trim() || t('Unnamed') : undefined}
         items={[
           {
-            label: 'Remove from this entry',
+            label: t('Remove from this entry'),
             icon: DeleteIcon,
             destructive: true,
             onPress: () => update(entry.id, { characterIds: entry.characterIds.filter(id => id !== chipMenuId) }),
@@ -172,7 +173,7 @@ export function EntryLinks({ entry, chapters }: { entry: WorldEntry; chapters: C
         onClose={() => setPicking(false)}
         projectId={entry.projectId}
         excludeIds={entry.characterIds}
-        title="Related characters"
+        title={t('Related characters')}
         onPick={characterId => {
           if (characterId && !entry.characterIds.includes(characterId)) {
             update(entry.id, { characterIds: [...entry.characterIds, characterId] });

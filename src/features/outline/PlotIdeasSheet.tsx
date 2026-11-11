@@ -3,16 +3,32 @@ import { ScrollView, View } from 'react-native';
 import { AiIcon, CaretLeftIcon, DeleteIcon, InfoIcon, PlusIcon, RefreshIcon } from '../../ui/icons';
 
 import { suggestPlots, type PlotDirection } from '../../core/ai/story';
+import { t, tn } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { existingWork, planActsOf, planPlotApply, storyIsBlank, type PlotApplyMode } from '../../core/story/plotPlan';
-import { plural } from '../../core/util/format';
 import { useProject } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { undoStory, undoable, useStory } from '../../state/useStory';
 import { Banner, Button, Sheet, Text, confirm, snackbar, toast } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from './AiParts';
+
+/** The directions as one text, as they are reported. */
+function directionsText(directions: PlotDirection[]): string {
+  return directions
+    .map(direction =>
+      [
+        [direction.tone, direction.title].filter(Boolean).join(': '),
+        direction.summary,
+        ...direction.acts.flat().map(chapter => `- ${[chapter.title, chapter.summary].filter(Boolean).join(': ')}`),
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    )
+    .join('\n\n');
+}
 
 export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose: () => void }) {
   const navigation = useAppNavigation();
@@ -54,7 +70,7 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
     }
     const plan = planPlotApply(planActsOf(current, store.chapters), direction.acts, mode);
     if (!plan.create.length) {
-      toast('This direction has no chapters to add');
+      toast(t('This direction has no chapters to add'));
       return;
     }
     const scope = `project:${projectId}` as const;
@@ -69,9 +85,11 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
         }),
       );
     });
-    const message = `${plural(plan.create.length, 'chapter')} added from "${direction.title}"`;
+    const message = tn(plan.create.length, '{count} chapter added from "{title}"', '{count} chapters added from "{title}"', {
+      title: direction.title,
+    });
     sheet.closeThen(() =>
-      snackbar(plan.remove.length ? { message } : { message, actionLabel: 'Undo', onAction: () => undoStory(scope) }),
+      snackbar(plan.remove.length ? { message } : { message, actionLabel: t('Undo'), onAction: () => undoStory(scope) }),
     );
   };
 
@@ -83,16 +101,19 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
     }
   };
 
-  const extras = [work.scenes ? plural(work.scenes, 'script scene') : '', work.pages ? plural(work.pages, 'drawn page') : '']
-    .filter(Boolean)
-    .join(' and ');
-  const lostText = `${plural(work.chapters, 'chapter')} with ${extras || 'everything written in them'}`;
+  const lostChapters = tn(work.chapters, '{count} chapter', '{count} chapters');
+  const lostScenes = work.scenes ? tn(work.scenes, '{count} script scene', '{count} script scenes') : '';
+  const lostPages = work.pages ? tn(work.pages, '{count} drawn page', '{count} drawn pages') : '';
+  const extras = lostScenes && lostPages ? t('{scenes} and {pages}', { scenes: lostScenes, pages: lostPages }) : lostScenes || lostPages;
+  const lostText = extras
+    ? t('{chapters} with {extras}', { chapters: lostChapters, extras })
+    : t('{chapters} with everything written in them', { chapters: lostChapters });
 
   const replace = async (direction: PlotDirection) => {
     const ok = await confirm(
-      `Replace ${plural(work.chapters, 'existing chapter')}?`,
-      `This deletes ${lostText}. This cannot be undone.`,
-      { confirmText: 'Delete and replace', destructive: true },
+      tn(work.chapters, 'Replace {count} existing chapter?', 'Replace {count} existing chapters?'),
+      t('This deletes {what}. This cannot be undone.', { what: lostText }),
+      { confirmText: t('Delete and replace'), destructive: true },
     );
     if (ok) {
       apply(direction, 'replace');
@@ -101,14 +122,14 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
 
   const renderDirection = (direction: PlotDirection, index: number) => (
     <View key={index} className="gap-2 rounded-lg bg-surface p-3">
-      <AiMark label={direction.tone || `Direction ${index + 1}`} />
+      <AiMark label={direction.tone || t('Direction {n}', { n: index + 1 })} />
       <Text variant="heading">{direction.title}</Text>
       {!!direction.summary && <Text tone="secondary">{direction.summary}</Text>}
       {direction.acts.map((list, actIndex) =>
         list.length ? (
           <View key={actIndex} className="mt-1 gap-1">
             <Text variant="caption" tone="muted">
-              {acts[actIndex]?.title ?? `Act ${actIndex + 1}`}
+              {acts[actIndex] ? t(acts[actIndex].title) : t('Act {n}', { n: actIndex + 1 })}
             </Text>
             {list.map((chapter, chapterIndex) => (
               <View key={chapterIndex} className="py-0.5 pl-2">
@@ -123,33 +144,37 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
           </View>
         ) : null,
       )}
-      <Button title="Use this direction" icon={AiIcon} variant="ai" onPress={() => use(direction)} />
+      <Button title={t('Use this direction')} icon={AiIcon} variant="ai" onPress={() => use(direction)} />
     </View>
   );
 
   const renderPicked = (direction: PlotDirection) => (
     <>
       <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
-        <AiMark label={direction.tone || 'AI suggestion'} />
+        <AiMark label={direction.tone || t('AI suggestion')} />
         <Text variant="heading">{direction.title}</Text>
         <Text tone="secondary">
-          Your story already has {plural(work.chapters, 'chapter')}. What should happen to {work.chapters === 1 ? 'it' : 'them'}?
+          {tn(
+            work.chapters,
+            'Your story already has {count} chapter. What should happen to it?',
+            'Your story already has {count} chapters. What should happen to them?',
+          )}
         </Text>
         <View className="gap-2 rounded-md bg-surface p-3">
           <Text variant="caption" tone="secondary">
-            Keeps everything you have. The new chapters go after the existing ones in each act.
+            {t('Keeps everything you have. The new chapters go after the existing ones in each act.')}
           </Text>
-          <Button title="Add after existing chapters" icon={PlusIcon} onPress={() => apply(direction, 'append')} />
+          <Button title={t('Add after existing chapters')} icon={PlusIcon} onPress={() => apply(direction, 'append')} />
         </View>
         <View className="gap-2 rounded-md bg-danger/15 p-3">
           <Text variant="caption" tone="danger">
-            Deletes {lostText}. This cannot be undone.
+            {t('Deletes {what}. This cannot be undone.', { what: lostText })}
           </Text>
-          <Button title="Replace existing chapters" icon={DeleteIcon} variant="danger" onPress={() => replace(direction)} />
+          <Button title={t('Replace existing chapters')} icon={DeleteIcon} variant="danger" onPress={() => replace(direction)} />
         </View>
       </ScrollView>
       <SheetFooter>
-        <Button title="Back to directions" icon={CaretLeftIcon} variant="ghost" onPress={() => setPicked(null)} />
+        <Button title={t('Back to directions')} icon={CaretLeftIcon} variant="ghost" onPress={() => setPicked(null)} />
       </SheetFooter>
     </>
   );
@@ -158,32 +183,32 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
     <>
       <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
         <Text tone="secondary">
-          The AI proposes up to three directions for your plot, with chapters for each act, based on:
+          {t('The AI proposes up to three directions for your plot, with chapters for each act, based on:')}
         </Text>
         <View className="gap-0.5 rounded-md bg-surface p-3">
           <Text variant="caption" tone="muted">
-            Title
+            {t('Title')}
           </Text>
-          <Text>{project.title || 'Untitled'}</Text>
+          <Text>{project.title || t('Untitled')}</Text>
           <Text variant="caption" tone="muted" className="mt-2">
-            Genres
+            {t('Genres')}
           </Text>
-          <Text>{project.genres.length ? project.genres.join(', ') : 'None chosen'}</Text>
+          <Text>{project.genres.length ? project.genres.map(genre => t(genre)).join(', ') : t('None chosen')}</Text>
           <Text variant="caption" tone="muted" className="mt-2">
-            Logline
+            {t('Logline')}
           </Text>
-          <Text tone={logline ? 'text' : 'muted'}>{logline || 'Not written yet'}</Text>
+          <Text tone={logline ? 'text' : 'muted'}>{logline || t('Not written yet')}</Text>
         </View>
         {!logline && (
           <Banner
             tone="warning"
             icon={InfoIcon}
-            text="Without a logline the suggestions will be generic. You can write one sentence about your story at the top of the outline first, or continue anyway."
+            text={t('Without a logline the suggestions will be generic. You can write one sentence about your story at the top of the outline first, or continue anyway.')}
           />
         )}
       </ScrollView>
       <SheetFooter>
-        <Button title={logline ? 'Suggest plot directions' : 'Continue anyway'} icon={AiIcon} variant="ai" onPress={generate} />
+        <Button title={logline ? t('Suggest plot directions') : t('Continue anyway')} icon={AiIcon} variant="ai" onPress={generate} />
       </SheetFooter>
     </>
   );
@@ -196,14 +221,14 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
       return renderPicked(picked);
     }
     if (state.status === 'loading') {
-      return <AiBusy label="Thinking up plot directions…" onCancel={cancel} />;
+      return <AiBusy label={t('Thinking up plot directions…')} onCancel={cancel} />;
     }
     if (state.status === 'error') {
       return (
         <>
           <AiFailure message={state.message} onRetry={generate} />
           <SheetFooter>
-            <Button title="Back" variant="ghost" onPress={reset} />
+            <Button title={t('Back')} variant="ghost" onPress={reset} />
           </SheetFooter>
         </>
       );
@@ -213,12 +238,15 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
         <>
           <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
             <Text variant="caption" tone="muted">
-              Nothing changes in your story until you choose a direction.
+              {t('Nothing changes in your story until you choose a direction.')}
             </Text>
             {state.data.map(renderDirection)}
           </ScrollView>
           <SheetFooter>
-            <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} />
+            <View className="flex-row gap-2">
+              <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
+              <ReportAiButton text={directionsText(state.data)} feature="plotIdeas" />
+            </View>
           </SheetFooter>
         </>
       );
@@ -231,7 +259,7 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
       visible={sheet.visible}
       onClose={sheet.close}
       onClosed={sheet.onClosed}
-      title="AI plot ideas"
+      title={t('AI plot ideas')}
       subtitle={project.title}
       scroll={false}
       maxHeight="90%"

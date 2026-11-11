@@ -4,16 +4,17 @@ import { ReadIcon, RefreshIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { findPlotHoles, type PlotHole } from '../../core/ai/people';
+import { t, tn } from '../../core/i18n';
 import { chapterIdsOf } from '../../core/model/selectors';
 import type { ID } from '../../core/model/types';
 import { matchChapter } from '../../core/story/plotHoles';
-import { plural } from '../../core/util/format';
 import { useProject } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import { Button, Sheet, Tag, Text } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from './AiParts';
 
 export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose: () => void }) {
@@ -58,7 +59,7 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
       <View key={index} className="gap-2 rounded-lg bg-surface p-3">
         <View className="flex-row items-center justify-between gap-2">
           <Text variant="caption" tone="ai">
-            Issue {index + 1}
+            {t('Issue {n}', { n: index + 1 })}
           </Text>
           {!!hole.chapter && <Tag label={hole.chapter} icon={ReadIcon} />}
         </View>
@@ -66,14 +67,14 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
         {!!hole.suggestion && (
           <View className="gap-0.5">
             <Text variant="caption" tone="muted">
-              Suggestion
+              {t('Suggestion')}
             </Text>
             <Text tone="secondary">{hole.suggestion}</Text>
           </View>
         )}
         {chapterId !== undefined && (
           <Button
-            title="Open chapter"
+            title={t('Open chapter')}
             icon={ReadIcon}
             variant="secondary"
             small
@@ -90,14 +91,14 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
       return <AiSetupNotice onOpenProfile={openProfile} />;
     }
     if (state.status === 'loading') {
-      return <AiBusy label="Reading the outline and characters…" onCancel={cancel} />;
+      return <AiBusy label={t('Reading the outline and characters…')} onCancel={cancel} />;
     }
     if (state.status === 'error') {
       return (
         <>
           <AiFailure message={state.message} onRetry={generate} />
           <SheetFooter>
-            <Button title="Close" variant="ghost" onPress={sheet.close} />
+            <Button title={t('Close')} variant="ghost" onPress={sheet.close} />
           </SheetFooter>
         </>
       );
@@ -106,16 +107,20 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
       return (
         <>
           <ScrollView contentContainerClassName="gap-3 px-4 pb-4">
-            <AiMark label={plural(state.data.length, 'issue')} />
+            <AiMark label={tn(state.data.length, '{count} issue', '{count} issues')} />
             <Text variant="caption" tone="muted">
-              These are an editor's notes to think about. Nothing in your story is changed.
+              {t("These are an editor's notes to think about. Nothing in your story is changed.")}
             </Text>
             {state.data.map(renderHole)}
           </ScrollView>
           <SheetFooter>
             <View className="flex-row gap-2">
-              <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
-              <Button title="Close" variant="ghost" onPress={sheet.close} className="flex-1" />
+              <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
+              <Button title={t('Close')} variant="ghost" onPress={sheet.close} className="flex-1" />
+              <ReportAiButton
+                text={state.data.map(hole => [hole.chapter, hole.issue, hole.suggestion].filter(Boolean).join(': ')).join('\n')}
+                feature="plotHoles"
+              />
             </View>
           </SheetFooter>
         </>
@@ -125,12 +130,11 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
       <>
         <View className="px-4 pb-4">
           <Text tone="secondary">
-            The AI reads your outline and characters and lists contradictions, dropped threads and characters without a
-            clear motive.
+            {t('The AI reads your outline and characters and lists contradictions, dropped threads and characters without a clear motive.')}
           </Text>
         </View>
         <SheetFooter>
-          <Button title="Find plot holes" variant="ai" onPress={generate} />
+          <Button title={t('Find plot holes')} variant="ai" onPress={generate} />
         </SheetFooter>
       </>
     );
@@ -141,7 +145,7 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
       visible={sheet.visible}
       onClose={sheet.close}
       onClosed={sheet.onClosed}
-      title="Find plot holes"
+      title={t('Find plot holes')}
       subtitle={project.title}
       scroll={false}
       maxHeight="90%"

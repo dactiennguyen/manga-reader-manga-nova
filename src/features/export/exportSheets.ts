@@ -1,4 +1,4 @@
-import { Skia, TextAlign, type SkImage, type SkTypefaceFontProvider } from '@shopify/react-native-skia';
+import { Skia, TextAlign, type SkCanvas, type SkImage, type SkTypefaceFontProvider } from '@shopify/react-native-skia';
 
 import type { Project } from '../../core/model/types';
 import { dayKey } from '../../core/util/time';
@@ -75,4 +75,54 @@ export async function renderInfo(project: Project, penName: string, w: number, h
   }
   surface.flush();
   return surface.makeImageSnapshot();
+}
+
+type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * The pen name in the bottom right corner of `box`, with a paper-coloured glow so it reads over
+ * both white paper and solid ink. It is part of the exported image, so it is not translated.
+ */
+export function drawSignature(canvas: SkCanvas, fonts: SkTypefaceFontProvider, name: string, box: Box): void {
+  const text = name.trim();
+  if (!text) {
+    return;
+  }
+  const fontSize = Math.max(14, box.w * 0.024);
+  const margin = box.w * 0.03;
+  const glow = { color: Skia.Color(PAPER), blurRadius: fontSize * 0.25 };
+  const builder = Skia.ParagraphBuilder.Make(
+    {
+      textAlign: TextAlign.Right,
+      maxLines: 1,
+      textStyle: {
+        color: Skia.Color(INK),
+        fontFamilies: [FONT_FAMILY.sansBold],
+        fontSize,
+        // One blurred copy is too faint over black ink.
+        shadows: [glow, glow, glow],
+      },
+    },
+    fonts,
+  );
+  builder.addText(text);
+  const built = builder.build();
+  built.layout(box.w - margin * 2);
+  built.paint(canvas, box.x + margin, box.y + box.h - margin - built.getHeight());
+}
+
+/** Returns a signed copy and frees the image it was given. */
+export function signImage(image: SkImage, fonts: SkTypefaceFontProvider, name: string): SkImage {
+  const surface = Skia.Surface.Make(image.width(), image.height());
+  if (!surface) {
+    return image;
+  }
+  const canvas = surface.getCanvas();
+  canvas.drawImage(image, 0, 0);
+  drawSignature(canvas, fonts, name, { x: 0, y: 0, w: image.width(), h: image.height() });
+  surface.flush();
+  const signed = surface.makeImageSnapshot();
+  surface.dispose();
+  image.dispose();
+  return signed;
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AiIcon, ArrowDownIcon, ArrowUpIcon, BackIcon, ColumnsIcon, DeleteIcon, EditIcon, ForwardIcon, ListIcon, MoveToIcon, ShareIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import type { Act, Chapter, ID, Project } from '../../core/model/types';
 import { chapterCount, chapterEdges, locateChapter, shiftTarget } from '../../core/story/outlineTools';
 import { useStory } from '../../state/useStory';
@@ -56,48 +57,51 @@ export function useOutlineMenu({
     if (target) {
       story().moveChapter(chapterId, target.actId, target.index);
       if (target.crossed) {
-        toast(`Moved to ${target.crossed}`);
+        toast(t('Moved to {act}', { act: t(target.crossed) }));
       }
     }
   };
 
   const requestRemoveAct = async (act: Act) => {
     if (acts.length <= 1) {
-      toast('A story needs at least one act');
+      toast(t('A story needs at least one act'));
       return;
     }
     if (act.chapterIds.length > 0) {
       open({ kind: 'removeAct', actId: act.id });
       return;
     }
-    const ok = await confirm(`Delete "${act.title}"?`, 'This act is empty.', { confirmText: 'Delete act', destructive: true });
+    const ok = await confirm(t('Delete "{name}"?', { name: t(act.title) }), t('This act is empty.'), {
+      confirmText: t('Delete act'),
+      destructive: true,
+    });
     if (ok) {
       story().removeAct(projectId, act.id);
     }
   };
 
   const mainMenu = (): MenuContent => ({
-    title: 'Outline',
+    title: t('Outline'),
     items: [
-      { label: listMode ? 'View as board' : 'View as list', icon: listMode ? ColumnsIcon : ListIcon, onPress: actions.toggleList },
-      { label: 'AI plot ideas', icon: AiIcon, onPress: actions.openPlotIdeas },
-      { label: 'Find plot holes (AI)', icon: AiIcon, onPress: actions.openPlotHoles },
-      { label: 'Export outline as text', icon: ShareIcon, onPress: actions.shareOutline },
+      { label: listMode ? t('View as board') : t('View as list'), icon: listMode ? ColumnsIcon : ListIcon, onPress: actions.toggleList },
+      { label: t('AI plot ideas'), icon: AiIcon, onPress: actions.openPlotIdeas },
+      { label: t('Find plot holes (AI)'), icon: AiIcon, onPress: actions.openPlotHoles },
+      { label: t('Export outline as text'), icon: ShareIcon, onPress: actions.shareOutline },
     ],
   });
 
   const chapterMenu = (id: ID): MenuContent => {
     const { first, last } = chapterEdges(acts, id);
     return {
-      title: `Chapter ${numbers[id] ?? ''}`,
+      title: t('Chapter {n}', { n: numbers[id] ?? '' }),
       subtitle: chapters[id]?.title,
       items: [
-        { label: 'Edit chapter', icon: EditIcon, onPress: () => actions.editChapter(id) },
-        { label: 'Break into scenes (AI)', icon: AiIcon, onPress: () => actions.breakIntoScenes(id) },
-        { label: 'Move up', icon: ArrowUpIcon, disabled: first, onPress: () => shiftChapter(id, -1) },
-        { label: 'Move down', icon: ArrowDownIcon, disabled: last, onPress: () => shiftChapter(id, 1) },
+        { label: t('Edit chapter'), icon: EditIcon, onPress: () => actions.editChapter(id) },
+        { label: t('Break into scenes (AI)'), icon: AiIcon, onPress: () => actions.breakIntoScenes(id) },
+        { label: t('Move up'), icon: ArrowUpIcon, disabled: first, onPress: () => shiftChapter(id, -1) },
+        { label: t('Move down'), icon: ArrowDownIcon, disabled: last, onPress: () => shiftChapter(id, 1) },
         acts.length > 1 && {
-          label: 'Move to act…',
+          label: t('Move to act…'),
           icon: MoveToIcon,
           onPress: () => open({ kind: 'chapterToAct', chapterId: id }),
         },
@@ -108,12 +112,12 @@ export function useOutlineMenu({
   const chapterToActMenu = (id: ID): MenuContent => {
     const current = locateChapter(acts, id).act;
     return {
-      title: 'Move to act',
+      title: t('Move to act'),
       subtitle: chapters[id]?.title,
       items: acts
         .filter(act => act.id !== current?.id)
         .map(act => ({
-          label: act.title,
+          label: t(act.title),
           subtitle: chapterCount(act.chapterIds.length),
           onPress: () => story().moveChapter(id, act.id, act.chapterIds.length),
         })),
@@ -121,16 +125,20 @@ export function useOutlineMenu({
   };
 
   const removeActMenu = (act: Act): MenuContent => ({
-    title: `Delete "${act.title}"`,
-    subtitle: `This act still has ${chapterCount(act.chapterIds.length)}. Which act should they move to?`,
+    title: t('Delete "{name}"', { name: t(act.title) }),
+    subtitle: tn(
+      act.chapterIds.length,
+      'This act still has {count} chapter. Which act should they move to?',
+      'This act still has {count} chapters. Which act should they move to?',
+    ),
     items: acts
       .filter(item => item.id !== act.id)
       .map(item => ({
-        label: item.title,
+        label: t(item.title),
         subtitle: chapterCount(item.chapterIds.length),
         onPress: () => {
           story().removeAct(projectId, act.id, item.id);
-          toast(`Chapters moved to ${item.title}`);
+          toast(t('Chapters moved to {act}', { act: t(item.title) }));
         },
       })),
   });
@@ -138,23 +146,23 @@ export function useOutlineMenu({
   const actMenu = (act: Act): MenuContent => {
     const actIndex = acts.indexOf(act);
     return {
-      title: act.title,
+      title: t(act.title),
       subtitle: chapterCount(act.chapterIds.length),
       items: [
-        { label: 'Rename', icon: EditIcon, onPress: () => actions.renameAct(act.id) },
+        { label: t('Rename'), icon: EditIcon, onPress: () => actions.renameAct(act.id) },
         {
-          label: 'Move left',
+          label: t('Move left'),
           icon: BackIcon,
           disabled: actIndex === 0,
           onPress: () => story().moveAct(projectId, act.id, -1),
         },
         {
-          label: 'Move right',
+          label: t('Move right'),
           icon: ForwardIcon,
           disabled: actIndex === acts.length - 1,
           onPress: () => story().moveAct(projectId, act.id, 1),
         },
-        { label: 'Delete act', icon: DeleteIcon, destructive: true, onPress: () => requestRemoveAct(act) },
+        { label: t('Delete act'), icon: DeleteIcon, destructive: true, onPress: () => requestRemoveAct(act) },
       ],
     };
   };

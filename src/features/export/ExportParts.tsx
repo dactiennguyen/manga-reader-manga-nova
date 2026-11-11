@@ -4,13 +4,20 @@ import { CheckIcon, DeleteIcon } from '../../ui/icons';
 
 import type { ExportRecord } from '../../core/export/history';
 import type { ExportFormat } from '../../core/export/plan';
+import { msg, t } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { formatBytes } from '../../core/util/format';
 import { formatRelative } from '../../core/util/time';
 import { useThumb } from '../../render/thumbs';
 import { Divider, ICON, Icon, IconButton, ListItem, Pressable, Text, type IconGlyph } from '../../ui';
 
-export const FORMAT_LABEL: Record<ExportFormat, string> = { png: 'PNG', pdf: 'PDF', cbz: 'CBZ', long: 'Long image' };
+export const FORMAT_LABEL: Record<ExportFormat, string> = {
+  png: 'PNG',
+  pdf: 'PDF',
+  cbz: 'CBZ',
+  long: msg('Long image'),
+  social: msg('Social posts'),
+};
 
 export function FormatCard({
   icon,
@@ -68,7 +75,7 @@ function Thumb({ pageId, index }: { pageId: ID; index: number }) {
         {uri && (
           <Image
             accessibilityIgnoresInvertColors
-            accessibilityLabel={`Page ${index + 1}`}
+            accessibilityLabel={t('Page {n}', { n: index + 1 })}
             source={{ uri }}
             resizeMode="cover"
             className="h-full w-full"
@@ -121,8 +128,8 @@ export function HistoryList({
                   title={item.fileName}
                   subtitle={
                     gone
-                      ? 'File deleted'
-                      : `${FORMAT_LABEL[item.format]} · ${formatBytes(item.size)} · ${formatRelative(item.createdAt)}`
+                      ? t('File deleted')
+                      : `${t(FORMAT_LABEL[item.format])} · ${formatBytes(item.size)} · ${formatRelative(item.createdAt)}`
                   }
                   disabled={gone}
                   onPress={() => onPress(item)}
@@ -133,7 +140,7 @@ export function HistoryList({
                 size={ICON.md}
                 color="text-muted"
                 onPress={() => onDelete(item)}
-                accessibilityLabel={`Delete ${item.fileName}`}
+                accessibilityLabel={t('Delete {name}', { name: item.fileName })}
               />
             </View>
           </View>

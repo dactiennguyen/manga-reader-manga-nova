@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated';
 
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { ArtLayer, ID, PanelArt } from '../../core/model/types';
 import {
@@ -41,7 +42,7 @@ export function LayerPanel({
 
   const add = () => {
     if (full) {
-      toast(`Up to ${LIMITS.layers} layers`);
+      toast(t('Up to {max} layers', { max: LIMITS.layers }));
       return;
     }
     const at = art.layers.findIndex(item => item.id === art.activeLayerId);
@@ -50,13 +51,13 @@ export function LayerPanel({
 
   const remove = async (layer: ArtLayer) => {
     if (art.layers.length <= 1) {
-      toast('Keep at least one layer');
+      toast(t('Keep at least one layer'));
       return;
     }
     if (
       (layer.strokes.length || layer.image) &&
-      !(await confirm(`Delete layer "${layer.name}"?`, 'Its strokes will be lost.', {
-        confirmText: 'Delete',
+      !(await confirm(t('Delete layer "{name}"?', { name: layer.name }), t('Its strokes will be lost.'), {
+        confirmText: t('Delete'),
         destructive: true,
       }))
     ) {
@@ -87,11 +88,11 @@ export function LayerPanel({
       return;
     }
     if (lower.locked) {
-      toast('The layer below is locked');
+      toast(t('The layer below is locked'));
       return;
     }
     if (upper.image && (lower.image || lower.strokes.length)) {
-      toast('Cannot merge an image layer onto a layer with content');
+      toast(t('Cannot merge an image layer onto a layer with content'));
       return;
     }
     const strokes = upper.strokes.map(stroke =>
@@ -105,18 +106,18 @@ export function LayerPanel({
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close layers panel" />
+      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel={t('Close layers panel')} />
       <Animated.View
         entering={(side === 'right' ? SlideInRight : SlideInLeft).duration(160)}
         className={`absolute bottom-0 top-0 w-72 bg-raised p-2 ${side === 'right' ? 'right-0' : 'left-0'}`}
       >
         <View className="flex-row items-center">
           <Text variant="label" tone="secondary" className="flex-1 pl-1">
-            Layers {art.layers.length}/{LIMITS.layers}
+            {t('Layers {count}/{max}', { count: art.layers.length, max: LIMITS.layers })}
           </Text>
-          <IconButton icon={ImageIcon} size={ICON.md} onPress={onImportImage} accessibilityLabel="Import image into layer" />
-          <IconButton icon={PlusIcon} size={ICON.md} onPress={add} disabled={full} accessibilityLabel="Add layer" />
-          <IconButton icon={CloseIcon} size={ICON.md} onPress={onClose} accessibilityLabel="Close" />
+          <IconButton icon={ImageIcon} size={ICON.md} onPress={onImportImage} accessibilityLabel={t('Import image into layer')} />
+          <IconButton icon={PlusIcon} size={ICON.md} onPress={add} disabled={full} accessibilityLabel={t('Add layer')} />
+          <IconButton icon={CloseIcon} size={ICON.md} onPress={onClose} accessibilityLabel={t('Close')} />
         </View>
         <ScrollView contentContainerClassName="gap-2 pb-4">
           {art.layers
@@ -133,27 +134,30 @@ export function LayerPanel({
                     <IconButton
                       icon={layer.visible ? PreviewIcon : HiddenIcon}
                       size={ICON.md}
-                      accessibilityLabel={layer.visible ? 'Hide layer' : 'Show layer'}
+                      accessibilityLabel={layer.visible ? t('Hide layer') : t('Show layer')}
                       onPress={() => editLayer(panelId, layer.id, { visible: !layer.visible })}
                     />
                     <Pressable
                       className="min-h-12 flex-1 justify-center"
                       onPress={() => setActiveLayer(panelId, layer.id)}
-                      accessibilityLabel={`Select layer ${layer.name}`}
+                      accessibilityLabel={t('Select layer {name}', { name: layer.name })}
                       accessibilityState={{ selected: active }}
                     >
                       <Text variant="label" numberOfLines={1}>
                         {layer.name}
                       </Text>
                       <Text variant="caption" tone="muted">
-                        {Math.round(layer.opacity * 100)}% · {layer.strokes.length} strokes
-                        {layer.image ? ' · image' : ''}
+                        {Math.round(layer.opacity * 100)}% ·{' '}
+                        {layer.strokes.length === 1
+                          ? t('{count} stroke', { count: layer.strokes.length })
+                          : t('{count} strokes', { count: layer.strokes.length })}
+                        {layer.image ? ` · ${t('image')}` : ''}
                       </Text>
                     </Pressable>
                     <IconButton
                       icon={layer.locked ? LockIcon : UnlockIcon}
                       size={ICON.md}
-                      accessibilityLabel={layer.locked ? 'Unlock layer' : 'Lock layer'}
+                      accessibilityLabel={layer.locked ? t('Unlock layer') : t('Lock layer')}
                       onPress={() => editLayer(panelId, layer.id, { locked: !layer.locked })}
                     />
                   </View>
@@ -161,7 +165,7 @@ export function LayerPanel({
                     <>
                       <View className="px-2">
                         <Slider
-                          label="Layer opacity"
+                          label={t('Layer opacity')}
                           value={layer.opacity}
                           min={0}
                           max={1}
@@ -176,31 +180,31 @@ export function LayerPanel({
                         <IconButton
                           icon={ArrowUpIcon}
                           size={ICON.md}
-                          accessibilityLabel="Move layer up"
+                          accessibilityLabel={t('Move layer up')}
                           onPress={() => move(index, 1)}
                           disabled={index >= art.layers.length - 1}
                         />
                         <IconButton
                           icon={ArrowDownIcon}
                           size={ICON.md}
-                          accessibilityLabel="Move layer down"
+                          accessibilityLabel={t('Move layer down')}
                           onPress={() => move(index, -1)}
                           disabled={index === 0}
                         />
                         <IconButton
                           icon={MergeIcon}
                           size={ICON.md}
-                          accessibilityLabel="Merge down"
+                          accessibilityLabel={t('Merge down')}
                           onPress={() => mergeDown(index)}
                           disabled={index === 0}
                         />
                         <IconButton
                           icon={EditIcon}
                           size={ICON.md}
-                          accessibilityLabel="Rename layer"
+                          accessibilityLabel={t('Rename layer')}
                           onPress={() => setRenameId(layer.id)}
                         />
-                        <IconButton icon={DeleteIcon} size={ICON.md} accessibilityLabel="Delete layer" onPress={() => remove(layer)} />
+                        <IconButton icon={DeleteIcon} size={ICON.md} accessibilityLabel={t('Delete layer')} onPress={() => remove(layer)} />
                       </View>
                     </>
                   ) : null}
@@ -212,7 +216,7 @@ export function LayerPanel({
       <PromptDialog
         visible={!!renaming}
         onClose={() => setRenameId(null)}
-        title="Rename layer"
+        title={t('Rename layer')}
         initialValue={renaming?.name ?? ''}
         maxLength={30}
         onSubmit={value => {

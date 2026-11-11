@@ -3,6 +3,7 @@ import { Modal, Pressable as RNPressable, View, type TextInputProps } from 'reac
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 import { Button, type ButtonVariant } from './Button';
+import { t } from '../core/i18n';
 import { ModalShownContext, useModalShown } from './modalShown';
 import { DIALOG_SHADOW } from './shadows';
 import { Text } from './Text';
@@ -43,7 +44,7 @@ export function Dialog({
       navigationBarTranslucent
     >
       <KeyboardAvoidingView behavior="padding" className="flex-1 items-center justify-center p-6">
-        <RNPressable accessibilityLabel="Close" className="absolute inset-0 bg-scrim" onPress={onClose} />
+        <RNPressable accessibilityLabel={t('Close')} className="absolute inset-0 bg-scrim" onPress={onClose} />
         <View accessibilityViewIsModal className="max-h-[90%] w-full max-w-[560px] gap-3 rounded-xl bg-overlay p-6" style={{ boxShadow: DIALOG_SHADOW }}>
           {!!title && (
             <Text variant="title" accessibilityRole="header">
@@ -80,7 +81,7 @@ export function PromptDialog({
   message,
   initialValue = '',
   placeholder,
-  confirmText = 'Save',
+  confirmText = t('Save'),
   maxLength,
   multiline,
   allowEmpty,
@@ -118,7 +119,7 @@ export function PromptDialog({
       title={title}
       message={message}
       actions={[
-        { label: 'Cancel', onPress: onClose, variant: 'ghost' },
+        { label: t('Cancel'), onPress: onClose, variant: 'ghost' },
         { label: confirmText, onPress: submit, variant: 'primary', disabled: blocked },
       ]}
     >

@@ -1,3 +1,5 @@
+import { msg, t, tn } from '../i18n';
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function dayKey(time: number = Date.now()): string {
@@ -12,33 +14,39 @@ export function dayKeyToDate(key: string): Date {
   return new Date(y, m - 1, d);
 }
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const WEEKDAYS = [msg('Sun'), msg('Mon'), msg('Tue'), msg('Wed'), msg('Thu'), msg('Fri'), msg('Sat')];
 
-function formatDate(time: number, withWeekday = false): string {
+/** Sun is 0, as in Date.getDay(). */
+export function weekdayName(index: number): string {
+  return t(WEEKDAYS[index] ?? '');
+}
+
+export function formatDate(time: number, withWeekday = false): string {
   const d = new Date(time);
-  const date = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(
-    2,
-    '0',
-  )}/${d.getFullYear()}`;
-  return withWeekday ? `${WEEKDAYS[d.getDay()]}, ${date}` : date;
+  const date = t('{day}/{month}/{year}', {
+    day: String(d.getDate()).padStart(2, '0'),
+    month: String(d.getMonth() + 1).padStart(2, '0'),
+    year: d.getFullYear(),
+  });
+  return withWeekday ? t('{weekday}, {date}', { weekday: t(WEEKDAYS[d.getDay()]), date }) : date;
 }
 
 export function formatRelative(time: number, now: number = Date.now()): string {
   const diff = Math.max(0, now - time);
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) {
-    return 'just now';
+    return t('just now');
   }
   if (minutes < 60) {
-    return `${minutes} min ago`;
+    return t('{n} min ago', { n: minutes });
   }
   const hours = Math.floor(minutes / 60);
   if (hours < 24) {
-    return `${hours} hr ago`;
+    return t('{n} hr ago', { n: hours });
   }
   const days = Math.floor(hours / 24);
   if (days < 30) {
-    return days === 1 ? '1 day ago' : `${days} days ago`;
+    return tn(days, '{count} day ago', '{count} days ago');
   }
   return formatDate(time);
 }

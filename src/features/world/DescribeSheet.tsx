@@ -4,6 +4,7 @@ import { EditFileIcon, PlusIcon, RefreshIcon } from '../../ui/icons';
 
 import { storyBrief } from '../../core/ai/context';
 import { describeWorldEntry } from '../../core/ai/people';
+import { t } from '../../core/i18n';
 import { WORLD_TYPE_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
 import { BODY_MAX, appendBody } from '../../core/story/plotHoles';
@@ -12,6 +13,7 @@ import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import { Button, Sheet, Text, toast } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from '../outline/AiParts';
 
 export function DescribeSheet({
@@ -67,7 +69,7 @@ export function DescribeSheet({
     store.updateWorldEntry(entryId, { body });
     onApplied();
     sheet.close();
-    toast(mode === 'append' ? 'Description added to the content' : 'Content replaced');
+    toast(mode === 'append' ? t('Description added to the content') : t('Content replaced'));
   };
 
   const renderBody = () => {
@@ -75,14 +77,14 @@ export function DescribeSheet({
       return <AiSetupNotice onOpenProfile={openProfile} />;
     }
     if (state.status === 'loading') {
-      return <AiBusy label={`Writing about ${title}…`} onCancel={cancel} />;
+      return <AiBusy label={t('Writing about {title}…', { title })} onCancel={cancel} />;
     }
     if (state.status === 'error') {
       return (
         <>
           <AiFailure message={state.message} onRetry={generate} />
           <SheetFooter>
-            <Button title="Close" variant="ghost" onPress={sheet.close} />
+            <Button title={t('Close')} variant="ghost" onPress={sheet.close} />
           </SheetFooter>
         </>
       );
@@ -95,8 +97,8 @@ export function DescribeSheet({
             <AiMark />
             <Text variant="caption" tone="muted">
               {hasBody
-                ? 'Nothing changes until you choose. Replace drops your current content; append keeps it and adds this below.'
-                : 'Nothing changes until you choose to use this text.'}
+                ? t('Nothing changes until you choose. Replace drops your current content; append keeps it and adds this below.')
+                : t('Nothing changes until you choose to use this text.')}
             </Text>
             <View className="rounded-lg bg-surface p-3">
               <Text>{text}</Text>
@@ -104,15 +106,16 @@ export function DescribeSheet({
           </ScrollView>
           <SheetFooter>
             <Button
-              title={hasBody ? 'Replace content' : 'Use as content'}
+              title={hasBody ? t('Replace content') : t('Use as content')}
               icon={EditFileIcon}
               variant="ai"
               onPress={() => apply(text, 'replace')}
             />
-            {hasBody && <Button title="Append" icon={PlusIcon} onPress={() => apply(text, 'append')} />}
+            {hasBody && <Button title={t('Append')} icon={PlusIcon} onPress={() => apply(text, 'append')} />}
             <View className="flex-row gap-2">
-              <Button title="Try again" icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
-              <Button title="Discard" variant="ghost" onPress={sheet.close} className="flex-1" />
+              <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
+              <Button title={t('Discard')} variant="ghost" onPress={sheet.close} className="flex-1" />
+              <ReportAiButton text={text} feature="world" />
             </View>
           </SheetFooter>
         </>
@@ -122,12 +125,11 @@ export function DescribeSheet({
       <>
         <View className="px-4 pb-4">
           <Text tone="secondary">
-            The AI writes a wiki entry for this {WORLD_TYPE_LABEL[entry.type].toLowerCase()} from its title and your story. You
-            preview it before anything is saved.
+            {t('The AI writes a wiki entry for this {type} from its title and your story. You preview it before anything is saved.', { type: t(WORLD_TYPE_LABEL[entry.type]).toLowerCase() })}
           </Text>
         </View>
         <SheetFooter>
-          <Button title="Write description" variant="ai" onPress={generate} />
+          <Button title={t('Write description')} variant="ai" onPress={generate} />
         </SheetFooter>
       </>
     );
@@ -138,7 +140,7 @@ export function DescribeSheet({
       visible={sheet.visible}
       onClose={sheet.close}
       onClosed={sheet.onClosed}
-      title="Write with AI"
+      title={t('Write with AI')}
       subtitle={title}
       scroll={false}
       maxHeight="90%"

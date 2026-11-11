@@ -4,6 +4,7 @@ import { RefreshIcon, SettingsIcon } from '../../ui/icons';
 
 import { scriptText, storyBrief } from '../../core/ai/context';
 import { changeVoice, continueScript, rewriteBlocks, shortenLine, suggestSfx, type BlockDraft } from '../../core/ai/writing';
+import { t } from '../../core/i18n';
 import { BLOCK_LABEL } from '../../core/model/constants';
 import type { Character, ID, Scene } from '../../core/model/types';
 import {
@@ -136,26 +137,28 @@ export function AiWriteSheet({
 
   const loadingLabel = (): string => {
     if (action === 'continue') {
-      return 'Writing the next blocks…';
+      return t('Writing the next blocks…');
     }
     if (action === 'rewrite') {
-      return scope === 'scene' ? 'Rewriting the scene…' : 'Rewriting the block…';
+      return scope === 'scene' ? t('Rewriting the scene…') : t('Rewriting the block…');
     }
     if (action === 'voice') {
-      return `Rewriting in ${speaker?.name || 'the character'}'s voice…`;
+      return speaker?.name
+        ? t("Rewriting in {name}'s voice…", { name: speaker.name })
+        : t("Rewriting in the character's voice…");
     }
     if (action === 'shorten') {
-      return 'Shortening the line…';
+      return t('Shortening the line…');
     }
-    return 'Thinking of sounds…';
+    return t('Thinking of sounds…');
   };
 
   const renderBody = () => {
     if (!configured) {
       return (
         <View className="gap-3 px-4 pb-4">
-          <Text tone="secondary">Writing help needs an AI server. Set its address in Profile first.</Text>
-          <Button title="Open Profile" icon={SettingsIcon} variant="ai" onPress={() => sheet.closeThen(onOpenProfile)} />
+          <Text tone="secondary">{t('Writing help needs an AI server. Set its address in Profile first.')}</Text>
+          <Button title={t('Open Profile')} icon={SettingsIcon} variant="ai" onPress={() => sheet.closeThen(onOpenProfile)} />
         </View>
       );
     }
@@ -210,26 +213,26 @@ export function AiWriteSheet({
     }
     return (
       <Footer>
-        <Button title="Try again" icon={RefreshIcon} variant="ai" onPress={retry} />
-        <Button title="Back" variant="ghost" onPress={back} />
+        <Button title={t('Try again')} icon={RefreshIcon} variant="ai" onPress={retry} />
+        <Button title={t('Back')} variant="ghost" onPress={back} />
       </Footer>
     );
   };
 
   const subtitle = location
-    ? `${BLOCK_LABEL[location.block.type]}${speaker ? ` · ${speaker.name}` : ''}${
+    ? `${t(BLOCK_LABEL[location.block.type])}${speaker ? ` · ${speaker.name}` : ''}${
         location.block.text.trim() ? ` · ${snippet(location.block.text)}` : ''
       }`
-    : 'End of the script';
+    : t('End of the script');
 
   return (
     <Sheet
       visible={sheet.visible}
       onClose={sheet.close}
       onClosed={sheet.onClosed}
-      title={action ? AI_TITLE[action] : 'AI writing help'}
+      title={action ? t(AI_TITLE[action]) : t('AI writing help')}
       subtitle={subtitle}
-      right={action !== null && configured ? <Button title="Back" variant="ghost" small onPress={back} /> : undefined}
+      right={action !== null && configured ? <Button title={t('Back')} variant="ghost" small onPress={back} /> : undefined}
       scroll={false}
       maxHeight="90%"
     >

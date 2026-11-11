@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
 
+import { t } from '../../core/i18n';
 import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
 import { ART, ArtBanner, Pressable, Text } from '../../ui';
@@ -29,20 +30,20 @@ export function StartTiles() {
   const style = () => useSettings.getState().defaultStyle;
 
   const draw: Start = {
-    label: 'Draw now',
-    hint: 'Open a blank page',
+    label: t('Draw now'),
+    hint: t('Open a blank page'),
     art: ART.tileDraw,
     onPress: () => openBlankCanvas(navigation, style()),
   };
   const layout: Start = {
-    label: 'Lay out page',
-    hint: 'Split a page into panels',
+    label: t('Lay out page'),
+    hint: t('Split a page into panels'),
     art: ART.tileStoryboard,
     onPress: () => openBlankLayout(navigation, style()),
   };
   const write: Start = {
-    label: 'Write script',
-    hint: 'Plan scenes and dialogue',
+    label: t('Write script'),
+    hint: t('Plan scenes and dialogue'),
     art: ART.tileScript,
     onPress: () => navigation.navigate('NewProject'),
   };

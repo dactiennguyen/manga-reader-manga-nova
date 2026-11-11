@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { View } from 'react-native';
 
+import { t } from '../core/i18n';
 import { Button } from './Button';
 import { Text } from './Text';
 
@@ -24,13 +25,13 @@ export class ErrorBoundary extends Component<Props, { failed: boolean }> {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-bg p-6">
         <Text variant="title" className="text-center">
-          Something went wrong
+          {t('Something went wrong')}
         </Text>
         <Text tone="secondary" className="text-center">
-          Your work is saved. Try again, or go back.
+          {t('Your work is saved. Try again, or go back.')}
         </Text>
-        <Button title="Try again" onPress={() => this.setState({ failed: false })} />
-        {!!this.props.onBack && <Button title="Go back" variant="ghost" onPress={this.props.onBack} />}
+        <Button title={t('Try again')} onPress={() => this.setState({ failed: false })} />
+        {!!this.props.onBack && <Button title={t('Go back')} variant="ghost" onPress={this.props.onBack} />}
       </View>
     );
   }

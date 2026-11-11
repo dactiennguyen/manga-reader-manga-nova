@@ -1,3 +1,4 @@
+import * as affine from '../src/core/art/affine';
 import * as artMath from '../src/core/art/artMath';
 import * as freehand from '../src/core/art/freehand';
 import * as liveOutline from '../src/core/art/liveOutline';
@@ -5,6 +6,7 @@ import * as session from '../src/core/art/session';
 import * as strokes from '../src/core/art/strokes';
 import * as drawArt from '../src/render/drawArt';
 import * as liveStroke from '../src/render/liveStroke';
+import * as selectionScene from '../src/render/selectionScene';
 
 jest.mock('@shopify/react-native-skia', () => require('./helpers/fakeSkia'));
 
@@ -59,6 +61,14 @@ describe('worklet closures', () => {
     ['recordPending', liveStroke.recordPending],
     ['recordTransformFrame', liveStroke.recordTransformFrame],
     ['emptyPicture', liveStroke.emptyPicture],
+    ['hitFrame', affine.hitFrame],
+    ['dragScale', affine.dragScale],
+    ['dragRotate', affine.dragRotate],
+    ['applySelectionOp', affine.applySelectionOp],
+    ['recordSelectionScene', selectionScene.recordSelectionScene],
+    ['recordSelectionFrame', selectionScene.recordSelectionFrame],
+    ['extendLasso', selectionScene.extendLasso],
+    ['recordLasso', selectionScene.recordLasso],
   ];
 
   it.each(entries)('%s reaches only defined worklets', (name, entry) => {

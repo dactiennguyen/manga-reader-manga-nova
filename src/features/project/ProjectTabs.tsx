@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { LockIcon, PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { ROLE_LABEL, WORLD_TYPE_LABEL, WORLD_TYPES } from '../../core/model/constants';
 import { charactersOf, worldOf } from '../../core/model/selectors';
 import type { ID, StoryData, WorldType } from '../../core/model/types';
@@ -27,25 +28,25 @@ export function CharactersTab({ state, projectId }: TabProps) {
     return (
       <EmptyState
         art={ART.emptyCharacters}
-        title="No one here yet."
-        message="Create your main character first!"
-        action={{ label: 'Create character', onPress: add }}
+        title={t('No one here yet.')}
+        message={t('Create your main character first!')}
+        action={{ label: t('Create character'), onPress: add }}
       />
     );
   }
   return (
     <View className="gap-3">
       <View className="flex-row justify-end">
-        <Button title="Character" icon={PlusIcon} small onPress={add} />
+        <Button title={t('Character')} icon={PlusIcon} small onPress={add} />
       </View>
       <View className="flex-row flex-wrap">
         {characters.map(character => {
-          const name = character.name || 'Untitled';
-          const role = ROLE_LABEL[character.role];
+          const name = character.name || t('Untitled');
+          const role = t(ROLE_LABEL[character.role]);
           return (
             <Pressable
               key={character.id}
-              accessibilityLabel={`${name}, ${role}${character.locked ? ', locked' : ''}`}
+              accessibilityLabel={character.locked ? t('{name}, {role}, locked', { name, role }) : `${name}, ${role}`}
               onPress={() => navigation.navigate('Character', { characterId: character.id })}
               className="w-1/3 items-center gap-0.5 px-1 py-2"
             >
@@ -86,20 +87,20 @@ export function WorldTab({ state, projectId }: TabProps) {
       {entries.length === 0 ? (
         <EmptyState
           art={ART.emptyWorld}
-          title="Where does the story take place?"
-          message="Keep track of places, factions and terms here."
-          action={{ label: 'New entry', onPress: () => setPicking(true) }}
+          title={t('Where does the story take place?')}
+          message={t('Keep track of places, factions and terms here.')}
+          action={{ label: t('New entry'), onPress: () => setPicking(true) }}
         />
       ) : (
         <>
           <View className="flex-row justify-between gap-2">
             <Button
-              title="See all"
+              title={t('See all')}
               variant="secondary"
               small
               onPress={() => navigation.navigate('World', { projectId })}
             />
-            <Button title="New entry" icon={PlusIcon} small onPress={() => setPicking(true)} />
+            <Button title={t('New entry')} icon={PlusIcon} small onPress={() => setPicking(true)} />
           </View>
           {ENTRY_TYPES.map(type => {
             const group = entries.filter(entry => entry.type === type);
@@ -107,11 +108,11 @@ export function WorldTab({ state, projectId }: TabProps) {
               return null;
             }
             return (
-              <Section key={type} title={`${WORLD_TYPE_LABEL[type]} (${group.length})`}>
+              <Section key={type} title={`${t(WORLD_TYPE_LABEL[type])} (${group.length})`}>
                 {group.map(entry => (
                   <ListItem
                     key={entry.id}
-                    title={entry.title || 'Untitled'}
+                    title={entry.title || t('Untitled')}
                     subtitle={entry.body.trim().split('\n')[0] || undefined}
                     chevron
                     onPress={() => navigation.navigate('WorldEntry', { entryId: entry.id })}
@@ -125,8 +126,8 @@ export function WorldTab({ state, projectId }: TabProps) {
       <Menu
         visible={picking}
         onClose={() => setPicking(false)}
-        title="Add world entry"
-        items={ENTRY_TYPES.map(type => ({ label: WORLD_TYPE_LABEL[type], onPress: () => add(type) }))}
+        title={t('Add world entry')}
+        items={ENTRY_TYPES.map(type => ({ label: t(WORLD_TYPE_LABEL[type]), onPress: () => add(type) }))}
       />
     </View>
   );
@@ -151,22 +152,22 @@ export function NotesTab({ state, projectId }: TabProps) {
     return (
       <EmptyState
         art={ART.tileNotes}
-        title="Had a sudden idea?"
-        message="Jot it down here before it slips away."
-        action={{ label: 'Note', onPress: add }}
+        title={t('Had a sudden idea?')}
+        message={t('Jot it down here before it slips away.')}
+        action={{ label: t('Note'), onPress: add }}
       />
     );
   }
   return (
     <View className="gap-3">
       <View className="flex-row justify-end">
-        <Button title="Note" icon={PlusIcon} small onPress={add} />
+        <Button title={t('Note')} icon={PlusIcon} small onPress={add} />
       </View>
       <Section>
         {notes.map(note => (
           <ListItem
             key={note.id}
-            title={note.title || note.body.trim().split('\n')[0] || 'Empty note'}
+            title={note.title || note.body.trim().split('\n')[0] || t('Empty note')}
             subtitle={formatRelative(note.updatedAt)}
             chevron
             onPress={() => navigation.navigate('WorldEntry', { entryId: note.id })}

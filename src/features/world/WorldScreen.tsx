@@ -3,6 +3,7 @@ import { ScrollView, Share, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CheckIcon, CopyIcon, DeleteIcon, MoreIcon, PlusIcon, SearchIcon, ShapesIcon, ShareIcon } from '../../ui/icons';
 
+import { msg, t } from '../../core/i18n';
 import { WORLD_TYPES, WORLD_TYPE_LABEL } from '../../core/model/constants';
 import type { ID, WorldEntry, WorldType } from '../../core/model/types';
 import { UNTITLED, matchesQuery, wikiText } from '../../core/world/worldTools';
@@ -32,21 +33,21 @@ import { EntryRow, WORLD_TYPE_ICON } from './worldShared';
 type ViewMode = 'list' | 'timeline';
 
 const VIEW_OPTIONS: readonly { value: ViewMode; label: string }[] = [
-  { value: 'list', label: 'List' },
-  { value: 'timeline', label: 'Timeline' },
+  { value: 'list', label: msg('List') },
+  { value: 'timeline', label: msg('Timeline') },
 ];
 
 function emptyText(query: string, view: ViewMode, filter: WorldType | 'all'): string {
   if (query) {
-    return `No entries match "${query}".`;
+    return t('No entries match "{query}".', { query });
   }
   if (view === 'timeline') {
-    return 'No events yet. Add events and give them a time anchor to see how the story flows.';
+    return t('No events yet. Add events and give them a time anchor to see how the story flows.');
   }
   if (filter === 'all') {
-    return 'The story world is empty. Note down places, factions, terms and events so you remember them while writing.';
+    return t('The story world is empty. Note down places, factions, terms and events so you remember them while writing.');
   }
-  return `No ${WORLD_TYPE_LABEL[filter].toLowerCase()} entries yet.`;
+  return t('No {type} entries yet.', { type: t(WORLD_TYPE_LABEL[filter]).toLowerCase() });
 }
 
 export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
@@ -107,12 +108,12 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
       reading: entry.reading,
       leaderId: entry.leaderId,
     });
-    toast('Entry duplicated');
+    toast(t('Entry duplicated'));
   };
 
   const remove = async (entry: WorldEntry) => {
-    const ok = await confirm(`Delete "${entry.title.trim() || UNTITLED}"?`, 'This entry will be removed from the story world.', {
-      confirmText: 'Delete',
+    const ok = await confirm(t('Delete "{title}"?', { title: entry.title.trim() || t(UNTITLED) }), t('This entry will be removed from the story world.'), {
+      confirmText: t('Delete'),
       destructive: true,
     });
     if (ok) {
@@ -122,17 +123,17 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
 
   const exportWiki = async () => {
     if (entries.length === 0) {
-      toast('Nothing to export yet');
+      toast(t('Nothing to export yet'));
       return;
     }
     const { characters } = useStory.getState();
     try {
       await Share.share({
-        title: `${project?.title ?? 'Story'} — World wiki`,
+        title: t('{title} — World wiki', { title: project?.title ?? t('Story') }),
         message: wikiText(project?.title ?? '', entries, chapters, characters),
       });
     } catch {
-      toast('Could not share');
+      toast(t('Could not share'));
     }
   };
 
@@ -153,12 +154,12 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
     }
   };
   const emptyActionTitle =
-    view === 'timeline' ? 'Add event' : filter === 'all' ? 'New entry' : `Add ${WORLD_TYPE_LABEL[filter].toLowerCase()}`;
+    view === 'timeline' ? t('Add event') : filter === 'all' ? t('New entry') : t('Add {type}', { type: t(WORLD_TYPE_LABEL[filter]).toLowerCase() });
 
   return (
     <Screen padded={false} bottom={false}>
       <AppBar
-        title="World"
+        title={t('World')}
         subtitle={project?.title}
         onBack={() => navigation.goBack()}
         right={
@@ -167,9 +168,9 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
               icon={SearchIcon}
               active={searching}
               onPress={() => (searching ? closeSearch() : setSearching(true))}
-              accessibilityLabel="Search"
+              accessibilityLabel={t('Search')}
             />
-            <IconButton icon={MoreIcon} onPress={() => setMoreMenu(true)} accessibilityLabel="More" />
+            <IconButton icon={MoreIcon} onPress={() => setMoreMenu(true)} accessibilityLabel={t('More')} />
           </>
         }
       />
@@ -179,23 +180,23 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
             value={query}
             onChangeText={setQuery}
             onClear={() => setQuery('')}
-            placeholder="Search titles and content"
-            accessibilityLabel="Search titles and content"
+            placeholder={t('Search titles and content')}
+            accessibilityLabel={t('Search titles and content')}
             autoFocus
           />
         </View>
       )}
       <View className="px-4 pt-3">
-        <Segmented options={VIEW_OPTIONS} value={view} onChange={setView} />
+        <Segmented options={VIEW_OPTIONS.map(item => ({ ...item, label: t(item.label) }))} value={view} onChange={setView} />
       </View>
       {view === 'list' && (
         <View className="pt-2">
           <ChipRow className="px-4">
-            <Chip label="All" selected={filter === 'all'} count={counts.all} onPress={() => setFilter('all')} />
+            <Chip label={t('All')} selected={filter === 'all'} count={counts.all} onPress={() => setFilter('all')} />
             {WORLD_TYPES.map(type => (
               <Chip
                 key={type}
-                label={WORLD_TYPE_LABEL[type]}
+                label={t(WORLD_TYPE_LABEL[type])}
                 icon={WORLD_TYPE_ICON[type]}
                 selected={filter === type}
                 count={counts[type] ?? 0}
@@ -221,7 +222,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
         ) : (
           groups.map(group => (
             <View key={group.type} className="mb-3 gap-2">
-              <SectionHeader>{WORLD_TYPE_LABEL[group.type]}</SectionHeader>
+              <SectionHeader>{t(WORLD_TYPE_LABEL[group.type])}</SectionHeader>
               <View>
                 {group.items.map(entry => (
                   <EntryRow key={entry.id} entry={entry} onPress={() => open(entry.id)} onLongPress={() => setRowMenuId(entry.id)} />
@@ -231,14 +232,14 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
           ))
         )}
       </ScrollView>
-      <Fab icon={PlusIcon} label="New entry" onPress={() => setTypeMenu(true)} bottom={16 + insets.bottom} />
+      <Fab icon={PlusIcon} label={t('New entry')} onPress={() => setTypeMenu(true)} bottom={16 + insets.bottom} />
 
       <Menu
         visible={typeMenu}
         onClose={() => setTypeMenu(false)}
-        title="What type of entry?"
+        title={t('What type of entry?')}
         items={WORLD_TYPES.map(type => ({
-          label: WORLD_TYPE_LABEL[type],
+          label: t(WORLD_TYPE_LABEL[type]),
           icon: WORLD_TYPE_ICON[type],
           onPress: () => create(type),
         }))}
@@ -246,17 +247,17 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
       <Menu
         visible={moreMenu}
         onClose={() => setMoreMenu(false)}
-        items={[{ label: 'Export wiki as text', icon: ShareIcon, onPress: exportWiki }]}
+        items={[{ label: t('Export wiki as text'), icon: ShareIcon, onPress: exportWiki }]}
       />
       <Menu
         visible={!!rowEntry}
         onClose={() => setRowMenuId(null)}
-        title={rowShown ? rowShown.title.trim() || UNTITLED : undefined}
-        subtitle={rowShown ? WORLD_TYPE_LABEL[rowShown.type] : undefined}
+        title={rowShown ? rowShown.title.trim() || t(UNTITLED) : undefined}
+        subtitle={rowShown ? t(WORLD_TYPE_LABEL[rowShown.type]) : undefined}
         items={[
-          { label: 'Change type', icon: ShapesIcon, onPress: () => setRetypeId(rowMenuId) },
+          { label: t('Change type'), icon: ShapesIcon, onPress: () => setRetypeId(rowMenuId) },
           {
-            label: 'Duplicate',
+            label: t('Duplicate'),
             icon: CopyIcon,
             onPress: () => {
               if (rowEntry) {
@@ -265,7 +266,7 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
             },
           },
           {
-            label: 'Delete',
+            label: t('Delete'),
             icon: DeleteIcon,
             destructive: true,
             onPress: () => {
@@ -279,9 +280,9 @@ export function WorldScreen({ route, navigation }: ScreenProps<'World'>) {
       <Menu
         visible={!!retypeEntry}
         onClose={() => setRetypeId(null)}
-        title="Change type"
+        title={t('Change type')}
         items={WORLD_TYPES.map(type => ({
-          label: WORLD_TYPE_LABEL[type],
+          label: t(WORLD_TYPE_LABEL[type]),
           icon: retypeEntry?.type === type ? CheckIcon : WORLD_TYPE_ICON[type],
           onPress: () => {
             if (retypeId) {

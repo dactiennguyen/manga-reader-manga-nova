@@ -1,10 +1,8 @@
-import { plural } from '../util/format';
+import { t, tn } from '../i18n';
 import type { ID, Page } from '../model/types';
 import { panelOrder, type LayoutTemplate } from './layout';
 
 export type ChangeWarning = { title: string; message: string; confirmText: string; destructive?: boolean };
-
-const UNDO_NOTE = 'Undo restores them with their art.';
 
 /** Existing panels fill the template's slots in reading order, so the last ones are what falls off. */
 export function droppedPanels(page: Pick<Page, 'layout' | 'order'>, template: Pick<LayoutTemplate, 'count'>, rtl: boolean): ID[] {
@@ -12,7 +10,11 @@ export function droppedPanels(page: Pick<Page, 'layout' | 'order'>, template: Pi
 }
 
 function droppedText(count: number): string {
-  return `${plural(count, 'panel')} ${count === 1 ? 'is' : 'are'} dropped.`;
+  return tn(
+    count,
+    '{count} panel is dropped. Undo restores them with their art.',
+    '{count} panels are dropped. Undo restores them with their art.',
+  );
 }
 
 export function templateWarning(
@@ -24,30 +26,34 @@ export function templateWarning(
   const dropped = droppedPanels(page, template, rtl).length;
   if (dropped > 0) {
     return {
-      title: 'Change template?',
-      message: `${droppedText(dropped)} ${UNDO_NOTE}`,
-      confirmText: 'Change',
+      title: t('Change template?'),
+      message: droppedText(dropped),
+      confirmText: t('Change'),
     };
   }
   if (Object.keys(page.panels).some(hasArt)) {
-    return { title: 'Change template?', message: 'Art stays where it was on the page.', confirmText: 'Change' };
+    return { title: t('Change template?'), message: t('Art stays where it was on the page.'), confirmText: t('Change') };
   }
   return null;
 }
 
 export function clearWarning(panelCount: number): ChangeWarning {
   return {
-    title: 'Clear all panels?',
-    message: `${droppedText(panelCount)} ${UNDO_NOTE}`,
-    confirmText: 'Clear',
+    title: t('Clear all panels?'),
+    message: droppedText(panelCount),
+    confirmText: t('Clear'),
     destructive: true,
   };
 }
 
 export function pasteWarning(panelCount: number): ChangeWarning {
   return {
-    title: 'Paste layout?',
-    message: `Current panels are replaced: ${droppedText(panelCount)} ${UNDO_NOTE}`,
-    confirmText: 'Paste',
+    title: t('Paste layout?'),
+    message: tn(
+      panelCount,
+      'Current panels are replaced: {count} panel is dropped. Undo restores them with their art.',
+      'Current panels are replaced: {count} panels are dropped. Undo restores them with their art.',
+    ),
+    confirmText: t('Paste'),
   };
 }

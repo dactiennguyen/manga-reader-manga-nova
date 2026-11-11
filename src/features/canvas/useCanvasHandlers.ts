@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, type RefObject } from 'react';
 
 import { layerBounds, type LayerTransform } from '../../core/art/artMath';
 import { HOLD_MS, TAP_MS, type SessionEnv } from '../../core/art/session';
+import { t } from '../../core/i18n';
 import type { PanelShape } from '../../core/layout/layout';
 import type { ID } from '../../core/model/types';
 import { sampleArtColor } from '../../render/drawArt';
@@ -52,45 +53,45 @@ export function useCanvasHandlers({
     tools.setPicking(false);
     if (picked) {
       tools.setColor(picked);
-      toast(`Picked ${picked}`);
+      toast(t('Picked {color}', { color: picked }));
     }
     return picked;
   };
 
   const onEffect = (effect: JsEffect) => {
-    const t = timers.current;
+    const active = timers.current;
     switch (effect.kind) {
       case 'toast':
-        toast(effect.message);
+        toast(t(effect.message));
         break;
       case 'stylusDetected':
         setStylusMode(true);
         break;
       case 'holdStart':
-        if (t.hold) {
-          clearTimeout(t.hold);
+        if (active.hold) {
+          clearTimeout(active.hold);
         }
-        t.hold = setTimeout(() => {
-          t.hold = null;
+        active.hold = setTimeout(() => {
+          active.hold = null;
           send({ type: 'hold', token: effect.token });
         }, HOLD_MS);
         break;
       case 'holdCancel':
-        if (t.hold) {
-          clearTimeout(t.hold);
-          t.hold = null;
+        if (active.hold) {
+          clearTimeout(active.hold);
+          active.hold = null;
         }
         break;
       case 'tapTimerStart':
-        t.tap = setTimeout(() => {
-          t.tap = null;
+        active.tap = setTimeout(() => {
+          active.tap = null;
           send({ type: 'tapTimeout' });
         }, TAP_MS);
         break;
       case 'tapTimerCancel':
-        if (t.tap) {
-          clearTimeout(t.tap);
-          t.tap = null;
+        if (active.tap) {
+          clearTimeout(active.tap);
+          active.tap = null;
         }
         break;
       case 'sample': {
@@ -100,7 +101,7 @@ export function useCanvasHandlers({
             send({ type: 'holdPicked', token: effect.token });
           }
         } else if (!picked) {
-          toast('No color here');
+          toast(t('No color here'));
         }
         break;
       }
@@ -112,6 +113,16 @@ export function useCanvasHandlers({
         break;
       case 'toggleChrome':
         toggleChrome();
+        break;
+      case 'lassoCommit':
+        doc.selection.lasso(effect.points);
+        break;
+      case 'selectionMatrix':
+        doc.selection.setMatrix(effect.m);
+        break;
+      case 'selectionDismiss':
+        // A tap outside keeps the work. Only Cancel throws a transform away.
+        doc.selection.end(true);
         break;
     }
   };

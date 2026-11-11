@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
 import { AddImageIcon, DeleteIcon, PlusIcon, StarIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { WorldEntry } from '../../core/model/types';
 import { fileUri } from '../../core/util/paths';
@@ -23,7 +24,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
 
   const addImage = async () => {
     if (entry.images.length >= LIMITS.worldImages) {
-      toast(`Up to ${LIMITS.worldImages} images`);
+      toast(t('Up to {n} images', { n: LIMITS.worldImages }));
       return;
     }
     try {
@@ -32,12 +33,12 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
         update(entry.id, { images: [...currentImages(), path].slice(0, LIMITS.worldImages) });
       }
     } catch {
-      toast('Could not load the image');
+      toast(t('Could not load the image'));
     }
   };
 
   const removeImage = async (path: string) => {
-    const ok = await confirm('Delete this image?', undefined, { confirmText: 'Delete', destructive: true });
+    const ok = await confirm(t('Delete this image?'), undefined, { confirmText: t('Delete'), destructive: true });
     if (ok) {
       update(entry.id, { images: currentImages().filter(item => item !== path) });
     }
@@ -47,13 +48,13 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
     <>
       {entry.images.length === 0 ? (
         <Pressable
-          accessibilityLabel="Add image"
+          accessibilityLabel={t('Add image')}
           onPress={addImage}
           className="mx-4 mt-3 h-13 flex-row items-center justify-center gap-2 overflow-hidden rounded-md bg-surface"
         >
           <Icon icon={AddImageIcon} size={ICON.md} color="text-secondary" />
           <Text variant="label" tone="secondary">
-            Add image
+            {t('Add image')}
           </Text>
         </Pressable>
       ) : (
@@ -61,7 +62,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
           {entry.images.map((path, index) => (
             <Pressable
               key={path}
-              accessibilityLabel={index === 0 ? 'Main image' : `Image ${index + 1}`}
+              accessibilityLabel={index === 0 ? t('Main image') : t('Image {n}', { n: index + 1 })}
               onPress={() => setViewing(path)}
               onLongPress={() => setImageMenu(path)}
               className="overflow-hidden rounded-md bg-surface"
@@ -70,14 +71,14 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
               <Image accessibilityIgnoresInvertColors source={{ uri: fileUri(path) }} className="h-full w-full" resizeMode="cover" />
               {index === 0 && entry.images.length > 1 && (
                 <View className="absolute bottom-0 left-0 rounded-tr-sm bg-overlay px-2 py-0.5">
-                  <Text variant="caption">Main image</Text>
+                  <Text variant="caption">{t('Main image')}</Text>
                 </View>
               )}
             </Pressable>
           ))}
           {entry.images.length < LIMITS.worldImages && (
             <Pressable
-              accessibilityLabel="Add image"
+              accessibilityLabel={t('Add image')}
               onPress={addImage}
               className="items-center justify-center gap-1 overflow-hidden rounded-md bg-surface"
               style={FRAME}
@@ -93,10 +94,10 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
       <Menu
         visible={!!imageMenu}
         onClose={() => setImageMenu(null)}
-        title="Image"
+        title={t('Image')}
         items={[
           {
-            label: 'Set as main image',
+            label: t('Set as main image'),
             icon: StarIcon,
             disabled: entry.images[0] === imageMenu,
             onPress: () => {
@@ -106,7 +107,7 @@ export function EntryImages({ entry }: { entry: WorldEntry }) {
             },
           },
           {
-            label: 'Delete',
+            label: t('Delete'),
             icon: DeleteIcon,
             destructive: true,
             onPress: () => {

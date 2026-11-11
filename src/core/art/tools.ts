@@ -1,23 +1,25 @@
+import { msg } from '../i18n';
 import type { LayerTransform } from './artMath';
 import type { ArtLayer, ID, PanelArt, Stroke, StrokeTool } from '../model/types';
 
-export type CanvasTool = StrokeTool | 'move';
+export type CanvasTool = StrokeTool | 'move' | 'select';
 
 export type ShapeTool = 'line' | 'rect' | 'ellipse';
 
 export const TOOLS: { id: CanvasTool; label: string }[] = [
-  { id: 'gpen', label: 'G-pen' },
-  { id: 'pencil', label: 'Pencil' },
-  { id: 'brush', label: 'Brush' },
-  { id: 'eraser', label: 'Eraser' },
-  { id: 'fill', label: 'Lasso fill' },
-  { id: 'move', label: 'Move and scale layer' },
+  { id: 'gpen', label: msg('G-pen') },
+  { id: 'pencil', label: msg('Pencil') },
+  { id: 'brush', label: msg('Brush') },
+  { id: 'eraser', label: msg('Eraser') },
+  { id: 'fill', label: msg('Lasso fill') },
+  { id: 'select', label: msg('Select strokes') },
+  { id: 'move', label: msg('Move and scale layer') },
 ];
 
 export const SHAPE_TOOLS: { id: ShapeTool; label: string }[] = [
-  { id: 'line', label: 'Straight line' },
-  { id: 'rect', label: 'Rectangle' },
-  { id: 'ellipse', label: 'Ellipse' },
+  { id: 'line', label: msg('Straight line') },
+  { id: 'rect', label: msg('Rectangle') },
+  { id: 'ellipse', label: msg('Ellipse') },
 ];
 
 export function isShapeId(tool: CanvasTool): tool is ShapeTool {
@@ -32,7 +34,7 @@ export function supportsTone(tool: CanvasTool): boolean {
 
 export function strokeToolOf(tool: CanvasTool): StrokeTool {
   'worklet';
-  return tool === 'move' ? 'gpen' : tool;
+  return tool === 'move' || tool === 'select' ? 'gpen' : tool;
 }
 
 export const SIZE_MIN = 2;

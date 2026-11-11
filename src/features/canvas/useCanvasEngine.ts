@@ -1,4 +1,4 @@
-import { type SkPicture } from '@shopify/react-native-skia';
+import { type SkPath, type SkPicture } from '@shopify/react-native-skia';
 import { useCallback, useMemo, type RefObject } from 'react';
 import {
   GestureStateManager,
@@ -11,6 +11,7 @@ import {
 import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import { scheduleOnRN, scheduleOnUI } from 'react-native-worklets';
 
+import { IDENTITY_AFFINE, type Affine } from '../../core/art/affine';
 import { IDENTITY_TRANSFORM, type Box, type LayerTransform } from '../../core/art/artMath';
 import {
   createSession,
@@ -33,6 +34,7 @@ import {
   type LiveStroke,
   type PendingStroke,
 } from '../../render/liveStroke';
+import { extendLasso, type LassoTrail, type SelectionScene } from '../../render/selectionScene';
 
 export type StrokeMeta = Omit<Stroke, 'points'>;
 
@@ -40,6 +42,7 @@ export type StrokeMeta = Omit<Stroke, 'points'>;
 export type JsEffect = Exclude<
   SessionEffect,
   | { kind: 'strokeBegin' | 'strokeExtend' | 'strokeCancel' | 'strokeCommit' | 'view' | 'guide' }
+  | { kind: 'lasso' | 'selection' }
   | { kind: 'transform' | 'transformCancel' | 'transformCommit' }
 >;
 
@@ -61,13 +64,27 @@ export type CanvasEngine = {
   contents: SharedValue<ScenePictures>;
   livePicture: SharedValue<SkPicture>;
   pendingPicture: SharedValue<SkPicture>;
+  /** The active layer split around the selected strokes, while a selection is open. */
+  selScene: SharedValue<SelectionScene | null>;
+  selMatrix: SharedValue<Affine>;
+  lassoPath: SharedValue<SkPath | null>;
   blank: SkPicture;
   /** Screen rects of the floating panels. A stroke entering one fades them. */
   chromeRects: SharedValue<Record<string, Box>>;
   faded: SharedValue<boolean>;
+  /** Where the pen is while a stroke is drawn, in page units, for others to follow in a shared page. */
+  cursor: SharedValue<{ x: number; y: number } | null>;
   send: (event: SessionEvent) => void;
-  /** One UI-thread update, so a finished stroke never leaves the screen for a frame. */
-  publish: (pictures: ScenePictures, seq: number | null, clearTransform: boolean) => void;
+  /**
+   * One UI-thread update, so a finished stroke never leaves the screen for a frame. `selection` opens or
+   * closes the selection in that same update. Leave it out to keep it as it is.
+   */
+  publish: (
+    pictures: ScenePictures,
+    seq: number | null,
+    clearTransform: boolean,
+    selection?: SelectionScene | null,
+  ) => void;
 };
 
 const NO_VIEW: ViewState = { tx: 0, ty: 0, scale: 1, rot: 0, flip: false };
@@ -85,11 +102,16 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   const pendingPicture = useSharedValue<SkPicture>(blank);
   const live = useSharedValue<LiveStroke | null>(null);
   const pending = useSharedValue<PendingStroke[]>([]);
+  const selScene = useSharedValue<SelectionScene | null>(null);
+  const selMatrix = useSharedValue<Affine>(IDENTITY_AFFINE);
+  const lasso = useSharedValue<LassoTrail | null>(null);
+  const lassoPath = useSharedValue<SkPath | null>(null);
   const seq = useSharedValue(0);
   const pressure = useSharedValue(0.5);
   const pressureSeen = useSharedValue(false);
   const chromeRects = useSharedValue<Record<string, Box>>({});
   const faded = useSharedValue(false);
+  const cursor = useSharedValue<{ x: number; y: number } | null>(null);
 
   const js = useMemo(
     () => ({
@@ -167,6 +189,18 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
           case 'transformCommit':
             scheduleOnRN(toJsTransform, effect.layerId, effect.t);
             break;
+          case 'lasso':
+            lasso.value = out.state.lasso ? extendLasso(lasso.value, out.state.lasso) : null;
+            lassoPath.value = lasso.value ? lasso.value.path : null;
+            break;
+          case 'lassoCommit':
+            lasso.value = null;
+            lassoPath.value = null;
+            scheduleOnRN(toJsEffect, effect);
+            break;
+          case 'selection':
+            selMatrix.value = out.state.sel ? out.state.sel.m : IDENTITY_AFFINE;
+            break;
           default:
             scheduleOnRN(toJsEffect, effect);
         }
@@ -176,10 +210,13 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
     blank,
     env,
     guide,
+    lasso,
+    lassoPath,
     live,
     livePicture,
     pending,
     pendingPicture,
+    selMatrix,
     seq,
     session,
     toJsEffect,
@@ -229,12 +266,19 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         } else if (faded.value) {
           faded.value = false;
         }
+        const drawing = session.value.stroke;
+        if (drawing && drawing.points.length >= 2) {
+          const stride = drawing.pressure ? 3 : 2;
+          const at = drawing.points.length - stride;
+          cursor.value = { x: drawing.points[at], y: drawing.points[at + 1] };
+        }
       },
       onTouchesUp: (e: GestureTouchEvent) => {
         'worklet';
         dispatch({ type: 'up', changed: e.changedTouches, time: Date.now() });
         if (session.value.ids.length === 0) {
           faded.value = false;
+          cursor.value = null;
           GestureStateManager.deactivate(e.handlerTag);
         }
       },
@@ -245,7 +289,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         GestureStateManager.fail(e.handlerTag);
       },
     };
-  }, [chromeRects, dispatch, faded, pressure, pressureSeen, session]);
+  }, [chromeRects, cursor, dispatch, faded, pressure, pressureSeen, session]);
 
   const panConfig = useMemo(() => {
     const read = (e: { stylusData?: { pressure: number } }) => {
@@ -266,11 +310,20 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   const send = useCallback((event: SessionEvent) => scheduleOnUI(dispatch, event), [dispatch]);
 
   const applyScene = useMemo(
-    () => (pictures: ScenePictures, ack: number | null, clearTransform: boolean) => {
+    () => (
+      pictures: ScenePictures,
+      ack: number | null,
+      clearTransform: boolean,
+      selection: SelectionScene | null | undefined,
+    ) => {
       'worklet';
       contents.value = pictures;
       if (clearTransform) {
         xform.value = IDENTITY_TRANSFORM;
+      }
+      if (selection !== undefined) {
+        selScene.value = selection;
+        dispatch({ type: 'setSelection', box: selection ? selection.box : null });
       }
       if (ack !== null) {
         const rest = pending.value.filter(item => item.seq > ack);
@@ -278,12 +331,12 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         pendingPicture.value = rest.length ? recordPending(rest) : blank;
       }
     },
-    [blank, contents, pending, pendingPicture, xform],
+    [blank, contents, dispatch, pending, pendingPicture, selScene, xform],
   );
 
   const publish = useCallback(
-    (pictures: ScenePictures, ack: number | null, clearTransform: boolean) =>
-      scheduleOnUI(applyScene, pictures, ack, clearTransform),
+    (pictures: ScenePictures, ack: number | null, clearTransform: boolean, selection?: SelectionScene | null) =>
+      scheduleOnUI(applyScene, pictures, ack, clearTransform, selection),
     [applyScene],
   );
 
@@ -297,9 +350,13 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
     contents,
     livePicture,
     pendingPicture,
+    selScene,
+    selMatrix,
+    lassoPath,
     blank,
     chromeRects,
     faded,
+    cursor,
     send,
     publish,
   };

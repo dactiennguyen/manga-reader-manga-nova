@@ -1,5 +1,6 @@
 import { Image, ScrollView, type ImageSourcePropType } from 'react-native';
 
+import { t } from '../../core/i18n';
 import { chapterIdsOf } from '../../core/model/selectors';
 import type { Project } from '../../core/model/types';
 import { useAppNavigation } from '../../state/navigation';
@@ -24,16 +25,16 @@ export function ProjectTools({ project, onTab }: { project: Project; onTab: (tab
   const chapterId = chapterIdsOf(project)[0];
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-3 px-4 pb-3">
-      <Tile label="Outline" art={ART.tileOutline} onPress={() => navigation.navigate('Outline', { projectId: project.id })} />
-      {!!chapterId && <Tile label="Script" art={ART.tileScript} onPress={() => navigation.navigate('Script', { chapterId })} />}
+      <Tile label={t('Outline')} art={ART.tileOutline} onPress={() => navigation.navigate('Outline', { projectId: project.id })} />
+      {!!chapterId && <Tile label={t('Script')} art={ART.tileScript} onPress={() => navigation.navigate('Script', { chapterId })} />}
       {!!chapterId && (
-        <Tile label="Storyboard" art={ART.tileStoryboard} onPress={() => navigation.navigate('Storyboard', { chapterId })} />
+        <Tile label={t('Storyboard')} art={ART.tileStoryboard} onPress={() => navigation.navigate('Storyboard', { chapterId })} />
       )}
-      <Tile label="Characters" art={ART.tileCharacters} onPress={() => onTab('characters')} />
-      <Tile label="World" art={ART.tileWorld} onPress={() => onTab('world')} />
-      <Tile label="Notes" art={ART.tileNotes} onPress={() => onTab('notes')} />
-      <Tile label="Export" art={ART.tileExport} onPress={() => navigation.navigate('Export', { projectId: project.id })} />
-      <Tile label="Assistant" art={ART.tileAi} onPress={() => navigation.navigate('Tabs', { screen: 'Assistant', params: { projectId: project.id } })} />
+      <Tile label={t('Characters')} art={ART.tileCharacters} onPress={() => onTab('characters')} />
+      <Tile label={t('World')} art={ART.tileWorld} onPress={() => onTab('world')} />
+      <Tile label={t('Notes')} art={ART.tileNotes} onPress={() => onTab('notes')} />
+      <Tile label={t('Export')} art={ART.tileExport} onPress={() => navigation.navigate('Export', { projectId: project.id })} />
+      <Tile label={t('Assistant')} art={ART.tileAi} onPress={() => navigation.navigate('Tabs', { screen: 'Assistant', params: { projectId: project.id } })} />
     </ScrollView>
   );
 }

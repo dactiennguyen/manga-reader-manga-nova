@@ -1,7 +1,8 @@
+import { msg, t } from '../i18n';
 import { WORLD_TYPE_LABEL, WORLD_TYPES } from '../model/constants';
 import type { Chapter, Character, ID, Scene, WorldEntry } from '../model/types';
 
-export const UNTITLED = 'Untitled';
+export const UNTITLED = msg('Untitled');
 
 export type TimelineGroup = { key: string; label: string; items: WorldEntry[] };
 
@@ -18,17 +19,17 @@ export function firstLine(text: string): string {
 
 export function anchorLabel(anchor: WorldEntry['anchor'], chapters: Pick<Chapter, 'id' | 'title'>[]): string {
   if (anchor === 'before') {
-    return 'Before the story';
+    return t('Before the story');
   }
   if (anchor === 'after') {
-    return 'After the story';
+    return t('After the story');
   }
   const index = anchor ? chapters.findIndex(chapter => chapter.id === anchor) : -1;
   if (index < 0) {
-    return 'No time anchor';
+    return t('No time anchor');
   }
   const title = chapters[index].title.trim();
-  return title ? `Chapter ${index + 1} · ${title}` : `Chapter ${index + 1}`;
+  return title ? t('Chapter {n} · {title}', { n: index + 1, title }) : t('Chapter {n}', { n: index + 1 });
 }
 
 export function matchesQuery(entry: Pick<WorldEntry, 'title' | 'body'>, query: string): boolean {
@@ -45,28 +46,28 @@ export function wikiText(
   chapters: Chapter[],
   characters: Record<ID, Character>,
 ): string {
-  const lines: string[] = [`${projectTitle.trim() || 'Untitled story'} — World wiki`, ''];
+  const lines: string[] = [t('{title} — World wiki', { title: projectTitle.trim() || t('Untitled story') }), ''];
   const nameOf = (id: ID | undefined) => (id ? characters[id]?.name.trim() : '') || '';
   for (const type of WORLD_TYPES) {
     const group = entries.filter(entry => entry.type === type);
     if (group.length === 0) {
       continue;
     }
-    lines.push(`== ${WORLD_TYPE_LABEL[type].toUpperCase()} ==`, '');
+    lines.push(`== ${t(WORLD_TYPE_LABEL[type]).toUpperCase()} ==`, '');
     for (const entry of group) {
-      lines.push(`# ${entry.title.trim() || UNTITLED}`);
+      lines.push(`# ${entry.title.trim() || t(UNTITLED)}`);
       if (type === 'term' && entry.reading?.trim()) {
-        lines.push(`Reading: ${entry.reading.trim()}`);
+        lines.push(t('Reading: {text}', { text: entry.reading.trim() }));
       }
       if (type === 'event') {
-        lines.push(`Time anchor: ${anchorLabel(entry.anchor, chapters)}`);
+        lines.push(t('Time anchor: {anchor}', { anchor: anchorLabel(entry.anchor, chapters) }));
       }
       if (type === 'faction' && nameOf(entry.leaderId)) {
-        lines.push(`Leader: ${nameOf(entry.leaderId)}`);
+        lines.push(t('Leader: {name}', { name: nameOf(entry.leaderId) }));
       }
       const related = entry.characterIds.map(nameOf).filter(Boolean);
       if (related.length > 0) {
-        lines.push(`Related characters: ${related.join(', ')}`);
+        lines.push(t('Related characters: {names}', { names: related.join(', ') }));
       }
       if (entry.body.trim()) {
         lines.push(entry.body.trim());
@@ -131,7 +132,7 @@ export function entryMentions(title: string, chapters: Chapter[], scenes: Record
       const name = chapter.title.trim();
       result.push({
         chapterId: chapter.id,
-        label: name ? `Chapter ${index + 1} · ${name}` : `Chapter ${index + 1}`,
+        label: name ? t('Chapter {n} · {title}', { n: index + 1, title: name }) : t('Chapter {n}', { n: index + 1 }),
         blockId,
         count,
       });

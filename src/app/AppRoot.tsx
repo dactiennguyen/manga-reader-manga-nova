@@ -4,7 +4,6 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  createNavigationContainerRef,
   type NavigationState,
   type Theme,
 } from '@react-navigation/native';
@@ -15,17 +14,21 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind } from 'uniwind';
 
-import { copyUriToCache } from '../native/files';
+import { t } from '../core/i18n';
+import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
-import type { RootStackParamList } from '../state/navigation';
+import { ReportHost } from '../features/aiReport/ReportHost';
+import { handleNearbyLink } from '../features/nearby/deepLink';
+import { RoomFollower } from '../features/nearby/RoomFollower';
+import { syncReminder } from '../features/profile/reminder';
+import { navigationRef } from '../state/navigation';
 import { appServices } from '../state/services';
-import { useSettings } from '../state/useSettings';
+import { flushActivity } from '../state/useActivity';
+import { useAppLocale, useSettings } from '../state/useSettings';
 import { flushStory } from '../state/useStory';
 import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
 import { boot } from './boot';
 import { RootNavigator } from './navigation';
-
-const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 function rootRoute(state: NavigationState | undefined): string | undefined {
   return state?.routes[state.index]?.name;
@@ -41,9 +44,14 @@ async function openArchive(url: string | null | undefined): Promise<void> {
     if (navigationRef.isReady()) {
       navigationRef.navigate('Project', { projectId });
     }
-    toast('Story imported');
+    toast(t('Story imported'));
   } catch (error) {
-    toast(error instanceof Error ? error.message : "This file can't be read.");
+    toast(error instanceof Error ? error.message : t("This file can't be read."));
+  } finally {
+    // iOS copies a file opened from another app into Documents/Inbox and leaves it there.
+    if (url.startsWith('file://') && url.includes('/Documents/Inbox/')) {
+      removeFile(stripFileScheme(url)).catch(() => undefined);
+    }
   }
 }
 
@@ -77,6 +85,7 @@ function useThemeMode() {
 }
 
 function Shell() {
+  const locale = useAppLocale();
   const { theme } = useUniwind();
   const dark = theme === 'dark';
   const [route, setRoute] = useState<string | undefined>();
@@ -101,11 +110,18 @@ function Shell() {
     const flush = AppState.addEventListener('change', next => {
       if (next !== 'active') {
         flushStory();
+        flushActivity();
       }
     });
-    Linking.getInitialURL().then(openArchive);
+    // manganova:// links (room QR codes, mangaka cards) first; anything else is a file to import.
+    const openUrl = (url: string | null | undefined) => {
+      if (!handleNearbyLink(url, navigationRef)) {
+        openArchive(url);
+      }
+    };
+    Linking.getInitialURL().then(openUrl);
     const link = Linking.addEventListener('url', (event: { url: string }) => {
-      openArchive(event.url);
+      openUrl(event.url);
     });
     return () => {
       flush.remove();
@@ -117,6 +133,11 @@ function Shell() {
   useEffect(() => {
     setSystemBarsDarkIcons(!darkBars);
   }, [darkBars]);
+
+  // The reminder text is fixed when it is scheduled, so it is set again in the current language.
+  useEffect(() => {
+    syncReminder().catch(() => undefined);
+  }, [locale]);
 
   return (
     <>
@@ -130,11 +151,14 @@ function Shell() {
         }}
         onStateChange={state => setRoute(rootRoute(state))}
       >
-        <RootNavigator />
+        {/* The key redraws every screen when the language changes. The navigation state lives in the container. */}
+        <RootNavigator key={locale} />
       </NavigationContainer>
+      <RoomFollower navigationRef={navigationRef} />
       {route === 'Canvas' ? null : <NavBarBacking />}
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
       <ConfirmHost />
+      <ReportHost />
     </>
   );
 }
@@ -158,12 +182,12 @@ export function AppRoot() {
             ) : state === 'failed' ? (
               <View className="flex-1 items-center justify-center gap-3 p-6">
                 <Text variant="title" className="text-center">
-                  Couldn't open your stories
+                  {t("Couldn't open your stories")}
                 </Text>
                 <Text tone="secondary" className="text-center">
-                  Your data was not changed.
+                  {t('Your data was not changed.')}
                 </Text>
-                <Button title="Try again" onPress={retry} />
+                <Button title={t('Try again')} onPress={retry} />
               </View>
             ) : null}
           </ErrorBoundary>

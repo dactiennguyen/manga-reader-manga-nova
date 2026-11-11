@@ -1,7 +1,8 @@
 import { View } from 'react-native';
-import { ArchiveIcon, DocumentIcon, ImagesIcon, LongImageIcon } from '../../ui/icons';
+import { ArchiveIcon, DocumentIcon, ImagesIcon, LongImageIcon, PanelFrameIcon } from '../../ui/icons';
 
-import type { ExportFormat, ExportOptions, ExportQuality, LongWidth } from '../../core/export/plan';
+import type { ExportFormat, ExportOptions, ExportQuality, LongWidth, SocialShape } from '../../core/export/plan';
+import { msg, t, tn } from '../../core/i18n';
 import { chapterLabel } from '../../core/model/selectors';
 import type { Chapter, ID, Page, Project } from '../../core/model/types';
 import { useStory } from '../../state/useStory';
@@ -21,10 +22,11 @@ import {
 import { FORMAT_LABEL, FormatCard, OptionRow } from './ExportParts';
 
 const FORMATS: { value: ExportFormat; icon: IconGlyph; description: string }[] = [
-  { value: 'png', icon: ImagesIcon, description: 'One image per page, packed in a ZIP. Good for social posts.' },
-  { value: 'pdf', icon: DocumentIcon, description: 'For printing or sending to beta readers.' },
-  { value: 'cbz', icon: ArchiveIcon, description: 'Opens in comic reader apps.' },
-  { value: 'long', icon: LongImageIcon, description: 'Stitches pages into a vertical strip for webtoon platforms.' },
+  { value: 'png', icon: ImagesIcon, description: msg('One image per page, packed in a ZIP.') },
+  { value: 'pdf', icon: DocumentIcon, description: msg('For printing or sending to beta readers.') },
+  { value: 'cbz', icon: ArchiveIcon, description: msg('Opens in comic reader apps.') },
+  { value: 'long', icon: LongImageIcon, description: msg('Stitches pages into a vertical strip for webtoon platforms.') },
+  { value: 'social', icon: PanelFrameIcon, description: msg('One image per panel, framed for a feed or a story.') },
 ];
 
 export function ChapterPicker({
@@ -48,9 +50,9 @@ export function ChapterPicker({
 }) {
   const state = useStory.getState();
   return (
-    <Section title="Chapters">
+    <Section title={t('Chapters')}>
       <View className="px-4 py-1">
-        {selectable.length > 1 && <Checkbox checked={allSelected} onChange={onSelectAll} label="Select all" />}
+        {selectable.length > 1 && <Checkbox checked={allSelected} onChange={onSelectAll} label={t('Select all')} />}
         {chapters.map(chapter => {
           const ids = chapterPages[chapter.id];
           const notDone = ids.filter(id => !pages[id].done).length;
@@ -59,7 +61,7 @@ export function ChapterPicker({
               <View key={chapter.id} className="py-1">
                 <Text tone="muted">{chapterLabel(state, chapter.id)}</Text>
                 <Text variant="caption" tone="muted">
-                  No pages
+                  {t('No pages')}
                 </Text>
               </View>
             );
@@ -72,8 +74,8 @@ export function ChapterPicker({
                 label={chapterLabel(state, chapter.id)}
               />
               <Text variant="caption" tone={notDone ? 'warning' : 'secondary'} className="ml-9">
-                {ids.length} {ids.length === 1 ? 'page' : 'pages'}
-                {notDone ? ` · ${notDone} not done` : ''}
+                {tn(ids.length, '{count} page', '{count} pages')}
+                {notDone ? ` · ${t('{n} not done', { n: notDone })}` : ''}
               </Text>
             </View>
           );
@@ -86,14 +88,14 @@ export function ChapterPicker({
 export function FormatPicker({ format, onChange }: { format: ExportFormat; onChange: (format: ExportFormat) => void }) {
   return (
     <View className="gap-2">
-      <SectionHeader>Format</SectionHeader>
+      <SectionHeader>{t('Format')}</SectionHeader>
       <View accessibilityRole="radiogroup" className="flex-row flex-wrap gap-3">
         {FORMATS.map(item => (
           <FormatCard
             key={item.value}
             icon={item.icon}
-            title={FORMAT_LABEL[item.value]}
-            description={item.description}
+            title={t(FORMAT_LABEL[item.value])}
+            description={t(item.description)}
             selected={format === item.value}
             onPress={() => onChange(item.value)}
           />
@@ -116,10 +118,10 @@ export function LanguagePicker({
 }) {
   return (
     <View className="gap-2">
-      <SectionHeader>Language</SectionHeader>
+      <SectionHeader>{t('Language')}</SectionHeader>
       <Card className="gap-2 p-3">
         <ChipRow>
-          <Chip label="Original" selected={!lang} onPress={() => onChange(null)} />
+          <Chip label={t('Original')} selected={!lang} onPress={() => onChange(null)} />
           {languages.map(name => (
             <Chip key={name} label={name} selected={lang === name} onPress={() => onChange(name)} />
           ))}
@@ -127,12 +129,47 @@ export function LanguagePicker({
         <Text variant="caption" tone="secondary">
           {translated
             ? translated.done < translated.total
-              ? `${translated.done} of ${translated.total} bubbles translated. The rest are exported with the original text.`
-              : `All ${translated.total} bubbles are translated.`
-            : 'Bubbles are exported with the original text.'}
+              ? t('{done} of {total} bubbles translated. The rest are exported with the original text.', {
+                  done: translated.done,
+                  total: translated.total,
+                })
+              : t('All {total} bubbles are translated.', { total: translated.total })
+            : t('Bubbles are exported with the original text.')}
         </Text>
       </Card>
     </View>
+  );
+}
+
+function SignatureRows({
+  form,
+  withAuthor,
+  onChange,
+}: {
+  form: ExportOptions;
+  withAuthor: boolean;
+  onChange: (patch: Partial<ExportOptions>) => void;
+}) {
+  return (
+    <>
+      <SwitchRow
+        title={t('Sign every image')}
+        subtitle={t('Puts your pen name in the bottom corner')}
+        value={form.signature}
+        onValueChange={signature => onChange({ signature })}
+      />
+      {withAuthor && (
+        <OptionRow label={t('Author')}>
+          <TextField
+            value={form.penName}
+            onChangeText={penName => onChange({ penName })}
+            placeholder={t('Pen name')}
+            accessibilityLabel={t('Pen name')}
+            maxLength={60}
+          />
+        </OptionRow>
+      )}
+    </>
   );
 }
 
@@ -149,8 +186,8 @@ export function OptionsForm({
 }) {
   if (form.format === 'long') {
     return (
-      <Section title="Options">
-        <OptionRow label="Width">
+      <Section title={t('Options')}>
+        <OptionRow label={t('Width')}>
           <Segmented<LongWidth>
             options={[
               { value: 800, label: '800 px' },
@@ -160,29 +197,48 @@ export function OptionsForm({
             onChange={longWidth => onChange({ longWidth })}
           />
         </OptionRow>
-        <OptionRow label="Page gap">
+        <OptionRow label={t('Page gap')}>
           <Segmented
             options={[
-              { value: 0, label: 'None' },
-              { value: 24, label: 'Small' },
-              { value: 64, label: 'Large' },
+              { value: 0, label: t('None') },
+              { value: 24, label: t('Small') },
+              { value: 64, label: t('Large') },
             ]}
             value={form.gap}
             onChange={gap => onChange({ gap })}
           />
         </OptionRow>
         <SwitchRow
-          title="Auto-cut every 4000 px"
-          subtitle="Splits between pages so each image stays easy to upload"
+          title={t('Auto-cut every 4000 px')}
+          subtitle={t('Splits between pages so each image stays easy to upload')}
           value={form.autoCut}
           onValueChange={autoCut => onChange({ autoCut })}
         />
+        <SignatureRows form={form} withAuthor={form.signature} onChange={onChange} />
+      </Section>
+    );
+  }
+  if (form.format === 'social') {
+    return (
+      <Section title={t('Options')}>
+        <OptionRow label={t('Frame')}>
+          <Segmented<SocialShape>
+            options={[
+              { value: 'square', label: t('Square') },
+              { value: 'portrait', label: '4:5' },
+              { value: 'story', label: '9:16' },
+            ]}
+            value={form.socialShape}
+            onChange={socialShape => onChange({ socialShape })}
+          />
+        </OptionRow>
+        <SignatureRows form={form} withAuthor={form.signature} onChange={onChange} />
       </Section>
     );
   }
   return (
-    <Section title="Options">
-      <OptionRow label="Quality">
+    <Section title={t('Options')}>
+      <OptionRow label={t('Quality')}>
         <Segmented<ExportQuality>
           options={[
             { value: 1, label: '1x · 1200 px' },
@@ -193,11 +249,11 @@ export function OptionsForm({
         />
       </OptionRow>
       {form.format === 'pdf' && (
-        <OptionRow label="Layout">
+        <OptionRow label={t('Layout|pages')}>
           <Segmented
             options={[
-              { value: 'single', label: 'Single page' },
-              { value: 'spread', label: 'Spread' },
+              { value: 'single', label: t('Single page') },
+              { value: 'spread', label: t('Spread') },
             ]}
             value={form.spread ? 'spread' : 'single'}
             onChange={value => onChange({ spread: value === 'spread' })}
@@ -205,30 +261,20 @@ export function OptionsForm({
         </OptionRow>
       )}
       <SwitchRow
-        title="Add cover page"
-        subtitle={project.coverUri ? 'Uses the story cover' : 'Builds a title cover from the story name'}
+        title={t('Add cover page')}
+        subtitle={project.coverUri ? t('Uses the story cover') : t('Builds a title cover from the story name')}
         value={form.cover}
         onValueChange={cover => onChange({ cover })}
       />
       {form.format === 'pdf' && (
         <SwitchRow
-          title="Add info page"
-          subtitle="Title, author and export date"
+          title={t('Add info page')}
+          subtitle={t('Title, author and export date')}
           value={form.info}
           onValueChange={info => onChange({ info })}
         />
       )}
-      {(form.cover || withInfo) && (
-        <OptionRow label="Author">
-          <TextField
-            value={form.penName}
-            onChangeText={penName => onChange({ penName })}
-            placeholder="Pen name"
-            accessibilityLabel="Pen name"
-            maxLength={60}
-          />
-        </OptionRow>
-      )}
+      <SignatureRows form={form} withAuthor={form.cover || withInfo || form.signature} onChange={onChange} />
     </Section>
   );
 }

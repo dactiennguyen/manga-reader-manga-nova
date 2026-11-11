@@ -1,4 +1,5 @@
 import { LIMITS } from '../model/constants';
+import { t, tn } from '../i18n';
 import type { Project, StoryData } from '../model/types';
 import { DAY_MS } from '../util/time';
 
@@ -34,5 +35,5 @@ export function trashDaysLeft(project: Pick<Project, 'deletedAt'>, now: number):
 }
 
 export function trashCountdown(left: number): string {
-  return left > 1 ? `${left} days left` : left === 1 ? '1 day left' : 'Will be deleted today';
+  return left >= 1 ? tn(left, '{count} day left', '{count} days left') : t('Will be deleted today');
 }

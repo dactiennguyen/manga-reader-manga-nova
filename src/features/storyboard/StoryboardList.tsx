@@ -1,6 +1,7 @@
 import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { t } from '../../core/i18n';
 import { panelOrder } from '../../core/layout/layout';
 import { SHOT_LABEL } from '../../core/model/constants';
 import type { ID, Page } from '../../core/model/types';
@@ -58,7 +59,7 @@ export function StoryboardList({
             <View className="flex-1 gap-1">
               {order.length === 0 && (
                 <Text variant="caption" tone="muted">
-                  No panels yet
+                  {t('No panels yet')}
                 </Text>
               )}
               {order.map((panelId, panelIndex) => {
@@ -67,9 +68,9 @@ export function StoryboardList({
                   <Text key={panelId} variant="caption" tone="secondary" numberOfLines={2}>
                     <Text variant="label">
                       {panelIndex + 1}
-                      {panel?.shot ? ` · ${SHOT_LABEL[panel.shot]}` : ''}
+                      {panel?.shot ? ` · ${t(SHOT_LABEL[panel.shot])}` : ''}
                     </Text>
-                    {`  ${panel?.description || 'No description'}`}
+                    {`  ${panel?.description || t('No description')}`}
                   </Text>
                 );
               })}

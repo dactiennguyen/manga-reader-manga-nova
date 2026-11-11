@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { View } from 'react-native';
 import { CaretDownIcon, CaretUpIcon, CloseIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import type { FindContext } from '../../core/script/blockOps';
 import { Button, Chip, IconButton, SearchField, Text, TextField } from '../../ui';
 
@@ -39,7 +40,7 @@ export const FindBar = memo(function FindBarBase({
   onClose,
 }: FindBarProps) {
   const none = count === 0;
-  const status = !query ? '' : none ? 'No results' : `${current + 1} of ${count}`;
+  const status = !query ? '' : none ? t('No results') : t('{n} of {total}', { n: current + 1, total: count });
   return (
     <View className="gap-2 bg-raised px-3 py-2">
       <View className="flex-row items-center gap-1">
@@ -47,35 +48,35 @@ export const FindBar = memo(function FindBarBase({
           autoFocus
           value={query}
           onChangeText={onQuery}
-          placeholder="Find in script"
+          placeholder={t('Find in script')}
           autoCapitalize="none"
           autoCorrect={false}
           submitBehavior="submit"
           onSubmitEditing={onNext}
-          accessibilityLabel="Find in script"
+          accessibilityLabel={t('Find in script')}
           className="flex-1"
         />
-        <IconButton icon={CaretUpIcon} onPress={onPrevious} disabled={none} accessibilityLabel="Previous match" />
-        <IconButton icon={CaretDownIcon} onPress={onNext} disabled={none} accessibilityLabel="Next match" />
-        <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close find" />
+        <IconButton icon={CaretUpIcon} onPress={onPrevious} disabled={none} accessibilityLabel={t('Previous match')} />
+        <IconButton icon={CaretDownIcon} onPress={onNext} disabled={none} accessibilityLabel={t('Next match')} />
+        <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel={t('Close find')} />
       </View>
       <View className="flex-row items-center gap-2">
         <TextField
           value={replacement}
           onChangeText={onReplacement}
-          placeholder="Replace with"
+          placeholder={t('Replace with')}
           autoCapitalize="none"
           autoCorrect={false}
           returnKeyType="done"
           submitBehavior="submit"
-          accessibilityLabel="Replace with"
+          accessibilityLabel={t('Replace with')}
           className="flex-1"
         />
-        <Button title="Replace" variant="secondary" small onPress={onReplace} disabled={none} />
-        <Button title="All" small onPress={onReplaceAll} disabled={none} />
+        <Button title={t('Replace')} variant="secondary" small onPress={onReplace} disabled={none} />
+        <Button title={t('All')} small onPress={onReplaceAll} disabled={none} />
       </View>
       <View className="flex-row items-center gap-2">
-        <Chip label="Match case" selected={matchCase} onPress={() => onMatchCase(!matchCase)} />
+        <Chip label={t('Match case')} selected={matchCase} onPress={() => onMatchCase(!matchCase)} />
         <Text
           variant="caption"
           tone={query && none ? 'danger' : 'muted'}
@@ -95,7 +96,7 @@ export const FindBar = memo(function FindBarBase({
               {context.after}
             </>
           ) : (
-            'Searches every block in this chapter'
+            t('Searches every block in this chapter')
           )}
         </Text>
       </View>

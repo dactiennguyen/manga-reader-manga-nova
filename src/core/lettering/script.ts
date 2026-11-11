@@ -43,7 +43,8 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(Math.max(min, max), value));
 }
 
-function sized(bubble: Bubble, maxH: number, measure: TextMeasure | null): Bubble {
+/** Grows a bubble downwards, up to maxH, until its text fits at the size it was given. */
+export function sized(bubble: Bubble, maxH: number, measure: TextMeasure | null): Bubble {
   let next = bubble;
   if (!measure || bubble.type === 'sfx') {
     return next;

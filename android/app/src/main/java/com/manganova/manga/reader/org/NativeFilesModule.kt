@@ -22,7 +22,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-/** Implements specs/NativeFiles.ts: zip/unzip, images to PDF, sharing and clipboard. */
+/** Implements specs/NativeFiles.ts: zip/unzip, images to PDF or video, sharing and clipboard. */
 class NativeFilesModule(reactContext: ReactApplicationContext) : NativeFilesSpec(reactContext) {
 
   private val executor = Executors.newSingleThreadExecutor()
@@ -126,6 +126,41 @@ class NativeFilesModule(reactContext: ReactApplicationContext) : NativeFilesSpec
         promise.reject("E_PDF", e.message, e)
       } finally {
         document.close()
+      }
+    }
+  }
+
+  override fun framesToVideo(framePaths: ReadableArray, outPath: String, fps: Double, promise: Promise) {
+    val paths = (0 until framePaths.size()).mapNotNull { framePaths.getString(it) }
+    executor.execute {
+      try {
+        FrameVideoEncoder.encode(paths, outPath, fps.toInt().coerceIn(1, 60))
+        promise.resolve(null)
+      } catch (e: Throwable) {
+        File(outPath).delete()
+        promise.reject("E_VIDEO", e.message, e)
+      }
+    }
+  }
+
+  override fun concatAudio(paths: ReadableArray, outPath: String, gapMs: Double, promise: Promise) {
+    val list = (0 until paths.size()).mapNotNull { paths.getString(it) }
+    executor.execute {
+      try {
+        promise.resolve(AudioJoiner.concat(list, outPath, gapMs.toLong().coerceIn(0, 5000)).toDouble())
+      } catch (e: Throwable) {
+        promise.reject("E_AUDIO", e.message, e)
+      }
+    }
+  }
+
+  override fun addAudioToVideo(videoPath: String, audioPath: String, outPath: String, promise: Promise) {
+    executor.execute {
+      try {
+        AudioJoiner.addAudio(videoPath, audioPath, outPath)
+        promise.resolve(null)
+      } catch (e: Throwable) {
+        promise.reject("E_VIDEO", e.message, e)
       }
     }
   }

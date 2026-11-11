@@ -16,3 +16,9 @@ export function formatBytes(bytes: number): string {
 export function plural(count: number, noun: string, pluralNoun = `${noun}s`): string {
   return `${count} ${count === 1 ? noun : pluralNoun}`;
 }
+
+/** The first `max` characters, counted as code points, so an emoji is never cut into a broken half. */
+export function takeChars(text: string, max: number): string {
+  const chars = Array.from(text);
+  return chars.length > max ? chars.slice(0, max).join('') : text;
+}

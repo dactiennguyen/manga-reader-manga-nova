@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CaretDownIcon, CloseIcon, FlagIcon, MoreIcon, PenLineIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { Button, ICON, Icon, IconButton, PANEL_SHADOW, Pressable, Slider, Text } from '../../ui';
 
 export function PageCounter({ label }: { label: string }) {
@@ -42,9 +43,9 @@ export function ReaderTopBar({
       className="absolute inset-x-2 flex-row items-center gap-1 rounded-xl bg-raised p-1"
       style={{ top: insets.top + 8, boxShadow: PANEL_SHADOW }}
     >
-      <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel="Close preview" />
+      <IconButton icon={CloseIcon} onPress={onClose} accessibilityLabel={t('Close preview')} />
       <Pressable
-        accessibilityLabel={`${chapterTitle}, choose a chapter`}
+        accessibilityLabel={t('{title}, choose a chapter', { title: chapterTitle })}
         onPress={onChapters}
         className="h-12 flex-1 flex-row items-center gap-1 overflow-hidden rounded-md px-2"
       >
@@ -58,13 +59,13 @@ export function ReaderTopBar({
         active={flagged}
         disabled={!canFlag}
         onPress={onFlag}
-        accessibilityLabel="Flag this page"
+        accessibilityLabel={t('Flag this page')}
       />
       <IconButton
         icon={MoreIcon}
         badge={flagCount || undefined}
         onPress={onMore}
-        accessibilityLabel="More options"
+        accessibilityLabel={t('More options')}
       />
     </View>
   );
@@ -95,7 +96,7 @@ export function ReaderBottomBar({
         {sliderCount > 1 && (
           <Slider
             className="flex-1"
-            label="Page"
+            label={t('Page')}
             min={1}
             max={sliderCount}
             step={1}
@@ -107,7 +108,7 @@ export function ReaderBottomBar({
           {label}
         </Text>
       </View>
-      <Button title="Edit this page" icon={PenLineIcon} variant="secondary" small disabled={!canEdit} onPress={onEdit} />
+      <Button title={t('Edit this page')} icon={PenLineIcon} variant="secondary" small disabled={!canEdit} onPress={onEdit} />
     </View>
   );
 }

@@ -1,6 +1,15 @@
 import { useCallback } from 'react';
 
+import {
+  POSE_COLOR,
+  POSE_GRAY,
+  POSE_LAYER_OPACITY,
+  buildPoseStrokes,
+  fitPoseBox,
+  type Pose,
+} from '../../core/art/poses';
 import { coverImageRect, fitImageRect } from '../../core/art/strokes';
+import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { PanelShape } from '../../core/layout/layout';
 import type { ArtLayer, ID } from '../../core/model/types';
@@ -23,36 +32,36 @@ export function useLayerActions(
       return;
     }
     if (active.locked) {
-      toast('Layer is locked');
+      toast(t('Layer is locked'));
       return;
     }
     const path = await pickImage();
     const image = path ? await loadImage(path) : null;
     if (!path || !image) {
       if (path) {
-        toast('Could not open the image');
+        toast(t('Could not open the image'));
       }
       return;
     }
     const rect = fitImageRect(image.width(), image.height(), shape.bbox);
     editLayer(panelId, active.id, { image: { uri: path, ...rect } });
-    toast('Image placed on layer');
+    toast(t('Image placed on layer'));
   }, [active, panelId, shape]);
 
   const clearActive = useCallback(async () => {
     // Strokes do not re-render the screen, so `active` can be behind the store.
     const layer = loadArt(panelId)?.layers.find(item => item.id === active?.id);
     if (!layer || (!layer.strokes.length && !layer.image)) {
-      toast('Layer is already empty');
+      toast(t('Layer is already empty'));
       return;
     }
     if (layer.locked) {
-      toast('Layer is locked');
+      toast(t('Layer is locked'));
       return;
     }
-    if (await confirm(`Clear layer "${layer.name}"?`, undefined, { confirmText: 'Clear', destructive: true })) {
+    if (await confirm(t('Clear layer "{name}"?', { name: layer.name }), undefined, { confirmText: t('Clear'), destructive: true })) {
       rewriteLayer(panelId, layer.id, [], { image: undefined });
-      toast('Layer cleared');
+      toast(t('Layer cleared'));
     }
   }, [active, panelId]);
 
@@ -68,7 +77,7 @@ export function useLayerActions(
     async (material: Material): Promise<boolean> => {
       const background = material.kind === 'background';
       if ((loadArt(panelId)?.layers.length ?? 0) >= LIMITS.layers) {
-        toast(`A panel can hold ${LIMITS.layers} layers. Merge or delete one first`);
+        toast(t('A panel can hold {max} layers. Merge or delete one first', { max: LIMITS.layers }));
         return false;
       }
       try {
@@ -84,12 +93,32 @@ export function useLayerActions(
         }
         return true;
       } catch {
-        toast('Could not add this material');
+        toast(t('Could not add this material'));
         return false;
       }
     },
     [active, panelId, shape],
   );
 
-  return { importImage, clearActive, addReference, placeMaterial };
+  /** The mannequin gets its own layer just under the one being drawn on, which stays the active layer. */
+  const placePose = useCallback(
+    (pose: Pose, colored: boolean): boolean => {
+      const layers = loadArt(panelId)?.layers ?? [];
+      if (layers.length >= LIMITS.layers) {
+        toast(t('A panel can hold {max} layers. Merge or delete one first', { max: LIMITS.layers }));
+        return false;
+      }
+      const strokes = buildPoseStrokes(pose, fitPoseBox(pose, shape.bbox), colored ? POSE_COLOR : POSE_GRAY);
+      const below = layers.findIndex(layer => layer.id === active?.id);
+      // The name is translated here: from now on it is the person's layer, and they can rename it.
+      addLayer(panelId, t(pose.label), { strokes, opacity: POSE_LAYER_OPACITY }, Math.max(0, below));
+      if (active) {
+        setActiveLayer(panelId, active.id);
+      }
+      return true;
+    },
+    [active, panelId, shape],
+  );
+
+  return { importImage, clearActive, addReference, placeMaterial, placePose };
 }

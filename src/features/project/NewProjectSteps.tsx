@@ -1,8 +1,10 @@
 import { View } from 'react-native';
 import { AiIcon, CheckIcon, RefreshIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { ART_STYLE_LABEL, LIMITS } from '../../core/model/constants';
 import { FORMATS, type FormatKey } from '../../core/story/newProject';
+import { STARTERS, starterOf } from '../../core/story/starters';
 import {
   AiErrorBox,
   AiLoading,
@@ -12,14 +14,16 @@ import {
   Card,
   Chip,
   ChipGroup,
+  ChipRow,
   FieldLabel,
   SwitchRow,
   Text,
   TextField,
 } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { OptionCard } from '../onboarding/OptionCard';
 import { StylePicker } from '../onboarding/StylePicker';
-import type { NewProjectForm } from './useNewProject';
+import { storyIdeaText, type NewProjectForm } from './useNewProject';
 
 function StepTitle({ children }: { children: string }) {
   return (
@@ -33,38 +37,43 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
   const { ai, aiSource, genres, idea, logline } = form;
   return (
     <>
-      <StepTitle>Your story</StepTitle>
+      <StepTitle>{t('Your story')}</StepTitle>
       {!!idea && (
         <Card className="p-3">
           <Text variant="bodySmall" tone="secondary">
-            Idea: {idea}
+            {t('Idea: {idea}', { idea })}
           </Text>
         </Card>
       )}
-      {form.aiFilled && <AiNote text="Suggested by AI — edit anything" />}
+      {form.aiFilled && (
+        <View className="flex-row items-center gap-1">
+          <AiNote text={t('Suggested by AI — edit anything')} className="flex-1" />
+          <ReportAiButton text={form.aiText} feature="storyIdea" />
+        </View>
+      )}
       <View className="gap-2">
-        <FieldLabel>Story title</FieldLabel>
+        <FieldLabel>{t('Story title')}</FieldLabel>
         <TextField
           value={form.title}
           onChangeText={form.editTitle}
-          placeholder="E.g. The Magic Pen"
-          accessibilityLabel="Story title"
+          placeholder={t('E.g. The Magic Pen')}
+          accessibilityLabel={t('Story title')}
           maxLength={LIMITS.projectTitle}
           autoFocus={!idea && !form.draft}
         />
         {form.duplicate && (
           <Text variant="caption" tone="muted">
-            You already have a story with this title
+            {t('You already have a story with this title')}
           </Text>
         )}
       </View>
       <View className="gap-1">
-        <FieldLabel>{`Genres (${genres.length}/${LIMITS.genresPerProject})`}</FieldLabel>
+        <FieldLabel>{t('Genres ({count}/{max})', { count: genres.length, max: LIMITS.genresPerProject })}</FieldLabel>
         <ChipGroup>
           {form.genreList.map(genre => (
             <Chip
               key={genre}
-              label={genre}
+              label={t(genre)}
               selected={genres.includes(genre)}
               onPress={() => form.toggleGenre(genre)}
             />
@@ -72,12 +81,12 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
         </ChipGroup>
       </View>
       <View className="gap-2">
-        <FieldLabel>One-line summary</FieldLabel>
+        <FieldLabel>{t('One-line summary')}</FieldLabel>
         <TextField
           value={logline}
           onChangeText={form.editLogline}
-          placeholder="Who is it about, what do they want, what stands in the way?"
-          accessibilityLabel="One-line summary"
+          placeholder={t('Who is it about, what do they want, what stands in the way?')}
+          accessibilityLabel={t('One-line summary')}
           maxLength={LIMITS.logline}
           multiline
           textAlignVertical="top"
@@ -85,7 +94,7 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
         />
         <View className="flex-row items-center justify-between gap-2">
           <Button
-            title="Suggest with AI"
+            title={t('Suggest with AI')}
             variant="ai"
             icon={AiIcon}
             small
@@ -98,11 +107,11 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
         </View>
         {!aiSource && (
           <Text variant="caption" tone="muted">
-            Type a title or a rough idea first, and AI can shape it into a pitch.
+            {t('Type a title or a rough idea first, and AI can shape it into a pitch.')}
           </Text>
         )}
       </View>
-      {ai.status === 'loading' && <AiLoading label="Writing a suggestion…" onCancel={form.cancelAi} />}
+      {ai.status === 'loading' && <AiLoading label={t('Writing a suggestion…')} onCancel={form.cancelAi} />}
       {ai.status === 'error' && (
         <AiErrorBox
           message={ai.message}
@@ -111,21 +120,22 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
         />
       )}
       {ai.status === 'done' && (
-        <AiPanel title="AI suggestion">
+        <AiPanel title={t('AI suggestion')}>
           <Text variant="heading">{ai.data.title}</Text>
           {ai.data.genres.length > 0 && (
             <Text variant="caption" tone="secondary">
-              {ai.data.genres.join(' · ')}
+              {ai.data.genres.map(genre => t(genre)).join(' · ')}
             </Text>
           )}
           <Text>{ai.data.logline}</Text>
           <Text variant="caption" tone="secondary">
-            Use replaces the title, genres and summary above. Nothing changes until you tap it.
+            {t('Use replaces the title, genres and summary above. Nothing changes until you tap it.')}
           </Text>
-          <View className="flex-row flex-wrap justify-end gap-2">
-            <Button title="Discard" variant="ghost" small onPress={form.resetAi} />
-            <Button title="Try again" variant="secondary" icon={RefreshIcon} small onPress={form.suggest} />
-            <Button title="Use" variant="ai" icon={CheckIcon} small onPress={() => form.acceptSuggestion(ai.data)} />
+          <View className="flex-row flex-wrap items-center justify-end gap-2">
+            <ReportAiButton text={storyIdeaText(ai.data)} feature="storyIdea" className="mr-auto" />
+            <Button title={t('Discard')} variant="ghost" small onPress={form.resetAi} />
+            <Button title={t('Try again')} variant="secondary" icon={RefreshIcon} small onPress={form.suggest} />
+            <Button title={t('Use')} variant="ai" icon={CheckIcon} small onPress={() => form.acceptSuggestion(ai.data)} />
           </View>
         </AiPanel>
       )}
@@ -158,13 +168,13 @@ function FormatArt({ kind }: { kind: FormatKey }) {
 export function FormatStep({ form }: { form: NewProjectForm }) {
   return (
     <>
-      <StepTitle>Format</StepTitle>
+      <StepTitle>{t('Format')}</StepTitle>
       <View accessibilityRole="radiogroup" className="gap-3">
         {FORMATS.map(item => (
           <OptionCard
             key={item.key}
-            label={item.label}
-            hint={item.hint}
+            label={t(item.label)}
+            hint={t(item.hint)}
             selected={item.key === form.formatKey}
             onPress={() => form.setFormatKey(item.key)}
             left={<FormatArt kind={item.key} />}
@@ -172,8 +182,24 @@ export function FormatStep({ form }: { form: NewProjectForm }) {
         ))}
       </View>
       <Text variant="caption" tone="muted">
-        Note: the format cannot be changed after you draw the first page.
+        {t('Note: the format cannot be changed after you draw the first page.')}
       </Text>
+      <StepTitle>{t('Start with')}</StepTitle>
+      <Card className="gap-2 p-3">
+        <ChipRow>
+          {STARTERS.map(item => (
+            <Chip
+              key={item.key}
+              label={t(item.label)}
+              selected={item.key === form.starterKey}
+              onPress={() => form.pickStarter(item.key)}
+            />
+          ))}
+        </ChipRow>
+        <Text variant="caption" tone="secondary">
+          {t(starterOf(form.starterKey).hint)}
+        </Text>
+      </Card>
     </>
   );
 }
@@ -182,27 +208,27 @@ export function StyleStep({ form }: { form: NewProjectForm }) {
   const { color, format, genres, logline, name, style } = form;
   return (
     <>
-      <StepTitle>Art style</StepTitle>
+      <StepTitle>{t('Art style')}</StepTitle>
       <StylePicker value={style} onChange={form.setStyle} />
       <Card>
         <SwitchRow
-          title="Color story"
-          subtitle="Turn off for classic black and white manga"
+          title={t('Color story')}
+          subtitle={t('Turn off for classic black and white manga')}
           value={color}
           onValueChange={form.setColor}
         />
       </Card>
       <Card className="gap-1 p-3">
         <Text variant="caption" tone="muted">
-          Summary
+          {t('Summary')}
         </Text>
         <Text variant="heading">{name}</Text>
         <Text tone="secondary">
           {[
-            genres.join(', ') || 'No genre',
-            format.label,
-            ART_STYLE_LABEL[style],
-            color ? 'Color story' : 'Black and white',
+            genres.map(genre => t(genre)).join(', ') || t('No genre'),
+            t(format.label),
+            t(ART_STYLE_LABEL[style]),
+            color ? t('Color story') : t('Black and white'),
           ].join(' · ')}
         </Text>
         {!!logline.trim() && <Text>{logline.trim()}</Text>}

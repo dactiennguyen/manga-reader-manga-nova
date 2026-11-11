@@ -2,8 +2,8 @@ import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { CaretDownIcon, CaretLeftIcon, CaretRightIcon, DoneIcon, MoreIcon, RedoIcon, UndoIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import type { Chapter } from '../../core/model/types';
-import { plural } from '../../core/util/format';
 import type { PageContext } from '../../render/drawPage';
 import { PageView, usePageContext } from '../../render/PageView';
 import { useChapter } from '../../state/hooks';
@@ -48,25 +48,25 @@ function PanelLayoutBody({
         onBack={c.goBack}
         right={
           <>
-            <IconButton icon={UndoIcon} disabled={!canUndo} onPress={() => undoStory(scope)} accessibilityLabel="Undo" />
-            <IconButton icon={RedoIcon} disabled={!canRedo} onPress={() => redoStory(scope)} accessibilityLabel="Redo" />
+            <IconButton icon={UndoIcon} disabled={!canUndo} onPress={() => undoStory(scope)} accessibilityLabel={t('Undo')} />
+            <IconButton icon={RedoIcon} disabled={!canRedo} onPress={() => redoStory(scope)} accessibilityLabel={t('Redo')} />
             <IconButton
               icon={DoneIcon}
               active={page.done}
               onPress={() => setPagesDone([pageId], !page.done)}
-              accessibilityLabel={page.done ? 'Mark not done' : 'Mark page done'}
+              accessibilityLabel={page.done ? t('Mark not done') : t('Mark page done')}
             />
-            <IconButton icon={MoreIcon} onPress={() => c.setSheet('menu')} accessibilityLabel="More" />
+            <IconButton icon={MoreIcon} onPress={() => c.setSheet('menu')} accessibilityLabel={t('More')} />
           </>
         }
       >
         <Pressable
-          accessibilityLabel="Jump to another page"
+          accessibilityLabel={t('Jump to another page')}
           onPress={() => c.setSheet('jump')}
           className="min-h-12 flex-row items-center gap-1"
         >
           <Text variant="title" numberOfLines={1}>
-            Page {index + 1} / {total}
+            {t('Page {n} / {total}', { n: index + 1, total })}
           </Text>
           <Icon icon={CaretDownIcon} />
         </Pressable>
@@ -81,7 +81,7 @@ function PanelLayoutBody({
             <View
               accessible
               accessibilityRole="image"
-              accessibilityLabel={`Page ${index + 1}, ${plural(shapes.length, 'panel')}`}
+              accessibilityLabel={tn(shapes.length, 'Page {n}, {count} panel', 'Page {n}, {count} panels', { n: index + 1 })}
               className="absolute"
               style={{ left: frame.ox, top: frame.oy, width: size.w * frame.k, height: size.h * frame.k }}
             >
@@ -112,14 +112,14 @@ function PanelLayoutBody({
           <IconButton
             icon={CaretLeftIcon}
             onPress={() => c.goTo(index + (rtl ? 1 : -1))}
-            accessibilityLabel={rtl ? 'Next page' : 'Previous page'}
+            accessibilityLabel={rtl ? t('Next page') : t('Previous page')}
           />
         }
         trailing={
           <IconButton
             icon={CaretRightIcon}
             onPress={() => c.goTo(index + (rtl ? -1 : 1))}
-            accessibilityLabel={rtl ? 'Previous page' : 'Next page'}
+            accessibilityLabel={rtl ? t('Previous page') : t('Next page')}
           />
         }
       />
@@ -134,7 +134,7 @@ export function PanelLayoutScreen({ navigation, route }: ScreenProps<'PanelLayou
   if (!ctx || !chapter) {
     return (
       <Screen>
-        <AppBar title="Page" onBack={() => navigation.goBack()} />
+        <AppBar title={t('Page')} onBack={() => navigation.goBack()} />
       </Screen>
     );
   }

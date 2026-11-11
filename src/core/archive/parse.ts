@@ -1,9 +1,10 @@
 import { z } from 'zod';
 
+import { msg, t } from '../i18n';
 import type { ID, PanelArt } from '../model/types';
 import type { ProjectBundle } from './bundle';
 
-const INVALID_MESSAGE = "This file can't be read or isn't a Manganova project";
+const INVALID_MESSAGE = msg("This file can't be read or isn't a Manganova project");
 
 const id = z.string().min(1);
 const ids = z.array(id).optional();
@@ -74,11 +75,11 @@ export function parseProjectBundle(json: string): ProjectBundle {
   try {
     data = JSON.parse(json);
   } catch {
-    throw new Error(INVALID_MESSAGE);
+    throw new Error(t(INVALID_MESSAGE));
   }
   const parsed = bundle.safeParse(data);
   if (!parsed.success) {
-    throw new Error(INVALID_MESSAGE);
+    throw new Error(t(INVALID_MESSAGE));
   }
   const art: Record<ID, PanelArt> = {};
   for (const [panelId, value] of Object.entries(parsed.data.art ?? {})) {

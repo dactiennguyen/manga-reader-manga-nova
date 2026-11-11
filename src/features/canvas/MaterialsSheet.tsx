@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Image, View } from 'react-native';
 
+import { msg, t } from '../../core/i18n';
 import { Pressable, Sheet, Tabs, Text } from '../../ui';
 import { MATERIALS, type Material, type MaterialKind } from './materials';
 
 const TABS: { key: MaterialKind; label: string }[] = [
-  { key: 'background', label: 'Backgrounds' },
-  { key: 'pattern', label: 'Patterns' },
+  { key: 'background', label: msg('Backgrounds') },
+  { key: 'pattern', label: msg('Patterns') },
 ];
 
 const THUMB_RATIO: Record<MaterialKind, number> = { background: 3 / 2, pattern: 1 };
@@ -25,13 +26,13 @@ export function MaterialsSheet({
 }) {
   const [kind, setKind] = useState<MaterialKind>('background');
   return (
-    <Sheet visible={visible} onClose={onClose} title="Materials" subtitle="Ready-made line art to drop into this panel">
-      <Tabs tabs={TABS} value={kind} onChange={setKind} stretch />
+    <Sheet visible={visible} onClose={onClose} title={t('Materials')} subtitle={t('Ready-made line art to drop into this panel')}>
+      <Tabs tabs={TABS.map(tab => ({ ...tab, label: t(tab.label) }))} value={kind} onChange={setKind} stretch />
       <View className="flex-row flex-wrap gap-3 pt-3">
         {MATERIALS.filter(item => item.kind === kind).map(item => (
           <Pressable
             key={item.id}
-            accessibilityLabel={`Add ${item.label}`}
+            accessibilityLabel={t('Add {name}', { name: t(item.label) })}
             onPress={() => onPick(item)}
             className="w-[47%] grow gap-1"
           >
@@ -39,7 +40,7 @@ export function MaterialsSheet({
               <Image accessibilityIgnoresInvertColors source={item.source} resizeMode="cover" style={FILL} />
             </View>
             <Text variant="caption" tone="secondary" numberOfLines={1}>
-              {item.label}
+              {t(item.label)}
             </Text>
           </Pressable>
         ))}

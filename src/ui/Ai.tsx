@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { AiIcon, RefreshIcon } from './icons';
 
+import { t } from '../core/i18n';
 import { Button } from './Button';
 import { Icon } from './Icon';
 import { Text } from './Text';
@@ -40,7 +41,7 @@ export function AiLoading({ label, onCancel }: { label: string; onCancel?: () =>
       <Text variant="bodySmall" tone="secondary" className="text-center">
         {label}
       </Text>
-      {!!onCancel && <Button title="Cancel" variant="ghost" onPress={onCancel} />}
+      {!!onCancel && <Button title={t('Cancel')} variant="ghost" onPress={onCancel} />}
     </View>
   );
 }
@@ -60,8 +61,8 @@ export function AiErrorBox({
         {message}
       </Text>
       <View className="flex-row justify-end gap-2">
-        {!!onCancel && <Button title="Cancel" variant="ghost" small onPress={onCancel} />}
-        {!!onRetry && <Button title="Retry" variant="secondary" icon={RefreshIcon} small onPress={onRetry} />}
+        {!!onCancel && <Button title={t('Cancel')} variant="ghost" small onPress={onCancel} />}
+        {!!onRetry && <Button title={t('Retry')} variant="secondary" icon={RefreshIcon} small onPress={onRetry} />}
       </View>
     </View>
   );

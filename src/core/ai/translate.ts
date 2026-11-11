@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { AiError, type AiMessage } from './port';
 import { askJson } from './story';
 
@@ -30,7 +31,7 @@ export function parseTranslations(value: unknown, count: number): string[] {
     : [];
   const lines = source.map(item => (typeof item === 'string' ? item.trim() : ''));
   if (lines.length !== count || lines.some(line => !line)) {
-    throw new AiError('format', 'The AI answer was not in the expected format. Try again.');
+    throw new AiError('format', t('The AI answer was not in the expected format. Try again.'));
   }
   return lines;
 }

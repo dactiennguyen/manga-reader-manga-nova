@@ -41,7 +41,7 @@ Chỉ so sánh nội dung trang. Giao diện app đổi hoàn toàn nên không 
 
 ## CI
 
-GitHub Actions, chỉ build Android. Có hai workflow:
+GitHub Actions. Có ba workflow:
 
 | Workflow | Chạy khi nào | Làm gì |
 | --- | --- | --- |

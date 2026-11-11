@@ -13,11 +13,18 @@ class AppPackage : BaseReactPackage() {
       when (name) {
         NativeScreenModule.NAME -> NativeScreenModule(reactContext)
         NativeFilesModule.NAME -> NativeFilesModule(reactContext)
+        NativeReminderModule.NAME -> NativeReminderModule(reactContext)
+        NativeSpeechModule.NAME -> NativeSpeechModule(reactContext)
         else -> null
       }
 
   override fun getReactModuleInfoProvider() = ReactModuleInfoProvider {
-    listOf(NativeScreenModule.NAME, NativeFilesModule.NAME).associateWith { name ->
+    listOf(
+        NativeScreenModule.NAME,
+        NativeFilesModule.NAME,
+        NativeReminderModule.NAME,
+        NativeSpeechModule.NAME,
+    ).associateWith { name ->
       ReactModuleInfo(
           name = name,
           className = name,

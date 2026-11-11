@@ -1,4 +1,5 @@
 import { AI_TIMEOUT_MS, AiError, normalizeBaseUrl, type AiClient, type AiRequest } from '../core/ai/port';
+import { t } from '../core/i18n';
 
 export type AiConfig = { baseUrl: string; apiKey: string; model: string; timeoutMs?: number };
 
@@ -18,7 +19,7 @@ function readPath(data: unknown, path: (string | number)[]): string {
 async function send(config: AiConfig, request: AiRequest, signal?: AbortSignal): Promise<string> {
   const baseUrl = normalizeBaseUrl(config.baseUrl);
   if (!baseUrl) {
-    throw new AiError('not-configured', 'Set the AI server address in Profile first.');
+    throw new AiError('not-configured', t('Set the AI server address in Profile first.'));
   }
   const apiKey = config.apiKey.trim();
   const controller = new AbortController();
@@ -49,13 +50,15 @@ async function send(config: AiConfig, request: AiRequest, signal?: AbortSignal):
       throw new AiError(
         'server',
         response.status === 401 || response.status === 403
-          ? 'The AI server rejected the API key.'
-          : `The AI server answered with an error (${response.status})${detail ? `: ${detail.slice(0, 120)}` : '.'}`,
+          ? t('The AI server rejected the API key.')
+          : detail
+            ? t('The AI server answered with an error ({status}): {detail}', { status: response.status, detail: detail.slice(0, 120) })
+            : t('The AI server answered with an error ({status}).', { status: response.status }),
       );
     }
     const content = readPath(data, ['choices', 0, 'message', 'content']);
     if (!content || !content.trim()) {
-      throw new AiError('empty', 'The AI returned an empty answer. Try again.');
+      throw new AiError('empty', t('The AI returned an empty answer. Try again.'));
     }
     return content;
   } catch (error) {
@@ -63,12 +66,12 @@ async function send(config: AiConfig, request: AiRequest, signal?: AbortSignal):
       throw error;
     }
     if (signal?.aborted) {
-      throw new AiError('cancelled', 'Cancelled.');
+      throw new AiError('cancelled', t('Cancelled.'));
     }
     if (timedOut) {
-      throw new AiError('timeout', 'The AI took too long to answer. Try again.');
+      throw new AiError('timeout', t('The AI took too long to answer. Try again.'));
     }
-    throw new AiError('network', 'Could not reach the AI server. Check the address and your connection.');
+    throw new AiError('network', t('Could not reach the AI server. Check the address and your connection.'));
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener('abort', onAbort);

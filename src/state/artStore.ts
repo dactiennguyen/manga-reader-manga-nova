@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import type { ArtRepo, LayerRow } from '../core/ports';
 import type { ArtLayer, ID, PanelArt, Stroke } from '../core/model/types';
 import { uid } from '../core/util/id';
+import { noteStrokes } from './useActivity';
 
 /** Panels kept in memory. Art is the largest thing the app holds. */
 const CACHE_PANELS = 3;
@@ -160,6 +161,7 @@ export function commitStroke(panelId: ID, layerId: ID, ...strokes: Stroke[]): vo
     ),
   }));
   record(panelId, [{ before, after: { ...before, ...state } }]);
+  noteStrokes(strokes.length);
 }
 
 /** Replaces a layer's strokes as a new generation, so undo only has to point back at the old one. */
@@ -173,6 +175,65 @@ export function rewriteLayer(panelId: ID, layerId: ID, strokes: Stroke[], patch:
     layers: art.layers.map(layer => (layer.id === layerId ? { ...layer, ...patch, strokes, ...state } : layer)),
   }));
   record(panelId, [{ before, after }]);
+}
+
+/**
+ * Changes made by someone else in a shared page. They are saved like any stroke but stay out of this
+ * phone's undo history: undo here only ever takes back what this person drew. Rows of the layer already
+ * in the history follow its new head, so undoing a local layer move cannot roll the other person back.
+ */
+function followForeign(panelId: ID, layerId: ID, state: { gen: number; head: number }): void {
+  const history = histories.get(panelId);
+  if (!history) {
+    return;
+  }
+  const fix = (row: LayerRow | null): LayerRow | null => (row && row.id === layerId ? { ...row, ...state } : row);
+  const fixAll = (steps: LayerPatch[][]) =>
+    steps.map(patches => patches.map(patch => ({ before: fix(patch.before), after: fix(patch.after) as LayerRow })));
+  history.past = fixAll(history.past);
+  history.future = fixAll(history.future);
+}
+
+export function commitForeignStrokes(panelId: ID, layerId: ID, strokes: Stroke[]): void {
+  const before = currentRow(panelId, layerId);
+  const state = repo
+    ? repo.appendStrokes(layerId, strokes)
+    : { gen: before.gen, head: before.head + strokes.length };
+  update(panelId, art => ({
+    ...art,
+    layers: art.layers.map(layer =>
+      layer.id === layerId ? { ...layer, strokes: [...layer.strokes, ...strokes], ...state } : layer,
+    ),
+  }));
+  followForeign(panelId, layerId, state);
+}
+
+/** The other person undid, cleared or moved their drawing: their whole layer arrives again. */
+export function rewriteForeignLayer(panelId: ID, layerId: ID, strokes: Stroke[]): void {
+  const before = currentRow(panelId, layerId);
+  const state = repo ? repo.writeGeneration(layerId, strokes) : { gen: before.gen + 1, head: strokes.length };
+  repo?.putLayer({ ...before, ...state });
+  update(panelId, art => ({
+    ...art,
+    layers: art.layers.map(layer => (layer.id === layerId ? { ...layer, strokes, ...state } : layer)),
+  }));
+  followForeign(panelId, layerId, state);
+}
+
+/** On top of the stack, without taking the active layer from the person drawing here. */
+export function addForeignLayer(panelId: ID, name: string, init: Partial<ArtLayer> = {}): ID {
+  const layer: ArtLayer = { ...newLayer(name), ...init, gen: 0, head: init.strokes?.length ?? 0 };
+  const pos = loadArt(panelId)?.layers.length ?? 0;
+  repo?.putLayer({ ...rowOf(panelId, layer, pos), head: 0 });
+  if (layer.strokes.length) {
+    repo?.appendStrokes(layer.id, layer.strokes);
+  }
+  update(panelId, art => ({
+    ...art,
+    layers: [...art.layers, layer],
+    activeLayerId: art.activeLayerId ?? layer.id,
+  }));
+  return layer.id;
 }
 
 export type LayerEdit = Partial<Pick<ArtLayer, 'name' | 'visible' | 'opacity' | 'locked' | 'image'>>;
@@ -190,11 +251,15 @@ export function editLayer(panelId: ID, layerId: ID, edit: LayerEdit): void {
 
 /** Inserts at `at` in the stack, the end by default. Layers above it move up in the same undo step. */
 export function addLayer(panelId: ID, name: string, init: Partial<ArtLayer> = {}, at?: number): ID {
-  const layer: ArtLayer = { ...newLayer(name), ...init, gen: 0, head: 0 };
+  const layer: ArtLayer = { ...newLayer(name), ...init, gen: 0, head: init.strokes?.length ?? 0 };
   const current = loadArt(panelId)?.layers ?? [];
   const pos = Math.max(0, Math.min(at ?? current.length, current.length));
   const after = rowOf(panelId, layer, pos);
-  repo?.putLayer(after);
+  // Strokes the layer starts with are appended to an empty row, so they belong to this same undo step.
+  repo?.putLayer({ ...after, head: 0 });
+  if (layer.strokes.length) {
+    repo?.appendStrokes(layer.id, layer.strokes);
+  }
   const patches: LayerPatch[] = [{ before: null, after }];
   current.slice(pos).forEach((above, index) => {
     const before = rowOf(panelId, above, pos + index);
@@ -403,6 +468,9 @@ function subscribe(listener: () => void): () => void {
     listeners.delete(listener);
   };
 }
+
+/** Every art change, outside React: drawing together sends this person's strokes as they land. */
+export const subscribeArt = subscribe;
 
 export function useArtRev(panelId: ID | undefined): number {
   return useSyncExternalStore(subscribe, () => (panelId ? artRev(panelId) : 0));

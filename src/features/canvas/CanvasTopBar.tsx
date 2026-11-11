@@ -5,6 +5,7 @@ import Animated, { type AnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { ID } from '../../core/model/types';
+import { t } from '../../core/i18n';
 import { canRedoArt, canUndoArt, redoArt, undoArt, useArtRev } from '../../state/artStore';
 import { IconButton, Text } from '../../ui';
 
@@ -24,13 +25,13 @@ const HistoryButtons = memo(function HistoryButtonsInner({ panelId }: { panelId:
         icon={UndoIcon}
         onPress={() => undoArt(panelId)}
         disabled={!canUndoArt(panelId)}
-        accessibilityLabel="Undo"
+        accessibilityLabel={t('Undo')}
       />
       <IconButton
         icon={RedoIcon}
         onPress={() => redoArt(panelId)}
         disabled={!canRedoArt(panelId)}
-        accessibilityLabel="Redo"
+        accessibilityLabel={t('Redo')}
       />
     </>
   );
@@ -63,15 +64,15 @@ export function CanvasTopBar({
       className="absolute left-2 right-2 flex-row items-center rounded-lg bg-raised px-1"
       style={[{ top: insets.top }, fade]}
     >
-      <IconButton icon={CheckIcon} onPress={onDone} accessibilityLabel="Done" />
+      <IconButton icon={CheckIcon} onPress={onDone} accessibilityLabel={t('Done')} />
       <View pointerEvents="none" className="flex-1 px-2">
         <Text variant="title" numberOfLines={1} maxFontSizeMultiplier={1.3}>
           {title}
         </Text>
       </View>
       <HistoryButtons panelId={panelId} />
-      <IconButton icon={LayersIcon} onPress={onLayers} active={layersOpen} accessibilityLabel="Layers" />
-      <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel="More" />
+      <IconButton icon={LayersIcon} onPress={onLayers} active={layersOpen} accessibilityLabel={t('Layers')} />
+      <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel={t('More')} />
     </Animated.View>
   );
 }

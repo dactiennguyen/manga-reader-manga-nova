@@ -1,3 +1,4 @@
+import { msg } from '../i18n';
 import { GENRES, LIMITS } from '../model/constants';
 import type { PageSize, Project, ProjectFormat } from '../model/types';
 
@@ -10,22 +11,22 @@ export const FORMATS: FormatOption[] = [
     key: 'manga-B5',
     format: 'manga',
     pageSize: 'B5',
-    label: 'Manga page B5',
-    hint: 'Common print size, read page by page',
+    label: msg('Manga page B5'),
+    hint: msg('Common print size, read page by page'),
   },
   {
     key: 'manga-A5',
     format: 'manga',
     pageSize: 'A5',
-    label: 'Manga page A5',
-    hint: 'Compact size, great for short stories',
+    label: msg('Manga page A5'),
+    hint: msg('Compact size, great for short stories'),
   },
   {
     key: 'webtoon',
     format: 'webtoon',
     pageSize: 'B5',
-    label: 'Webtoon',
-    hint: 'Vertical strip, scroll to read on a phone',
+    label: msg('Webtoon'),
+    hint: msg('Vertical strip, scroll to read on a phone'),
   },
 ];
 

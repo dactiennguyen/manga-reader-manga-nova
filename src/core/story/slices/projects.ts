@@ -1,4 +1,5 @@
 import { buildProjectBundle, mapBundleImages, remapBundleIds } from '../../archive/bundle';
+import { t } from '../../i18n';
 import { cleanLanguageName, dropTranslations, languageNameError, renameTranslations } from '../../lettering/translation';
 import { DEFAULT_ACT_TITLES, LIMITS } from '../../model/constants';
 import type { Act, Bubble, Chapter, ID, Page, PanelArt, Project, StoryData } from '../../model/types';
@@ -42,7 +43,7 @@ export function createProjectActions(set: StorySet, get: StoryGet, art: StoryArt
       const chapterId = uid();
       const acts: Act[] = DEFAULT_ACT_TITLES.map((title, index) => ({
         id: uid(),
-        title,
+        title: t(title),
         chapterIds: index === 0 ? [chapterId] : [],
       }));
       const project: Project = { ...input, id: projectId, done: false, acts, createdAt: now, updatedAt: now };
@@ -187,7 +188,7 @@ export function createProjectActions(set: StorySet, get: StoryGet, art: StoryArt
       const now = Date.now();
       const project: Project = {
         ...copy.project,
-        title: `${bundle.project.title} (copy)`,
+        title: t('{title} (copy)', { title: bundle.project.title }),
         createdAt: now,
         updatedAt: now,
       };

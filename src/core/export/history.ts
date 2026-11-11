@@ -10,7 +10,7 @@ const recordSchema = z.object({
   mime: z.string(),
   size: z.number(),
   pages: z.number(),
-  format: z.enum(['png', 'pdf', 'cbz', 'long']),
+  format: z.enum(['png', 'pdf', 'cbz', 'long', 'social']),
   createdAt: z.number(),
 });
 

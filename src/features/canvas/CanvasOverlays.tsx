@@ -7,6 +7,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { fitView, type SessionEnv } from '../../core/art/session';
 import type { ViewState } from '../../core/art/tools';
+import { msg, t } from '../../core/i18n';
 import { fileUri } from '../../core/util/paths';
 import { ICON, IconButton, Pressable, Text } from '../../ui';
 
@@ -16,14 +17,14 @@ const REF_SIZES = [152, 224];
 export type CanvasReference = { id: string; images: string[]; title?: string; note?: string };
 
 const TIPS = [
-  ['One finger', 'Draw. Press and hold to pick a color.'],
-  ['Two fingers', 'Drag to pan, pinch to zoom, twist to rotate the view.'],
-  ['Two-finger tap', 'Undo. Double-tap with two fingers to fit the screen.'],
-  ['Three-finger tap', 'Redo.'],
-  ['Rulers', 'The ruler button adds symmetry or perspective. Tap the same one again to turn it off.'],
-  ['Shapes and tone', 'Tap the shapes tool twice to choose a shape. Brush and lasso fill can paint screentone.'],
-  ['Stylus', 'Pressure is recorded and one finger pans the view.'],
-  ['Double-tap outside the panel', 'Hide or show the tools.'],
+  [msg('One finger'), msg('Draw. Press and hold to pick a color.')],
+  [msg('Two fingers'), msg('Drag to pan, pinch to zoom, twist to rotate the view.')],
+  [msg('Two-finger tap'), msg('Undo. Double-tap with two fingers to fit the screen.')],
+  [msg('Three-finger tap'), msg('Redo.')],
+  [msg('Rulers'), msg('The ruler button adds symmetry or perspective. Tap the same one again to turn it off.')],
+  [msg('Shapes and tone'), msg('Tap the shapes tool twice to choose a shape. Brush and lasso fill can paint screentone.')],
+  [msg('Stylus'), msg('Pressure is recorded and one finger pans the view.')],
+  [msg('Double-tap outside the panel'), msg('Hide or show the tools.')],
 ];
 
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
@@ -70,7 +71,7 @@ export function ReferenceWindow({
             source={{ uri: fileUri(path) }}
             style={{ width: size - 4, height: size - 4 }}
             resizeMode="contain"
-            accessibilityLabel={title ? `${title} reference` : 'Reference image'}
+            accessibilityLabel={title ? t('{name} reference', { name: title }) : t('Reference image')}
           />
         ) : null}
         {title || note ? (
@@ -92,17 +93,17 @@ export function ReferenceWindow({
             icon={big ? MinimizeIcon : MaximizeIcon}
             size={ICON.sm}
             onPress={() => setBig(value => !value)}
-            accessibilityLabel={big ? 'Shrink reference image' : 'Enlarge reference image'}
+            accessibilityLabel={big ? t('Shrink reference image') : t('Enlarge reference image')}
           />
           {images.length > 1 ? (
             <IconButton
               icon={CaretRightIcon}
               size={ICON.sm}
               onPress={() => setShown(value => (value + 1) % images.length)}
-              accessibilityLabel="Next reference image"
+              accessibilityLabel={t('Next reference image')}
             />
           ) : null}
-          <IconButton icon={CloseIcon} size={ICON.sm} onPress={onClose} accessibilityLabel="Hide reference image" />
+          <IconButton icon={CloseIcon} size={ICON.sm} onPress={onClose} accessibilityLabel={t('Hide reference image')} />
         </View>
       </Animated.View>
     </GestureDetector>
@@ -115,20 +116,20 @@ export function TipsOverlay({ onClose }: { onClose: () => void }) {
       className="items-center justify-center bg-scrim p-6"
       style={StyleSheet.absoluteFill}
       onPress={onClose}
-      accessibilityLabel="Dismiss tips"
+      accessibilityLabel={t('Dismiss tips')}
     >
       <View className="max-w-96 gap-3 rounded-lg bg-raised p-4">
-        <Text variant="title">Canvas gestures</Text>
+        <Text variant="title">{t('Canvas gestures')}</Text>
         {TIPS.map(([head, body]) => (
           <View key={head} className="gap-0.5">
-            <Text variant="label">{head}</Text>
+            <Text variant="label">{t(head)}</Text>
             <Text variant="bodySmall" tone="secondary">
-              {body}
+              {t(body)}
             </Text>
           </View>
         ))}
         <Text variant="caption" tone="muted" className="pt-2 text-center">
-          Tap to start drawing
+          {t('Tap to start drawing')}
         </Text>
       </View>
     </Pressable>

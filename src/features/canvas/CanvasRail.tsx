@@ -5,6 +5,7 @@ import Animated, { type AnimatedStyle } from 'react-native-reanimated';
 
 import { GUIDES, type GuideKind } from '../../core/art/guides';
 import { SHAPE_TOOLS, TOOLS, isShapeId, type CanvasTool, type ShapeTool } from '../../core/art/tools';
+import { t } from '../../core/i18n';
 import { IconButton } from '../../ui';
 import { GUIDE_ICONS, SHAPES_ICON, SHAPE_ICONS, TOOL_ICONS } from './canvasIcons';
 
@@ -55,7 +56,7 @@ export function CanvasRail({
       key={item.id}
       icon={iconOf(item.id)}
       active={item.id === tool && !picking}
-      accessibilityLabel={item.label}
+      accessibilityLabel={t(item.label)}
       onPress={() => {
         setShapesOpen(false);
         setGuidesOpen(false);
@@ -85,7 +86,7 @@ export function CanvasRail({
               <IconButton
                 icon={isShapeId(tool) ? SHAPE_ICONS[shapeDef.id] : SHAPES_ICON}
                 active={shapeActive}
-                accessibilityLabel={`Shapes, ${shapeDef.label}`}
+                accessibilityLabel={t('Shapes, {shape}', { shape: t(shapeDef.label) })}
                 onPress={() => {
                   setGuidesOpen(false);
                   if (shapeActive) {
@@ -103,7 +104,7 @@ export function CanvasRail({
               <IconButton
                 icon={guide ? GUIDE_ICONS[guide] : RulerIcon}
                 active={!!guide}
-                accessibilityLabel={guide ? `Rulers, ${GUIDES.find(item => item.id === guide)?.label}` : 'Rulers'}
+                accessibilityLabel={guide ? t('Rulers, {ruler}', { ruler: t(GUIDES.find(item => item.id === guide)?.label ?? '') }) : t('Rulers')}
                 onPress={() => {
                   setShapesOpen(false);
                   setGuidesOpen(open => !open);
@@ -112,7 +113,7 @@ export function CanvasRail({
               <IconButton
                 icon={EyedropperIcon}
                 active={picking}
-                accessibilityLabel="Eyedropper"
+                accessibilityLabel={t('Eyedropper')}
                 onPress={() => {
                   setShapesOpen(false);
                   setGuidesOpen(false);
@@ -122,7 +123,7 @@ export function CanvasRail({
               <IconButton
                 icon={CollapseIcon}
                 color="text-muted"
-                accessibilityLabel="Collapse toolbar"
+                accessibilityLabel={t('Collapse toolbar')}
                 onPress={() => {
                   setShapesOpen(false);
                   setGuidesOpen(false);
@@ -140,7 +141,7 @@ export function CanvasRail({
               key={item.id}
               icon={SHAPE_ICONS[item.id]}
               active={item.id === tool && !picking}
-              accessibilityLabel={item.label}
+              accessibilityLabel={t(item.label)}
               onPress={() => {
                 onTool(item.id);
                 setShapesOpen(false);
@@ -156,7 +157,7 @@ export function CanvasRail({
               key={item.id}
               icon={GUIDE_ICONS[item.id]}
               active={item.id === guide}
-              accessibilityLabel={item.label}
+              accessibilityLabel={t(item.label)}
               onPress={() => {
                 onGuide(item.id);
                 setGuidesOpen(false);

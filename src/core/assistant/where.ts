@@ -1,13 +1,14 @@
+import { msg, t } from '../i18n';
 import type { LastOpened, Project } from '../model/types';
 import { conversationTitle, type AssistantMessage } from './conversations';
 
 const SCREEN_LABEL: Record<LastOpened['screen'], string> = {
-  Script: 'Script',
-  Storyboard: 'Storyboard',
-  PanelLayout: 'Panel layout',
-  Canvas: 'Canvas',
-  Lettering: 'Lettering',
-  Outline: 'Outline',
+  Script: msg('Script'),
+  Storyboard: msg('Storyboard'),
+  PanelLayout: msg('Panel layout'),
+  Canvas: msg('Canvas'),
+  Lettering: msg('Lettering'),
+  Outline: msg('Outline'),
 };
 
 export function latestProject(projects: Record<string, Project>): Project | undefined {
@@ -28,14 +29,15 @@ export function assistantProject(projects: Record<string, Project>, projectId: s
 
 export function whereOf(project: Project | undefined, chapterTitle: string | undefined): string {
   if (!project) {
-    return 'Home';
+    return t('Home');
   }
   const last = project.lastOpened;
   if (!last) {
-    return 'Project overview';
+    return t('Project overview');
   }
-  const label = SCREEN_LABEL[last.screen];
-  return chapterTitle ? `${label} of chapter "${chapterTitle}"` : label;
+  const label = t(SCREEN_LABEL[last.screen]);
+  // quickPrompts matches on the screen name, so every translation keeps {screen} first.
+  return chapterTitle ? t('{screen} of chapter "{title}"', { screen: label, title: chapterTitle }) : label;
 }
 
 /** A saved answer is titled after the question that prompted it. */
@@ -45,5 +47,5 @@ export function noteTitleFor(messages: AssistantMessage[], messageId: string): s
     .slice(0, Math.max(0, index))
     .reverse()
     .find(item => item.role === 'user');
-  return question ? conversationTitle(question.text) : 'Assistant note';
+  return question ? conversationTitle(question.text) : t('Assistant note');
 }

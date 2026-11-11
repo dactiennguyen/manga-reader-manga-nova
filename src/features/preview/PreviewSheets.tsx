@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { AwakeIcon, FlagIcon, HiddenIcon, PreviewIcon, RotateIcon, TranslateIcon } from '../../ui/icons';
+import { AwakeIcon, FlagIcon, HiddenIcon, PreviewIcon, RotateIcon, StickerIcon, TranslateIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import { chapterLabel } from '../../core/model/selectors';
 import type { Chapter, ID, PageFlag } from '../../core/model/types';
 import { FLAG_REASONS } from '../../core/preview/reader';
@@ -10,7 +11,7 @@ import { usePage } from '../../state/hooks';
 import { useStory } from '../../state/useStory';
 import { Button, Chip, ChipGroup, Menu, Pressable, Sheet, Text, TextField, confirm } from '../../ui';
 
-export type ReaderSheet = 'chapters' | 'menu' | 'flags' | 'language' | null;
+export type ReaderSheet = 'chapters' | 'menu' | 'flags' | 'language' | 'notes' | null;
 
 function FlagEditor({ pageId, flag, onClose }: { pageId: ID; flag: PageFlag | undefined; onClose: () => void }) {
   const [note, setNote] = useState(flag?.note ?? '');
@@ -26,20 +27,20 @@ function FlagEditor({ pageId, flag, onClose }: { pageId: ID; flag: PageFlag | un
       <TextField
         value={note}
         onChangeText={setNote}
-        placeholder="What needs fixing on this page?"
-        accessibilityLabel="Flag note"
+        placeholder={t('What needs fixing on this page?')}
+        accessibilityLabel={t('Flag note')}
         multiline
         maxLength={300}
       />
       <ChipGroup>
         {FLAG_REASONS.map(reason => (
-          <Chip key={reason} label={reason} selected={reasons.includes(reason)} onPress={() => toggle(reason)} />
+          <Chip key={reason} label={t(reason)} selected={reasons.includes(reason)} onPress={() => toggle(reason)} />
         ))}
       </ChipGroup>
       <View className="flex-row gap-2">
-        {flag && <Button title="Remove flag" variant="secondary" className="flex-1" onPress={() => save(undefined)} />}
+        {flag && <Button title={t('Remove flag')} variant="secondary" className="flex-1" onPress={() => save(undefined)} />}
         <Button
-          title={flag ? 'Save' : 'Flag page'}
+          title={flag ? t('Save') : t('Flag page')}
           icon={FlagIcon}
           className="flex-1"
           onPress={() => save({ note: note.trim(), reasons })}
@@ -63,7 +64,7 @@ export function FlagSheet({
     <Sheet
       visible={!!pageId}
       onClose={onClose}
-      title={page?.flag ? 'Edit flag' : 'Flag this page'}
+      title={page?.flag ? t('Edit flag') : t('Flag this page')}
       subtitle={pageLabel}
     >
       {pageId && <FlagEditor key={pageId} pageId={pageId} flag={page?.flag} onClose={onClose} />}
@@ -85,17 +86,17 @@ export function FlagListSheet({
   const pages = useStory(s => s.pages);
   const flagged = pageIds.filter(id => !!pages[id]?.flag);
   const clearAll = async () => {
-    if (await confirm('Remove all flags?', 'Every flag in this chapter will be cleared.', { destructive: true })) {
+    if (await confirm(t('Remove all flags?'), t('Every flag in this chapter will be cleared.'), { destructive: true })) {
       const { updatePage } = useStory.getState();
       flagged.forEach(id => updatePage(id, { flag: undefined }));
       onClose();
     }
   };
   return (
-    <Sheet visible={visible} onClose={onClose} title="Flags" subtitle={`${flagged.length} in this chapter`}>
+    <Sheet visible={visible} onClose={onClose} title={t('Flags')} subtitle={t('{count} in this chapter', { count: flagged.length })}>
       <View className="gap-3 p-4">
         {flagged.length === 0 && (
-          <Text tone="secondary">No flags yet. Long-press a page to mark something to fix.</Text>
+          <Text tone="secondary">{t('No flags yet. Long-press a page to mark something to fix.')}</Text>
         )}
         {flagged.map(id => {
           const flag = pages[id].flag as PageFlag;
@@ -103,7 +104,7 @@ export function FlagListSheet({
           return (
             <Pressable
               key={id}
-              accessibilityLabel={[`Page ${number}`, flag.note, flag.reasons.join(', ')].filter(Boolean).join('. ')}
+              accessibilityLabel={[t('Page {n}', { n: number }), flag.note, flag.reasons.map(reason => t(reason)).join(', ')].filter(Boolean).join('. ')}
               onPress={() => {
                 onClose();
                 onJump(id);
@@ -111,18 +112,18 @@ export function FlagListSheet({
               className="min-h-12 gap-1 overflow-hidden rounded-md bg-overlay p-3"
             >
               <Text variant="caption" tone="accent">
-                Page {number}
+                {t('Page {n}', { n: number })}
               </Text>
               {!!flag.note && <Text>{flag.note}</Text>}
               {flag.reasons.length > 0 && (
                 <Text variant="caption" tone="secondary">
-                  {flag.reasons.join(' · ')}
+                  {flag.reasons.map(reason => t(reason)).join(' · ')}
                 </Text>
               )}
             </Pressable>
           );
         })}
-        {flagged.length > 0 && <Button title="Remove all" variant="danger" small onPress={clearAll} />}
+        {flagged.length > 0 && <Button title={t('Remove all')} variant="danger" small onPress={clearAll} />}
       </View>
     </Sheet>
   );
@@ -144,6 +145,7 @@ export function ReaderMenus({
   onToggleAwake,
   onRotate,
   onLanguage,
+  noteCount = 0,
 }: {
   sheet: ReaderSheet;
   onSheet: (sheet: ReaderSheet) => void;
@@ -160,6 +162,8 @@ export function ReaderMenus({
   onToggleAwake: () => void;
   onRotate: () => void;
   onLanguage: (lang: string | undefined) => void;
+  /** Notes friends left while reading this chapter together; the menu offers them when there are any. */
+  noteCount?: number;
 }) {
   const state = useStory.getState();
   const close = () => onSheet(null);
@@ -168,10 +172,10 @@ export function ReaderMenus({
       <Menu
         visible={sheet === 'chapters'}
         onClose={close}
-        title="Chapters"
+        title={t('Chapters')}
         items={chapters.map(ch => ({
           label: chapterLabel(state, ch.id),
-          subtitle: ch.pageIds.length === 1 ? '1 page' : `${ch.pageIds.length} pages`,
+          subtitle: tn(ch.pageIds.length, '{count} page', '{count} pages'),
           disabled: ch.pageIds.length === 0,
           onPress: () => onChapter(ch.id),
         }))}
@@ -181,27 +185,33 @@ export function ReaderMenus({
         onClose={close}
         items={[
           {
-            label: hideUnfinished ? 'Show unfinished pages' : 'Hide unfinished pages',
+            label: hideUnfinished ? t('Show unfinished pages') : t('Hide unfinished pages'),
             icon: hideUnfinished ? PreviewIcon : HiddenIcon,
             onPress: onToggleUnfinished,
           },
           {
-            label: 'Flag list',
-            subtitle: flagCount === 1 ? '1 flagged page' : `${flagCount} flagged pages`,
+            label: t('Flag list'),
+            subtitle: tn(flagCount, '{count} flagged page', '{count} flagged pages'),
             icon: FlagIcon,
             onPress: () => onSheet('flags'),
           },
-          { label: 'Keep screen on', subtitle: awake ? 'On' : 'Off', icon: AwakeIcon, onPress: onToggleAwake },
+          noteCount > 0 && {
+            label: t('Notes from friends'),
+            subtitle: tn(noteCount, '{count} note', '{count} notes'),
+            icon: StickerIcon,
+            onPress: () => onSheet('notes'),
+          },
+          { label: t('Keep screen on'), subtitle: awake ? t('On') : t('Off'), icon: AwakeIcon, onPress: onToggleAwake },
           manga &&
             orientationSupported && {
-              label: landscape ? 'Rotate to portrait' : 'Rotate to landscape',
-              subtitle: landscape ? 'One page at a time' : 'Two-page spread view',
+              label: landscape ? t('Rotate to portrait') : t('Rotate to landscape'),
+              subtitle: landscape ? t('One page at a time') : t('Two-page spread view'),
               icon: RotateIcon,
               onPress: onRotate,
             },
           languages.length > 0 && {
-            label: 'Language',
-            subtitle: activeLang ?? 'Original',
+            label: t('Language'),
+            subtitle: activeLang ?? t('Original'),
             icon: TranslateIcon,
             onPress: () => onSheet('language'),
           },
@@ -210,12 +220,12 @@ export function ReaderMenus({
       <Menu
         visible={sheet === 'language'}
         onClose={close}
-        title="Language"
+        title={t('Language')}
         items={[
-          { label: 'Original', subtitle: activeLang ? undefined : 'Selected', onPress: () => onLanguage(undefined) },
+          { label: t('Original'), subtitle: activeLang ? undefined : t('Selected'), onPress: () => onLanguage(undefined) },
           ...languages.map(code => ({
             label: code,
-            subtitle: activeLang === code ? 'Selected' : undefined,
+            subtitle: activeLang === code ? t('Selected') : undefined,
             onPress: () => onLanguage(code),
           })),
         ]}

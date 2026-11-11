@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { DeleteIcon, EditIcon, PlusIcon, TranslateIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { LANGUAGE_NAME_MAX, MAX_LANGUAGES, languageNameError, translationProgress } from '../../core/lettering/translation';
 import type { Bubble, Project } from '../../core/model/types';
 import { useStory } from '../../state/useStory';
@@ -9,7 +10,7 @@ import { Button, ICON, IconButton, ListItem, PromptDialog, Sheet, Text, confirm,
 
 export function progressLabel(bubbles: Bubble[], lang: string): string {
   const { done, total } = translationProgress(bubbles, lang);
-  return total ? `${done} of ${total} translated` : 'Nothing to translate';
+  return total ? t('{done} of {total} translated', { done, total }) : t('Nothing to translate');
 }
 
 export function ManageLanguagesSheet({
@@ -35,7 +36,7 @@ export function ManageLanguagesSheet({
     const added = error ? null : useStory.getState().addLanguage(project.id, name);
     setAdding(false);
     if (!added) {
-      toast(error ?? 'Could not add that language');
+      toast(error ? t(error) : t('Could not add that language'));
       return;
     }
     onAdded?.(added);
@@ -46,7 +47,7 @@ export function ManageLanguagesSheet({
     const renamed = error ? null : useStory.getState().renameLanguage(project.id, from, name);
     setRenaming(null);
     if (!renamed) {
-      toast(error ?? 'Could not rename that language');
+      toast(error ? t(error) : t('Could not rename that language'));
       return;
     }
     onRenamed?.(from, renamed);
@@ -54,9 +55,9 @@ export function ManageLanguagesSheet({
 
   const remove = async (name: string) => {
     const ok = await confirm(
-      `Remove ${name}?`,
-      `Every ${name} translation in this story will be deleted. The original text and the art are kept.`,
-      { confirmText: 'Remove', destructive: true },
+      t('Remove {name}?', { name }),
+      t('Every {name} translation in this story will be deleted. The original text and the art are kept.', { name }),
+      { confirmText: t('Remove'), destructive: true },
     );
     if (ok) {
       useStory.getState().removeLanguage(project.id, name);
@@ -65,8 +66,8 @@ export function ManageLanguagesSheet({
 
   return (
     <>
-      <Sheet visible={visible} onClose={onClose} title="Languages" subtitle="The art is shared. Only the text changes.">
-        <ListItem title="Original" subtitle="The text you wrote first" icon={TranslateIcon} />
+      <Sheet visible={visible} onClose={onClose} title={t('Languages')} subtitle={t('The art is shared. Only the text changes.')}>
+        <ListItem title={t('Original')} subtitle={t('The text you wrote first')} icon={TranslateIcon} />
         {languages.map(name => (
           <ListItem
             key={name}
@@ -74,24 +75,24 @@ export function ManageLanguagesSheet({
             icon={TranslateIcon}
             right={
               <View className="flex-row items-center">
-                <IconButton icon={EditIcon} size={ICON.md} onPress={() => setRenaming(name)} accessibilityLabel={`Rename ${name}`} />
+                <IconButton icon={EditIcon} size={ICON.md} onPress={() => setRenaming(name)} accessibilityLabel={t('Rename {name}', { name })} />
                 <IconButton
                   icon={DeleteIcon}
                   size={ICON.md}
                   color="danger"
                   onPress={() => remove(name)}
-                  accessibilityLabel={`Remove ${name}`}
+                  accessibilityLabel={t('Remove {name}', { name })}
                 />
               </View>
             }
           />
         ))}
         <View className="gap-3 p-4">
-          <Button title="Add language" icon={PlusIcon} disabled={full} onPress={() => setAdding(true)} />
+          <Button title={t('Add language')} icon={PlusIcon} disabled={full} onPress={() => setAdding(true)} />
           <Text variant="caption" tone="secondary" className="text-center">
             {full
-              ? `A story can have up to ${MAX_LANGUAGES} extra languages.`
-              : 'Translations are typed by hand, one bubble at a time or from the translation list.'}
+              ? t('A story can have up to {max} extra languages.', { max: MAX_LANGUAGES })
+              : t('Translations are typed by hand, one bubble at a time or from the translation list.')}
           </Text>
         </View>
       </Sheet>
@@ -99,16 +100,16 @@ export function ManageLanguagesSheet({
         visible={adding}
         onClose={() => setAdding(false)}
         onSubmit={add}
-        title="Add language"
-        placeholder="For example: Vietnamese"
-        confirmText="Add"
+        title={t('Add language')}
+        placeholder={t('For example: {name}', { name: 'Vietnamese' })}
+        confirmText={t('Add')}
         maxLength={LANGUAGE_NAME_MAX}
       />
       <PromptDialog
         visible={!!renaming}
         onClose={() => setRenaming(null)}
         onSubmit={name => renaming && rename(renaming, name)}
-        title="Rename language"
+        title={t('Rename language')}
         initialValue={renaming ?? ''}
         maxLength={LANGUAGE_NAME_MAX}
       />

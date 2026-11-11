@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { ID } from '../model/types';
 
 export type AssistantRole = 'user' | 'assistant';
@@ -24,7 +25,7 @@ export function projectKeyOf(projectId: ID | undefined | null): string {
 export function conversationTitle(question: string): string {
   const clean = question.replace(/\s+/g, ' ').trim();
   if (!clean) {
-    return 'New conversation';
+    return t('New conversation');
   }
   if (clean.length <= TITLE_MAX) {
     return clean;

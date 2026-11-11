@@ -2,18 +2,18 @@ import { useMemo, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
 
+import { msg, t, tn } from '../../core/i18n';
 import { templatePreview, templatesFor, type LayoutTemplate, type TemplateKind } from '../../core/layout/layout';
 import type { ProjectFormat } from '../../core/model/types';
-import { plural } from '../../core/util/format';
 import { INK, PAPER } from '../../render/ink';
 import { Chip, ChipRow, Pressable, Sheet, Text } from '../../ui';
 
 const KIND_LABEL: Record<TemplateKind, string> = {
-  grid: 'Even grid',
-  diagonal: 'Diagonal',
-  bleed: 'Bleed',
-  koma: '4-koma',
-  strip: 'Strip',
+  grid: msg('Even grid'),
+  diagonal: msg('Diagonal'),
+  bleed: msg('Bleed'),
+  koma: msg('4-koma'),
+  strip: msg('Strip'),
 };
 
 const SHEET_MAX = 560;
@@ -39,7 +39,7 @@ function TemplateTile({
   const shapes = useMemo(() => templatePreview(template, { w: width, h: height }, rtl), [template, width, height, rtl]);
   return (
     <Pressable
-      accessibilityLabel={`${template.count}-panel template, ${KIND_LABEL[template.kind]}`}
+      accessibilityLabel={t('{count}-panel template, {kind}', { count: template.count, kind: t(KIND_LABEL[template.kind]) })}
       onPress={onPress}
       className="items-center gap-1"
     >
@@ -57,7 +57,7 @@ function TemplateTile({
         </Svg>
       </View>
       <Text variant="caption" tone="secondary">
-        {plural(template.count, 'panel')}
+        {tn(template.count, '{count} panel', '{count} panels')}
       </Text>
     </Pressable>
   );
@@ -82,24 +82,24 @@ export function TemplateSheet({
   const [count, setCount] = useState(0);
   const [kind, setKind] = useState<TemplateKind | null>(null);
   const all = useMemo(() => templatesFor(format), [format]);
-  const counts = useMemo(() => [...new Set(all.map(t => t.count))].sort((a, b) => a - b), [all]);
-  const kinds = useMemo(() => [...new Set(all.map(t => t.kind))], [all]);
-  const shown = all.filter(t => (!count || t.count === count) && (!kind || t.kind === kind));
+  const counts = useMemo(() => [...new Set(all.map(item => item.count))].sort((a, b) => a - b), [all]);
+  const kinds = useMemo(() => [...new Set(all.map(item => item.kind))], [all]);
+  const shown = all.filter(item => (!count || item.count === count) && (!kind || item.kind === kind));
   const tileW = Math.floor((Math.min(screenW, SHEET_MAX) - SIDE_PAD * 2 - TILE_GAP * (COLUMNS - 1)) / COLUMNS);
 
   return (
-    <Sheet visible={visible} onClose={onClose} title="Panel templates">
+    <Sheet visible={visible} onClose={onClose} title={t('Panel templates')}>
       <ChipRow className="px-4">
-        <Chip label="All" selected={!count} onPress={() => setCount(0)} />
+        <Chip label={t('All')} selected={!count} onPress={() => setCount(0)} />
         {counts.map(n => (
           <Chip key={n} label={`${n}`} selected={count === n} onPress={() => setCount(n)} />
         ))}
       </ChipRow>
       {kinds.length > 1 && (
         <ChipRow className="px-4">
-          <Chip label="Any style" selected={!kind} onPress={() => setKind(null)} />
+          <Chip label={t('Any style')} selected={!kind} onPress={() => setKind(null)} />
           {kinds.map(item => (
-            <Chip key={item} label={KIND_LABEL[item]} selected={kind === item} onPress={() => setKind(item)} />
+            <Chip key={item} label={t(KIND_LABEL[item])} selected={kind === item} onPress={() => setKind(item)} />
           ))}
         </ChipRow>
       )}

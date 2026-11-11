@@ -13,6 +13,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { t } from '../core/i18n';
 import { ModalShownContext, useModalShown } from './modalShown';
 import { Text } from './Text';
 import { MOTION } from './tokens';
@@ -107,7 +108,7 @@ export function Sheet({
       <GestureHandlerRootView className="flex-1">
         <KeyboardAvoidingView behavior="padding" className="flex-1 justify-end">
           <Animated.View className="absolute inset-0 bg-scrim" style={backdrop}>
-            <RNPressable accessibilityLabel="Close" className="flex-1" onPress={onClose} />
+            <RNPressable accessibilityLabel={t('Close')} className="flex-1" onPress={onClose} />
           </Animated.View>
           <Animated.View
             accessibilityViewIsModal
@@ -116,7 +117,7 @@ export function Sheet({
             style={[panel, { maxHeight, paddingBottom: insets.bottom + 12 }]}
           >
             <GestureDetector gesture={drag}>
-              <View accessibilityRole="adjustable" accessibilityLabel="Drag down to close" className="h-6 items-center justify-center">
+              <View accessibilityRole="adjustable" accessibilityLabel={t('Drag down to close')} className="h-6 items-center justify-center">
                 <View className="h-1 w-10 rounded-full bg-control-border" />
               </View>
             </GestureDetector>

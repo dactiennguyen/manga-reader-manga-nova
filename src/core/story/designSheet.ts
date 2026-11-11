@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { EXPRESSION_LABEL } from '../model/constants';
 import type { CharacterSheet, Expression } from '../model/types';
 
@@ -5,12 +6,12 @@ export type SheetSlot = 'face' | 'body' | Expression;
 
 export function slotLabel(slot: SheetSlot): string {
   if (slot === 'face') {
-    return 'Face';
+    return t('Face');
   }
   if (slot === 'body') {
-    return 'Full body';
+    return t('Full body');
   }
-  return EXPRESSION_LABEL[slot];
+  return t(EXPRESSION_LABEL[slot]);
 }
 
 export function slotPath(sheet: CharacterSheet, slot: SheetSlot): string | undefined {

@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlusIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlayTogetherIcon, PlusIcon, ReadIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
 
+import { t, tn } from '../../core/i18n';
 import { LIMITS, PROJECT_STATUS_LABEL } from '../../core/model/constants';
 import type { ID } from '../../core/model/types';
 import {
@@ -16,7 +17,6 @@ import {
   type LibraryRow,
   type LibrarySort,
 } from '../../core/story/library';
-import { plural } from '../../core/util/format';
 import { useStoryData } from '../../state/hooks';
 import { useAppNavigation } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
@@ -46,6 +46,7 @@ import {
   trashProjectWithConfirm,
 } from '../project/projectActions';
 import { GridCard, ListCard } from './ProjectCards';
+import { useSampleStory } from '../home/sampleStory';
 import { useLibraryImport } from './useLibraryImport';
 
 export function LibraryScreen() {
@@ -83,6 +84,7 @@ export function LibraryScreen() {
     closeSearch();
   };
 
+  const { openSample } = useSampleStory();
   const { importing, importProject } = useLibraryImport(projectId => {
     clearFilters();
     setHighlightId(projectId);
@@ -117,8 +119,10 @@ export function LibraryScreen() {
         hideBack
         right={
           <>
-            {!searching && <IconButton icon={SearchIcon} onPress={() => setSearching(true)} accessibilityLabel="Search" />}
-            <IconButton icon={MoreIcon} onPress={() => setOpen('header')} accessibilityLabel="More" />
+            {!searching && <IconButton icon={SearchIcon} onPress={() => setSearching(true)} accessibilityLabel={t('Search')} />}
+            {/* Send a story to a friend, or read one together. */}
+            <IconButton icon={PlayTogetherIcon} onPress={() => navigation.navigate('Nearby')} accessibilityLabel={t('Play together')} />
+            <IconButton icon={MoreIcon} onPress={() => setOpen('header')} accessibilityLabel={t('More')} />
           </>
         }
       >
@@ -127,13 +131,13 @@ export function LibraryScreen() {
             autoFocus
             value={query}
             onChangeText={setQuery}
-            placeholder="Search by title"
-            accessibilityLabel="Search by title"
+            placeholder={t('Search by title')}
+            accessibilityLabel={t('Search by title')}
             onClear={closeSearch}
           />
         ) : (
           <Text variant="display" accessibilityRole="header">
-            Library
+            {t('Library')}
           </Text>
         )}
       </AppBar>
@@ -158,7 +162,7 @@ export function LibraryScreen() {
                 {LIBRARY_FILTERS.map(key => (
                   <Chip
                     key={key}
-                    label={key === 'all' ? 'All' : PROJECT_STATUS_LABEL[key]}
+                    label={key === 'all' ? t('All') : t(PROJECT_STATUS_LABEL[key])}
                     count={counts[key]}
                     selected={filter === key}
                     onPress={() => setFilter(key)}
@@ -167,45 +171,46 @@ export function LibraryScreen() {
               </ChipRow>
               <View className="flex-row items-center justify-between">
                 <Text variant="label" tone="secondary">
-                  {plural(visible.length, 'story', 'stories')}
+                  {tn(visible.length, '{count} story', '{count} stories')}
                 </Text>
                 <Button
-                  title={LIBRARY_SORT_LABEL[sort]}
+                  title={t(LIBRARY_SORT_LABEL[sort])}
                   icon={SortIcon}
                   variant="ghost"
                   small
                   onPress={() => setOpen('sort')}
                 />
               </View>
-              {importing && <LoadingView label="Importing project…" />}
+              {importing && <LoadingView label={t('Importing project…')} />}
             </View>
           ) : importing ? (
-            <LoadingView label="Importing project…" />
+            <LoadingView label={t('Importing project…')} />
           ) : undefined
         }
         ListEmptyComponent={
           rows.length === 0 ? (
             <EmptyState
               art={ART.emptyLibrary}
-              title="Your shelf is empty."
-              message="Create your first story!"
-              action={{ label: 'New story', onPress: newStory }}
+              title={t('Your shelf is empty.')}
+              message={t('Create your first story!')}
+              action={{ label: t('New story'), onPress: newStory }}
             />
           ) : (
-            <EmptyState title="No stories match" action={{ label: 'Clear filters', onPress: clearFilters }} />
+            <EmptyState title={t('No stories match')} action={{ label: t('Clear filters'), onPress: clearFilters }} />
           )
         }
       />
-      {rows.length > 0 && <Fab icon={PlusIcon} label="New story" onPress={newStory} bottom={insets.bottom + (dockInset || 16)} />}
+      {rows.length > 0 && <Fab icon={PlusIcon} label={t('New story')} onPress={newStory} bottom={insets.bottom + (dockInset || 16)} />}
 
       <Menu
         visible={open === 'header'}
         onClose={() => setOpen(null)}
         items={[
-          { label: 'Import project (.manganova)', icon: MoveToIcon, onPress: importProject },
-          { label: 'Trash', icon: DeleteIcon, onPress: () => navigation.navigate('Trash') },
+          { label: t('Import project (.manganova)'), icon: MoveToIcon, onPress: importProject },
+          { label: t('Open the sample story'), icon: ReadIcon, onPress: openSample },
+          { label: t('Trash'), icon: DeleteIcon, onPress: () => navigation.navigate('Trash') },
           {
-            label: layout === 'grid' ? 'List view' : 'Grid view',
+            label: layout === 'grid' ? t('List view') : t('Grid view'),
             icon: layout === 'grid' ? ListIcon : TemplatesIcon,
             onPress: () => useSettings.getState().set({ libraryLayout: layout === 'grid' ? 'list' : 'grid' }),
           },
@@ -214,41 +219,41 @@ export function LibraryScreen() {
       <Menu
         visible={open === 'sort'}
         onClose={() => setOpen(null)}
-        title="Sort by"
+        title={t('Sort by')}
         items={(Object.keys(LIBRARY_SORT_LABEL) as LibrarySort[]).map(key => ({
-          label: LIBRARY_SORT_LABEL[key],
-          subtitle: key === sort ? 'Selected' : undefined,
+          label: t(LIBRARY_SORT_LABEL[key]),
+          subtitle: key === sort ? t('Selected') : undefined,
           onPress: () => useSettings.getState().set({ librarySort: key }),
         }))}
       />
       <Menu
         visible={open === 'item'}
         onClose={() => setOpen(null)}
-        title={target?.title || 'Untitled'}
+        title={target?.title || t('Untitled')}
         items={
           target
             ? [
-                { label: 'Rename', icon: EditIcon, onPress: () => setOpen('rename') },
-                { label: 'Change cover', icon: ImageIcon, onPress: () => changeProjectCover(target.id) },
+                { label: t('Rename'), icon: EditIcon, onPress: () => setOpen('rename') },
+                { label: t('Change cover'), icon: ImageIcon, onPress: () => changeProjectCover(target.id) },
                 {
-                  label: 'Duplicate',
-                  subtitle: 'A full copy with its own script, pages and art',
+                  label: t('Duplicate'),
+                  subtitle: t('A full copy with its own script, pages and art'),
                   icon: CopyIcon,
                   onPress: () =>
                     duplicateStory(target.id, copyId => navigation.navigate('Project', { projectId: copyId })),
                 },
                 {
-                  label: 'Export project',
-                  subtitle: 'A .manganova file for backup or moving devices',
+                  label: t('Export project'),
+                  subtitle: t('A .manganova file for backup or moving devices'),
                   icon: ExportIcon,
                   onPress: () => exportProjectFile(target.id),
                 },
                 {
-                  label: target.done ? 'Mark as not done' : 'Mark as done',
+                  label: target.done ? t('Mark as not done') : t('Mark as done'),
                   icon: MarkDoneIcon,
                   onPress: () => useStory.getState().updateProject(target.id, { done: !target.done }),
                 },
-                { label: 'Delete', icon: DeleteIcon, destructive: true, onPress: () => trashProjectWithConfirm(target) },
+                { label: t('Delete'), icon: DeleteIcon, destructive: true, onPress: () => trashProjectWithConfirm(target) },
               ]
             : []
         }
@@ -256,9 +261,9 @@ export function LibraryScreen() {
       <PromptDialog
         visible={open === 'rename'}
         onClose={() => setOpen(null)}
-        title="Rename story"
+        title={t('Rename story')}
         initialValue={target?.title ?? ''}
-        placeholder="Story title"
+        placeholder={t('Story title')}
         maxLength={LIMITS.projectTitle}
         onSubmit={value => {
           setOpen(null);

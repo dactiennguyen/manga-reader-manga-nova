@@ -1,6 +1,7 @@
 import { ScrollView, View } from 'react-native';
 import { AiIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon, MoreIcon, PlusIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { BLOCK_LABEL, BLOCK_TYPES } from '../../core/model/constants';
 import type { BlockType } from '../../core/model/types';
 import { Chip, ICON, Icon, IconButton, Pressable, Text } from '../../ui';
@@ -40,7 +41,7 @@ export function ScriptToolbar({
         contentContainerClassName="items-center gap-2 px-3"
       >
         <Pressable
-          accessibilityLabel="AI writing help"
+          accessibilityLabel={t('AI writing help')}
           hitSlop={6}
           onPress={onAi}
           className="h-9 flex-row items-center gap-1.5 overflow-hidden rounded-sm bg-ai/15 px-3"
@@ -51,13 +52,13 @@ export function ScriptToolbar({
           </Text>
         </Pressable>
         {BLOCK_TYPES.map(item => (
-          <Chip key={item} label={BLOCK_LABEL[item]} selected={type === item} onPress={() => onType(item)} />
+          <Chip key={item} label={t(BLOCK_LABEL[item])} selected={type === item} onPress={() => onType(item)} />
         ))}
-        <IconButton icon={PlusIcon} onPress={onAdd} accessibilityLabel="Add block below" />
-        <IconButton icon={ArrowUpIcon} onPress={() => onMove(-1)} disabled={first} accessibilityLabel="Move block up" />
-        <IconButton icon={ArrowDownIcon} onPress={() => onMove(1)} disabled={last} accessibilityLabel="Move block down" />
-        <IconButton icon={DeleteIcon} onPress={onDelete} disabled={!canDelete} accessibilityLabel="Delete block" />
-        <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel="Block options" />
+        <IconButton icon={PlusIcon} onPress={onAdd} accessibilityLabel={t('Add block below')} />
+        <IconButton icon={ArrowUpIcon} onPress={() => onMove(-1)} disabled={first} accessibilityLabel={t('Move block up')} />
+        <IconButton icon={ArrowDownIcon} onPress={() => onMove(1)} disabled={last} accessibilityLabel={t('Move block down')} />
+        <IconButton icon={DeleteIcon} onPress={onDelete} disabled={!canDelete} accessibilityLabel={t('Delete block')} />
+        <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel={t('Block options')} />
       </ScrollView>
     </View>
   );

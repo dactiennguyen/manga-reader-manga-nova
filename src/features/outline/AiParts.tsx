@@ -2,6 +2,7 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { AiIcon, SettingsIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import { AiErrorBox, AiLoading, Button, ICON, Icon, Text } from '../../ui';
 
 /**
@@ -25,7 +26,7 @@ export function useSheetClose(onClose: () => void) {
   return { visible, close, closeThen, onClosed };
 }
 
-export function AiMark({ label = 'AI suggestion' }: { label?: string }) {
+export function AiMark({ label = t('AI suggestion') }: { label?: string }) {
   return (
     <View className="flex-row items-center gap-1 self-start rounded-sm bg-ai/15 px-2 py-1">
       <Icon icon={AiIcon} size={ICON.xs} color="ai" />
@@ -41,12 +42,12 @@ export function AiSetupNotice({ onOpenProfile }: { onOpenProfile: () => void }) 
     <View className="items-center gap-3 p-6">
       <Icon icon={AiIcon} size={ICON.xl} color="ai" />
       <Text variant="heading" className="text-center">
-        AI is not set up yet
+        {t('AI is not set up yet')}
       </Text>
       <Text tone="secondary" className="text-center">
-        To get AI suggestions, set the AI server address in Profile first.
+        {t('To get AI suggestions, set the AI server address in Profile first.')}
       </Text>
-      <Button title="Open Profile" icon={SettingsIcon} variant="ai" onPress={onOpenProfile} className="mt-2 self-stretch" />
+      <Button title={t('Open Profile')} icon={SettingsIcon} variant="ai" onPress={onOpenProfile} className="mt-2 self-stretch" />
     </View>
   );
 }

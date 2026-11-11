@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Image, View, type ImageSourcePropType } from 'react-native';
 
+import { t } from '../core/i18n';
 import type { Character, Project } from '../core/model/types';
 import { fileUri } from '../core/util/paths';
 import { STYLE_ART } from './art';
@@ -29,7 +30,7 @@ function PrintedCover({ project, width, height }: { project: Pick<Project, 'titl
       <Image accessibilityIgnoresInvertColors source={STYLE_ART[project.style]} className="absolute inset-0" style={{ width, height }} />
       <View className={`absolute inset-x-0 top-0 ${small ? 'p-1.5' : 'p-3'}`}>
         <Text variant={small ? 'caption' : 'heading'} tone="onPaper" numberOfLines={2} maxFontSizeMultiplier={1.2}>
-          {project.title.trim() || 'Untitled'}
+          {project.title.trim() || t('Untitled')}
         </Text>
       </View>
     </>

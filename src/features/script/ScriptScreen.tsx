@@ -5,6 +5,7 @@ import { FlashList, type ListRenderItem } from '@shopify/flash-list';
 import { ForwardIcon, PlusIcon } from '../../ui/icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { t, tn } from '../../core/i18n';
 import { isRtl } from '../../core/layout/layout';
 import { estimatePages } from '../../core/model/paginate';
 import { chapterLabel, scriptOutdated } from '../../core/model/selectors';
@@ -12,7 +13,6 @@ import type { Chapter, ID, Scene } from '../../core/model/types';
 import type { AiAction } from '../../core/script/aiDrafts';
 import { blockEdges, hasScriptText, pagesText, panelRefs } from '../../core/script/blockOps';
 import { formatScript, scriptFileName } from '../../core/script/scriptTools';
-import { plural } from '../../core/util/format';
 import { uid } from '../../core/util/id';
 import { MIME, RNFS, shareFile } from '../../native/files';
 import { useChapter, useLastOpened } from '../../state/hooks';
@@ -47,8 +47,8 @@ export function ScriptScreen({ route, navigation }: ScreenProps<'Script'>) {
   if (!chapter) {
     return (
       <Screen>
-        <AppBar title="Script" onBack={() => navigation.goBack()} />
-        <EmptyState title="Chapter not found" message="This chapter may have been deleted." />
+        <AppBar title={t('Script')} onBack={() => navigation.goBack()} />
+        <EmptyState title={t('Chapter not found')} message={t('This chapter may have been deleted.')} />
       </Screen>
     );
   }
@@ -139,7 +139,7 @@ function ScriptEditor({ chapter, initialBlockId }: { chapter: Chapter; initialBl
     ctl.flush();
     const current = ctl.scenes();
     if (!hasScriptText(current)) {
-      toast('Nothing to share yet');
+      toast(t('Nothing to share yet'));
       return;
     }
     const path = `${RNFS.CachesDirectoryPath}/${scriptFileName(title)}`;
@@ -147,7 +147,7 @@ function ScriptEditor({ chapter, initialBlockId }: { chapter: Chapter; initialBl
       await RNFS.writeFile(path, formatScript(title, current, useStory.getState().characters), 'utf8');
       await shareFile(path, MIME.text, title);
     } catch {
-      toast('Could not share the script');
+      toast(t('Could not share the script'));
     }
   };
 
@@ -155,13 +155,17 @@ function ScriptEditor({ chapter, initialBlockId }: { chapter: Chapter; initialBl
   const focusedId = ctl.focusedId;
   const focusedEdge = blockEdges(chapter.sceneIds, focused);
   const blockCount = scenes.reduce((sum, scene) => sum + scene.blocks.length, 0);
-  const statsText = `${pagesText(estimatePages(scenes))} · ${plural(scenes.length, 'scene')} · ${plural(blockCount, 'block')}`;
+  const statsText = `${pagesText(estimatePages(scenes))} · ${tn(scenes.length, '{count} scene', '{count} scenes')} · ${tn(
+    blockCount,
+    '{count} block',
+    '{count} blocks',
+  )}`;
   const pickedCharacter = ctl.find(pickFor)?.block.characterId;
 
   const footer = (
     <View className="gap-3 px-4 pb-24 md:px-6">
-      <Button title="New scene" icon={PlusIcon} variant="secondary" onPress={ctl.addScene} />
-      <Button title="Paginate" icon={ForwardIcon} onPress={openStoryboard} />
+      <Button title={t('New scene')} icon={PlusIcon} variant="secondary" onPress={ctl.addScene} />
+      <Button title={t('Paginate')} icon={ForwardIcon} onPress={openStoryboard} />
     </View>
   );
 
@@ -185,7 +189,11 @@ function ScriptEditor({ chapter, initialBlockId }: { chapter: Chapter; initialBl
       />
       {scriptOutdated(chapter) && (
         <View className="px-4 pb-2">
-          <Banner tone="warning" text="Script changed since pagination" action={{ label: 'Open storyboard', onPress: openStoryboard }} />
+          <Banner
+            tone="warning"
+            text={t('Script changed since pagination')}
+            action={{ label: t('Open storyboard'), onPress: openStoryboard }}
+          />
         </View>
       )}
       <View className="flex-1">

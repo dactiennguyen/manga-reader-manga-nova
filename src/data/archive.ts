@@ -6,6 +6,7 @@ import {
   uniqueTitle,
 } from '../core/archive/bundle';
 import { parseProjectBundle } from '../core/archive/parse';
+import { msg, t } from '../core/i18n';
 import type { ID, PanelArt, Project, StoryData } from '../core/model/types';
 import { uid, slugify } from '../core/util/id';
 import { toAbsolute } from '../core/util/paths';
@@ -23,7 +24,7 @@ import {
   zipDir,
 } from '../native/files';
 
-const INVALID_MESSAGE = "This file can't be read or isn't a Manganova project";
+const INVALID_MESSAGE = msg("This file can't be read or isn't a Manganova project");
 const RELATIVE_IMAGE = /^images\/[A-Za-z0-9_-]+\.[A-Za-z0-9]+$/;
 
 export type ArchiveStory = {
@@ -57,7 +58,7 @@ function byId<T extends { id: ID }>(items: T[]): Record<ID, T> {
 export async function exportProjectArchive(story: ArchiveStory, projectId: ID): Promise<string> {
   const bundle = buildProjectBundle(story.data(), projectId, story.exportArt);
   if (!bundle) {
-    throw new Error('Story not found.');
+    throw new Error(t('Story not found.'));
   }
   await ensureDirs();
   const tmpDir = `${DIRS.tmp}/archive-${uid()}`;
@@ -102,7 +103,7 @@ export async function importProjectArchive(story: ArchiveStory, archivePath: str
       await unzipTo(stripFileScheme(archivePath), tmpDir);
       json = await RNFS.readFile(`${tmpDir}/story.json`, 'utf8');
     } catch {
-      throw new Error(INVALID_MESSAGE);
+      throw new Error(t(INVALID_MESSAGE));
     }
     const remapped = remapBundleIds(parseProjectBundle(json));
     const relatives = new Set<string>();

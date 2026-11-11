@@ -1,6 +1,7 @@
 import { Image, View } from 'react-native';
 import { ChapterIcon, EventIcon, FlagIcon, NoteIcon, PlaceIcon } from '../../ui/icons';
 
+import { t } from '../../core/i18n';
 import type { WorldEntry, WorldType } from '../../core/model/types';
 import { fileUri } from '../../core/util/paths';
 import { UNTITLED, firstLine } from '../../core/world/worldTools';
@@ -28,8 +29,8 @@ function EntryThumb({ entry, size = 48 }: { entry: WorldEntry; size?: number }) 
 }
 
 export function EntryRow({ entry, onPress, onLongPress }: { entry: WorldEntry; onPress: () => void; onLongPress: () => void }) {
-  const title = entry.title.trim() || UNTITLED;
-  const line = firstLine(entry.body) || 'No description yet';
+  const title = entry.title.trim() || t(UNTITLED);
+  const line = firstLine(entry.body) || t('No description yet');
   return (
     <Card
       accessibilityLabel={`${title}, ${line}`}

@@ -1,11 +1,11 @@
 import type { BlockDraft } from '../../core/ai/writing';
+import { t, tn } from '../../core/i18n';
 import type { Block, BlockType, ID, Scene } from '../../core/model/types';
 import type { UndoScope } from '../../core/ports';
 import { applyTexts, insertDrafts, type BlockLocation, type TextChange } from '../../core/script/aiDrafts';
 import { insertBlockAfter, moveInScene, patchBlocks, removeBlockAt, transferBlock, withBlockType } from '../../core/script/blockOps';
 import type { SceneChange } from '../../core/script/scriptTools';
 import type { ActionMeta } from '../../core/story/scopes';
-import { plural } from '../../core/util/format';
 import { uid } from '../../core/util/id';
 import { restoreScriptVersion, snapshotScript, type ScriptVersion } from '../../state/scriptHistory';
 import { redoStory, undoStory, useStory } from '../../state/useStory';
@@ -107,7 +107,7 @@ export function createScriptOps({ chapterId, scope, sceneIds, scenes, find, flus
     flush();
     if (transfer(blockId, targetSceneId, false)) {
       reveal(targetSceneId, blockId);
-      toast(`Moved to scene ${sceneIds().indexOf(targetSceneId) + 1}`);
+      toast(t('Moved to scene {n}', { n: sceneIds().indexOf(targetSceneId) + 1 }));
     }
   };
 
@@ -126,10 +126,14 @@ export function createScriptOps({ chapterId, scope, sceneIds, scenes, find, flus
 
   const removeScene = async (sceneId: ID, number: number) => {
     const count = story().scenes[sceneId]?.blocks.length ?? 0;
-    const ok = await confirm(`Delete scene ${number}?`, `Its ${count} ${count === 1 ? 'block' : 'blocks'} will be deleted.`, {
-      confirmText: 'Delete scene',
-      destructive: true,
-    });
+    const ok = await confirm(
+      t('Delete scene {n}?', { n: number }),
+      tn(count, 'Its {count} block will be deleted.', 'Its {count} blocks will be deleted.'),
+      {
+        confirmText: t('Delete scene'),
+        destructive: true,
+      },
+    );
     if (ok) {
       flush();
       edit(() => story().removeScene(sceneId));
@@ -155,34 +159,38 @@ export function createScriptOps({ chapterId, scope, sceneIds, scenes, find, flus
     snapshotScript(chapterId);
     applyChanges(result.changes, { collapsed: false });
     reveal(result.changes[0].sceneId, result.blockIds[0]);
-    snackbar({ message: `Inserted ${plural(result.blockIds.length, 'block')}`, actionLabel: 'Undo', onAction: undo });
+    snackbar({
+      message: tn(result.blockIds.length, 'Inserted {count} block', 'Inserted {count} blocks'),
+      actionLabel: t('Undo'),
+      onAction: undo,
+    });
   };
 
   const replaceAiTexts = (changes: TextChange[]) => {
     flush();
     const sceneChanges = applyTexts(scenes(), changes);
     if (!sceneChanges.length) {
-      toast('Nothing changed');
+      toast(t('Nothing changed'));
       return;
     }
     snapshotScript(chapterId);
     applyChanges(sceneChanges);
     snackbar({
-      message: changes.length === 1 ? 'Line replaced' : `Replaced ${plural(changes.length, 'block')}`,
-      actionLabel: 'Undo',
+      message: changes.length === 1 ? t('Line replaced') : t('Replaced {count} blocks', { count: changes.length }),
+      actionLabel: t('Undo'),
       onAction: undo,
     });
   };
 
   const restoreVersion = async (version: ScriptVersion) => {
-    const ok = await confirm('Restore this version?', 'Your current script is saved as a version first.', {
-      confirmText: 'Restore',
+    const ok = await confirm(t('Restore this version?'), t('Your current script is saved as a version first.'), {
+      confirmText: t('Restore'),
     });
     if (ok) {
       flush();
       restoreScriptVersion(chapterId, version);
       clearFocus();
-      toast('Version restored');
+      toast(t('Version restored'));
     }
     return ok;
   };

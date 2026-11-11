@@ -1,5 +1,5 @@
 #!/bin/sh
-# Regenerates every launcher icon and the splash mark from assets/icon/*.svg. Needs rsvg-convert and magick.
+# Regenerates every launcher icon and the splash mark, Android and iOS, from assets/icon/*.svg. Needs rsvg-convert and magick.
 set -e
 cd "$(dirname "$0")/.."
 RES=android/app/src/main/res

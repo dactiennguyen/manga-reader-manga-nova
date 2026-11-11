@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, type ReactNode } from 'react';
 import { View, type AccessibilityActionEvent, type AccessibilityActionInfo } from 'react-native';
 import {
   GestureDetector,
@@ -12,6 +12,7 @@ import {
 import Animated from 'react-native-reanimated';
 import { FlagIcon } from '../../ui/icons';
 
+import { msg, t, tn } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { pageLabel } from '../../core/preview/reader';
 import { slotAtPoint } from '../../core/preview/spreads';
@@ -25,23 +26,39 @@ import { useZoom } from './useZoom';
 const BADGE_ZONE = 52;
 
 const PAGE_ACTIONS: AccessibilityActionInfo[] = [
-  { name: 'activate', label: 'Show or hide controls' },
-  { name: 'longpress', label: 'Flag this page' },
+  { name: 'activate', label: msg('Show or hide controls') },
+  { name: 'longpress', label: msg('Flag this page') },
 ];
 
 const TURN_ACTIONS: AccessibilityActionInfo[] = [
-  { name: 'nextPage', label: 'Next page' },
-  { name: 'previousPage', label: 'Previous page' },
+  { name: 'nextPage', label: msg('Next page') },
+  { name: 'previousPage', label: msg('Previous page') },
 ];
 
-function PageSlot({ pageId, width, options }: { pageId: ID; width: number; options: PageDrawOptions }) {
+/** Draws extra marks over a page, such as stickers friends dropped, in that page's own size. */
+export type PageOverlay = (pageId: ID, width: number, height: number) => ReactNode;
+
+function PageSlot({
+  pageId,
+  width,
+  height,
+  options,
+  overlay,
+}: {
+  pageId: ID;
+  width: number;
+  height: number;
+  options: PageDrawOptions;
+  overlay?: PageOverlay;
+}) {
   const page = usePage(pageId);
   return (
     <View style={{ width }}>
       <PageView pageId={pageId} width={width} options={options} />
+      {overlay?.(pageId, width, height)}
       {page && !page.done && (
         <View className="absolute left-2 top-2 rounded-sm bg-raised/80 px-2 py-0.5">
-          <Text variant="caption">Not done</Text>
+          <Text variant="caption">{t('Not done')}</Text>
         </View>
       )}
       {page?.flag && (
@@ -82,6 +99,8 @@ export const PreviewPage = memo(function PreviewPageItem({
   onPinchChange,
   outerGesture,
   onDoubleTap,
+  onLongPressAt,
+  overlay,
 }: {
   pageIds: ID[];
   firstPageNumber: number;
@@ -100,6 +119,9 @@ export const PreviewPage = memo(function PreviewPageItem({
   onPinchChange?: (active: boolean) => void;
   outerGesture?: NativeGesture;
   onDoubleTap?: (x: number, y: number) => void;
+  /** Replaces flagging on long press: where on which page, in page fractions (0 to 1). */
+  onLongPressAt?: (pageId: ID, x: number, y: number) => void;
+  overlay?: PageOverlay;
 }) {
   const contentW = slots * pageWidth;
   const { pinch, pan, style, zoomed, reset, toggleAt, toContent } = useZoom({
@@ -129,7 +151,9 @@ export const PreviewPage = memo(function PreviewPageItem({
         point.x <= left + pageWidth &&
         point.y >= 0 &&
         point.y <= BADGE_ZONE;
-      return { pageId: pageIds[slot], onBadge };
+      const fx = (point.x - left) / pageWidth;
+      const fy = point.y / pageHeight;
+      return { pageId: pageIds[slot], onBadge, fx, fy };
     };
     return {
       tap: {
@@ -168,10 +192,17 @@ export const PreviewPage = memo(function PreviewPageItem({
         minDuration: 450,
         numberOfPointers: 1,
         maxDistance: 12,
-        onActivate: (e: { x: number; y: number }) => onFlag(slotAt(e.x, e.y).pageId),
+        onActivate: (e: { x: number; y: number }) => {
+          const hit = slotAt(e.x, e.y);
+          if (onLongPressAt) {
+            onLongPressAt(hit.pageId, hit.fx, hit.fy);
+          } else {
+            onFlag(hit.pageId);
+          }
+        },
       },
     };
-  }, [zoomed, toggleAt, toContent, pageIds, slots, pageWidth, contentW, rtl, onTap, onFlag, onDoubleTap]);
+  }, [zoomed, toggleAt, toContent, pageIds, slots, pageWidth, pageHeight, contentW, rtl, onTap, onFlag, onDoubleTap, onLongPressAt]);
 
   const tap = useTapGesture(touches.tap);
   const doubleTap = useTapGesture(touches.doubleTap);
@@ -207,7 +238,10 @@ export const PreviewPage = memo(function PreviewPageItem({
           accessible
           accessibilityRole="image"
           accessibilityLabel={label}
-          accessibilityActions={zoomable ? [...PAGE_ACTIONS, ...TURN_ACTIONS] : PAGE_ACTIONS}
+          accessibilityActions={(zoomable ? [...PAGE_ACTIONS, ...TURN_ACTIONS] : PAGE_ACTIONS).map(action => ({
+            ...action,
+            label: action.label && t(action.label),
+          }))}
           onAccessibilityAction={onAccessibilityAction}
           className="absolute inset-0 items-center justify-center"
         >
@@ -216,7 +250,7 @@ export const PreviewPage = memo(function PreviewPageItem({
             style={[{ width: contentW, height: pageHeight }, zoomable && style]}
           >
             {pageIds.map(id => (
-              <PageSlot key={id} pageId={id} width={pageWidth} options={options} />
+              <PageSlot key={id} pageId={id} width={pageWidth} height={pageHeight} options={options} overlay={overlay} />
             ))}
           </Animated.View>
         </Animated.View>
@@ -248,14 +282,14 @@ export function EndCard({
     <View className="items-center justify-center" style={{ width, height }}>
       <Card className="w-4/5 max-w-[360px] gap-3 p-4">
         <Text variant="display" accessibilityRole="header" className="text-center">
-          End of chapter {chapterNumber}
+          {t('End of chapter {n}', { n: chapterNumber })}
         </Text>
         <Text variant="caption" tone="secondary" className="text-center">
-          {pageCount === 1 ? '1 page' : `${pageCount} pages`}
+          {tn(pageCount, '{count} page', '{count} pages')}
         </Text>
-        {hasNext && <Button title="Read next chapter" onPress={onNext} />}
-        <Button title="Export" variant={hasNext ? 'secondary' : 'primary'} onPress={onExport} />
-        <Button title="Close" variant="ghost" onPress={onClose} />
+        {hasNext && <Button title={t('Read next chapter')} onPress={onNext} />}
+        <Button title={t('Export')} variant={hasNext ? 'secondary' : 'primary'} onPress={onExport} />
+        <Button title={t('Close')} variant="ghost" onPress={onClose} />
       </Card>
     </View>
   );

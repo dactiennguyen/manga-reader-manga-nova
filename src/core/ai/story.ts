@@ -1,3 +1,4 @@
+import { msg, t } from '../i18n';
 import { GENRES, LIMITS } from '../model/constants';
 import { AiError, chat, extractJson, type AiMessage } from './port';
 
@@ -14,7 +15,7 @@ export type StoryContext = { title: string; genres: string[]; logline: string };
 const EDITOR =
   'You are an experienced manga story editor helping an author. Answer with JSON only: no markdown fences, no commentary. Write in the same language as the author.';
 
-const FORMAT_ERROR = 'The AI answer was not in the expected format. Try again.';
+const FORMAT_ERROR = msg('The AI answer was not in the expected format. Try again.');
 
 function text(value: unknown, max: number): string {
   return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, max).trim() : '';
@@ -44,7 +45,7 @@ export function parseStoryIdea(value: unknown): StoryIdea {
   const title = text(field(value, 'title'), LIMITS.projectTitle);
   const logline = text(field(value, 'logline'), LIMITS.logline);
   if (!title || !logline) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return { title, logline, genres: matchGenres(field(value, 'genres')) };
 }
@@ -72,13 +73,13 @@ export function parsePlotDirections(value: unknown, actCount: number): PlotDirec
     }
     directions.push({
       tone: text(field(item, 'tone'), 24),
-      title: text(field(item, 'title'), LIMITS.projectTitle) || 'Untitled direction',
+      title: text(field(item, 'title'), LIMITS.projectTitle) || t('Untitled direction'),
       summary: text(field(item, 'summary'), 240),
       acts,
     });
   }
   if (!directions.length) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return directions.slice(0, 3);
 }
@@ -89,7 +90,7 @@ export function parseSceneIdeas(value: unknown): SceneIdea[] {
     .map(item => ({ description: text(field(item, 'description'), 200), setting: text(field(item, 'setting'), 80) }))
     .filter(scene => scene.description);
   if (!scenes.length) {
-    throw new AiError('format', FORMAT_ERROR);
+    throw new AiError('format', t(FORMAT_ERROR));
   }
   return scenes.slice(0, 6);
 }
