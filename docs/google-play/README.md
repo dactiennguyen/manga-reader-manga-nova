@@ -51,12 +51,13 @@ Việc 2 chưa xong, thiếu thì không nộp được.
 8. **Khai báo phần Chơi cùng nhau và Lồng tiếng** ([18-choi-cung-nhau.md](../18-choi-cung-nhau.md)):
    - **Quyền mới trong manifest:**
      - `RECORD_AUDIO`: thu lời thoại khi lồng tiếng.
+     - `CAMERA`: quét mã QR để vào phòng hoặc thêm bạn. App chỉ đọc mã trên máy, không chụp hay lưu ảnh nào.
      - `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE`, `CHANGE_WIFI_MULTICAST_STATE`, `ACCESS_LOCAL_NETWORK`: tìm phòng và kết nối trên Wi-Fi.
    - **Data safety:**
      - Tiếng thu âm, tranh và truyện chỉ đi thẳng từ máy này sang máy bạn bè trong cùng phòng, khi người dùng tự bấm gửi. Chúng không đi qua server nào của bạn.
      - Google miễn khai báo "chia sẻ" với dữ liệu chuyển đi do chính người dùng chủ động. Dù vậy, hãy đọc lại định nghĩa "thu thập" và "chia sẻ" trong Play Console trước khi chọn. Nếu phân vân, chọn khai báo nhiều hơn sẽ an toàn hơn.
      - Tranh, truyện và tiếng thu âm cũng phải khớp với phần mô tả và trang chính sách.
-   - **Trang chính sách:** thêm một đoạn nói rằng app dùng micro khi lồng tiếng, và dùng mạng Wi-Fi nội bộ để chơi với người ở gần. Tiếng và tranh không được tải lên server.
+   - **Trang chính sách:** thêm một đoạn nói rằng app dùng micro khi lồng tiếng, dùng camera chỉ để đọc mã QR, và dùng mạng Wi-Fi nội bộ để chơi với người ở gần. Tiếng, ảnh và tranh không được tải lên server.
    - **Nội dung do AI tạo:** đã có nút báo cáo ở mọi câu trả lời AI. Phần câu hỏi về AI trong Play Console có thể trả lời là có.
 
 ## 3. Điền Play Console

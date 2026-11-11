@@ -4,13 +4,15 @@ Tài liệu cho lập trình viên làm tiếp phần chơi nhiều người. M�
 
 Cập nhật: 2026-11-11, nhánh `develop`.
 
-## 8 hoạt động
+## 10 hoạt động
 
 | Hoạt động | Logic (`src/core/nearby`) | Màn hình (`src/features/nearby`) |
 | --- | --- | --- |
 | Vẽ cùng nhau: một trang, mỗi người một layer mang tên mình, con trỏ có tên, thả cảm xúc | `codraw.ts`, `drawPayload.ts` | `CoDrawScreen`, `codraw/*` |
 | Tiếp sức: mỗi người vẽ một khung, chỉ thấy khung ngay trước | `relay.ts`, `relaySession.ts` | `RelayScreen`, `relay/*` |
 | Thi vẽ nhanh: cùng đề, bấm giờ, bình chọn (không tự bầu cho mình) | `battle.ts`, `battleSession.ts` | `BattleScreen`, `battle/*` |
+| Đoán tranh: lần lượt vẽ một từ bí mật, người khác gõ câu đoán | `guess.ts`, `guessSession.ts` | `GuessScreen`, `guess/*` |
+| Cùng viết kịch bản: cả phòng viết kịch bản một chương cùng lúc | `scriptTogether.ts`, `scriptSession.ts` | `ScriptTogetherScreen`, `script/*` |
 | Đọc cùng nhau: chủ phòng lật trang, mọi người dán nhãn góp ý | `readTogether.ts`, `reviewNotes.ts` | `ReadTogetherScreen`, `share/TogetherReader.tsx` |
 | Lồng tiếng: chia vai, mỗi người thu lời thoại của mình, ghép thành bản nghe | `dub.ts`, `dubClips.ts`, `dubRoom.ts`, `dubPlay.ts` | `DubScreen`, `dub/*` |
 | Đổi thẻ nhân vật | `cardSwap.ts` | `CardSwapScreen` |
@@ -26,7 +28,8 @@ Màn phòng (`RoomScreen`) cho chủ phòng chọn hoạt động. `RoomFollower
 - **Định dạng.** Mỗi dòng là một JSON `{m, from?, to?}`, được kiểm tra bằng zod trong `schema.ts`. Dữ liệu lớn (truyện, ảnh, tiếng) được chia thành `blob` 48 KB. Có ba đường dừng một blob: người nhận bỏ dở thì sau `BLOB_IDLE_TIMEOUT` blob tự hủy, người gửi gọi `cancel()`, hoặc mạng rớt thì blob báo lỗi chứ không im lặng mất.
 - **Giữ kết nối.** Khách ping 3 giây một lần. Không thấy ping trong 10 giây thì coi là mất. Khách rớt mạng được giữ chỗ 8 giây (`REJOIN_GRACE`) để quay lại với đúng màu và vai cũ. Chỉ có thể nhận lại chỗ của một thành viên đang trong thời gian giữ chỗ, hoặc của chính máy đó (cùng địa chỉ IP).
 - **Đồng hồ.** Mỗi lần pong, khách đo độ lệch giữa đồng hồ của mình và của chủ phòng (`clockOffset`). Nhờ vậy thi vẽ nhanh bắt đầu cùng lúc trên mọi máy.
-- **Phiên bản.** Khi tin nhắn đổi cấu trúc thì tăng `PROTOCOL_VERSION`. Máy cũ khi đó được báo "cập nhật app" thay vì bị lỗi.
+- **Phiên bản.** Khi tin nhắn đổi cấu trúc thì tăng `PROTOCOL_VERSION`. Máy cũ khi đó được báo "cập nhật app" thay vì bị lỗi. Bản 2 thêm hai hoạt động mới.
+- **Tin gửi từ trong lúc đang xử lý một tin khác.** Chủ phòng xử lý tin của chính mình trước, rồi mới chuyển tin đó cho các máy khác. Vì vậy một tin chủ phòng gửi ngay trong lúc đang xử lý (ví dụ kết thúc lượt ngay khi có người đoán đúng) sẽ tới máy khác **trước** tin gốc. Hãy gửi những tin này sau một microtask, như `soon()` trong `guessSession.ts` và `closeIfDone` trong `battleSession.ts`.
 
 ## Vào phòng
 
@@ -37,7 +40,27 @@ Màn phòng (`RoomScreen`) cho chủ phòng chọn hoạt động. `RoomFollower
 | QR / link `manganova://join?h=&p=&k=&n=` | Đủ địa chỉ | Dùng được cả khi hai máy khác mạng con, ví dụ máy ảo Android |
 | Danh thiếp `manganova://friend?d=` | Bạn bè, kèm phòng đang mở nếu có | Thêm bạn; nút "Vào phòng của họ" ẩn khi đã ở chung phòng |
 
+Trong app có trình quét QR (`ScanCodeScreen`): nút "Quét mã QR" nằm ở thẻ vào phòng bằng mã và ở mục Bạn bè trong Danh thiếp. App nhận được cả mã phòng lẫn danh thiếp, và chọn được ảnh chụp mã QR khi máy không có camera, ví dụ Simulator.
+- **Camera:** dùng VisionCamera v5. iOS dùng bộ đọc mã có sẵn của hệ thống (`useObjectOutput`). Android dùng plugin ML Kit `react-native-vision-camera-barcode-scanner`, plugin này chỉ được link cho Android (`react-native.config.js`), vì pod iOS của nó kéo theo cả ML Kit.
+- **Ảnh:** Skia đọc ảnh ra pixel, rồi `jsQR` (thuần JS) đọc mã (`core/nearby/qrRead.ts`).
+- **Quyền camera:** chỉ xin khi máy có camera, nên Simulator và máy không có camera không bị hỏi.
+- **Xcode 26.1:** trình biên dịch Swift crash khi tối ưu VisionCamera ở bản Release. `ios/Podfile` đặt riêng pod này ở chế độ biên dịch từng file. Khi Xcode mới hơn build được thì bỏ đoạn này.
+
 Chủ phòng đổi chế độ thì quảng bá cũ bị gỡ và một quảng bá mới được phát. `roomsFrom` gộp các dòng trùng địa chỉ và ưu tiên dòng có khóa. Vì vậy dù gói "tạm biệt" của mDNS bị mất, phòng vừa khóa cũng không còn vào được chỉ bằng một chạm.
+
+## Đoán tranh
+
+- **Ai biết từ khóa:** chỉ máy của người vẽ. Câu đoán được gửi riêng cho người vẽ (`to`). Máy người vẽ chấm, rồi báo cho cả phòng ai đã đoán đúng (`guess.hit`, không kèm chữ) hoặc ai đã đoán gì (`guess.miss`). Câu đoán sai một chữ được báo riêng cho người đoán (`guess.close`). Từ khóa chỉ lộ khi hết lượt.
+- **Ai giữ đồng hồ:** chủ phòng mở lượt, mở bảng vẽ khi người vẽ đã chọn từ, kết thúc lượt khi hết giờ, khi mọi người đã đoán đúng hoặc khi người vẽ rời phòng, và công bố điểm cuối.
+- **Cách tính điểm:** dựa vào thứ tự đoán đúng (100, 80, 60, rồi 50 cho những người sau). Người vẽ được 25 điểm cho mỗi người đoán đúng. Mọi máy tự tính ra cùng một kết quả.
+- **Từ để vẽ:** 48 từ, nằm trong phần `guessWords` của các file ngôn ngữ. Một bản dịch có thể kèm cách viết khác sau dấu `|`, ví dụ `猫|ねこ|ネコ`. Cách viết đầu được hiển thị, cách nào cũng tính là đúng. Từ khóa tiếng Anh luôn được chấp nhận. Khi so sánh, app bỏ dấu, chữ hoa, khoảng trắng và chuyển katakana thành hiragana.
+- **Nét vẽ:** gửi từng đoạn khoảng 70 ms một lần, tính theo đơn vị bảng 1000×1000.
+
+## Cùng viết kịch bản
+
+- **Thứ tự:** khách gửi mỗi thay đổi riêng cho chủ phòng. Chủ phòng phát lại cho cả phòng dưới dạng `script.apply`, kèm tên người viết. Mọi máy chỉ áp dụng các tin `apply`, theo cùng một thứ tự, nên không cần ghép bản. Khách không tự áp dụng thay đổi của mình trước: nếu làm vậy, khi hai người cùng giành một dòng, cả hai đều tưởng mình đã giữ được.
+- **Giữ dòng:** chạm vào một dòng hoặc tiêu đề cảnh là giữ chỗ đó. Chỉ người đang giữ mới gõ được, người khác thấy tên họ và chữ hiện ngay khi họ gõ. Chỗ giữ được nhả khi chuyển sang dòng khác, rời màn hình hoặc rời phòng.
+- **Lưu:** chủ phòng lưu vào chương của mình, và kịch bản cũ được giữ lại thành một phiên bản (`snapshotScript`). Mã của các dòng được giữ nguyên, nên bóng thoại đã gắn với dòng không bị mất liên kết. Người vào muộn được chủ phòng gửi bản hiện tại.
 
 ## Quyền
 
@@ -47,6 +70,8 @@ Chủ phòng đổi chế độ thì quảng bá cũ bị gỡ và một quảng
 | iOS | `NSMicrophoneUsageDescription` | Lồng tiếng |
 | Android | `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE`, `CHANGE_WIFI_MULTICAST_STATE`, `ACCESS_LOCAL_NETWORK` | Tìm phòng và kết nối |
 | Android | `RECORD_AUDIO` | Lồng tiếng |
+| iOS | `NSCameraUsageDescription` | Quét mã QR trong app |
+| Android | `CAMERA` (`uses-feature` không bắt buộc) | Quét mã QR trong app |
 
 ## Báo cáo câu trả lời AI
 
@@ -67,5 +92,6 @@ Khi `SUPPORT_EMAIL` trong `core/model/constants.ts` có giá trị, khung báo c
 
 - **Chủ phòng trên iOS không chạy ngầm được.** Chủ phòng chuyển sang app khác lâu hơn khoảng 10 giây thì khách mất kết nối, kèm thông báo rõ ràng.
 - **Dữ liệu trong phòng không mã hóa.** Mã bí mật chỉ có 16 bit và chỉ dùng để chặn người vào nhầm, không chống được người cố tình nghe lén trên cùng mạng. Nếu cần bảo mật thật thì phải thêm TLS (thư viện có hỗ trợ) hoặc mã hóa bằng khóa trao đổi qua QR.
-- **QR dùng scheme riêng** (`manganova://`). Một số app camera trên Android không mở được loại link này. Muốn chắc chắn thì cần trình quét QR trong app, hoặc link `https://` kèm App Links.
+- **QR dùng scheme riêng** (`manganova://`). Một số app camera trên Android không mở được loại link này. Trình quét trong app khắc phục việc đó. Muốn app camera nào cũng mở được thì cần link `https://` kèm App Links.
+- **Cùng viết kịch bản** giới hạn một chương khoảng 180.000 ký tự, để cả kịch bản vừa một tin nhắn.
 - **Ghép tiếng thành video** cần native: iOS dùng AVFoundation, Android dùng `AudioJoiner.kt` (MediaMuxer).

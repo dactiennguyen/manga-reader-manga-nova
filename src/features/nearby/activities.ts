@@ -5,15 +5,17 @@ import type { RoomStoreState } from '../../core/nearby/room';
 import type { Activity } from '../../core/nearby/types';
 import { NEARBY_ART } from '../../ui/nearbyArt';
 
-type ActivityRoute = 'CoDraw' | 'Relay' | 'Battle' | 'ReadTogether' | 'Dub' | 'CardSwap' | 'MangakaCard' | 'SendStory';
+type ActivityRoute = 'CoDraw' | 'Relay' | 'Battle' | 'Guess' | 'ScriptTogether' | 'ReadTogether' | 'Dub' | 'CardSwap' | 'MangakaCard' | 'SendStory';
 
 export type ActivityCard = { activity: Exclude<Activity, 'lobby'>; route: ActivityRoute; title: string; blurb: string; art: ImageSourcePropType };
 
-/** The eight things to do together, in the order the lobby shows them. Texts are msg() keys. */
+/** The things to do together, in the order the lobby shows them. Texts are msg() keys. */
 export const ACTIVITY_CARDS: readonly ActivityCard[] = [
   { activity: 'codraw', route: 'CoDraw', title: msg('Draw together'), blurb: msg('One page, everyone drawing live'), art: NEARBY_ART.codraw },
   { activity: 'relay', route: 'Relay', title: msg('Panel relay'), blurb: msg('Each draws a panel, seeing only the one before'), art: NEARBY_ART.relay },
   { activity: 'battle', route: 'Battle', title: msg('Speed battle'), blurb: msg('Same prompt, a timer, then everyone votes'), art: NEARBY_ART.battle },
+  { activity: 'guess', route: 'Guess', title: msg('Guess the drawing'), blurb: msg('One draws a secret word, the others race to guess it'), art: NEARBY_ART.guess },
+  { activity: 'script', route: 'ScriptTogether', title: msg('Write together'), blurb: msg('Write one chapter script at once, each on a line'), art: NEARBY_ART.script },
   { activity: 'read', route: 'ReadTogether', title: msg('Read together'), blurb: msg('Turn the pages for everyone and collect notes'), art: NEARBY_ART.read },
   { activity: 'dub', route: 'Dub', title: msg('Dub together'), blurb: msg('Give each character a real voice'), art: NEARBY_ART.dub },
   { activity: 'cards', route: 'CardSwap', title: msg('Card swap'), blurb: msg('Trade character cards with friends'), art: NEARBY_ART.cards },

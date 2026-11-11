@@ -4,10 +4,11 @@
  * Messages are plain JSON, one per line on a TCP connection (see protocol.ts). Large payloads such as a
  * whole story or an image travel as numbered chunks of a `blob` and are put back together on arrival.
  */
-import type { Bubble, ID, Stroke } from '../model/types';
+import type { BlockType, Bubble, DialogueKind, ID, Stroke } from '../model/types';
+import type { ScriptDoc, ScriptOp, SharedBlock } from './scriptTogether';
 
 /** Bumped when a message changes shape, so an older app can say "update to join" instead of breaking. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /** The Bonjour / NSD service type rooms are advertised under. Info.plist NSBonjourServices must match. */
 export const SERVICE_TYPE = '_manganova._tcp';
@@ -23,7 +24,7 @@ export type Member = {
   host: boolean;
 };
 
-export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka';
+export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'guess' | 'script' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka';
 
 /** What a phone can see of a room before joining: from discovery, a QR code or a typed code. */
 export type RoomAddress = {
@@ -82,6 +83,38 @@ export type Message =
   | { t: 'battle.submit'; from: MemberId; blobId: string }
   | { t: 'battle.vote'; from: MemberId; for: MemberId }
   | { t: 'battle.result'; scores: Record<MemberId, number> }
+  // Guess the drawing (guess.ts). `turn` ties each message to one turn, so a late one cannot leak into the next.
+  | { t: 'guess.start'; rounds: number; seconds: number; order: MemberId[] }
+  | { t: 'guess.turn'; turn: number; drawer: MemberId; chooseUntil: number }
+  /** Drawer to host only: a word is picked. The word itself stays on the drawer's phone. */
+  | { t: 'guess.picked'; turn: number; mask: string }
+  | { t: 'guess.draw'; turn: number; mask: string; endsAt: number }
+  | { t: 'guess.ink'; turn: number; id: number; size: number; color: string; points: number[]; done: boolean }
+  | { t: 'guess.undo'; turn: number }
+  | { t: 'guess.clear'; turn: number }
+  /** Guesser to drawer only. */
+  | { t: 'guess.try'; turn: number; text: string }
+  | { t: 'guess.hit'; turn: number; member: MemberId }
+  | { t: 'guess.miss'; turn: number; member: MemberId; text: string }
+  /** Drawer to one guesser: one letter off. */
+  | { t: 'guess.close'; turn: number }
+  /** `hits` is the host's list of right guessers, so every phone scores the same turn. */
+  | { t: 'guess.end'; turn: number; hits: MemberId[] }
+  | { t: 'guess.reveal'; turn: number; word: string }
+  | { t: 'guess.over'; scores: Record<MemberId, number> }
+  // Writing a script together (scriptTogether.ts). The host orders every change; `key` is a line (b:id) or a scene heading (s:id).
+  | { t: 'script.doc'; doc: ScriptDoc; rev: number; locks: Record<string, MemberId> }
+  /** Guest to host: send me the script again (joined late, or missed it). */
+  | { t: 'script.want' }
+  | { t: 'script.focus'; key: string | null }
+  | { t: 'script.edit'; key: string; text: string }
+  | { t: 'script.add'; sceneId: string; afterId: string | null; block: SharedBlock }
+  | { t: 'script.set'; blockId: string; type: BlockType; characterId?: string; kind?: DialogueKind }
+  | { t: 'script.remove'; blockId: string }
+  | { t: 'script.scene'; sceneId: string; afterId: string | null }
+  | { t: 'script.end' }
+  /** Host to all: a change, by whom, in the one order every phone applies. */
+  | { t: 'script.apply'; by: MemberId; op: ScriptOp }
   | { t: 'read.page'; projectId: ID; pageIndex: number }
   // Added by share: a guest who missed the story asks the host to send it again.
   | { t: 'read.want'; from: MemberId; projectId: ID }

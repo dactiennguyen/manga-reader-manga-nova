@@ -115,6 +115,7 @@ export { ArrowCounterClockwiseIcon as RestoreIcon } from 'phosphor-react-native/
 export { ArrowClockwiseIcon as RotateIcon } from 'phosphor-react-native/src/icons/ArrowClockwise';
 export { ArrowCounterClockwiseIcon as RotateLeftIcon } from 'phosphor-react-native/src/icons/ArrowCounterClockwise';
 export { FloppyDiskIcon as SaveIcon } from 'phosphor-react-native/src/icons/FloppyDisk';
+export { ScanIcon as ScanIcon } from 'phosphor-react-native/src/icons/Scan';
 export { ScrollIcon as ScriptIcon } from 'phosphor-react-native/src/icons/Scroll';
 export { MagnifyingGlassIcon as SearchIcon } from 'phosphor-react-native/src/icons/MagnifyingGlass';
 export { SelectionAllIcon as SelectAllIcon } from 'phosphor-react-native/src/icons/SelectionAll';

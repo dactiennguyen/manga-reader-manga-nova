@@ -15,6 +15,31 @@ PODS:
   - hermes-engine (260318099.0.5):
     - hermes-engine/Pre-built (= 260318099.0.5)
   - hermes-engine/Pre-built (260318099.0.5)
+  - NitroImage (0.15.2):
+    - hermes-engine
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - NitroModules (0.37.1):
     - hermes-engine
     - RCTRequired
@@ -2353,6 +2378,32 @@ PODS:
   - SocketRocket (0.7.1):
     - ReactNativeDependencies
   - SSZipArchive (2.6.0)
+  - VisionCamera (5.2.4):
+    - hermes-engine
+    - NitroImage
+    - NitroModules
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-callinvoker
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - Yoga (0.0.0):
     - React-Core-prebuilt
 
@@ -2364,6 +2415,7 @@ DEPENDENCIES:
   - fmt (from `build/rndeps-facades/fmt`)
   - glog (from `build/rndeps-facades/glog`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - NitroImage (from `../node_modules/react-native-nitro-image`)
   - NitroModules (from `../node_modules/react-native-nitro-modules`)
   - NitroSound (from `../node_modules/react-native-nitro-sound`)
   - "op-sqlite (from `../node_modules/@op-engineering/op-sqlite`)"
@@ -2460,6 +2512,7 @@ DEPENDENCIES:
   - RNWorklets (from `../node_modules/react-native-worklets`)
   - SocketRocket (from `build/rndeps-facades/SocketRocket`)
   - SSZipArchive (~> 2.6)
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `build/rncore-facades/Yoga`)
 
 SPEC REPOS:
@@ -2483,6 +2536,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-v260318099.0.5
+  NitroImage:
+    :path: "../node_modules/react-native-nitro-image"
   NitroModules:
     :path: "../node_modules/react-native-nitro-modules"
   NitroSound:
@@ -2671,6 +2726,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-worklets"
   SocketRocket:
     :path: build/rndeps-facades/SocketRocket
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: build/rncore-facades/Yoga
 
@@ -2683,6 +2740,7 @@ SPEC CHECKSUMS:
   fmt: ba0886e864ebb21d14c98b2e12e164b8002f5b93
   glog: 3cf7cb46f743c4bc758ae3e6d9c15bd1b4cfd6d4
   hermes-engine: 79484fc4e58f328d01b9339ef899ca633d3702ee
+  NitroImage: eb713c7afe8fe1f6122d26e28d5c35f2b6495b82
   NitroModules: c32f969b7c536e0b6b401a9dfdb35bb4eba071ef
   NitroSound: 2e661bf89e49d0d7e94bef4d46b50d07e3db23d2
   op-sqlite: 9e09cc646119816c897e8bd3b9fb891c7b61e57e
@@ -2778,8 +2836,9 @@ SPEC CHECKSUMS:
   RNWorklets: c05b04d721cccc1d44182425cd09efeddb6b1bbe
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
   SSZipArchive: 8a6ee5677c8e304bebc109e39cf0da91ccef22ea
+  VisionCamera: 0f292837bb94d00194221bc7cdc3278299418965
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
-PODFILE CHECKSUM: eab7a579b33361aaaa1efb0364fe1968db97dfa1
+PODFILE CHECKSUM: 2ff03a2c2e634ca33078f7f3ee383957b7982922
 
 COCOAPODS: 1.16.2

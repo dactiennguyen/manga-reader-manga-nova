@@ -8,7 +8,7 @@ import { useAppNavigation } from '../../state/navigation';
 import { localWifiAddress, useNearbyRooms, useRoom } from '../../state/useRoom';
 import { useSettings } from '../../state/useSettings';
 import { AppBar, ArtBanner, Banner, Button, Card, Dialog, Divider, FieldLabel, ListItem, Screen, Section, Text, TextField, useColor } from '../../ui';
-import { LockIcon, PlayTogetherIcon, WifiIcon } from '../../ui/icons';
+import { LockIcon, PlayTogetherIcon, ScanIcon, WifiIcon } from '../../ui/icons';
 import { NEARBY_ART } from '../../ui/nearbyArt';
 import { JoinModeChoice } from './JoinModeChoice';
 
@@ -108,6 +108,7 @@ function NearbyRooms({
 }
 
 function CodeCard({ onJoin, busy }: { onJoin: (address: RoomAddress) => void; busy: boolean }) {
+  const navigation = useAppNavigation();
   const [code, setCode] = useState('');
   const [wrong, setWrong] = useState(false);
   const join = async () => {
@@ -118,7 +119,7 @@ function CodeCard({ onJoin, busy }: { onJoin: (address: RoomAddress) => void; bu
     }
   };
   return (
-    <Section title={t('Join with a room code')} footer={t("Or scan the host's QR code with your phone's camera.")}>
+    <Section title={t('Join with a room code')}>
       <View className="gap-3 p-3">
         <TextField
           value={code}
@@ -139,6 +140,7 @@ function CodeCard({ onJoin, busy }: { onJoin: (address: RoomAddress) => void; bu
           </Text>
         )}
         <Button title={t('Join')} variant="secondary" loading={busy} disabled={code.replace(/[\s-]/g, '').length < 10} onPress={join} />
+        <Button title={t('Scan a QR code')} icon={ScanIcon} variant="ghost" onPress={() => navigation.navigate('ScanCode')} />
       </View>
     </Section>
   );

@@ -34,5 +34,15 @@ target 'Manganova' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Xcode 26.1's Swift compiler crashes ("Global is external, but doesn't have external or weak linkage")
+    # when it optimizes VisionCamera as one whole module in Release. Compiling it file by file avoids that
+    # and keeps the optimization. Remove once a newer Xcode builds it with whole-module optimization.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'VisionCamera'
+      target.build_configurations.each do |build|
+        build.build_settings['SWIFT_COMPILATION_MODE'] = 'singlefile'
+      end
+    end
   end
 end

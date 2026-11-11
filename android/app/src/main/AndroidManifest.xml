@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Dub together: asked for only when the person starts recording a line. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Scan a room QR code or a friend's card inside the app: asked for only when the scanner opens. Phones
+         without a camera can still install the app and pick a photo of the code instead. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- Play together on the same Wi-Fi. Rooms are found with NSD (multicast DNS), which needs the Wi-Fi state and
          a multicast lock (taken by react-native-zeroconf only while publishing or browsing) to hear other phones.

@@ -83,6 +83,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Manganova uses the camera only to scan a room's QR code or a friend's mangaka card.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Manganova uses the microphone only when you record a voice for a speech bubble in Dub together.</string>
 	<key>RCTNewArchEnabled</key>

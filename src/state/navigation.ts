@@ -1,4 +1,4 @@
-import { useNavigation, useRoute, type NavigatorScreenParams, type RouteProp } from '@react-navigation/native';
+import { createNavigationContainerRef, useNavigation, useRoute, type NavigatorScreenParams, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import type { ID } from '../core/model/types';
@@ -42,12 +42,18 @@ export type RootStackParamList = {
   CoDraw: { pageId?: ID } | undefined;
   Relay: undefined;
   Battle: undefined;
+  Guess: undefined;
+  ScriptTogether: undefined;
   ReadTogether: { projectId: ID } | undefined;
   Dub: { chapterId?: ID } | undefined;
   CardSwap: undefined;
   MangakaCard: undefined;
   SendStory: undefined;
+  ScanCode: undefined;
 };
+
+/** The app's one navigator, for code that runs outside a screen: links opened from another app or a scanned code. */
+export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 export type AppNavigation = NativeStackNavigationProp<RootStackParamList>;
 

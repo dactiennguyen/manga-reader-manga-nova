@@ -23,11 +23,14 @@ import { BattleScreen } from '../features/nearby/BattleScreen';
 import { CardSwapScreen } from '../features/nearby/CardSwapScreen';
 import { CoDrawScreen } from '../features/nearby/CoDrawScreen';
 import { DubScreen } from '../features/nearby/DubScreen';
+import { GuessScreen } from '../features/nearby/GuessScreen';
 import { MangakaCardScreen } from '../features/nearby/MangakaCardScreen';
 import { NearbyScreen } from '../features/nearby/NearbyScreen';
 import { ReadTogetherScreen } from '../features/nearby/ReadTogetherScreen';
 import { RelayScreen } from '../features/nearby/RelayScreen';
 import { RoomScreen } from '../features/nearby/RoomScreen';
+import { ScanCodeScreen } from '../features/nearby/ScanCodeScreen';
+import { ScriptTogetherScreen } from '../features/nearby/ScriptTogetherScreen';
 import { SendStoryScreen } from '../features/nearby/SendStoryScreen';
 import { NewProjectScreen } from '../features/project/NewProjectScreen';
 import { ProjectScreen } from '../features/project/ProjectScreen';
@@ -141,11 +144,14 @@ export function RootNavigator() {
       <Stack.Screen name="CoDraw" component={CoDrawScreen} options={{ gestureEnabled: false, animation: 'fade' }} />
       <Stack.Screen name="Relay" component={RelayScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="Battle" component={BattleScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="Guess" component={GuessScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ScriptTogether" component={ScriptTogetherScreen} />
       <Stack.Screen name="ReadTogether" component={ReadTogetherScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="Dub" component={DubScreen} />
       <Stack.Screen name="CardSwap" component={CardSwapScreen} />
       <Stack.Screen name="MangakaCard" component={MangakaCardScreen} />
       <Stack.Screen name="SendStory" component={SendStoryScreen} />
+      <Stack.Screen name="ScanCode" component={ScanCodeScreen} />
     </Stack.Navigator>
   );
 }

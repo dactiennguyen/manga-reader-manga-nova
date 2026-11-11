@@ -10,8 +10,8 @@ import { useAppNavigation } from '../../state/navigation';
 import { mangakaId, useNearbyShare } from '../../state/useNearbyShare';
 import { useRoom } from '../../state/useRoom';
 import { useSettings } from '../../state/useSettings';
-import { AppBar, Button, IconButton, ListItem, PromptDialog, Screen, Section, Text, confirm, toast } from '../../ui';
-import { CopyIcon, DeleteIcon, EditIcon, ShareIcon } from '../../ui/icons';
+import { AppBar, Button, ICON, IconButton, ListItem, PromptDialog, Screen, Section, Text, confirm, toast, useColor } from '../../ui';
+import { CopyIcon, DeleteIcon, EditIcon, ScanIcon, ShareIcon } from '../../ui/icons';
 import { shareCardImage } from '../studio/cards/shareCard';
 import type { CardViewRef } from '../studio/cards/FlipCard';
 import { FriendSheet } from './share/FriendSheet';
@@ -34,6 +34,7 @@ export function MangakaCardScreen() {
   const [editingName, setEditingName] = useState(false);
   const [sharing, setSharing] = useState(false);
   const cardRef = useRef<CardViewRef>(null);
+  const accent = useColor('accent');
 
   const name = penName || t('Mangaka');
   // Newest first, so the card shows what the person is working on now.
@@ -94,7 +95,13 @@ export function MangakaCardScreen() {
         </Text>
       </View>
 
-      <Section title={t('Friends')} footer={friends.length === 0 ? t("Scan a friend's mangaka card with your phone camera to add them here.") : undefined}>
+      <Section title={t('Friends')} footer={friends.length === 0 ? t("Scan a friend's mangaka card to add them here.") : undefined}>
+        <ListItem
+          left={<ScanIcon size={ICON.lg} color={accent} />}
+          title={t('Scan a QR code')}
+          subtitle={t("Add a friend from their mangaka card")}
+          onPress={() => navigation.navigate('ScanCode')}
+        />
         {friends.length === 0 ? (
           <ListItem title={t('No friends added yet')} />
         ) : (

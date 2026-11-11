@@ -4,7 +4,6 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  createNavigationContainerRef,
   type NavigationState,
   type Theme,
 } from '@react-navigation/native';
@@ -22,7 +21,7 @@ import { ReportHost } from '../features/aiReport/ReportHost';
 import { handleNearbyLink } from '../features/nearby/deepLink';
 import { RoomFollower } from '../features/nearby/RoomFollower';
 import { syncReminder } from '../features/profile/reminder';
-import type { RootStackParamList } from '../state/navigation';
+import { navigationRef } from '../state/navigation';
 import { appServices } from '../state/services';
 import { flushActivity } from '../state/useActivity';
 import { useAppLocale, useSettings } from '../state/useSettings';
@@ -30,8 +29,6 @@ import { flushStory } from '../state/useStory';
 import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
 import { boot } from './boot';
 import { RootNavigator } from './navigation';
-
-const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 function rootRoute(state: NavigationState | undefined): string | undefined {
   return state?.routes[state.index]?.name;

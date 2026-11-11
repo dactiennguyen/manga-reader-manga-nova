@@ -1,3 +1,4 @@
+import { PROTOCOL_VERSION } from '../src/core/nearby/types';
 import { listingAddress, listingCodePrefix, parseListingCode, roomCode, roomLink, parseRoomLink } from '../src/core/nearby/link';
 import { createLoopbackPhones } from '../src/core/nearby/loopback';
 import { roomStateCreator, type RoomStoreState } from '../src/core/nearby/room';
@@ -162,9 +163,9 @@ describe('nearby discovery adverts', () => {
   const base = { fullName: '', host: '', addresses: [], ipv6: [] };
 
   it('puts the token in the TXT record only for an open room', () => {
-    expect(txtFor({ name: 'Ink club', port: 5000, token: '1a2b' })).toEqual({ app: 'manganova', v: 1, n: 'Ink club', k: '1a2b' });
+    expect(txtFor({ name: 'Ink club', port: 5000, token: '1a2b' })).toEqual({ app: 'manganova', v: PROTOCOL_VERSION, n: 'Ink club', k: '1a2b' });
     const locked = txtFor({ name: 'Ink club', port: 5000 });
-    expect(locked).toEqual({ app: 'manganova', v: 1, n: 'Ink club', lock: '1' });
+    expect(locked).toEqual({ app: 'manganova', v: PROTOCOL_VERSION, n: 'Ink club', lock: '1' });
     expect(locked).not.toHaveProperty('k');
   });
 

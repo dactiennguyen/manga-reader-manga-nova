@@ -6,15 +6,20 @@
 import { useSyncExternalStore } from 'react';
 
 import { BattleSession, type BattleSnapshot } from '../../../core/nearby/battleSession';
+import { GuessSession, type GuessSnapshot } from '../../../core/nearby/guessSession';
 import { RelaySession, type RelaySnapshot } from '../../../core/nearby/relaySession';
+import { ScriptSession, type ScriptSnapshot } from '../../../core/nearby/scriptSession';
 import { realClock } from '../../../core/nearby/transport';
 import { useRoom } from '../../../state/useRoom';
 import { CoDrawSession, type CoDrawSnapshot } from '../codraw/coDrawSession';
+import { guessWords } from '../guess/guessWords';
 
 export const relaySession = new RelaySession(useRoom).start();
 // The room measures the host clock against ours on every ping, so everyone starts the timer together.
 export const battleSession = new BattleSession(useRoom, realClock, () => useRoom.getState().clockOffset ?? undefined).start();
 export const coDrawSession = new CoDrawSession(useRoom).start();
+export const guessSession = new GuessSession(useRoom, guessWords).start();
+export const scriptSession = new ScriptSession(useRoom).start();
 
 // Leaving the room, or the room moving on to something else, forgets the finished activity.
 useRoom.subscribe((state, previous) => {
@@ -30,6 +35,12 @@ useRoom.subscribe((state, previous) => {
   if (left || (was === 'codraw' && now !== 'codraw')) {
     coDrawSession.reset();
   }
+  if (left || (was === 'guess' && now !== 'guess')) {
+    guessSession.reset();
+  }
+  if (left || (was === 'script' && now !== 'script')) {
+    scriptSession.reset();
+  }
 });
 
 export function useRelay(): RelaySnapshot {
@@ -42,4 +53,12 @@ export function useBattle(): BattleSnapshot {
 
 export function useCoDraw(): CoDrawSnapshot {
   return useSyncExternalStore(coDrawSession.subscribe, coDrawSession.getSnapshot);
+}
+
+export function useGuess(): GuessSnapshot {
+  return useSyncExternalStore(guessSession.subscribe, guessSession.getSnapshot);
+}
+
+export function useScriptTogether(): ScriptSnapshot {
+  return useSyncExternalStore(scriptSession.subscribe, scriptSession.getSnapshot);
 }

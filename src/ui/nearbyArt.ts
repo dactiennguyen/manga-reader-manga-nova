@@ -7,6 +7,8 @@ export const NEARBY_ART = {
   codraw: require('../assets/art/nearby/codraw.webp'),
   relay: require('../assets/art/nearby/relay.webp'),
   battle: require('../assets/art/nearby/battle.webp'),
+  guess: require('../assets/art/nearby/guess.webp'),
+  script: require('../assets/art/nearby/script.webp'),
   read: require('../assets/art/nearby/read.webp'),
   dub: require('../assets/art/nearby/dub.webp'),
   cards: require('../assets/art/nearby/cards.webp'),
