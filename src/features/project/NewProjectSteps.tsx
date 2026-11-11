@@ -20,9 +20,10 @@ import {
   Text,
   TextField,
 } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { OptionCard } from '../onboarding/OptionCard';
 import { StylePicker } from '../onboarding/StylePicker';
-import type { NewProjectForm } from './useNewProject';
+import { storyIdeaText, type NewProjectForm } from './useNewProject';
 
 function StepTitle({ children }: { children: string }) {
   return (
@@ -44,7 +45,12 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
           </Text>
         </Card>
       )}
-      {form.aiFilled && <AiNote text={t('Suggested by AI — edit anything')} />}
+      {form.aiFilled && (
+        <View className="flex-row items-center gap-1">
+          <AiNote text={t('Suggested by AI — edit anything')} className="flex-1" />
+          <ReportAiButton text={form.aiText} feature="storyIdea" />
+        </View>
+      )}
       <View className="gap-2">
         <FieldLabel>{t('Story title')}</FieldLabel>
         <TextField
@@ -125,7 +131,8 @@ export function StoryStep({ form }: { form: NewProjectForm }) {
           <Text variant="caption" tone="secondary">
             {t('Use replaces the title, genres and summary above. Nothing changes until you tap it.')}
           </Text>
-          <View className="flex-row flex-wrap justify-end gap-2">
+          <View className="flex-row flex-wrap items-center justify-end gap-2">
+            <ReportAiButton text={storyIdeaText(ai.data)} feature="storyIdea" className="mr-auto" />
             <Button title={t('Discard')} variant="ghost" small onPress={form.resetAi} />
             <Button title={t('Try again')} variant="secondary" icon={RefreshIcon} small onPress={form.suggest} />
             <Button title={t('Use')} variant="ai" icon={CheckIcon} small onPress={() => form.acceptSuggestion(ai.data)} />

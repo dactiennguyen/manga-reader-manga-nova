@@ -14,6 +14,7 @@ import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import { Button, Sheet, Tag, Text } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from './AiParts';
 
 export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose: () => void }) {
@@ -116,6 +117,10 @@ export function PlotHolesSheet({ projectId, onClose }: { projectId: ID; onClose:
             <View className="flex-row gap-2">
               <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
               <Button title={t('Close')} variant="ghost" onPress={sheet.close} className="flex-1" />
+              <ReportAiButton
+                text={state.data.map(hole => [hole.chapter, hole.issue, hole.suggestion].filter(Boolean).join(': ')).join('\n')}
+                feature="plotHoles"
+              />
             </View>
           </SheetFooter>
         </>

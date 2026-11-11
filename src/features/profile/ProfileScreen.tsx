@@ -12,6 +12,7 @@ import {
   DeviceIcon,
   DoneIcon,
   EditIcon,
+  FlagIcon,
   HandIcon,
   IdeaIcon,
   InfoIcon,
@@ -25,13 +26,14 @@ import {
 } from '../../ui/icons';
 
 import { ARCHIVE_EXTENSION } from '../../core/archive/bundle';
-import { LOCALES, LOCALE_NAME, msg, t, type LanguageChoice } from '../../core/i18n';
+import { LOCALES, LOCALE_NAME, msg, t, tn, type LanguageChoice } from '../../core/i18n';
 import { ART_STYLE_LABEL } from '../../core/model/constants';
 import { initialOf } from '../../core/model/selectors';
 import { storyStats } from '../../core/story/stats';
 import { formatBytes } from '../../core/util/format';
 import { DIRS, dirSize } from '../../native/files';
 import { useAppNavigation } from '../../state/navigation';
+import { useAiReports } from '../../state/useAiReports';
 import { useSettings, type CreatorRole, type Handedness, type ThemeMode } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import {
@@ -48,6 +50,7 @@ import {
   Text,
   useDockInset,
 } from '../../ui';
+import { ReportsSheet } from '../aiReport/ReportsSheet';
 import { AiServerSheet } from './AiServerSheet';
 import { ReminderRows } from './ReminderRows';
 import { StreakCard } from './StreakCard';
@@ -106,6 +109,8 @@ export function ProfileScreen() {
   const [menu, setMenu] = useState<'theme' | 'hand' | 'language' | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [aiSheet, setAiSheet] = useState(false);
+  const [reportsSheet, setReportsSheet] = useState(false);
+  const reportCount = useAiReports(s => s.reports.length);
   const [usedBytes, setUsedBytes] = useState<number | null>(null);
   const { importing, onImport } = useImportArchive();
 
@@ -250,6 +255,13 @@ export function ProfileScreen() {
             onValueChange={value => set({ aiDemo: value })}
           />
         )}
+        <ListItem
+          icon={FlagIcon}
+          title={t('Reported AI answers')}
+          subtitle={reportCount ? tn(reportCount, '{count} report', '{count} reports') : t('Flag an AI answer to report it')}
+          chevron
+          onPress={() => setReportsSheet(true)}
+        />
       </Section>
 
       <Section title={t('Privacy and data')}>
@@ -304,6 +316,7 @@ export function ProfileScreen() {
         }))}
       />
       <AiServerSheet visible={aiSheet} onClose={() => setAiSheet(false)} />
+      <ReportsSheet visible={reportsSheet} onClose={() => setReportsSheet(false)} />
       <PromptDialog
         visible={editingName}
         onClose={() => setEditingName(false)}

@@ -12,8 +12,8 @@ import { GuestRefused, GuestSession, type GuestEndReason } from './guestSession'
 import { HostSession } from './hostSession';
 import { newToken } from './link';
 import { BLOB_IDLE_TIMEOUT, BlobAssembler, blobChunks, MAX_CHUNKS, CHUNK_CHARS } from './protocol';
-import { realClock, type Clock, type Discovery, type Network } from './transport';
-import type { Activity, BlobProgress, Member, MemberId, Message, MessageType, RoomAddress, RoomBlob, RoomState } from './types';
+import { realClock, type Advert, type Clock, type Discovery, type Network } from './transport';
+import type { Activity, BlobProgress, JoinMode, Member, MemberId, Message, MessageType, NearbyRoom, RoomAddress, RoomBlob, RoomState } from './types';
 
 export type RoomStatus = 'idle' | 'hosting' | 'joining' | 'joined' | 'error';
 
@@ -32,8 +32,12 @@ export type RoomStoreState = {
    * timers started by the host end at the same moment everywhere: hostTime = Date.now() + clockOffset.
    */
   clockOffset: number | null;
-  /** `roomName` defaults to `name` (the host's pen name). */
-  hostRoom(name: string, roomName?: string): Promise<RoomAddress>;
+  /** Who can join the room this phone hosts (see JoinMode). Only meaningful while hosting. */
+  joinMode: JoinMode;
+  /** `roomName` defaults to `name` (the host's pen name). `joinMode` defaults to code only, the safer choice. */
+  hostRoom(name: string, roomName?: string, joinMode?: JoinMode): Promise<RoomAddress>;
+  /** Host only: changes who can join and announces the room again, with or without the token. Members stay. */
+  setJoinMode(joinMode: JoinMode): void;
   joinRoom(address: RoomAddress, name: string): Promise<void>;
   leaveRoom(): void;
   send(message: Message, to?: MemberId): void;
@@ -53,8 +57,8 @@ export type RoomStoreState = {
   onBlob(handler: (blob: RoomBlob) => void): () => void;
   onBlobProgress(handler: (progress: BlobProgress) => void): () => void;
   setActivity(activity: Activity, options?: Record<string, unknown>): void;
-  /** Watches rooms announced nearby; for useNearbyRooms. */
-  browse(onChange: (rooms: RoomAddress[]) => void): () => void;
+  /** Watches rooms announced nearby; for useNearbyRooms. A code-only room comes without its token. */
+  browse(onChange: (rooms: NearbyRoom[]) => void): () => void;
   /** Clears an error so the hub can be used again. */
   reset(): void;
 };
@@ -85,7 +89,24 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   });
 }
 
-const IDLE = { status: 'idle' as const, me: null, room: null, address: null, error: null, reconnecting: false, clockOffset: null };
+const IDLE = {
+  status: 'idle' as const,
+  me: null,
+  room: null,
+  address: null,
+  error: null,
+  reconnecting: false,
+  clockOffset: null,
+  joinMode: 'code' as JoinMode,
+};
+
+/** The advert for a hosted room: a code-only room leaves the token out, so the list alone cannot join it. */
+export function advertFor(address: RoomAddress, joinMode: JoinMode): Advert {
+  const name = address.name ?? '';
+  return joinMode === 'open'
+    ? { name, port: address.port, token: address.token, host: address.host }
+    : { name, port: address.port, host: address.host };
+}
 
 function endMessage(reason: GuestEndReason): string {
   switch (reason) {
@@ -120,6 +141,7 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
     let host: HostSession | null = null;
     let guest: GuestSession | null = null;
     let unpublish: (() => void) | null = null;
+    let advertised: RoomAddress | null = null;
     let sweeper: unknown = null;
     let blobCount = 0;
 
@@ -159,9 +181,23 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
       sweeper = clock.setInterval(() => assembler.sweep(), BLOB_IDLE_TIMEOUT / 3);
     };
 
+    // Announces the hosted room (again), replacing any earlier advert. Without an advert friends can still
+    // join by QR or room code, so a failing discovery is not an error.
+    const advertise = (address: RoomAddress, joinMode: JoinMode) => {
+      unpublish?.();
+      unpublish = null;
+      advertised = address;
+      try {
+        unpublish = deps.discovery?.publish(advertFor(address, joinMode)) ?? null;
+      } catch {
+        unpublish = null;
+      }
+    };
+
     const teardown = () => {
       unpublish?.();
       unpublish = null;
+      advertised = null;
       host?.end();
       guest?.leave();
       host = null;
@@ -175,7 +211,7 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
     return {
       ...IDLE,
 
-      async hostRoom(name, roomName) {
+      async hostRoom(name, roomName, joinMode = 'code') {
         teardown();
         set({ ...IDLE, status: 'hosting' });
         // Any failure on the way must end in 'error': a room stuck in 'hosting' with no room hides the hub.
@@ -198,14 +234,9 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
           const title = (roomName ?? name).trim() || me.name;
           host = new HostSession(server, token, me, newId(), title, { deliver, room: room => set({ room }) }, clock, newId);
           const address: RoomAddress = { host: ip, port: server.port, token, name: title };
-          try {
-            unpublish = deps.discovery?.publish({ name: title, port: server.port, token, host: ip }) ?? null;
-          } catch {
-            // Without the advert friends can still join by QR or room code.
-            unpublish = null;
-          }
+          advertise(address, joinMode);
           startSweeper();
-          set({ status: 'hosting', me, room: host.room, address, error: null, clockOffset: 0 });
+          set({ status: 'hosting', me, room: host.room, address, error: null, clockOffset: 0, joinMode });
           return address;
         } catch {
           server.close();
@@ -335,6 +366,14 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
       onBlobProgress(handler) {
         progressHandlers.add(handler);
         return () => progressHandlers.delete(handler);
+      },
+
+      setJoinMode(joinMode) {
+        if (!host || !advertised || get().joinMode === joinMode) {
+          return;
+        }
+        advertise(advertised, joinMode);
+        set({ joinMode });
       },
 
       setActivity(activity, options) {

@@ -3,12 +3,14 @@ import { Image, View } from 'react-native';
 import { t, tn } from '../../core/i18n';
 import { memberColor } from '../../core/nearby/colors';
 import { roomCode, roomLink } from '../../core/nearby/link';
-import type { Member, RoomAddress } from '../../core/nearby/types';
+import type { JoinMode, Member, RoomAddress } from '../../core/nearby/types';
 import { useAppNavigation } from '../../state/navigation';
 import { useRoom } from '../../state/useRoom';
+import { useSettings } from '../../state/useSettings';
 import { AppBar, Badge, Banner, Card, confirm, EmptyState, IconButton, Pressable, QrCode, Screen, Section, SectionHeader, Text } from '../../ui';
 import { LeaveIcon, PlayTogetherIcon, WifiIcon } from '../../ui/icons';
 import { ACTIVITY_CARDS, type ActivityCard } from './activities';
+import { JoinModeChoice } from './JoinModeChoice';
 
 const QR_SIZE = 168;
 const TILE_ART = 88;
@@ -44,6 +46,23 @@ function InviteCard({ address }: { address: RoomAddress }) {
         )}
       </View>
     </Card>
+  );
+}
+
+/** Host only: who can join from now on. The room is announced again; people already here stay. */
+function JoinModeSection() {
+  const joinMode = useRoom(s => s.joinMode);
+  const setJoinMode = useRoom(s => s.setJoinMode);
+  const change = (mode: JoinMode) => {
+    setJoinMode(mode);
+    useSettings.getState().set({ roomJoinMode: mode });
+  };
+  return (
+    <Section title={t('Who can join')} footer={t('Changing this does not remove anyone already in the room.')}>
+      <View className="px-4 py-1">
+        <JoinModeChoice value={joinMode} onChange={change} />
+      </View>
+    </Section>
   );
 }
 
@@ -146,6 +165,7 @@ export function RoomScreen() {
         ))}
       </Section>
       {!!address && <InviteCard address={address} />}
+      {isHost && <JoinModeSection />}
       <ActivityGrid isHost={isHost} onPick={card => setActivity(card.activity)} />
     </Screen>
   );

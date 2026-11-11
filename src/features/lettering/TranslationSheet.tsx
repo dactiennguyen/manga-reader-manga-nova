@@ -16,6 +16,7 @@ import { useAiTask } from '../../state/useAiTask';
 import { useAiServerSet } from '../../state/useSettings';
 import { undoable, useStory } from '../../state/useStory';
 import { AiErrorBox, AiLoading, AiNote, AiPanel, Button, Card, ICON, Icon, Segmented, Sheet, Text, TextField, toast } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { progressLabel } from './Languages';
 
 type Section = { pageId: ID; number: number; bubbles: Bubble[] };
@@ -62,6 +63,8 @@ export function TranslationSheet({
   const [scope, setScope] = useState<'page' | 'chapter'>('page');
   const [proposals, setProposals] = useState<Proposal[] | null>(null);
   const [busyCount, setBusyCount] = useState(0);
+  /** The translations as the AI wrote them, before any edit, for a report. */
+  const [aiText, setAiText] = useState('');
   const { state: ai, start, cancel, reset } = useAiTask<string[]>();
   const lastMode = useRef<TranslateMode>('missing');
   const pages = useStory(s => s.pages);
@@ -123,6 +126,7 @@ export function TranslationSheet({
     ).then(lines => {
       if (lines) {
         setProposals(items.map((item, index) => ({ ...item, text: lines[index] ?? '' })));
+        setAiText(items.map((item, index) => `${item.original} → ${lines[index] ?? ''}`).join('\n'));
         reset();
       }
     });
@@ -212,7 +216,10 @@ export function TranslationSheet({
               </Card>
             ))}
             <Button title={t('Apply')} icon={CheckIcon} variant="ai" onPress={apply} />
-            <Button title={t('Discard')} variant="ghost" onPress={() => setProposals(null)} />
+            <View className="flex-row items-center gap-2">
+              <Button title={t('Discard')} variant="ghost" onPress={() => setProposals(null)} className="flex-1" />
+              <ReportAiButton text={aiText} feature="translation" />
+            </View>
           </AiPanel>
         ) : (
           renderAi()

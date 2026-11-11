@@ -18,6 +18,7 @@ import { usePage, useProjectOfPage } from '../state/hooks';
 import { connectScriptHistory } from '../state/scriptHistory';
 import { configureServices } from '../state/services';
 import { connectActivity } from '../state/useActivity';
+import { connectAiReports } from '../state/useAiReports';
 import { connectAssistant } from '../state/useAssistant';
 import { connectDubClips } from '../state/useDubClips';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
@@ -52,6 +53,7 @@ export async function boot(): Promise<void> {
   connectActivity(meta);
   connectStudio(meta);
   connectDubClips(meta);
+  connectAiReports(meta);
   connectArt(createArtRepo(db));
   connectStory(
     createStoryRepo(db),

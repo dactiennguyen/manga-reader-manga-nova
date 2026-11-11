@@ -1,17 +1,19 @@
 import { useFocusEffect, useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
-import { useCallback, useRef, type ComponentRef } from 'react';
+import { useCallback, useMemo, useRef, useState, type ComponentRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useKeyboardState } from 'react-native-keyboard-controller';
 import { HistoryIcon, SendIcon, StopIcon } from '../../ui/icons';
 
 import { t } from '../../core/i18n';
 import { useAppNavigation, type TabParamList } from '../../state/navigation';
+import { useAiReports } from '../../state/useAiReports';
 import { useAiConfigured, useAiDemo } from '../../state/useSettings';
 import { AiErrorBox, AiLoading, AiNote, AppBar, ICON, IconButton, Screen, TextField, useDockInset } from '../../ui';
 import {
   AssistantBubble,
   ConversationsSheet,
   NotConfiguredNotice,
+  ReportedBubble,
   UserBubble,
   WelcomePanel,
 } from './AssistantParts';
@@ -30,6 +32,20 @@ export function AssistantScreen() {
   const chat = useAssistantChat(params?.projectId);
   const { active, ai, conversations, input, loading, project, where } = chat;
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const reports = useAiReports(s => s.reports);
+  const reported = useMemo(() => new Set(reports.map(report => report.answerId).filter(Boolean)), [reports]);
+  /** Reported answers the person chose to see again, for this visit only. */
+  const [shown, setShown] = useState<ReadonlySet<string>>(() => new Set());
+  const toggleShown = (id: string, on: boolean) =>
+    setShown(prev => {
+      const next = new Set(prev);
+      if (on) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
 
   /** A story passed in holds only for this visit: the dock opens the latest one. */
   useFocusEffect(useCallback(() => () => tab.setParams({ projectId: undefined }), [tab]));
@@ -68,12 +84,16 @@ export function AssistantScreen() {
         {messages.map(message =>
           message.role === 'user' ? (
             <UserBubble key={message.id} message={message} />
+          ) : reported.has(message.id) && !shown.has(message.id) ? (
+            <ReportedBubble key={message.id} onShow={() => toggleShown(message.id, true)} />
           ) : (
             <AssistantBubble
               key={message.id}
               message={message}
               onCopy={() => chat.copy(message)}
               onSave={project ? () => chat.saveNote(message) : undefined}
+              reported={reported.has(message.id)}
+              onHide={() => toggleShown(message.id, false)}
             />
           ),
         )}

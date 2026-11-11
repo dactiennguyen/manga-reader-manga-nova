@@ -14,6 +14,11 @@ import { useSettings } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import { confirm, toast } from '../../ui';
 
+/** An AI story suggestion as one text, as it is reported. */
+export function storyIdeaText(suggestion: StoryIdea): string {
+  return [suggestion.title, suggestion.genres.join(', '), suggestion.logline].filter(Boolean).join('\n');
+}
+
 export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) {
   const idea = route.params?.idea?.trim() ?? '';
   const draft = route.params?.draft;
@@ -25,6 +30,8 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
   const [genres, setGenres] = useState<string[]>(() => knownGenres(draft?.genres));
   const [logline, setLogline] = useState(() => (draft?.logline?.trim() || idea).slice(0, LIMITS.logline));
   const [aiFilled, setAiFilled] = useState(!!draft);
+  /** What the AI wrote into the form, for a report while the AI note shows. */
+  const [aiText, setAiText] = useState(() => (draft ? storyIdeaText(draft) : ''));
   const [formatKey, setFormatKey] = useState<FormatKey>('manga-B5');
   const [starterKey, setStarterKey] = useState<StarterKey>('blank');
   const [style, setStyle] = useState<ArtStyle>(defaultStyle);
@@ -118,6 +125,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
       setGenres(picked);
     }
     setAiFilled(true);
+    setAiText(storyIdeaText(suggestion));
     reset();
   };
 
@@ -173,6 +181,7 @@ export function useNewProject({ navigation, route }: ScreenProps<'NewProject'>) 
     genreList,
     logline,
     aiFilled,
+    aiText,
     aiSource,
     ai,
     format,

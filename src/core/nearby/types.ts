@@ -35,6 +35,16 @@ export type RoomAddress = {
   name?: string;
 };
 
+/**
+ * Who can join a hosted room. `open`: anyone on the same Wi-Fi, by tapping the room in their list (the
+ * advert carries the token). `code`: the room is still listed, with a lock, but the advert leaves the
+ * token out, so joining needs the room code or the QR code from the host's screen.
+ */
+export type JoinMode = 'open' | 'code';
+
+/** A room in the list of rooms nearby. `token` is null for a code-only room: tapping it asks for the code. */
+export type NearbyRoom = { host: string; port: number; token: string | null; name?: string };
+
 export type RoomState = {
   roomId: string;
   name: string;

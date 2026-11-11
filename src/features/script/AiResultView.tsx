@@ -7,6 +7,7 @@ import { BLOCK_LABEL, LIMITS } from '../../core/model/constants';
 import type { Block, Character, ID } from '../../core/model/types';
 import { pairRewrite, type AiAction, type BlockLocation, type TextChange } from '../../core/script/aiDrafts';
 import { AiNote, Button, Pressable, Text } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { BeforeAfter, DraftBlockView, Footer } from './AiDraftViews';
 
 export type AiResult =
@@ -15,11 +16,23 @@ export type AiResult =
   | { kind: 'line'; text: string }
   | { kind: 'sfx'; words: string[] };
 
-function RetryRow({ onRetry, onDiscard }: { onRetry: () => void; onDiscard: () => void }) {
+/** The AI's words in one piece, as they are reported. */
+function resultText(result: AiResult): string {
+  if (result.kind === 'line') {
+    return result.text;
+  }
+  if (result.kind === 'sfx') {
+    return result.words.join(', ');
+  }
+  return result.drafts.map(draft => (draft.characterName ? `${draft.characterName}: ${draft.text}` : draft.text)).join('\n');
+}
+
+function RetryRow({ result, onRetry, onDiscard }: { result: AiResult; onRetry: () => void; onDiscard: () => void }) {
   return (
     <View className="flex-row gap-2">
       <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={onRetry} className="flex-1" />
       <Button title={t('Discard')} variant="ghost" onPress={onDiscard} className="flex-1" />
+      <ReportAiButton text={resultText(result)} feature="script" />
     </View>
   );
 }
@@ -63,7 +76,7 @@ export function AiResultView({
             icon={CheckIcon}
             onPress={() => onInsert(location?.block.id ?? null, result.drafts)}
           />
-          <RetryRow onRetry={onRetry} onDiscard={onDiscard} />
+          <RetryRow result={result} onRetry={onRetry} onDiscard={onDiscard} />
         </Footer>
       </>
     );
@@ -111,7 +124,7 @@ export function AiResultView({
             disabled={!pairs.length}
             onPress={() => onReplace(pairs)}
           />
-          <RetryRow onRetry={onRetry} onDiscard={onDiscard} />
+          <RetryRow result={result} onRetry={onRetry} onDiscard={onDiscard} />
         </Footer>
       </>
     );
@@ -143,7 +156,7 @@ export function AiResultView({
             disabled={!location}
             onPress={() => location && onReplace([{ id: location.block.id, text: result.text }])}
           />
-          <RetryRow onRetry={onRetry} onDiscard={onDiscard} />
+          <RetryRow result={result} onRetry={onRetry} onDiscard={onDiscard} />
         </Footer>
       </>
     );
@@ -167,7 +180,7 @@ export function AiResultView({
         </View>
       </ScrollView>
       <Footer>
-        <RetryRow onRetry={onRetry} onDiscard={onDiscard} />
+        <RetryRow result={result} onRetry={onRetry} onDiscard={onDiscard} />
       </Footer>
     </>
   );

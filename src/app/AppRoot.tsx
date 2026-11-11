@@ -18,6 +18,7 @@ import { Uniwind, useUniwind } from 'uniwind';
 import { t } from '../core/i18n';
 import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
+import { ReportHost } from '../features/aiReport/ReportHost';
 import { handleNearbyLink } from '../features/nearby/deepLink';
 import { RoomFollower } from '../features/nearby/RoomFollower';
 import { syncReminder } from '../features/profile/reminder';
@@ -160,6 +161,7 @@ function Shell() {
       {route === 'Canvas' ? null : <NavBarBacking />}
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
       <ConfirmHost />
+      <ReportHost />
     </>
   );
 }

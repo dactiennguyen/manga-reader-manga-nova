@@ -12,6 +12,7 @@ import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import { Button, Divider, FieldLabel, Segmented, Sheet, Tag, Text, TextField, toast } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from '../outline/AiParts';
 
 const KEYWORDS_MAX = 300;
@@ -111,6 +112,7 @@ export function FillSheet({
           <View className="flex-row gap-2">
             <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
             <Button title={t('Discard')} variant="ghost" onPress={sheet.close} className="flex-1" />
+            <ReportAiButton text={rows.map(row => `${row.label}: ${row.value}`).join('\n')} feature="character" />
           </View>
         </SheetFooter>
       </>

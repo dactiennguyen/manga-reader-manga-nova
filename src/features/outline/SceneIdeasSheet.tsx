@@ -13,6 +13,7 @@ import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { undoable, useStory } from '../../state/useStory';
 import { Banner, Button, ICON, Icon, Sheet, Text } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from './AiParts';
 
 function sceneBlocks(idea: SceneIdea): Block[] {
@@ -149,6 +150,10 @@ export function SceneIdeasSheet({ chapterId, number, onClose }: { chapterId: ID;
             <View className="flex-row gap-2">
               <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
               <Button title={t('Discard')} variant="ghost" onPress={sheet.close} className="flex-1" />
+              <ReportAiButton
+                text={ideas.map(idea => [idea.setting, idea.description].filter(Boolean).join(': ')).join('\n')}
+                feature="sceneIdeas"
+              />
             </View>
           </SheetFooter>
         </>

@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { ActivityIndicator, Image, View } from 'react-native';
 
 import { t } from '../../core/i18n';
-import { parseRoomCode } from '../../core/nearby/link';
-import type { RoomAddress } from '../../core/nearby/types';
+import { listingAddress, listingCodePrefix, parseListingCode, parseRoomCode } from '../../core/nearby/link';
+import type { NearbyRoom, RoomAddress } from '../../core/nearby/types';
 import { useAppNavigation } from '../../state/navigation';
 import { localWifiAddress, useNearbyRooms, useRoom } from '../../state/useRoom';
 import { useSettings } from '../../state/useSettings';
-import { AppBar, ArtBanner, Banner, Button, Card, Divider, ListItem, Screen, Section, Text, TextField, useColor } from '../../ui';
-import { PlayTogetherIcon, WifiIcon } from '../../ui/icons';
+import { AppBar, ArtBanner, Banner, Button, Card, Dialog, Divider, FieldLabel, ListItem, Screen, Section, Text, TextField, useColor } from '../../ui';
+import { LockIcon, PlayTogetherIcon, WifiIcon } from '../../ui/icons';
 import { NEARBY_ART } from '../../ui/nearbyArt';
+import { JoinModeChoice } from './JoinModeChoice';
 
 const HINT_ART = { width: 80, height: 80 };
 
@@ -33,12 +34,13 @@ function HostCard() {
   const navigation = useAppNavigation();
   const myName = useMyName();
   const hostRoom = useRoom(s => s.hostRoom);
+  const joinMode = useSettings(s => s.roomJoinMode);
   const [name, setName] = useState(myName);
   const [busy, setBusy] = useState(false);
   const create = async () => {
     setBusy(true);
     try {
-      await hostRoom(myName, name.trim() || myName);
+      await hostRoom(myName, name.trim() || myName, joinMode);
       navigation.navigate('Room');
     } catch {
       // The error is in the store and shown as a banner.
@@ -50,13 +52,25 @@ function HostCard() {
     <Section title={t('Host a room')} footer={t('Friends see this name in their list of rooms.')}>
       <View className="gap-3 p-3">
         <TextField value={name} onChangeText={setName} placeholder={t('Room name')} maxLength={40} accessibilityLabel={t('Room name')} />
+        <View className="gap-1">
+          <FieldLabel>{t('Who can join')}</FieldLabel>
+          <JoinModeChoice value={joinMode} onChange={mode => useSettings.getState().set({ roomJoinMode: mode })} />
+        </View>
         <Button title={t('Create a room')} icon={PlayTogetherIcon} loading={busy} onPress={create} />
       </View>
     </Section>
   );
 }
 
-function NearbyRooms({ onJoin, joining }: { onJoin: (address: RoomAddress) => void; joining: string | null }) {
+function NearbyRooms({
+  onJoin,
+  onLocked,
+  joining,
+}: {
+  onJoin: (address: RoomAddress) => void;
+  onLocked: (room: NearbyRoom) => void;
+  joining: string | null;
+}) {
   const rooms = useNearbyRooms();
   const muted = useColor('text-muted');
   return (
@@ -71,16 +85,19 @@ function NearbyRooms({ onJoin, joining }: { onJoin: (address: RoomAddress) => vo
       ) : (
         rooms.map((room, index) => {
           const key = `${room.host}:${room.port}`;
+          // A code-only room has no token in its advert: tapping it asks for the code instead of joining.
+          const address = listingAddress(room);
+          const idle = address ? t('Tap to join') : t('Room code needed');
           return (
             <View key={key}>
               {index > 0 && <Divider inset={16} />}
               <ListItem
-                icon={PlayTogetherIcon}
+                icon={address ? PlayTogetherIcon : LockIcon}
                 title={room.name || t('Room')}
-                subtitle={joining === key ? t('Joining…') : t('Tap to join')}
+                subtitle={joining === key ? t('Joining…') : idle}
                 disabled={!!joining}
                 chevron
-                onPress={() => onJoin(room)}
+                onPress={() => (address ? onJoin(address) : onLocked(room))}
               />
             </View>
           );
@@ -127,6 +144,66 @@ function CodeCard({ onJoin, busy }: { onJoin: (address: RoomAddress) => void; bu
   );
 }
 
+/** The room code for a locked room tapped in the list. Its start is filled in, so only the last part is typed. */
+function LockedRoomDialog({ room, onClose, onJoin }: { room: NearbyRoom | null; onClose: () => void; onJoin: (address: RoomAddress) => void }) {
+  const [code, setCode] = useState('');
+  const [wrong, setWrong] = useState<'format' | 'mismatch' | null>(null);
+  const [shownFor, setShownFor] = useState<NearbyRoom | null>(null);
+  if (room !== shownFor) {
+    // A new room was tapped: start again from its filled-in start.
+    setShownFor(room);
+    setCode(room ? (listingCodePrefix(room) ?? '') : '');
+    setWrong(null);
+  }
+  // The last 4 characters alone, or a whole code (with or without the filled-in start).
+  const typed = code.replace(/[\s-]/g, '').length;
+  const ready = typed === 4 || typed >= 10;
+  const join = () => {
+    const address = room && ready ? parseListingCode(code, room) : null;
+    // The last characters also carry part of the port, so a mistyped code points at another port: say the
+    // code is wrong here instead of trying it and reporting the room as unreachable. The address is not
+    // compared, since a host with two networks can show a code for one and be listed under the other.
+    const here = !!address && !!room && address.port === room.port;
+    setWrong(!address ? 'format' : here ? null : 'mismatch');
+    if (address && here) {
+      onClose();
+      onJoin(address);
+    }
+  };
+  return (
+    <Dialog
+      visible={!!room}
+      onClose={onClose}
+      title={t('Join {room}', { room: room?.name || t('Room') })}
+      message={t('Ask the host for the code or scan their QR.')}
+      actions={[
+        { label: t('Cancel'), onPress: onClose, variant: 'ghost' },
+        { label: t('Join'), onPress: join, variant: 'primary', disabled: !ready },
+      ]}
+    >
+      <TextField
+        value={code}
+        onChangeText={value => {
+          setCode(value.toUpperCase());
+          setWrong(null);
+        }}
+        placeholder="ABCDE-FGHJK"
+        autoCapitalize="characters"
+        autoCorrect={false}
+        autoFocus
+        maxLength={20}
+        accessibilityLabel={t('Room code')}
+        onSubmitEditing={join}
+      />
+      {wrong && (
+        <Text variant="bodySmall" tone="danger">
+          {wrong === 'mismatch' ? t('That room code is not right. Ask the host to show it again.') : t('A room code has 10 letters and numbers.')}
+        </Text>
+      )}
+    </Dialog>
+  );
+}
+
 function WifiHint() {
   return (
     <Card className="flex-row items-center gap-3 p-3">
@@ -148,6 +225,7 @@ export function NearbyScreen() {
   const { status, room, error, joinRoom, reset } = useRoom();
   const enterRoom = useEnterRoom();
   const [joining, setJoining] = useState<string | null>(null);
+  const [locked, setLocked] = useState<NearbyRoom | null>(null);
   const inRoom = status === 'hosting' || status === 'joined';
 
   const join = async (address: RoomAddress) => {
@@ -174,10 +252,11 @@ export function NearbyScreen() {
       {!inRoom && (
         <>
           <HostCard />
-          <NearbyRooms onJoin={join} joining={joining} />
+          <NearbyRooms onJoin={join} onLocked={setLocked} joining={joining} />
           <CodeCard onJoin={join} busy={!!joining} />
         </>
       )}
+      <LockedRoomDialog room={locked} onClose={() => setLocked(null)} onJoin={join} />
       <WifiHint />
     </Screen>
   );

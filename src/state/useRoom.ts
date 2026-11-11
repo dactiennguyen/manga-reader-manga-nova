@@ -8,7 +8,7 @@ import { create } from 'zustand';
 
 import { parseRoomLink, roomLink } from '../core/nearby/link';
 import { roomStateCreator, type RoomStoreState } from '../core/nearby/room';
-import type { RoomAddress } from '../core/nearby/types';
+import type { NearbyRoom } from '../core/nearby/types';
 import { nativeDiscovery, nativeNetwork } from '../native/nearby';
 
 export type { RoomStatus, RoomStoreState } from '../core/nearby/room';
@@ -16,9 +16,9 @@ export { parseRoomLink, roomLink };
 
 export const useRoom = create<RoomStoreState>()(roomStateCreator({ network: nativeNetwork, discovery: nativeDiscovery }));
 
-/** Rooms announced on this Wi-Fi, watched while the calling screen is mounted. */
-export function useNearbyRooms(): RoomAddress[] {
-  const [rooms, setRooms] = useState<RoomAddress[]>([]);
+/** Rooms announced on this Wi-Fi, watched while the calling screen is mounted. Code-only rooms have no token. */
+export function useNearbyRooms(): NearbyRoom[] {
+  const [rooms, setRooms] = useState<NearbyRoom[]>([]);
   const browse = useRoom(state => state.browse);
   useEffect(() => browse(setRooms), [browse]);
   return rooms;

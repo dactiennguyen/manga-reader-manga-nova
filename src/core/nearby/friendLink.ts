@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { decodeBase64Url, encodeBase64Url } from './base64url';
 import type { RoomAddress } from './types';
+import { takeChars } from '../util/format';
 
 export const FRIEND_SCHEME = 'manganova://friend';
 export const FRIEND_LIMITS = { name: 40, stories: 3, title: 40, url: 1200, json: 900 } as const;
@@ -36,8 +37,7 @@ const wire = z.object({
 
 /** Trims and cuts by characters, not UTF-16 units, so an emoji or kanji is never split in half. */
 function clipText(text: string, max: number): string {
-  const chars = [...text.replace(/\s+/g, ' ').trim()];
-  return chars.length > max ? chars.slice(0, max).join('').trim() : chars.join('');
+  return takeChars(text.replace(/\s+/g, ' ').trim(), max).trim();
 }
 
 export function friendLink(card: FriendCard): string {

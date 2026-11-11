@@ -12,7 +12,23 @@ import { useAiTask } from '../../state/useAiTask';
 import { useAiConfigured } from '../../state/useSettings';
 import { undoStory, undoable, useStory } from '../../state/useStory';
 import { Banner, Button, Sheet, Text, confirm, snackbar, toast } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 import { AiBusy, AiFailure, AiMark, AiSetupNotice, SheetFooter, useSheetClose } from './AiParts';
+
+/** The directions as one text, as they are reported. */
+function directionsText(directions: PlotDirection[]): string {
+  return directions
+    .map(direction =>
+      [
+        [direction.tone, direction.title].filter(Boolean).join(': '),
+        direction.summary,
+        ...direction.acts.flat().map(chapter => `- ${[chapter.title, chapter.summary].filter(Boolean).join(': ')}`),
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    )
+    .join('\n\n');
+}
 
 export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose: () => void }) {
   const navigation = useAppNavigation();
@@ -227,7 +243,10 @@ export function PlotIdeasSheet({ projectId, onClose }: { projectId: ID; onClose:
             {state.data.map(renderDirection)}
           </ScrollView>
           <SheetFooter>
-            <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} />
+            <View className="flex-row gap-2">
+              <Button title={t('Try again')} icon={RefreshIcon} variant="secondary" onPress={generate} className="flex-1" />
+              <ReportAiButton text={directionsText(state.data)} feature="plotIdeas" />
+            </View>
           </SheetFooter>
         </>
       );

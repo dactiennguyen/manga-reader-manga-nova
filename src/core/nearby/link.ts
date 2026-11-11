@@ -6,7 +6,7 @@
  * and the 16-bit token. The first two parts of the IP are taken from the joining phone, which is on the
  * same Wi-Fi (home networks are almost always /16 or smaller).
  */
-import type { RoomAddress } from './types';
+import type { NearbyRoom, RoomAddress } from './types';
 
 const SCHEME = 'manganova:';
 const CODE_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'; // Crockford base32: no I, L, O, U to misread
@@ -104,13 +104,18 @@ export function roomCode(address: RoomAddress): string | null {
   return `${code.slice(0, 5)}-${code.slice(5)}`;
 }
 
-/** Reads a typed room code; `myIp` supplies the first two parts of the host's IP address. */
-export function parseRoomCode(code: string, myIp: string | null): RoomAddress | null {
-  const clean = code
+/** A typed code as plain code letters: no spaces or dash, and the easily misread letters fixed. */
+function cleanCode(code: string): string {
+  return code
     .toUpperCase()
     .replace(/[\s-]/g, '')
     .replace(/[IL]/g, '1')
     .replace(/O/g, '0');
+}
+
+/** Reads a typed room code; `myIp` supplies the first two parts of the host's IP address. */
+export function parseRoomCode(code: string, myIp: string | null): RoomAddress | null {
+  const clean = cleanCode(code);
   if (clean.length !== 10) {
     return null;
   }
@@ -133,4 +138,46 @@ export function parseRoomCode(code: string, myIp: string | null): RoomAddress | 
     return null;
   }
   return { host: `${a}.${b}.${c}.${d}`, port, token: token.toString(16).padStart(4, '0') };
+}
+
+/** The address for joining a listed room with one tap, or null for a code-only room (it has no token). */
+export function listingAddress(room: NearbyRoom): RoomAddress | null {
+  if (room.token === null || !validToken(room.token)) {
+    return null;
+  }
+  return room.name ? { host: room.host, port: room.port, token: room.token, name: room.name } : { host: room.host, port: room.port, token: room.token };
+}
+
+/**
+ * The start of a listed room's code, "ABCDE-F". The code's first 6 characters come only from the host's
+ * address and port (the token is in the last 16 bits, which start inside character 7), so a code-only room
+ * in the list can fill them in and the guest types just the last 4 from the host's screen.
+ */
+export function listingCodePrefix(room: Pick<NearbyRoom, 'host' | 'port'>): string | null {
+  const code = roomCode({ host: room.host, port: room.port, token: '0000' });
+  return code ? code.slice(0, 7) : null;
+}
+
+/**
+ * Reads a code typed for a room tapped in the list: the whole room code, the last 4 characters after the
+ * filled-in start, or a whole code typed after that start. The listed host supplies the first two parts of
+ * the IP address. The host still checks the token, so a wrong code is refused there.
+ */
+export function parseListingCode(input: string, room: Pick<NearbyRoom, 'host' | 'port' | 'name'>): RoomAddress | null {
+  const clean = cleanCode(input);
+  const prefix = cleanCode(listingCodePrefix(room) ?? '');
+  let full: string | null = null;
+  if (clean.length === 10) {
+    full = clean;
+  } else if (prefix && clean.length === 4) {
+    full = prefix + clean;
+  } else if (prefix && clean.length === prefix.length + 10 && clean.startsWith(prefix)) {
+    full = clean.slice(prefix.length);
+  }
+  const address = full ? parseRoomCode(full, room.host) : null;
+  if (!address) {
+    return null;
+  }
+  // Keep the listed name when the code points at the room that was tapped.
+  return room.name && address.host === room.host && address.port === room.port ? { ...address, name: room.name } : address;
 }

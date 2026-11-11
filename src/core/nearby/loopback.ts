@@ -10,7 +10,7 @@
  */
 import { roomStateCreator, type RoomStateCreator, type RoomStoreState } from './room';
 import { realClock, type Advert, type Clock, type Connection, type Discovery, type Network, type Server } from './transport';
-import type { RoomAddress } from './types';
+import type { NearbyRoom } from './types';
 
 type End = {
   remote: string;
@@ -27,6 +27,8 @@ export type LoopbackNetwork = {
   /** The network as seen from the phone with this IP address. */
   phone(ip: string): Network;
   discovery(): Discovery;
+  /** The adverts announced right now, exactly as the hosts published them. */
+  published(): Advert[];
   /** Breaks every link of this phone, like a Wi-Fi blink. */
   cut(ip: string): void;
   /** While offline, the phone can neither connect nor be reached. */
@@ -114,7 +116,7 @@ export function createLoopbackNetwork(options: { fragment?: boolean } = {}): Loo
     },
     browse(onChange) {
       const notify = () =>
-        onChange([...adverts].map((ad): RoomAddress => ({ host: ad.host ?? '', port: ad.port, token: ad.token, name: ad.name })));
+        onChange([...adverts].map((ad): NearbyRoom => ({ host: ad.host ?? '', port: ad.port, token: ad.token ?? null, name: ad.name })));
       watchers.add(notify);
       notify();
       return () => watchers.delete(notify);
@@ -156,6 +158,7 @@ export function createLoopbackNetwork(options: { fragment?: boolean } = {}): Loo
       };
     },
     discovery,
+    published: () => [...adverts],
     cut(ip) {
       [...ends].filter(end => end.ip === ip).forEach(shut);
     },

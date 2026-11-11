@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { normalizeBaseUrl } from '../core/ai/port';
 import { resolveLocale, setLocale, type LanguageChoice, type Locale } from '../core/i18n';
 import type { ArtStyle } from '../core/model/types';
+import type { JoinMode } from '../core/nearby/types';
 import type { MetaRepo } from '../core/ports';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
@@ -41,6 +42,8 @@ export type AppSettings = {
   reminderOn: boolean;
   /** Hour of the day, 0 to 23. */
   reminderHour: number;
+  /** Who can join a Play-together room this phone hosts; the last choice is kept. Code only by default. */
+  roomJoinMode: JoinMode;
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -68,6 +71,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   dailyGoal: 100,
   reminderOn: false,
   reminderHour: 20,
+  roomJoinMode: 'code',
 };
 
 const KEY = 'settings';

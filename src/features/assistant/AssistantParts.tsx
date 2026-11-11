@@ -1,20 +1,26 @@
 import { Image, View } from 'react-native';
-import { AiIcon, CheckIcon, CopyIcon, DeleteIcon, MessageIcon, NoteIcon, PlusIcon } from '../../ui/icons';
+import { AiIcon, CheckIcon, CopyIcon, DeleteIcon, FlagIcon, MessageIcon, NoteIcon, PlusIcon } from '../../ui/icons';
 
 import { t, tn } from '../../core/i18n';
 import type { Project } from '../../core/model/types';
 import { formatRelative } from '../../core/util/time';
 import type { AssistantMessage, Conversation } from '../../state/useAssistant';
 import { ART, AiNote, Button, Chip, ICON, Icon, IconButton, ListItem, Sheet, Text } from '../../ui';
+import { ReportAiButton } from '../aiReport/ReportButton';
 
 export function AssistantBubble({
   message,
   onCopy,
   onSave,
+  reported,
+  onHide,
 }: {
   message: AssistantMessage;
   onCopy: () => void;
   onSave?: () => void;
+  /** Reported and shown again on request: offers to fold it away instead of reporting twice. */
+  reported?: boolean;
+  onHide?: () => void;
 }) {
   return (
     <View className="max-w-[92%] gap-2 self-start rounded-lg bg-surface p-3">
@@ -25,10 +31,28 @@ export function AssistantBubble({
         </Text>
       </View>
       <Text selectable>{message.text}</Text>
-      <View className="-ml-2 flex-row flex-wrap gap-1">
+      <View className="-ml-2 -mr-2 flex-row flex-wrap items-center gap-1">
         <Button title={t('Copy')} icon={CopyIcon} variant="ghost" small onPress={onCopy} />
         {!!onSave && <Button title={t('Save as note')} icon={NoteIcon} variant="ghost" small onPress={onSave} />}
+        {reported ? (
+          <Button title={t('Hide answer')} variant="ghost" small onPress={onHide} className="ml-auto" />
+        ) : (
+          <ReportAiButton text={message.text} feature="assistant" answerId={message.id} className="ml-auto" />
+        )}
       </View>
+    </View>
+  );
+}
+
+/** Takes the place of an answer the person reported, which stays one tap away. */
+export function ReportedBubble({ onShow }: { onShow: () => void }) {
+  return (
+    <View className="max-w-[92%] flex-row items-center gap-2 self-start rounded-lg bg-surface py-1 pl-3 pr-1">
+      <Icon icon={FlagIcon} size={ICON.sm} color="text-muted" />
+      <Text variant="bodySmall" tone="secondary" className="shrink">
+        {t('You reported this answer')}
+      </Text>
+      <Button title={t('Show answer')} variant="ghost" small onPress={onShow} />
     </View>
   );
 }

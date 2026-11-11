@@ -2,7 +2,7 @@
  * The few things a room needs from the network, so the room logic stays pure and testable: the real
  * phones use TCP sockets and Bonjour/NSD (src/native/nearby), tests use the in-memory loopback.
  */
-import type { RoomAddress } from './types';
+import type { NearbyRoom } from './types';
 
 /** One TCP connection, as raw bytes. Lines are cut out of it by protocol.ts. */
 export type Connection = {
@@ -30,13 +30,14 @@ export type Network = {
   localIPv4(): Promise<string | null>;
 };
 
-export type Advert = { name: string; port: number; token: string; host?: string };
+/** What a host announces. No `token` means a code-only room: listed with a lock, joined by code or QR. */
+export type Advert = { name: string; port: number; token?: string; host?: string };
 
 export type Discovery = {
   /** Announce a hosted room on the local network until the returned function is called. */
   publish(advert: Advert): () => void;
   /** Watch the rooms announced nearby until the returned function is called. */
-  browse(onChange: (rooms: RoomAddress[]) => void): () => void;
+  browse(onChange: (rooms: NearbyRoom[]) => void): () => void;
 };
 
 export type Clock = {
