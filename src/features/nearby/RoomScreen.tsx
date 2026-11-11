@@ -86,7 +86,7 @@ function ActivityTile({ card, isHost, onPick }: { card: ActivityCard; isHost: bo
       <Text variant="label" numberOfLines={1}>
         {title}
       </Text>
-      <Text variant="caption" tone="secondary" numberOfLines={2}>
+      <Text variant="caption" tone="secondary" numberOfLines={3}>
         {blurb}
       </Text>
     </Pressable>
@@ -138,6 +138,7 @@ export function RoomScreen() {
   }
 
   const isHost = me.host;
+  const playing = ACTIVITY_CARDS.find(card => card.activity === room.activity);
   const leave = async () => {
     const ok = await confirm(
       isHost ? t('End the room?') : t('Leave the room?'),
@@ -166,7 +167,21 @@ export function RoomScreen() {
       </Section>
       {!!address && <InviteCard address={address} />}
       {isHost && <JoinModeSection />}
-      <ActivityGrid isHost={isHost} onPick={card => setActivity(card.activity)} />
+      {/* Back here while something is being played (the back button, a reload): a way back in for everyone. */}
+      {playing && (
+        <Banner
+          icon={PlayTogetherIcon}
+          text={t('Playing now: {activity}', { activity: t(playing.title) })}
+          action={{ label: t('Open'), onPress: () => navigation.navigate(playing.route) }}
+        />
+      )}
+      <ActivityGrid
+        isHost={isHost}
+        onPick={card =>
+          // Picking what is already on changes nothing in the room, so no phone would move: open it here.
+          card.activity === room.activity ? navigation.navigate(card.route) : setActivity(card.activity)
+        }
+      />
     </Screen>
   );
 }

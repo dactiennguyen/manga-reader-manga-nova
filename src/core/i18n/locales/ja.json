@@ -2442,7 +2442,8 @@
     "Room code needed": "ルームコードが必要",
     "Join {room}": "{room}に参加",
     "Ask the host for the code or scan their QR.": "ホストにコードを聞くか、ホストのQRコードを読み取ってください。",
-    "Changing this does not remove anyone already in the room.": "変更しても、すでにルームにいる人はそのままです。"
+    "Changing this does not remove anyone already in the room.": "変更しても、すでにルームにいる人はそのままです。",
+    "Playing now: {activity}": "いまプレイ中：{activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "ページを作れませんでした。",

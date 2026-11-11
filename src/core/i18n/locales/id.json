@@ -2442,7 +2442,8 @@
     "Room code needed": "Perlu kode ruang",
     "Join {room}": "Gabung ke {room}",
     "Ask the host for the code or scan their QR.": "Minta kodenya ke tuan rumah atau pindai QR-nya.",
-    "Changing this does not remove anyone already in the room.": "Mengubah ini tidak mengeluarkan siapa pun yang sudah ada di ruang."
+    "Changing this does not remove anyone already in the room.": "Mengubah ini tidak mengeluarkan siapa pun yang sudah ada di ruang.",
+    "Playing now: {activity}": "Sedang dimainkan: {activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "Tidak bisa membuat halaman.",

@@ -2442,7 +2442,8 @@
     "Room code needed": "Cần mã phòng",
     "Join {room}": "Vào {room}",
     "Ask the host for the code or scan their QR.": "Hãy xin chủ phòng mã phòng hoặc quét mã QR của họ.",
-    "Changing this does not remove anyone already in the room.": "Đổi lựa chọn này sẽ không mời ai đang ở trong phòng ra ngoài."
+    "Changing this does not remove anyone already in the room.": "Đổi lựa chọn này sẽ không mời ai đang ở trong phòng ra ngoài.",
+    "Playing now: {activity}": "Đang chơi: {activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "Không tạo được trang.",

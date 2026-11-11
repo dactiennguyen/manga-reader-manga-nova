@@ -2442,7 +2442,8 @@
     "Room code needed": "Necesitas el código de sala",
     "Join {room}": "Unirse a {room}",
     "Ask the host for the code or scan their QR.": "Pide el código al anfitrión o escanea su QR.",
-    "Changing this does not remove anyone already in the room.": "Cambiar esto no saca a nadie que ya esté en la sala."
+    "Changing this does not remove anyone already in the room.": "Cambiar esto no saca a nadie que ya esté en la sala.",
+    "Playing now: {activity}": "Jugando ahora: {activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "No se pudo crear la página.",

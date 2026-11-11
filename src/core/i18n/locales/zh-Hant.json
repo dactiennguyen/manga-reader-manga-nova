@@ -2442,7 +2442,8 @@
     "Room code needed": "需要房間碼",
     "Join {room}": "加入{room}",
     "Ask the host for the code or scan their QR.": "向房主要房間碼，或掃描房主的 QR 碼。",
-    "Changing this does not remove anyone already in the room.": "更改後，已經在房間裡的人不會被移出。"
+    "Changing this does not remove anyone already in the room.": "更改後，已經在房間裡的人不會被移出。",
+    "Playing now: {activity}": "正在玩：{activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "無法建立頁面。",

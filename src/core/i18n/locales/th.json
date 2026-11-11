@@ -2442,7 +2442,8 @@
     "Room code needed": "ต้องใช้รหัสห้อง",
     "Join {room}": "เข้าร่วม {room}",
     "Ask the host for the code or scan their QR.": "ขอรหัสจากเจ้าของห้อง หรือสแกนคิวอาร์โค้ดของเขา",
-    "Changing this does not remove anyone already in the room.": "การเปลี่ยนตรงนี้จะไม่ทำให้ใครที่อยู่ในห้องแล้วต้องออก"
+    "Changing this does not remove anyone already in the room.": "การเปลี่ยนตรงนี้จะไม่ทำให้ใครที่อยู่ในห้องแล้วต้องออก",
+    "Playing now: {activity}": "กำลังเล่น: {activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "สร้างหน้าไม่ได้",

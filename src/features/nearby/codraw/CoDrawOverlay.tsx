@@ -110,8 +110,11 @@ export function CoDrawOverlay({
   const clear = useRailClearance();
 
   // The pen's position, read on the UI thread and passed to JS; the session sends ten a second at most.
+  // Only the shared value goes into the worklet: the whole engine also holds gesture handlers, which
+  // cannot be copied to the UI thread.
+  const pen = engine.cursor;
   useAnimatedReaction(
-    () => engine.cursor.value,
+    () => pen.value,
     (next, previous) => {
       if (next) {
         scheduleOnRN(onCursor, next.x, next.y, false);
@@ -119,7 +122,6 @@ export function CoDrawOverlay({
         scheduleOnRN(onCursor, previous.x, previous.y, true);
       }
     },
-    [onCursor],
   );
 
   const shown = liveCursors(cursors, panelId, now);

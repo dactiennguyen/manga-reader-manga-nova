@@ -27,7 +27,9 @@ Việc 2 chưa xong, thiếu thì không nộp được.
 
 1. **Upload key đã tạo.** Alias `manganova-upload`, file `android/app/manganova-upload.keystore`. Mật khẩu không nằm trong repo: GitHub Actions lấy từ Secrets, build trên máy lấy từ `android/keystore.properties`, và bản lưu ở `~/keys/`. Hãy sao lưu mật khẩu ra nơi an toàn, vì Secrets không đọc lại được.
 
-2. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào `website/privacy.html` và `website/terms.html`, rồi deploy lại theo [13-website.md](../13-website.md).
+2. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào ba chỗ:
+   - `website/privacy.html` và `website/terms.html`, rồi deploy lại theo [13-website.md](../13-website.md).
+   - `SUPPORT_EMAIL` trong `src/core/model/constants.ts`. Khi có email, khung "Báo cáo câu trả lời AI" mới cho người dùng gửi báo cáo về cho bạn. Chưa điền thì báo cáo chỉ được lưu trên máy người dùng.
 
 3. **Trang chính sách quyền riêng tư.** Đã xong, ghi đúng tên Manganova và package. Link ở đầu file này.
 
@@ -45,6 +47,17 @@ Việc 2 chưa xong, thiếu thì không nộp được.
 6. **Chặn chụp màn hình.** Bản release đang bật `FLAG_SECURE`, nên người dùng không chụp được màn hình app. Với app sáng tác, nhiều người muốn khoe tranh, nên hãy cân nhắc tắt trước khi đăng: đổi `SECURE_SCREEN` thành `false` trong `MainActivity.kt`.
 
 7. **Server AI phải là `https://`.** Bản release chặn kết nối không mã hóa.
+
+8. **Khai báo phần Chơi cùng nhau và Lồng tiếng** ([18-choi-cung-nhau.md](../18-choi-cung-nhau.md)):
+   - **Quyền mới trong manifest:**
+     - `RECORD_AUDIO`: thu lời thoại khi lồng tiếng.
+     - `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE`, `CHANGE_WIFI_MULTICAST_STATE`, `ACCESS_LOCAL_NETWORK`: tìm phòng và kết nối trên Wi-Fi.
+   - **Data safety:**
+     - Tiếng thu âm, tranh và truyện chỉ đi thẳng từ máy này sang máy bạn bè trong cùng phòng, khi người dùng tự bấm gửi. Chúng không đi qua server nào của bạn.
+     - Google miễn khai báo "chia sẻ" với dữ liệu chuyển đi do chính người dùng chủ động. Dù vậy, hãy đọc lại định nghĩa "thu thập" và "chia sẻ" trong Play Console trước khi chọn. Nếu phân vân, chọn khai báo nhiều hơn sẽ an toàn hơn.
+     - Tranh, truyện và tiếng thu âm cũng phải khớp với phần mô tả và trang chính sách.
+   - **Trang chính sách:** thêm một đoạn nói rằng app dùng micro khi lồng tiếng, và dùng mạng Wi-Fi nội bộ để chơi với người ở gần. Tiếng và tranh không được tải lên server.
+   - **Nội dung do AI tạo:** đã có nút báo cáo ở mọi câu trả lời AI. Phần câu hỏi về AI trong Play Console có thể trả lời là có.
 
 ## 3. Điền Play Console
 

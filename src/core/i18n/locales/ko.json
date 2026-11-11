@@ -2442,7 +2442,8 @@
     "Room code needed": "방 코드 필요",
     "Join {room}": "{room}에 참여",
     "Ask the host for the code or scan their QR.": "방장에게 코드를 물어보거나 방장의 QR 코드를 스캔하세요.",
-    "Changing this does not remove anyone already in the room.": "바꿔도 이미 방에 있는 사람은 그대로 있어요."
+    "Changing this does not remove anyone already in the room.": "바꿔도 이미 방에 있는 사람은 그대로 있어요.",
+    "Playing now: {activity}": "지금 하는 중: {activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "페이지를 만들지 못했어요.",

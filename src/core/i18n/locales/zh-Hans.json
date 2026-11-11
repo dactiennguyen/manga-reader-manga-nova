@@ -2442,7 +2442,8 @@
     "Room code needed": "需要房间码",
     "Join {room}": "加入{room}",
     "Ask the host for the code or scan their QR.": "向房主要房间码，或扫描房主的二维码。",
-    "Changing this does not remove anyone already in the room.": "更改后，已经在房间里的人不会被移出。"
+    "Changing this does not remove anyone already in the room.": "更改后，已经在房间里的人不会被移出。",
+    "Playing now: {activity}": "正在玩：{activity}"
   },
   "nearbyDraw": {
     "Couldn't make the page.": "无法创建页面。",
