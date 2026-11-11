@@ -10,7 +10,8 @@ Bản iOS dùng chung toàn bộ code TypeScript với Android. Phần riêng c�
 | iPhone 17 Pro (simulator) | Onboarding, Home, mở file `.manganova` và `.mangaka` từ ngoài app, vẽ, chèn vật liệu, xuất PDF, CBZ, ZIP PNG, ảnh dài, chia sẻ, lưu vào app Tệp |
 | iPad Pro 13" (simulator) | Mở được, xoay ngang được |
 | Máy thật, Apple Pencil | **Chưa thử** |
-| TestFlight qua CI | **Chưa chạy**, cần tài khoản Apple Developer |
+| Build `simulator` qua CI | Lệnh build đã chạy thử trên máy, Xcode 26.1 |
+| Ad Hoc, TestFlight qua CI | **Chưa chạy**, cần tài khoản Apple Developer |
 
 ## Chạy trên máy
 
@@ -61,24 +62,51 @@ Thêm file vào `ios/Manganova/` thì phải thêm vào project Xcode, vì Xcode
 1. Đăng ký Apple Developer Program, 99 USD mỗi năm.
 2. Trên App Store Connect, tạo app với bundle id `com.manganova.manga.reader.org`.
 3. Tạo chứng chỉ **Apple Distribution**, xuất ra file `.p12` có mật khẩu.
-4. Tạo provisioning profile loại **App Store** cho bundle id trên.
+4. Tạo provisioning profile loại **App Store** cho bundle id trên. Muốn cài thẳng lên iPhone mà không qua TestFlight thì tạo thêm một profile loại **Ad Hoc**, chọn các máy đã đăng ký UDID.
 5. Trong App Store Connect → Users and Access → Integrations, tạo API key quyền App Manager, tải file `.p8`.
 
-### GitHub Secrets cho TestFlight
+### Build bằng GitHub Actions
 
-| Secret | Giá trị |
-| --- | --- |
-| `IOS_DIST_CERT_P12_BASE64` | `base64 -i cert.p12 \| pbcopy` |
-| `IOS_DIST_CERT_PASSWORD` | Mật khẩu file `.p12` |
-| `IOS_PROVISIONING_PROFILE_BASE64` | `base64 -i profile.mobileprovision \| pbcopy` |
-| `IOS_TEAM_ID` | Team ID, 10 ký tự, ở trang Membership |
-| `ASC_KEY_ID` | Key ID của API key |
-| `ASC_ISSUER_ID` | Issuer ID ở cùng trang |
-| `ASC_KEY_P8_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
+Chạy workflow **Build iOS (manual)** ở tab Actions, chọn nhánh và `mode`:
 
-Rồi chạy **Build iOS (manual)** với `mode` là `testflight`. Workflow ghi thông tin ký vào xcconfig riêng của app, vì truyền qua dòng lệnh thì các target Pods cũng nhận và báo lỗi. Mỗi lần đẩy phải tăng `build_number`. Chế độ `simulator` không cần Secrets, dùng để kiểm tra code iOS còn build được.
+| `mode` | Kết quả | Cần gì |
+| --- | --- | --- |
+| `simulator` | `Manganova-simulator.zip` chứa `Manganova.app` cho iOS Simulator | Không cần gì |
+| `adhoc` | `Manganova.ipa` cài thẳng lên iPhone đã đăng ký, không qua TestFlight | Chứng chỉ, Team ID, profile Ad Hoc |
+| `testflight` | IPA được đẩy lên TestFlight | Chứng chỉ, Team ID, profile App Store, API key |
 
-Phần TestFlight chưa chạy thật lần nào, vì chưa có tài khoản. Lần đầu chạy có thể phải sửa.
+File build nằm ở mục Artifacts của lần chạy, giữ 3 ngày. Trang tóm tắt của lần chạy có lệnh cài. Bỏ chọn `run_checks` để bỏ qua typecheck, lint và test khi chỉ cần build lại nhanh.
+
+Cài bản `simulator`:
+
+```sh
+unzip Manganova-simulator.zip
+xcrun simctl install booted Manganova.app
+```
+
+Cài bản `adhoc`: cắm iPhone vào Mac rồi kéo file `.ipa` vào máy trong Finder, hoặc chạy `xcrun devicectl device install app --device <UDID> Manganova.ipa`. Máy phải nằm trong profile Ad Hoc. Muốn thêm máy thì đăng ký UDID trên developer.apple.com, tạo lại profile Ad Hoc, rồi cập nhật secret. Mỗi năm Apple cho đăng ký tối đa 100 iPhone.
+
+Trước khi ký, workflow đọc profile và dừng sớm, kèm lý do, khi gặp một trong các lỗi sau:
+- Profile sai Team ID hoặc sai bundle id.
+- Profile đã hết hạn.
+- Dùng profile Ad Hoc cho TestFlight, hoặc ngược lại.
+
+### GitHub Secrets
+
+| Secret | Giá trị | Dùng cho |
+| --- | --- | --- |
+| `IOS_DIST_CERT_P12_BASE64` | `base64 -i cert.p12 \| pbcopy` | `adhoc`, `testflight` |
+| `IOS_DIST_CERT_PASSWORD` | Mật khẩu file `.p12` | `adhoc`, `testflight` |
+| `IOS_TEAM_ID` | Team ID, 10 ký tự, ở trang Membership | `adhoc`, `testflight` |
+| `IOS_ADHOC_PROFILE_BASE64` | `base64 -i adhoc.mobileprovision \| pbcopy`, profile loại **Ad Hoc** | `adhoc` |
+| `IOS_PROVISIONING_PROFILE_BASE64` | `base64 -i appstore.mobileprovision \| pbcopy`, profile loại **App Store** | `testflight` |
+| `ASC_KEY_ID` | Key ID của API key | `testflight` |
+| `ASC_ISSUER_ID` | Issuer ID ở cùng trang | `testflight` |
+| `ASC_KEY_P8_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` | `testflight` |
+
+Một chứng chỉ Apple Distribution dùng được cho cả `adhoc` và `testflight`. Workflow ghi thông tin ký vào xcconfig riêng của app, vì nếu truyền qua dòng lệnh thì các target Pods cũng nhận và báo lỗi. Cache CocoaPods được lưu ngay sau `pod install`, trước bước ký, nên thông tin ký không lọt vào cache. Mỗi lần đẩy lên TestFlight phải tăng `build_number`.
+
+Phần `adhoc` và `testflight` chưa chạy thật lần nào, vì chưa có tài khoản. Lần đầu chạy có thể phải sửa. Phần `simulator` đã build thử trên máy với đúng lệnh của workflow.
 
 ### Trên App Store Connect
 

@@ -6,12 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'simulator: chỉ kiểm tra build, không cần tài khoản Apple. testflight: ký và đẩy lên TestFlight, cần Secrets của Apple'
+        description: 'simulator: file .app cho iOS Simulator, không cần tài khoản Apple. adhoc: file .ipa cài thẳng lên iPhone đã đăng ký. testflight: ký và đẩy lên TestFlight'
         required: true
         type: choice
         default: simulator
         options:
           - simulator
+          - adhoc
           - testflight
       version_name:
         description: 'Version hiển thị cho người dùng, ví dụ 1.0.1'
@@ -23,6 +24,11 @@ on:
         required: false
         type: string
         default: ''
+      run_checks:
+        description: 'Chạy typecheck, lint và test trước khi build'
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -35,28 +41,38 @@ jobs:
     env:
       CI: 'true'
       NODE_OPTIONS: --max-old-space-size=4096
+      BUNDLE_ID: com.manganova.manga.reader.org
+      SIGNED: ${{ inputs.mode != 'simulator' }}
     defaults:
       run:
         shell: bash
 
     steps:
       - name: Check Apple secrets
-        if: inputs.mode == 'testflight'
+        if: inputs.mode != 'simulator'
         env:
-          CERT: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
-          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
-          PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
-          TEAM: ${{ secrets.IOS_TEAM_ID }}
-          KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
-          KEY: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          MODE: ${{ inputs.mode }}
+          IOS_DIST_CERT_P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          IOS_ADHOC_PROFILE_BASE64: ${{ secrets.IOS_ADHOC_PROFILE_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
         run: |
+          names='IOS_DIST_CERT_P12_BASE64 IOS_DIST_CERT_PASSWORD IOS_TEAM_ID'
+          if [ "$MODE" = 'adhoc' ]; then
+            names="$names IOS_ADHOC_PROFILE_BASE64"
+          else
+            names="$names IOS_PROVISIONING_PROFILE_BASE64 ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_BASE64"
+          fi
           missing=''
-          for name in CERT CERT_PASSWORD PROFILE TEAM KEY_ID ISSUER KEY; do
+          for name in $names; do
             if [ -z "${!name}" ]; then missing="$missing $name"; fi
           done
           if [ -n "$missing" ]; then
-            echo "Thiếu Secrets cho TestFlight:$missing. Xem docs/14-ios.md" >&2
+            echo "Thiếu Secrets cho chế độ $MODE:$missing. Xem docs/14-ios.md" >&2
             exit 1
           fi
 
@@ -75,12 +91,15 @@ jobs:
         run: npm ci
 
       - name: Check TypeScript
+        if: inputs.run_checks
         run: npm run typecheck
 
       - name: Lint
+        if: inputs.run_checks
         run: npm run lint
 
       - name: Run tests
+        if: inputs.run_checks
         run: npm test -- --runInBand
 
       - name: Resolve version
@@ -103,15 +122,25 @@ jobs:
           echo "build=$build" >> "$GITHUB_OUTPUT"
           echo "Building iOS $name ($build)" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Cache CocoaPods
-        uses: actions/cache@v5
+      # Restore and save are split so the cache is written right after pod install. A single cache step
+      # would save at the end of the job, after the signing step has written into the Pods xcconfig.
+      - name: Restore CocoaPods
+        id: pods
+        uses: actions/cache/restore@v5
         with:
           path: ios/Pods
-          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock', 'package-lock.json') }}
 
       - name: Install pods
         working-directory: ios
         run: pod install
+
+      - name: Save CocoaPods
+        if: steps.pods.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ios/Pods
+          key: ${{ steps.pods.outputs.cache-primary-key }}
 
       - name: Build for the simulator
         if: inputs.mode == 'simulator'
@@ -127,39 +156,77 @@ jobs:
             -configuration Release \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build/dd \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
             CODE_SIGNING_ALLOWED=NO \
             MARKETING_VERSION="$VERSION_NAME" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            build
+            build | { if command -v xcbeautify > /dev/null; then xcbeautify --renderer github-actions; else cat; fi; }
+          app="$RUNNER_TEMP/dd/Build/Products/Release-iphonesimulator/Manganova.app"
+          mkdir -p "$RUNNER_TEMP/out"
+          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/out/Manganova-simulator.zip"
+          {
+            echo '### Cài lên iOS Simulator'
+            echo '```sh'
+            echo 'unzip Manganova-simulator.zip'
+            echo 'xcrun simctl install booted Manganova.app'
+            echo "xcrun simctl launch booted $BUNDLE_ID"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install signing certificate and profile
-        if: inputs.mode == 'testflight'
+        if: env.SIGNED == 'true'
         env:
+          MODE: ${{ inputs.mode }}
+          TEAM: ${{ secrets.IOS_TEAM_ID }}
           CERT: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
           CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
-          PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          PROFILE: ${{ inputs.mode == 'adhoc' && secrets.IOS_ADHOC_PROFILE_BASE64 || secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
         run: |
           keychain="$RUNNER_TEMP/signing.keychain-db"
           keychain_password="$(uuidgen)"
           printf '%s' "$CERT" | base64 --decode > "$RUNNER_TEMP/cert.p12"
           printf '%s' "$PROFILE" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+
+          # Read the profile first: a wrong profile fails here with a clear reason, not deep inside xcodebuild.
+          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          # plutil prints dates as ISO 8601 in UTC, so they compare as text. For an array it prints the count.
+          read_profile() { plutil -extract "$1" raw -o - "$RUNNER_TEMP/profile.plist" 2>/dev/null || true; }
+          uuid="$(read_profile UUID)"
+          app_id="$(read_profile Entitlements.application-identifier)"
+          expires="$(read_profile ExpirationDate)"
+          devices="$(read_profile ProvisionedDevices)"
+          devices="${devices:-0}"
+          if [ "$app_id" != "$TEAM.$BUNDLE_ID" ] && [ "$app_id" != "$TEAM.*" ]; then
+            echo "Profile dành cho '$app_id', cần '$TEAM.$BUNDLE_ID'. Kiểm tra IOS_TEAM_ID và bundle id của profile" >&2; exit 1
+          fi
+          if [ -z "$expires" ] || [[ "$expires" < "$(date -u +%Y-%m-%dT%H:%M:%SZ)" ]]; then
+            echo "Profile đã hết hạn ($expires). Tạo lại profile trên developer.apple.com" >&2; exit 1
+          fi
+          if [ "$MODE" = 'adhoc' ] && [ "$devices" -eq 0 ]; then
+            echo 'IOS_ADHOC_PROFILE_BASE64 không phải profile Ad Hoc (không có máy nào). Tạo profile loại Ad Hoc' >&2; exit 1
+          fi
+          if [ "$MODE" = 'testflight' ] && [ "$devices" -gt 0 ]; then
+            echo 'IOS_PROVISIONING_PROFILE_BASE64 là profile Ad Hoc hoặc Development. TestFlight cần profile loại App Store' >&2; exit 1
+          fi
+
           security create-keychain -p "$keychain_password" "$keychain"
           security set-keychain-settings -lut 21600 "$keychain"
           security unlock-keychain -p "$keychain_password" "$keychain"
           security import "$RUNNER_TEMP/cert.p12" -P "$CERT_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
           security set-key-partition-list -S apple-tool:,apple: -k "$keychain_password" "$keychain" > /dev/null
           security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
-          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
-          uuid="$(/usr/libexec/PlistBuddy -c 'Print UUID' "$RUNNER_TEMP/profile.plist")"
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp "$RUNNER_TEMP/profile.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$uuid.mobileprovision"
           echo "PROFILE_UUID=$uuid" >> "$GITHUB_ENV"
+          if [ "$MODE" = 'adhoc' ]; then
+            echo "Ad Hoc profile with $devices registered device(s), expires $expires" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Archive and export IPA
-        if: inputs.mode == 'testflight'
+        if: env.SIGNED == 'true'
         working-directory: ios
         env:
+          MODE: ${{ inputs.mode }}
           TEAM: ${{ secrets.IOS_TEAM_ID }}
           VERSION_NAME: ${{ steps.version.outputs.name }}
           BUILD_NUMBER: ${{ steps.version.outputs.build }}
@@ -182,24 +249,36 @@ jobs:
             -archivePath "$RUNNER_TEMP/Manganova.xcarchive" \
             MARKETING_VERSION="$VERSION_NAME" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            archive
+            archive | { if command -v xcbeautify > /dev/null; then xcbeautify --renderer github-actions; else cat; fi; }
+          # Xcode 15.3 renamed the export methods: ad-hoc is release-testing, app-store is app-store-connect.
+          if [ "$MODE" = 'adhoc' ]; then method='release-testing'; else method='app-store-connect'; fi
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
-            <key>method</key><string>app-store-connect</string>
+            <key>method</key><string>$method</string>
             <key>teamID</key><string>$TEAM</string>
             <key>signingStyle</key><string>manual</string>
             <key>provisioningProfiles</key>
-            <dict><key>com.manganova.manga.reader.org</key><string>$PROFILE_UUID</string></dict>
+            <dict><key>$BUNDLE_ID</key><string>$PROFILE_UUID</string></dict>
           </dict>
           </plist>
           PLIST
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/Manganova.xcarchive" \
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-            -exportPath "$RUNNER_TEMP/export"
+            -exportPath "$RUNNER_TEMP/out"
+          if [ "$MODE" = 'adhoc' ]; then
+            {
+              echo '### Cài lên iPhone'
+              echo 'Chỉ cài được trên máy có trong profile Ad Hoc. Cắm máy vào Mac rồi kéo file .ipa vào máy trong Finder, hoặc:'
+              echo '```sh'
+              echo 'xcrun devicectl list devices'
+              echo 'xcrun devicectl device install app --device <UDID> Manganova.ipa'
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload to TestFlight
         if: inputs.mode == 'testflight'
@@ -210,21 +289,23 @@ jobs:
         run: |
           mkdir -p "$HOME/.appstoreconnect/private_keys"
           printf '%s' "$KEY" | base64 --decode > "$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8"
-          xcrun altool --upload-app -t ios -f "$RUNNER_TEMP"/export/*.ipa --apiKey "$KEY_ID" --apiIssuer "$ISSUER"
+          xcrun altool --upload-app -t ios -f "$RUNNER_TEMP"/out/*.ipa --apiKey "$KEY_ID" --apiIssuer "$ISSUER"
           echo 'Uploaded to TestFlight. Processing on Apple takes a few minutes.' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload IPA
-        if: inputs.mode == 'testflight'
+      - name: Upload build
         uses: actions/upload-artifact@v7
         with:
-          name: manganova-ios-${{ steps.version.outputs.name }}-${{ steps.version.outputs.build }}
-          path: ${{ runner.temp }}/export/*.ipa
+          name: manganova-ios-${{ inputs.mode }}-${{ steps.version.outputs.name }}-${{ steps.version.outputs.build }}
+          path: |
+            ${{ runner.temp }}/out/*.zip
+            ${{ runner.temp }}/out/*.ipa
           if-no-files-found: error
           compression-level: 0
-          retention-days: 1
+          retention-days: 3
 
       - name: Remove signing files
         if: always()
         run: |
           security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
-          rm -f "$RUNNER_TEMP/cert.p12" "$RUNNER_TEMP/profile.mobileprovision" "$HOME/.appstoreconnect/private_keys/"*.p8
+          rm -f "$RUNNER_TEMP/cert.p12" "$RUNNER_TEMP/profile.mobileprovision" "$RUNNER_TEMP/profile.plist" \
+            "$HOME/.appstoreconnect/private_keys/"*.p8
