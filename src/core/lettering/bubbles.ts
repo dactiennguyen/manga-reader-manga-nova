@@ -17,6 +17,11 @@ export const SFX_STYLES: { label: string; font: Bubble['font']; letterSpacing: n
   { label: msg('Comic'), font: 'comic', letterSpacing: 2, skew: 0 },
   { label: msg('Heavy'), font: 'heavy', letterSpacing: 0, skew: 0 },
   { label: msg('Marker'), font: 'marker', letterSpacing: 2, skew: -0.1 },
+  // A face for each script the styles above cannot draw: Korean, Simplified and Traditional Chinese, Thai.
+  { label: msg('Bubbly'), font: 'bubbly', letterSpacing: 1, skew: 0 },
+  { label: msg('Playful'), font: 'playful', letterSpacing: 1, skew: 0 },
+  { label: msg('Soft'), font: 'soft', letterSpacing: 1, skew: 0 },
+  { label: msg('Casual'), font: 'casual', letterSpacing: 1, skew: -0.08 },
 ];
 
 type BubbleBox = Pick<Bubble, 'x' | 'y' | 'w' | 'h'>;

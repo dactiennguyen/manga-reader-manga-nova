@@ -128,7 +128,7 @@ function paragraph(assets: TrailerAssets, text: string, look: TextLook, width: n
         ellipsis: '…',
         textStyle: {
           color: Skia.Color(look.color),
-          fontFamilies: fontFamilies(look.font),
+          fontFamilies: fontFamilies(look.font, text),
           fontSize: look.size,
           heightMultiplier: 1.15,
           letterSpacing: look.spacing ?? 0,

@@ -1,21 +1,49 @@
-import { CATALOG } from './catalog';
+import { localeTable, localeText, type LocaleTable, type TranslatedLocale } from './locales';
 
 /**
  * The interface text is written in English in the code, and the English text is the key:
- * `t('Start creating')`. Vietnamese and Japanese live in ./catalog. A missing entry falls back
- * to English, and __tests__/i18nCatalog.test.ts fails when one is missing.
+ * `t('Start creating')`. Every other language is one JSON file in ./locales, grouped by part of the
+ * app and loaded only when that language is in use. A missing entry falls back to English, and
+ * __tests__/i18nCatalog.test.ts fails when one is missing.
  */
 
-export type Locale = 'en' | 'vi' | 'ja';
+export type Locale = 'en' | 'vi' | 'ja' | 'zh-Hans' | 'zh-Hant' | 'ko' | 'es' | 'pt' | 'id' | 'th';
 
 export type LanguageChoice = 'system' | Locale;
 
-export type CatalogPart = Record<string, { vi: string; ja: string }>;
+export type { LocaleTable, TranslatedLocale };
 
-export const LOCALES: readonly Locale[] = ['en', 'vi', 'ja'];
+export const LOCALES: readonly Locale[] = ['en', 'vi', 'ja', 'zh-Hans', 'zh-Hant', 'ko', 'es', 'pt', 'id', 'th'];
+
+export const TRANSLATED_LOCALES = LOCALES.filter((item): item is TranslatedLocale => item !== 'en');
 
 /** Shown in their own language, so they are not translated. */
-export const LOCALE_NAME: Record<Locale, string> = { en: 'English', vi: 'Tiếng Việt', ja: '日本語' };
+export const LOCALE_NAME: Record<Locale, string> = {
+  en: 'English',
+  vi: 'Tiếng Việt',
+  ja: '日本語',
+  'zh-Hans': '简体中文',
+  'zh-Hant': '繁體中文',
+  ko: '한국어',
+  es: 'Español',
+  pt: 'Português (Brasil)',
+  id: 'Bahasa Indonesia',
+  th: 'ไทย',
+};
+
+/** The BCP 47 tag of each language, for speech, sorting and the system. */
+export const LOCALE_TAG: Record<Locale, string> = {
+  en: 'en-US',
+  vi: 'vi-VN',
+  ja: 'ja-JP',
+  'zh-Hans': 'zh-CN',
+  'zh-Hant': 'zh-TW',
+  ko: 'ko-KR',
+  es: 'es-ES',
+  pt: 'pt-BR',
+  id: 'id-ID',
+  th: 'th-TH',
+};
 
 let locale: Locale = 'en';
 
@@ -27,9 +55,30 @@ export function setLocale(next: Locale): void {
   locale = next;
 }
 
-/** 'vi-VN' and 'vi' both give 'vi'. Anything the app has no text for gives English. */
+/**
+ * 'vi-VN' and 'vi' both give 'vi'. Chinese is told apart by script, then by region: Taiwan, Hong Kong and
+ * Macau read Traditional. Cantonese ('yue') is written in Traditional characters unless the tag says
+ * Simplified. Anything the app has no text for gives English.
+ */
 export function matchLocale(tag: string | null | undefined): Locale {
-  const language = (tag ?? '').toLowerCase().split(/[-_]/)[0];
+  const parts = (tag ?? '').toLowerCase().split(/[-_]/);
+  const language = parts[0];
+  if (language === 'zh') {
+    if (parts.includes('hant')) {
+      return 'zh-Hant';
+    }
+    if (parts.includes('hans')) {
+      return 'zh-Hans';
+    }
+    return parts.some(part => part === 'tw' || part === 'hk' || part === 'mo') ? 'zh-Hant' : 'zh-Hans';
+  }
+  if (language === 'yue') {
+    return parts.includes('hans') ? 'zh-Hans' : 'zh-Hant';
+  }
+  if (language === 'in') {
+    // Older Android names Indonesian 'in'.
+    return 'id';
+  }
   return LOCALES.find(item => item === language) ?? 'en';
 }
 
@@ -40,7 +89,7 @@ export function resolveLocale(choice: LanguageChoice, deviceTag: string | null |
 type Params = Record<string, string | number>;
 
 function fill(text: string, params?: Params): string {
-  return params ? text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? String(params[name]) : whole)) : text;
+  return params ? text.replace(/\{(\w+)\}/g, (whole, name: string) => (Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : whole)) : text;
 }
 
 /** `'Art|mode'` is the word "Art" as a mode name: the part after `|` only tells two meanings apart. */
@@ -54,8 +103,19 @@ function plain(text: string): string {
  * When one English word needs two translations, add a context: `t('Art|mode')` shows "Art" in English.
  */
 export function t(text: string, params?: Params): string {
-  const current = locale;
-  return fill((current === 'en' ? undefined : CATALOG[text]?.[current]) ?? plain(text), params);
+  return fill(lookup(locale, text) ?? plain(text), params);
+}
+
+function lookup(current: Locale, text: string): string | undefined {
+  return current === 'en' ? undefined : localeTable(current)[text];
+}
+
+/**
+ * One text in every language, English first. Reads every language file, without building tables for the
+ * languages not in use, so keep it off hot paths and keep what it returns.
+ */
+export function inEveryLanguage(text: string): string[] {
+  return [plain(text), ...TRANSLATED_LOCALES.map(item => localeText(item, text)).filter((value): value is string => !!value)];
 }
 
 /** For a count: `tn(pages, '{count} page', '{count} pages')`. `{count}` is filled in for you. */

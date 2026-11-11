@@ -1,7 +1,7 @@
 import { ImageFormat, Skia, TextAlign, type SkCanvas, type SkTypefaceFontProvider } from '@shopify/react-native-skia';
 import { useEffect, useState } from 'react';
 
-import { FONT_NAME, FONT_SCRIPTS, fontFamilies } from '../../core/lettering/fonts';
+import { FONT_NAME, FONT_SCRIPTS, fontFamilies, type FontScript } from '../../core/lettering/fonts';
 import { bubbleExtent } from '../../core/lettering/presets';
 import type { Bubble, BubbleFont } from '../../core/model/types';
 import { drawBubble } from '../../render/drawBubble';
@@ -65,11 +65,21 @@ export function bubbleThumb(bubble: Bubble, fonts: SkTypefaceFontProvider, width
   });
 }
 
+/** A few letters of each script after the name, so a font for Korean or Thai shows that it draws them. */
+const SCRIPT_SAMPLE: Record<Exclude<FontScript, 'vi'>, string> = {
+  ja: 'あア',
+  ko: '한글',
+  'zh-Hans': '汉字',
+  'zh-Hant': '漢字',
+  th: 'ไทย',
+};
+
 /** The font's own name set in the font, in black: the image is tinted to the text colour where it is shown. */
 export function fontSample(font: BubbleFont, fonts: SkTypefaceFontProvider, fontSize: number, ratio: number): Preview | null {
   try {
     const style = { color: Skia.Color('black'), fontFamilies: fontFamilies(font), fontSize };
-    const text = FONT_SCRIPTS[font].includes('ja') ? `${FONT_NAME[font]} あア` : FONT_NAME[font];
+    const script = FONT_SCRIPTS[font].find(item => item !== 'vi');
+    const text = script ? `${FONT_NAME[font]} ${SCRIPT_SAMPLE[script]}` : FONT_NAME[font];
     const paragraph = Skia.ParagraphBuilder.Make({ textAlign: TextAlign.Left, textStyle: style }, fonts)
       .pushStyle(style)
       .addText(text)

@@ -1,4 +1,5 @@
-import { CATALOG, CATALOG_PARTS } from '../src/core/i18n/catalog';
+import { TRANSLATED_LOCALES } from '../src/core/i18n';
+import { localeParts } from '../src/core/i18n/locales';
 
 declare const require: (name: string) => {
   readdirSync: (path: string, options: { withFileTypes: true }) => { name: string; isDirectory: () => boolean }[];
@@ -52,40 +53,59 @@ function usedKeys(): Map<string, string> {
 
 const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort().join(',');
 
+/** Vietnamese sets the parts and keys every other language must match. */
+const REFERENCE = localeParts('vi');
+
 describe('translation catalog', () => {
   const used = usedKeys();
+  const keys = new Map<string, string>();
+  const twice: string[] = [];
+  for (const [part, entries] of Object.entries(REFERENCE)) {
+    for (const key of Object.keys(entries)) {
+      if (keys.has(key)) {
+        twice.push(`${key} (${keys.get(key)}, ${part})`);
+      }
+      keys.set(key, part);
+    }
+  }
 
-  it('has Vietnamese and Japanese for every text in the code', () => {
-    const missing = [...used].filter(([key]) => !CATALOG[key]).map(([key, file]) => `${file}: ${key}`);
+  it('has every text the code uses', () => {
+    const missing = [...used].filter(([key]) => !keys.has(key)).map(([key, file]) => `${file}: ${key}`);
     expect(missing).toEqual([]);
   });
 
   it('has no entry the code no longer uses', () => {
-    expect(Object.keys(CATALOG).filter(key => !used.has(key))).toEqual([]);
+    expect([...keys.keys()].filter(key => !used.has(key))).toEqual([]);
   });
 
   it('keeps each text in one part only', () => {
-    const seen = new Map<string, string>();
-    const twice: string[] = [];
-    for (const [part, entries] of Object.entries(CATALOG_PARTS)) {
-      for (const key of Object.keys(entries)) {
-        if (seen.has(key)) {
-          twice.push(`${key} (${seen.get(key)}, ${part})`);
-        }
-        seen.set(key, part);
-      }
-    }
     expect(twice).toEqual([]);
   });
 
-  it('keeps the same placeholders in every language, and no empty text', () => {
-    const wrong = Object.entries(CATALOG).filter(
-      ([key, entry]) =>
-        !entry.vi.trim() ||
-        !entry.ja.trim() ||
-        placeholders(entry.vi) !== placeholders(key) ||
-        placeholders(entry.ja) !== placeholders(key),
-    );
-    expect(wrong.map(([key]) => key)).toEqual([]);
+  describe.each(TRANSLATED_LOCALES)('%s', locale => {
+    const parts = localeParts(locale);
+
+    it('has every text, in the same part as Vietnamese', () => {
+      const missing = [...keys].filter(([key, part]) => !parts[part]?.[key]?.trim()).map(([key, part]) => `${part}: ${key}`);
+      expect(missing).toEqual([]);
+    });
+
+    it('has no text the others do not have', () => {
+      const extra = Object.entries(parts).flatMap(([part, entries]) =>
+        Object.keys(entries)
+          .filter(key => keys.get(key) !== part)
+          .map(key => `${part}: ${key}`),
+      );
+      expect(extra).toEqual([]);
+    });
+
+    it('keeps the same placeholders', () => {
+      const wrong = Object.values(parts).flatMap(entries =>
+        Object.entries(entries)
+          .filter(([key, text]) => placeholders(text) !== placeholders(key))
+          .map(([key]) => key),
+      );
+      expect(wrong).toEqual([]);
+    });
   });
 });

@@ -8,6 +8,20 @@ describe('picking the language', () => {
     expect(matchLocale('ja_JP')).toBe('ja');
     expect(matchLocale('VI')).toBe('vi');
     expect(matchLocale('fr-FR')).toBe('en');
+    expect(matchLocale('zh-Hans-CN')).toBe('zh-Hans');
+    expect(matchLocale('zh-CN')).toBe('zh-Hans');
+    expect(matchLocale('zh')).toBe('zh-Hans');
+    expect(matchLocale('zh-Hant-HK')).toBe('zh-Hant');
+    expect(matchLocale('zh_TW')).toBe('zh-Hant');
+    expect(matchLocale('ko-KR')).toBe('ko');
+    expect(matchLocale('pt-BR')).toBe('pt');
+    expect(matchLocale('in-ID')).toBe('id');
+    expect(matchLocale('th-TH')).toBe('th');
+    // Cantonese is written in Traditional characters unless the tag says otherwise.
+    expect(matchLocale('yue-Hant-HK')).toBe('zh-Hant');
+    expect(matchLocale('yue-HK')).toBe('zh-Hant');
+    expect(matchLocale('yue')).toBe('zh-Hant');
+    expect(matchLocale('yue-Hans-CN')).toBe('zh-Hans');
     expect(matchLocale(undefined)).toBe('en');
   });
 
@@ -47,6 +61,15 @@ describe('translating', () => {
     expect(tn(0, '{count} page', '{count} pages')).toBe('0 pages');
   });
 
+  it('never takes what every object has for a translation', () => {
+    setLocale('vi');
+    for (const key of ['constructor', 'toString', 'hasOwnProperty', '__proto__', 'valueOf']) {
+      expect(t(key)).toBe(key);
+    }
+    expect(t('toString', { a: 1 })).toBe('toString');
+    expect(t('Hi {constructor}', {})).toBe('Hi {constructor}');
+  });
+
   it('marks text without changing it', () => {
     setLocale('vi');
     expect(msg('Cancel')).toBe('Cancel');
@@ -74,5 +97,21 @@ describe('quick start title', () => {
     setLocale('ja');
     expect(isQuickStartTitle(t(QUICK_START_TITLE))).toBe(true);
     expect(isQuickStartTitle('My story')).toBe(false);
+    expect(isQuickStartTitle('constructor')).toBe(false);
+  });
+
+  it('reads one text in every language without building the tables of languages not in use', () => {
+    jest.isolateModules(() => {
+      const locales = require('../src/core/i18n/locales');
+      const built = jest.spyOn(Object, 'assign');
+      const { inEveryLanguage } = require('../src/core/i18n');
+      const all: string[] = inEveryLanguage('Untitled story');
+      expect(all[0]).toBe('Untitled story');
+      expect(all).toHaveLength(10);
+      expect(all).toContain(locales.localeTable('vi')['Untitled story']);
+      // Only the table asked for just now was built.
+      expect(built.mock.calls.filter(call => call[0] && Object.getPrototypeOf(call[0]) === null)).toHaveLength(1);
+      built.mockRestore();
+    });
   });
 });

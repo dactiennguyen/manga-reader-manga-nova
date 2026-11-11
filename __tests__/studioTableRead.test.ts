@@ -85,6 +85,45 @@ describe('voices from a profile', () => {
     expect(genderOf(character('a', { gender: 'M' }))).toBe('male');
   });
 
+  it('reads gender in Korean, Chinese, Spanish, Portuguese, Indonesian and Thai', () => {
+    const cases: [string, 'female' | 'male'][] = [
+      ['여자', 'female'], ['여', 'female'], ['남자', 'male'], ['남', 'male'],
+      ['女孩', 'female'], ['妈妈', 'female'], ['哥哥', 'male'], ['國王', 'male'],
+      ['mujer', 'female'], ['chico', 'male'], ['mulher', 'female'], ['homem', 'male'],
+      ['perempuan', 'female'], ['laki-laki', 'male'], ['ผู้หญิง', 'female'], ['ผู้ชาย', 'male'],
+    ];
+    for (const [gender, expected] of cases) {
+      expect(`${gender} ${genderOf(character('a', { gender }))}`).toBe(`${gender} ${expected}`);
+    }
+    expect(genderOf(character('a', { bio: 'Ella creció junto al mar y su madre vendía pescado.' }))).toBe('female');
+    expect(genderOf(character('a', { bio: 'Dia seorang ayah dan suami yang baik.' }))).toBe('male');
+    expect(genderOf(character('a', { bio: '그녀는 바닷가에서 자랐고 엄마는 생선을 팔았다.' }))).toBe('female');
+    // 他 hides in 其他, so it is not read: this bio says nothing of the character's gender.
+    expect(genderOf(character('a', { bio: '其他人都走了。' }))).toBeNull();
+  });
+
+  it('reads age and manner of speaking in the other languages', () => {
+    expect(ageGroupOf('niña')).toBe('child');
+    expect(ageGroupOf('adolescente')).toBe('teen');
+    expect(ageGroupOf('idoso')).toBe('elder');
+    expect(ageGroupOf('remaja')).toBe('teen');
+    expect(ageGroupOf('노인')).toBe('elder');
+    expect(ageGroupOf('中年')).toBe('adult');
+    expect(ageGroupOf('小孩')).toBe('child');
+    expect(ageGroupOf('วัยรุ่น')).toBe('teen');
+    expect(ageGroupOf('ผู้สูงอายุ')).toBe('elder');
+    const base = character('a', { gender: 'hombre', age: '30' });
+    const plain = characterVoice(base);
+    for (const voice of ['voz grave y lenta', 'voz grave, lenta', 'suara berat dan pelan', '낮은 목소리, 느릿느릿', '低沉，说话缓慢', 'เสียงทุ้ม พูดช้า']) {
+      const voiced = characterVoice({ ...base, voice });
+      expect(`${voice} ${voiced.pitch < plain.pitch} ${voiced.rate < plain.rate}`).toBe(`${voice} true true`);
+    }
+    for (const voice of ['voz aguda y rápida', 'voz aguda, rápida', '높은 목소리, 빠른 말투', '尖细，语速快', 'เสียงแหลม พูดเร็ว']) {
+      const voiced = characterVoice({ ...base, voice });
+      expect(`${voice} ${voiced.pitch > plain.pitch} ${voiced.rate > plain.rate}`).toBe(`${voice} true true`);
+    }
+  });
+
   it('falls back to the rest of the profile, and stays unknown when it cannot tell', () => {
     expect(genderOf(character('a', { bio: 'She grew up by the sea and her mother sold fish.' }))).toBe('female');
     expect(genderOf(character('a', { voice: "I'm fine, he says." }))).toBe('male');
@@ -173,10 +212,40 @@ describe('helpers', () => {
   });
 
   it('finds the language of the script', () => {
-    expect(scriptLanguage([{ text: 'Xin chào, tôi là Linh.' }, { text: 'Ok' }], 'en')).toBe('vi');
+    expect(scriptLanguage([{ text: 'Xin chào, tôi là Linh. Rất vui được gặp bạn.' }, { text: 'Ok' }], 'en')).toBe('vi');
     expect(scriptLanguage([{ text: 'こんにちは' }], 'vi')).toBe('ja');
     expect(scriptLanguage([{ text: 'Hello there' }], 'vi')).toBe('en');
     expect(scriptLanguage([], 'ja')).toBe('ja');
+    expect(scriptLanguage([{ text: '안녕, 하나야.' }], 'en')).toBe('ko');
+    expect(scriptLanguage([{ text: 'สวัสดี' }], 'en')).toBe('th');
+    expect(scriptLanguage([{ text: '你迟到了。' }], 'en')).toBe('zh-Hans');
+    expect(scriptLanguage([{ text: '你遲到了。' }], 'zh-Hant')).toBe('zh-Hant');
+    expect(scriptLanguage([{ text: 'Llegas tarde, Hana.' }], 'es')).toBe('es');
+    expect(scriptLanguage([{ text: 'Hello there' }], 'ko')).toBe('en');
+  });
+
+  it('reads Spanish and Portuguese accents as Spanish and Portuguese, not Vietnamese', () => {
+    expect(scriptLanguage([{ text: '¿Qué pasó?' }], 'es')).toBe('es');
+    expect(scriptLanguage([{ text: 'Não, você está atrasado' }], 'pt')).toBe('pt');
+    expect(scriptLanguage([{ text: 'Não, você está atrasado' }, { text: 'É verdade, olá!' }], 'pt')).toBe('pt');
+    expect(scriptLanguage([{ text: 'Café, señor' }], 'id')).toBe('id');
+    // In an interface whose language is not written in Latin letters, plain and accented Latin is English.
+    expect(scriptLanguage([{ text: '¿Qué pasó?' }], 'ja')).toBe('en');
+    // Vietnamese still shows in its own letters, whatever the interface language.
+    expect(scriptLanguage([{ text: 'Trời ơi, muộn rồi!' }], 'pt')).toBe('vi');
+  });
+
+  it('reads kanji-only lines as Japanese in Japanese, and with kana around them', () => {
+    expect(scriptLanguage([{ text: '東京。' }, { text: '三年後。' }], 'ja')).toBe('ja');
+    expect(scriptLanguage([{ text: '贅沢！' }, { text: '躊躇' }, { text: '櫻井' }], 'ja')).toBe('ja');
+    expect(scriptLanguage([{ text: '東京。' }, { text: '三年後。' }, { text: 'ただいま' }], 'en')).toBe('ja');
+    // A character Japanese never writes makes it Chinese, even in Japanese.
+    expect(scriptLanguage([{ text: '你迟到了。' }, { text: '東京。' }], 'ja')).toBe('zh-Hans');
+    expect(scriptLanguage([{ text: '你好。' }, { text: '東京。' }], 'zh-Hant')).toBe('zh-Hant');
+    // Kanji Japanese also writes, in a Chinese interface, go by its forms and then the interface.
+    expect(scriptLanguage([{ text: '三年後。' }], 'zh-Hant')).toBe('zh-Hant');
+    expect(scriptLanguage([{ text: '這裡沒有人' }], 'zh-Hans')).toBe('zh-Hant');
+    expect(scriptLanguage([{ text: '三年後。' }], 'en')).toBe('zh-Hans');
   });
 
   it('hands out gendered device voices in turn', () => {

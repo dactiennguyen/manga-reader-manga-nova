@@ -101,7 +101,7 @@ function buildParagraph(
   const font = sfxStyle ? sfxStyle.font : bubble.bold && bubble.font === 'sans' ? 'sansBold' : bubble.font;
   const textStyle = {
     color: Skia.Color(color),
-    fontFamilies: fontFamilies(font),
+    fontFamilies: fontFamilies(font, bubble.text),
     fontSize,
     heightMultiplier: sfxStyle ? 1 : 1.15,
     letterSpacing: sfxStyle ? sfxStyle.letterSpacing : 0,

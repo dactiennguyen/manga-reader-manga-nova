@@ -1,6 +1,8 @@
 /**
  * A voice for each character of a table read: a pitch and a rate guessed from the profile (gender, age,
- * role and how they talk, in English, Vietnamese or Japanese words), then spread so two rarely sound alike.
+ * role and how they talk), then spread so two rarely sound alike. The profile can be written in any of the
+ * app's languages: English, Vietnamese, Spanish, Portuguese and Indonesian words are matched whole, and
+ * Japanese, Chinese, Korean and Thai words inside the text (see Keywords).
  */
 import type { Character } from '../model/types';
 import { ageYears } from './castUtil';
@@ -21,46 +23,131 @@ export const MIN_PITCH_GAP = 0.06;
 const NUDGE = 0.07;
 const NUDGE_STEPS = 8;
 
-/** Whole words for Latin scripts, in lower case. Japanese has no spaces, so its words are matched inside the text. */
-const FEMALE = {
+/**
+ * `words` are whole words of the languages written with spaces between words, in lower case. `inside` are
+ * found anywhere in the text: Japanese, Chinese and Thai have no spaces, and Korean fixes particles to the
+ * word (여자는, 여자가). Short ones that hide in longer words are left out (Chinese 他 in 其他, Thai ย่า in อย่า).
+ */
+type Keywords = { words: string[]; inside: string[] };
+
+const FEMALE: Keywords = {
   words: [
     'female', 'woman', 'women', 'girl', 'she', 'her', 'lady', 'mother', 'mom', 'sister', 'queen', 'princess',
     'wife', 'daughter', 'aunt', 'grandma', 'grandmother', 'feminine', 'heroine', 'witch',
     'nữ', 'cô', 'chị', 'bà', 'mẹ', 'má', 'em gái', 'con gái', 'cô gái', 'thiếu nữ', 'vợ', 'nàng', 'công chúa', 'nữ hoàng',
+    // Spanish and Portuguese.
+    'mujer', 'chica', 'niña', 'ella', 'señora', 'madre', 'mamá', 'hermana', 'reina', 'princesa', 'esposa', 'hija',
+    'tía', 'abuela', 'femenina', 'femenino', 'heroína', 'bruja',
+    'mulher', 'menina', 'garota', 'moça', 'ela', 'senhora', 'mãe', 'irmã', 'rainha', 'filha', 'tia', 'avó',
+    'feminina', 'bruxa',
+    // Indonesian.
+    'perempuan', 'wanita', 'gadis', 'cewek', 'ibu', 'nenek', 'ratu', 'putri', 'istri', 'bibi', 'tante',
   ],
-  ja: ['女', '姉', '妹', '母', '娘', '姫', 'おばあ', '婆', 'ママ'],
+  inside: [
+    '女', '姉', '妹', '母', '娘', '姫', 'おばあ', '婆', 'ママ',
+    '姐', '妈', '媽', '妻', '奶奶', '阿姨', '公主', '她',
+    '여자', '여성', '소녀', '엄마', '어머니', '언니', '누나', '할머니', '공주', '여왕', '아내', '그녀',
+    'ผู้หญิง', 'หญิง', 'สาว', 'คุณแม่', 'มารดา', 'ราชินี', 'เจ้าหญิง', 'ภรรยา', 'ลูกสาว', 'เธอ',
+  ],
 };
 
-const MALE = {
+const MALE: Keywords = {
   words: [
     'male', 'man', 'men', 'boy', 'he', 'his', 'him', 'guy', 'father', 'dad', 'brother', 'king', 'prince',
     'husband', 'son', 'uncle', 'grandpa', 'grandfather', 'masculine', 'hero', 'wizard',
     'nam', 'anh', 'ông', 'bố', 'cha', 'chú', 'cậu', 'trai', 'con trai', 'chàng', 'hắn', 'hoàng tử', 'vua',
+    // Spanish and Portuguese.
+    'hombre', 'chico', 'niño', 'él', 'señor', 'padre', 'papá', 'hermano', 'rey', 'príncipe', 'esposo', 'marido',
+    'hijo', 'tío', 'abuelo', 'masculino', 'héroe', 'brujo',
+    'homem', 'menino', 'garoto', 'rapaz', 'ele', 'senhor', 'pai', 'irmão', 'rei', 'filho', 'tio', 'avô', 'herói',
+    'bruxo',
+    // Indonesian: 'laki-laki' is two words once the hyphen goes.
+    'laki laki', 'lelaki', 'pria', 'cowok', 'ayah', 'bapak', 'kakek', 'raja', 'pangeran', 'suami', 'paman', 'putra',
   ],
-  ja: ['男', '兄', '弟', '父', '息子', '王子', 'おじい', '爺', 'パパ', '少年'],
+  inside: [
+    '男', '兄', '弟', '父', '息子', '王子', 'おじい', '爺', 'パパ', '少年',
+    '哥', '爸', '爷', '丈夫', '儿子', '兒子', '国王', '國王', '叔叔',
+    '남자', '남성', '소년', '아빠', '아버지', '오빠', '할아버지', '왕자', '아들', '삼촌', '남편',
+    'ผู้ชาย', 'ชาย', 'หนุ่ม', 'พ่อ', 'พี่ชาย', 'น้องชาย', 'ราชา', 'กษัตริย์', 'เจ้าชาย', 'สามี', 'ลูกชาย',
+  ],
 };
 
-const AGE_WORDS: { group: Exclude<AgeGroup, null>; words: string[]; ja: string[] }[] = [
-  { group: 'elder', words: ['old', 'elderly', 'elder', 'aged', 'ancient', 'grandma', 'grandpa', 'già', 'cụ', 'lão', 'ông lão', 'bà lão'], ja: ['老', '爺', '婆', '高齢', 'おじい', 'おばあ'] },
-  { group: 'child', words: ['child', 'kid', 'little', 'toddler', 'bé', 'nhí', 'trẻ con', 'em bé'], ja: ['子供', '子ども', '幼'] },
-  { group: 'teen', words: ['teen', 'teenager', 'teenage', 'young', 'youth', 'student', 'thiếu niên', 'thiếu nữ', 'học sinh', 'trẻ'], ja: ['少年', '少女', '高校', '中学', '若'] },
-  { group: 'adult', words: ['adult', 'middle', 'grown', 'trung niên', 'người lớn'], ja: ['中年', '大人'] },
+const AGE_WORDS: ({ group: Exclude<AgeGroup, null> } & Keywords)[] = [
+  {
+    group: 'elder',
+    words: [
+      'old', 'elderly', 'elder', 'aged', 'ancient', 'grandma', 'grandpa', 'già', 'cụ', 'lão', 'ông lão', 'bà lão',
+      'viejo', 'vieja', 'anciano', 'anciana', 'abuelo', 'abuela', 'velho', 'velha', 'idoso', 'idosa', 'avô', 'avó',
+      'tua', 'lansia', 'kakek', 'nenek', 'sepuh',
+    ],
+    inside: ['老', '爺', '婆', '高齢', 'おじい', 'おばあ', '爷爷', '奶奶', '高龄', '노인', '할머니', '할아버지', '노년', 'แก่', 'ชรา', 'สูงอายุ'],
+  },
+  {
+    group: 'child',
+    words: [
+      'child', 'kid', 'little', 'toddler', 'bé', 'nhí', 'trẻ con', 'em bé',
+      'niño', 'niña', 'pequeño', 'pequeña', 'criança', 'pequeno', 'pequena', 'anak', 'balita', 'kecil', 'bocah',
+    ],
+    inside: ['子供', '子ども', '幼', '孩子', '小孩', '儿童', '兒童', '어린이', '아이', '꼬마', 'เด็ก'],
+  },
+  {
+    group: 'teen',
+    words: [
+      'teen', 'teenager', 'teenage', 'young', 'youth', 'student', 'thiếu niên', 'thiếu nữ', 'học sinh', 'trẻ',
+      'adolescente', 'joven', 'estudiante', 'jovem', 'estudante', 'remaja', 'muda', 'pelajar', 'siswa', 'siswi',
+    ],
+    inside: ['少年', '少女', '高校', '中学', '若', '学生', '學生', '高中', '初中', '青年', '청소년', '십대', '학생', '소년', '소녀', 'วัยรุ่น', 'นักเรียน'],
+  },
+  {
+    group: 'adult',
+    words: ['adult', 'middle', 'grown', 'trung niên', 'người lớn', 'adulto', 'adulta', 'dewasa', 'paruh baya'],
+    inside: ['中年', '大人', '成年', '중년', '성인', '어른', 'ผู้ใหญ่', 'วัยกลางคน'],
+  },
 ];
 
 /** How someone talks, from the voice and traits fields. */
-const LOW = { words: ['deep', 'low', 'gravelly', 'gruff', 'husky', 'raspy', 'rough', 'trầm', 'khàn', 'ồm'], ja: ['低い', '低音', '渋い', 'ハスキー'] };
-const HIGH = { words: ['high', 'bright', 'squeaky', 'shrill', 'sweet', 'chirpy', 'giọng cao', 'the thé', 'lanh lảnh'], ja: ['高い', '高音', '甲高'] };
-const FAST = { words: ['fast', 'quick', 'rapid', 'energetic', 'excitable', 'hyper', 'loud', 'nhanh', 'liến thoắng', 'sôi nổi'], ja: ['早口', '元気'] };
-const SLOW = { words: ['slow', 'calm', 'measured', 'soft', 'quiet', 'stoic', 'gentle', 'chậm', 'điềm tĩnh', 'nhẹ nhàng', 'từ tốn', 'trầm tĩnh'], ja: ['ゆっくり', '落ち着', '穏やか', '静か', '無口'] };
+const LOW: Keywords = {
+  words: [
+    'deep', 'low', 'gravelly', 'gruff', 'husky', 'raspy', 'rough', 'trầm', 'khàn', 'ồm',
+    'grave', 'profunda', 'profundo', 'ronca', 'ronco', 'rouca', 'rouco', 'áspera', 'áspero', 'berat', 'serak', 'rendah',
+  ],
+  inside: ['低い', '低音', '渋い', 'ハスキー', '低沉', '沙哑', '沙啞', '浑厚', '渾厚', '낮은', '굵은', '허스키', '걸걸', 'ทุ้ม', 'แหบ', 'เสียงต่ำ'],
+};
+const HIGH: Keywords = {
+  words: [
+    'high', 'bright', 'squeaky', 'shrill', 'sweet', 'chirpy', 'giọng cao', 'the thé', 'lanh lảnh',
+    'aguda', 'agudo', 'chillona', 'chillón', 'dulce', 'estridente', 'doce', 'melengking', 'cempreng', 'nyaring',
+  ],
+  inside: ['高い', '高音', '甲高', '尖细', '尖細', '高亢', '清脆', '甜美', '높은', '하이톤', '앳된', 'แหลม', 'เสียงสูง'],
+};
+const FAST: Keywords = {
+  words: [
+    'fast', 'quick', 'rapid', 'energetic', 'excitable', 'hyper', 'loud', 'nhanh', 'liến thoắng', 'sôi nổi',
+    'rápido', 'rápida', 'enérgico', 'enérgica', 'ruidoso', 'ruidosa', 'agitado', 'agitada', 'barulhento', 'barulhenta',
+    'cepat', 'energik', 'bersemangat', 'cerewet',
+  ],
+  inside: ['早口', '元気', '语速快', '語速快', '急躁', '活泼', '活潑', '话多', '話多', '빠른', '빠르게', '활발', '수다', 'เร็ว', 'ร่าเริง', 'พูดมาก'],
+};
+const SLOW: Keywords = {
+  words: [
+    'slow', 'calm', 'measured', 'soft', 'quiet', 'stoic', 'gentle', 'chậm', 'điềm tĩnh', 'nhẹ nhàng', 'từ tốn', 'trầm tĩnh',
+    'lento', 'lenta', 'tranquilo', 'tranquila', 'calmado', 'calmada', 'suave', 'callado', 'callada', 'pausado', 'pausada',
+    'calmo', 'calma', 'quieto', 'quieta', 'lambat', 'pelan', 'tenang', 'lembut', 'pendiam',
+  ],
+  inside: [
+    'ゆっくり', '落ち着', '穏やか', '静か', '無口', '缓慢', '緩慢', '冷静', '冷靜', '温柔', '溫柔', '安静', '安靜', '沉默',
+    '느린', '느릿', '차분', '조용', '과묵', '부드러운', 'ช้าๆ', 'พูดช้า', 'สงบ', 'นุ่มนวล', 'เงียบ', 'ใจเย็น',
+  ],
+};
 
 function tokens(text: string): string {
   return ` ${text.toLowerCase().normalize('NFC').split(/[^\p{L}\p{N}]+/u).filter(Boolean).join(' ')} `;
 }
 
 /** How many of the words the text has. */
-function hits(text: string, list: { words: string[]; ja: string[] }): number {
+function hits(text: string, list: Keywords): number {
   const padded = tokens(text);
-  return list.words.filter(word => padded.includes(` ${word} `)).length + list.ja.filter(word => text.includes(word)).length;
+  return list.words.filter(word => padded.includes(` ${word} `)).length + list.inside.filter(word => text.includes(word)).length;
 }
 
 function profileText(character: Pick<Character, 'voice' | 'appearance' | 'bio' | 'traits'>): string {
@@ -70,8 +157,9 @@ function profileText(character: Pick<Character, 'voice' | 'appearance' | 'bio' |
 export function genderOf(character: Pick<Character, 'gender' | 'voice' | 'appearance' | 'bio' | 'traits'>): VoiceGender {
   const field = character.gender.trim();
   // A single letter is only read as a gender in the gender field: elsewhere "m" may be from "I'm".
-  if (/^f$/i.test(field) || /^m$/i.test(field)) {
-    return /^f/i.test(field) ? 'female' : 'male';
+  // Korean forms write 여 and 남, Thai ones ญ and ช.
+  if (/^[fm여남ญช]$/i.test(field)) {
+    return /^[f여ญ]$/i.test(field) ? 'female' : 'male';
   }
   if (field) {
     const female = hits(field, FEMALE);

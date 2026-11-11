@@ -1,12 +1,11 @@
 import NativeSpeech, { type SpeechVoice } from '../../specs/NativeSpeech';
+import { LOCALE_TAG, type Locale } from '../core/i18n';
 
 export type { SpeechVoice };
 
 /** The app's languages as the speech engines name them. */
-const SPEECH_TAG: Record<string, string> = { en: 'en-US', vi: 'vi-VN', ja: 'ja-JP' };
-
 export function speechTag(language: string): string {
-  return SPEECH_TAG[language] ?? language;
+  return LOCALE_TAG[language as Locale] ?? language;
 }
 
 /** False when the device has no speech engine, or no voice for the language. Never throws. */

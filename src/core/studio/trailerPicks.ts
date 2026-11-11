@@ -5,10 +5,11 @@
 import { collectPanelIds, computePanels, isRtl, pageSize, polyArea, type Poly, type Rect } from '../layout/layout';
 import { chapterIdsOf } from '../model/selectors';
 import type { Block, ID, Page, Shot, StoryData } from '../model/types';
+import { HAN, HANGUL, KANA } from '../lettering/textScript';
 import { speakableText } from './tableRead';
 
 export const TRAILER_MAX_PANELS = 6;
-/** Captions longer than this would not be read in time. Japanese counts double: it packs more per letter. */
+/** Captions longer than this would not be read in time. Japanese, Chinese and Korean count double: they pack more per letter. */
 export const CAPTION_MAX = 90;
 
 export type TrailerLine = { text: string; speaker: string | null; shout: boolean };
@@ -95,8 +96,10 @@ export function pickPanels(candidates: PanelPick[], max = TRAILER_MAX_PANELS): P
   return chosen.sort((a, b) => a.order - b.order);
 }
 
-function captionLength(text: string): number {
-  return [...text].reduce((sum, char) => sum + (/[぀-ヿ㐀-鿿]/.test(char) ? 2 : 1), 0);
+const wide = (char: string) => KANA.test(char) || HAN.test(char) || HANGUL.test(char);
+
+export function captionLength(text: string): number {
+  return [...text].reduce((sum, char) => sum + (wide(char) ? 2 : 1), 0);
 }
 
 /** How well a line works on screen: shouts and short punchy lines first. Null when it cannot be a caption. */

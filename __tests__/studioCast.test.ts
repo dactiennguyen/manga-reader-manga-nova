@@ -1,5 +1,6 @@
 import { setLocale } from '../src/core/i18n';
-import { CATALOG_PARTS } from '../src/core/i18n/catalog';
+import { TRANSLATED_LOCALES } from '../src/core/i18n';
+import { localeParts } from '../src/core/i18n/locales';
 import { EDITOR, READERS, castMember } from '../src/core/studio/cast';
 import { characterCard, profileCompleteness, rarityOf } from '../src/core/studio/cards';
 import { ageYears } from '../src/core/studio/castUtil';
@@ -286,8 +287,8 @@ describe('honesty', () => {
   it('never talks about users, views or downloads in any language', () => {
     const wrong: string[] = [];
     for (const part of PARTS) {
-      for (const [key, entry] of Object.entries(CATALOG_PARTS[part])) {
-        for (const text of [key, entry.vi, entry.ja]) {
+      for (const key of Object.keys(localeParts('vi')[part])) {
+        for (const text of [key, ...TRANSLATED_LOCALES.map(locale => localeParts(locale)[part]?.[key] ?? '')]) {
           if (BANNED.test(text)) {
             wrong.push(text);
           }

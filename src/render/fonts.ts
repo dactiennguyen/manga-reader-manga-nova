@@ -17,6 +17,9 @@ const SOURCES: Record<BubbleFont, number> = {
   rounded: require('../assets/fonts/MPLUSRounded1c-Medium.ttf'),
   marker: require('../assets/fonts/YuseiMagic-Regular.ttf'),
   heavy: require('../assets/fonts/DelaGothicOne-Regular.ttf'),
+  bubbly: require('../assets/fonts/Jua-Regular.ttf'),
+  playful: require('../assets/fonts/ZCOOLKuaiLe-Regular.ttf'),
+  soft: require('../assets/fonts/Huninn-Regular.ttf'),
 };
 
 let provider: SkTypefaceFontProvider | null = null;

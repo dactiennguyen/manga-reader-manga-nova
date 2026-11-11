@@ -11,7 +11,8 @@ const SAMPLE_SIZE = 17;
 /** Tall faces are scaled down so the name and the line under it both fit the 48dp chip. */
 const SAMPLE_MAX_H = 24;
 // Language codes, the same in every interface language. Screen readers get the full names.
-const SCRIPT_TAG: Record<FontScript, string> = { vi: 'VI', ja: 'JA' };
+// Simplified and Traditional Chinese are told apart the way Chinese readers label them.
+const SCRIPT_TAG: Record<FontScript, string> = { vi: 'VI', ja: 'JA', ko: 'KO', 'zh-Hans': '简', 'zh-Hant': '繁', th: 'TH' };
 
 function FontChip({
   font,

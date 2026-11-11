@@ -2,6 +2,7 @@ import { TEMPLATES, buildTemplate, panelOrder } from '../src/core/layout/layout'
 import type { Block, Page, Panel, Shot, StoryData } from '../src/core/model/types';
 import {
   CAPTION_MAX,
+  captionLength,
   KEN_BURNS_ZOOM,
   TRAILER_MAX_PANELS,
   containWindow,
@@ -101,8 +102,12 @@ describe('lines', () => {
     expect(shout).toBeGreaterThan(plain);
     expect(lineScore({ id: 'c', type: 'dialogue', text: 'x'.repeat(CAPTION_MAX + 1) })).toBeNull();
     expect(lineScore({ id: 'd', type: 'action', text: 'He runs.' })).toBeNull();
-    // Japanese packs more into each letter.
+    // Japanese, Chinese and Korean pack more into each letter.
     expect(lineScore({ id: 'e', type: 'dialogue', text: 'あ'.repeat(50) })).toBeNull();
+    expect(lineScore({ id: 'f', type: 'dialogue', text: '我'.repeat(50) })).toBeNull();
+    expect(lineScore({ id: 'g', type: 'dialogue', text: '하'.repeat(50) })).toBeNull();
+    expect(captionLength('안녕, 하나야')).toBe(2 * 5 + 2);
+    expect(captionLength('Hola, ¿qué?')).toBe(11);
   });
 });
 

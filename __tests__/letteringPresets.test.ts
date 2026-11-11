@@ -1,4 +1,5 @@
-import { CATALOG } from '../src/core/i18n/catalog';
+import { setLocale } from '../src/core/i18n';
+import { localeTable } from '../src/core/i18n/locales';
 import { computePanels, type Rect } from '../src/core/layout/layout';
 import { clampFontSize } from '../src/core/lettering/bubbleEdit';
 import { MIN_FONT_SIZE, SFX_STYLES, bubbleCenter } from '../src/core/lettering/bubbles';
@@ -74,10 +75,10 @@ describe('preset list', () => {
 
   it('has a Vietnamese and a Japanese word for every sound effect, in the right script', () => {
     for (const item of SFX_PRESETS) {
-      const entry = CATALOG[item.text];
-      expect(entry).toBeDefined();
-      expect(entry.vi).not.toBe(item.text);
-      expect(entry.ja).toMatch(/^[぀-ヿ…]+$/);
+      const vi = localeTable('vi')[item.text];
+      expect(vi).toBeDefined();
+      expect(vi).not.toBe(item.text);
+      expect(localeTable('ja')[item.text]).toMatch(/^[぀-ヿ…]+$/);
     }
   });
 });
@@ -178,6 +179,31 @@ describe('preset bubble', () => {
     expect(SFX_STYLES[style('sfx-whoosh', 'ビュン').sfxStyle as number].font).toBe('heavy');
     expect(SFX_STYLES[style('sfx-shhh', 'シーッ').sfxStyle as number].font).toBe('marker');
     expect(SFX_STYLES[style('sfx-shhh', 'SUỴT').sfxStyle as number].font).toBe('hand');
+    expect(style('sfx-boom', '콰광')).toMatchObject({ font: 'bubbly', rotation: preset('sfx-boom').style.rotation });
+    expect(style('sfx-boom', '轰隆')).toMatchObject({ font: 'playful' });
+    expect(style('sfx-boom', '嗶嗶！')).toMatchObject({ font: 'soft' });
+    // 轟 and 隆 are also Japanese, and 砰 is either form of Chinese: the word alone decides, by a fixed rule,
+    // so the style is the same in every interface language (see scriptOf).
+    for (const locale of ['en', 'zh-Hant', 'ja'] as const) {
+      setLocale(locale);
+      expect(style('sfx-boom', '轟隆')).toMatchObject({ font: 'heavy' });
+      expect(style('sfx-boom', '砰！')).toMatchObject({ font: 'soft' });
+    }
+    setLocale('en');
+    // A face with no accents leaves for one that has them.
+    const bubbly = SFX_STYLES.findIndex(item => item.font === 'bubbly');
+    const accented = presetBubble({ ...preset('sfx-boom'), style: { ...preset('sfx-boom').style, sfxStyle: bubbly } }, '¡PUM!', PANEL);
+    expect(SFX_STYLES[accented.sfxStyle as number].font).not.toBe('bubbly');
+    expect(presetBubble({ ...preset('sfx-boom'), style: { ...preset('sfx-boom').style, sfxStyle: bubbly } }, 'BAM', PANEL).sfxStyle).toBe(bubbly);
+    expect(style('sfx-shhh', 'ชู่ว์')).toMatchObject({ font: 'casual', skew: preset('sfx-shhh').style.skew ?? SFX_STYLES[3].skew });
+  });
+
+  it('starts a bubble in Korean, Chinese or Thai in a face that has the script', () => {
+    expect(presetBubble(preset('speech'), '안녕!', PANEL).font).toBe('bubbly');
+    expect(presetBubble(preset('speech'), '你好！我们走吧。', PANEL).font).toBe('playful');
+    expect(presetBubble(preset('speech'), '你好！我們走吧，說好了。', PANEL).font).toBe('soft');
+    expect(presetBubble(preset('speech'), '¿Qué pasó?', PANEL).font).toBe(preset('speech').style.font ?? 'hand');
+    expect(presetBubble(preset('caption'), 'สามปีต่อมา', PANEL).font).toBe('casual');
   });
 
   it('starts a bubble in a font that has the script of its text', () => {

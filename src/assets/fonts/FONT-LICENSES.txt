@@ -142,6 +142,27 @@ This Font Software is licensed under the SIL Open Font License, Version 1.1.
 The full license text is included in the Patrick Hand section above and at
 https://openfontlicense.org
 
+===== jua =====
+Copyright 2018 The Jua Project Authors
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
+===== zcoolkuaile =====
+Copyright 2018 The ZCOOL KuaiLe Project Authors (https://github.com/googlefonts/zcool-kuaile)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
+===== huninn =====
+Copyright 2025 The Huninn Project Authors (https://github.com/justfont/Huninn)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+The full license text is included in the Patrick Hand section above and at
+https://openfontlicense.org
+
 ===== Material Icons (Apache License 2.0) =====
 
                                  Apache License

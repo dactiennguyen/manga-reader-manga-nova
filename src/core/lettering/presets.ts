@@ -1,10 +1,11 @@
 import { msg } from '../i18n';
 import { PAGE_MARGIN, hitTestPanel, type PanelShape, type Pt, type Rect, type Size } from '../layout/layout';
-import type { Bubble, BubbleType, ID } from '../model/types';
+import type { Bubble, BubbleFont, BubbleType, ID } from '../model/types';
 import { clampFontSize } from './bubbleEdit';
 import { BUBBLE_STROKE, MIN_FONT_SIZE, SFX_STYLES, bubbleBounds, bubbleCenter, createBubble } from './bubbles';
 import type { TextMeasure } from './fit';
-import { FONT_SCRIPTS, fontForText, scriptOf } from './fonts';
+import { FONT_SCRIPTS, fontChain, fontForText, hasAccents, scriptOf, type FontScript } from './fonts';
+import { hasAccentedLatin } from './textScript';
 import { sized } from './script';
 
 export type SfxGroup = 'impact' | 'motion' | 'weather' | 'feeling' | 'quiet';
@@ -199,17 +200,37 @@ type PresetOptions = {
   id?: ID;
 };
 
+/** The sound-effect face for the scripts the Latin and Japanese styles cannot draw. */
+const SCRIPT_SFX_FONT: Record<Exclude<FontScript, 'vi' | 'ja'>, BubbleFont> = {
+  ko: 'bubbly',
+  'zh-Hans': 'playful',
+  'zh-Hant': 'soft',
+  th: 'casual',
+};
+
 /**
  * A sound-effect style whose font has the script of the word. Katakana in a Latin display style would
- * be drawn by a fallback anyway: taking the Japanese style says so in the style row.
+ * be drawn by a fallback anyway: taking the Japanese style says so in the style row. An accented word
+ * ('¡ZAS!', 'PÁ') leaves a style whose face has no accents for the first of its fallbacks that has them.
+ * Like fontForText it reads the word only, never the interface language.
  */
 function sfxStyleFor(index: number, text: string): number {
   const font = (SFX_STYLES[index] ?? SFX_STYLES[0]).font;
   const script = scriptOf(text);
-  if (!script || FONT_SCRIPTS[font].includes(script)) {
+  if (!script) {
+    if (hasAccents(font) || !hasAccentedLatin(text)) {
+      return index;
+    }
+    const found = fontChain(font)
+      .filter(hasAccents)
+      .map(item => SFX_STYLES.findIndex(style => style.font === item))
+      .find(item => item >= 0);
+    return found ?? index;
+  }
+  if (FONT_SCRIPTS[font].includes(script)) {
     return index;
   }
-  const wanted = script === 'vi' ? 'hand' : font === 'hand' ? 'marker' : 'heavy';
+  const wanted = script === 'vi' ? 'hand' : script === 'ja' ? (font === 'hand' ? 'marker' : 'heavy') : SCRIPT_SFX_FONT[script];
   const found = SFX_STYLES.findIndex(style => style.font === wanted);
   return found < 0 ? index : found;
 }

@@ -16,6 +16,9 @@ const CREDITS = [
   { name: 'M PLUS Rounded 1c', license: 'SIL Open Font License 1.1', use: msg('Lettering typeface') },
   { name: 'Yusei Magic', license: 'SIL Open Font License 1.1', use: msg('Handwriting typeface') },
   { name: 'Dela Gothic One', license: 'SIL Open Font License 1.1', use: msg('Display typeface') },
+  { name: 'Jua', license: 'SIL Open Font License 1.1', use: msg('Lettering typeface') },
+  { name: 'ZCOOL KuaiLe', license: 'SIL Open Font License 1.1', use: msg('Lettering typeface') },
+  { name: 'Huninn', license: 'SIL Open Font License 1.1', use: msg('Lettering typeface') },
   { name: 'Lucide', license: 'ISC License', use: msg('Icons') },
 ];
 

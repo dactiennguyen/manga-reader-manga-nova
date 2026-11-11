@@ -1,10 +1,10 @@
 /**
  * A table read: a chapter's script turned into lines for the device's speech engine, with one voice per
  * character. A voice is a pitch and a rate guessed from the character's profile (gender, age, role and how
- * they talk, in English, Vietnamese or Japanese words), then nudged so two characters rarely sound alike.
+ * they talk, in words of any of the app's languages), then nudged so two characters rarely sound alike.
  */
 import type { Locale } from '../i18n';
-import { scriptOf } from '../lettering/fonts';
+import { LATIN_LOCALES, chineseScript, hanScript, writingOf, type TextScript } from '../lettering/textScript';
 import type { Block, BlockType, Character, DialogueKind, ID, StoryData } from '../model/types';
 import {
   NARRATOR_VOICE,
@@ -126,26 +126,50 @@ export function tableRead(state: ScriptSource, chapterId: ID, options: TableRead
   });
 }
 
-/** Tone marks: French has some of them too, but English text almost never does. */
-const VIETNAMESE_MARKS = /[àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]/i;
-
 /**
- * The language the script is written in, which may not be the app's: Japanese and Vietnamese show in their
- * letters, and plain Latin text is read as English. With nothing to go on, the app's language.
+ * The language the script is written in, which may not be the app's: most languages show in their letters
+ * (see textScript.ts, which the fonts read too). Chinese lines that could be either form count as the form
+ * the other lines show, else as the app's. Han lines Japanese could have written count as Japanese when
+ * other lines have kana, as the Chinese of the other lines when there is some, and otherwise by the app's
+ * language: Japanese in Japanese, else Chinese. Plain Latin text is read in the app's language when that
+ * is written in Latin letters, else as English. With no lines, the app's language.
  */
 export function scriptLanguage(lines: Pick<Utterance, 'text'>[], fallback: Locale): Locale {
   if (lines.length === 0) {
     return fallback;
   }
-  const counts = { ja: 0, vi: 0, other: 0 };
+  const counts = new Map<TextScript, number>();
+  const add = (script: TextScript, count: number) => counts.set(script, (counts.get(script) ?? 0) + count);
+  const han: string[] = [];
+  let chinese = 0;
   lines.forEach(line => {
-    const script = scriptOf(line.text) ?? (VIETNAMESE_MARKS.test(line.text.normalize('NFC')) ? 'vi' : 'other');
-    counts[script] += 1;
+    const writing = writingOf(line.text);
+    if (writing === 'han') {
+      han.push(line.text);
+    } else if (writing === 'zh') {
+      chinese += 1;
+    } else if (writing) {
+      add(writing, 1);
+    }
   });
-  if (counts.ja === 0 && counts.vi === 0) {
-    return 'en';
+  const hans = counts.get('zh-Hans') ?? 0;
+  const hant = counts.get('zh-Hant') ?? 0;
+  const form: TextScript = hans + hant > 0 ? (hant > hans ? 'zh-Hant' : 'zh-Hans') : chineseScript(fallback);
+  const japanese = counts.has('ja');
+  const isChinese = chinese + hans + hant > 0;
+  if (chinese > 0) {
+    add(form, chinese);
   }
-  return counts.ja >= counts.vi ? 'ja' : 'vi';
+  han.forEach(text => add(japanese ? 'ja' : isChinese ? form : hanScript(text, fallback), 1));
+  let top: TextScript | null = null;
+  let most = 0;
+  for (const [script, count] of counts) {
+    if (count > most) {
+      top = script;
+      most = count;
+    }
+  }
+  return top ?? (LATIN_LOCALES.includes(fallback) ? fallback : 'en');
 }
 
 /** The line to start from or move to, kept inside the list. */

@@ -1,3 +1,4 @@
+import { HAN, KANA, THAI } from '../lettering/textScript';
 import { EMPTY_ACTIVITY, bestStreak, currentStreak, type Activity } from '../story/activity';
 import type { Character, ID, Page, StoryData } from '../model/types';
 import { DAY_MS, dayKeyToDate } from '../util/time';
@@ -43,10 +44,38 @@ export function characterIsFull(character: Character): boolean {
   );
 }
 
-function wordCount(text: string): number {
-  const words = text.trim().split(/\s+/).filter(Boolean);
-  // Japanese has no spaces, so a long run of it is counted by characters, roughly two to a word.
-  return words.reduce((sum, word) => sum + (/[぀-ヿ一-鿿]/.test(word) ? Math.max(1, Math.round(word.length / 2)) : 1), 0);
+/** Letters per word, for the scripts written without spaces between words. */
+const JAPANESE_PER_WORD = 2;
+const CHINESE_PER_WORD = 1.5;
+const THAI_PER_WORD = 5;
+
+/**
+ * Words in a text. Spaces part the words of Latin scripts and of Korean. Japanese, Chinese and Thai are
+ * written without them, so their runs are counted by letters: about two to a Japanese word, one and a
+ * half to a Chinese one and five to a Thai one. An estimate, but the same on every device: Hermes has no
+ * Intl.Segmenter, and the studio's goals must not move with the engine.
+ */
+export function wordCount(text: string): number {
+  let count = 0;
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    let cjk = 0;
+    let thai = 0;
+    let kana = false;
+    for (const char of word) {
+      if (KANA.test(char)) {
+        cjk++;
+        kana = true;
+      } else if (HAN.test(char)) {
+        cjk++;
+      } else if (THAI.test(char)) {
+        thai++;
+      }
+    }
+    const spaceless = Math.round(cjk / (kana ? JAPANESE_PER_WORD : CHINESE_PER_WORD)) + Math.round(thai / THAI_PER_WORD);
+    // Anything else between spaces is one word, as it always was.
+    count += Math.max(1, spaceless);
+  }
+  return count;
 }
 
 /** Every count the studio rules read, from what the person made and how often they drew. */

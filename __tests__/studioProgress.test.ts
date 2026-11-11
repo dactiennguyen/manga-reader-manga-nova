@@ -3,7 +3,7 @@ import type { Chapter, Character, Page, Project, Scene, StoryData } from '../src
 import { BADGES, badgeText, earnedBadges, newBadges } from '../src/core/studio/badges';
 import { LEVELS, levelProgress, requirementText } from '../src/core/studio/journey';
 import { issueOf } from '../src/core/studio/magazine';
-import { EMPTY_METRICS, metricsOf } from '../src/core/studio/metrics';
+import { EMPTY_METRICS, metricsOf, wordCount } from '../src/core/studio/metrics';
 import { studioPoints } from '../src/core/studio/points';
 import { progressPair } from '../src/core/studio/progress';
 import { hashString, pick, rand } from '../src/core/studio/seed';
@@ -184,6 +184,18 @@ describe('metrics', () => {
 
   it('reads drawing and studio records', () => {
     expect(m).toMatchObject({ strokes: 900, streak: 3, bestStreak: 3, activeDays: 4, promptsDone: 1, giftsOpened: 1 });
+  });
+
+  it('counts words in scripts written without spaces', () => {
+    expect(wordCount('I think we should go.')).toBe(5);
+    expect(wordCount('  ')).toBe(0);
+    expect(wordCount('안녕, 하나야! 늦었잖아.')).toBe(3);
+    // About two letters to a Japanese word, one and a half to a Chinese one and five to a Thai one.
+    expect(wordCount('今日はいい天気ですね。')).toBe(5);
+    expect(wordCount('我们今天去学校吧。')).toBe(5);
+    expect(wordCount('สวัสดีครับ ไปกันเถอะ')).toBe(4);
+    expect(wordCount('Tokyo 東京')).toBe(2);
+    expect(wordCount('!')).toBe(1);
   });
 
   it('starts at zero for a new person', () => {

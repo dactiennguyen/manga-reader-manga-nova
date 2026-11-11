@@ -1,4 +1,4 @@
-import { setLocale, t, type Locale } from '../src/core/i18n';
+import { LOCALES, setLocale, t } from '../src/core/i18n';
 import { SFX_STYLES } from '../src/core/lettering/bubbles';
 import { fitBubbleText } from '../src/core/lettering/fit';
 import { BUBBLE_FONTS, FONT_FAMILY, fontFamilies } from '../src/core/lettering/fonts';
@@ -31,6 +31,9 @@ const FILES: Record<BubbleFont, string> = {
   rounded: 'MPLUSRounded1c-Medium.ttf',
   marker: 'YuseiMagic-Regular.ttf',
   heavy: 'DelaGothicOne-Regular.ttf',
+  bubbly: 'Jua-Regular.ttf',
+  playful: 'ZCOOLKuaiLe-Regular.ttf',
+  soft: 'Huninn-Regular.ttf',
 };
 
 type NodeFs = { readFileSync: (path: string) => Uint8Array; writeFileSync: (path: string, data: Uint8Array) => void };
@@ -55,6 +58,13 @@ beforeAll(async () => {
 }, 60000);
 
 const MIXED = 'Ối trời ơi, đừng mà! ạ ế ữ ợ đ Ầ Ỹ こんにちは！ドキドキ ゴゴゴ 漢字の台詞、三年後。';
+// One line per script, each drawn as a bubble of its own: the family list follows the script of the text.
+const LINES = {
+  ko: '안녕, 하나야! 늦었잖아… ㅋㅋ 쾅! 두근두근',
+  'zh-Hans': '你迟到了！我们快走吧，这里没有人。砰！轰隆',
+  'zh-Hant': '你遲到了！我們快走吧，這裡沒有人。砰！轟隆',
+  th: 'สวัสดีครับ! ไปกันเถอะ ปัง! ตึกตัก',
+};
 
 function unresolved(families: string[], text: string): string {
   const style = { color: Skia.Color('black'), fontFamilies: families, fontSize: 28 };
@@ -75,15 +85,31 @@ describe('paragraph fallback in Skia', () => {
     }
   });
 
+  it('draws Korean, Chinese and Thai in every font, each line in one face after the chosen one', () => {
+    for (const font of BUBBLE_FONTS) {
+      for (const [script, text] of Object.entries(LINES)) {
+        const families = fontFamilies(font, text);
+        expect(`${font} ${script}:${unresolved(families, text)}`).toBe(`${font} ${script}:`);
+        // Past the chosen font, the next face draws all of the rest, so a line never mixes three faces.
+        const own = unresolved([families[0]], text);
+        if (own) {
+          expect(`${font} ${script}:${unresolved([families[1]], own.replace(/[\s!?,.…]/g, ''))}`).toBe(`${font} ${script}:`);
+        }
+      }
+    }
+  });
+
   it('draws every preset, in every interface language, in one font and with no missing letter', () => {
     const measure = bubbleMeasure(fonts);
-    for (const locale of ['en', 'vi', 'ja'] as Locale[]) {
+    for (const locale of LOCALES) {
       setLocale(locale);
       for (const preset of PRESETS) {
         const bubble = presetBubble(preset, t(preset.text), { x: 0, y: 0, w: 1000, h: 1000 }, { measure });
         // A word set half in one font and half in its fallback looks broken, so the first family has to do.
+        // Jua has no ellipsis: that one mark comes from the rounded face, whose Latin is closest to it.
         const font = bubble.type === 'sfx' ? SFX_STYLES[bubble.sfxStyle as number].font : bubble.font;
-        expect(`${locale} ${preset.id}:${unresolved([FONT_FAMILY[font]], bubble.text)}`).toBe(`${locale} ${preset.id}:`);
+        const missing = unresolved([FONT_FAMILY[font]], bubble.text).replace(font === 'bubbly' ? /…/g : /^$/, '');
+        expect(`${locale} ${preset.id}:${missing}`).toBe(`${locale} ${preset.id}:`);
         if (bubble.type === 'sfx') {
           expect(`${locale} ${preset.id} one line: ${measure(bubble, bubble.fontSize, bubble.w) < bubble.fontSize * 1.5}`).toBe(
             `${locale} ${preset.id} one line: true`,
@@ -96,7 +122,7 @@ describe('paragraph fallback in Skia', () => {
 
   it('fits the sample text of every bubble preset in its box at the size it asks for', () => {
     const measure = bubbleMeasure(fonts);
-    for (const locale of ['en', 'vi', 'ja'] as Locale[]) {
+    for (const locale of LOCALES) {
       setLocale(locale);
       for (const preset of PRESETS.filter(item => item.type !== 'sfx')) {
         const bubble = presetBubble(preset, t(preset.text), { x: 0, y: 0, w: 1000, h: 1000 }, { measure });
@@ -128,7 +154,7 @@ describe('paragraph fallback in Skia', () => {
     Skia.Path.Simplify = () => null;
     const cell = { w: 300, h: 190 };
     const columns = 6;
-    for (const locale of ['en', 'vi', 'ja'] as Locale[]) {
+    for (const locale of LOCALES) {
       setLocale(locale);
       const rows = Math.ceil(PRESETS.length / columns);
       const surface = Skia.Surface.Make(cell.w * columns, cell.h * rows);

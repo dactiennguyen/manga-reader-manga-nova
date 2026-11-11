@@ -1,12 +1,32 @@
 # Ngôn ngữ giao diện
 
-App có ba ngôn ngữ giao diện: tiếng Anh, tiếng Việt, tiếng Nhật. Người dùng chọn ở Profile → Language. Mặc định theo ngôn ngữ của máy, không khớp thì dùng tiếng Anh.
+App có mười ngôn ngữ giao diện: tiếng Anh, tiếng Việt, tiếng Nhật, tiếng Trung giản thể, tiếng Trung phồn thể, tiếng Hàn, tiếng Tây Ban Nha, tiếng Bồ Đào Nha (Brazil), tiếng Indonesia và tiếng Thái. Người dùng chọn ở Profile → Language. Mặc định app theo ngôn ngữ của máy, và dùng tiếng Anh nếu không khớp ngôn ngữ nào.
+
+Tiếng Trung được chọn theo chữ viết, rồi theo vùng. Máy ghi rõ `Hant`, hoặc đặt vùng Đài Loan, Hồng Kông, Ma Cao, thì dùng phồn thể. Các trường hợp còn lại dùng giản thể. Tiếng Quảng Đông (`yue`) dùng phồn thể, trừ khi máy ghi `Hans`. Android đời cũ ghi tiếng Indonesia là `in`; app vẫn nhận đúng.
 
 Nội dung truyện của người dùng không được dịch. Dịch lời thoại của truyện là tính năng khác, nằm ở màn Lettering.
 
+## Nhận ra chữ viết của truyện
+
+Font của bóng thoại và giọng đọc của Nghe chương đều đoán chữ viết bằng một chỗ duy nhất: `src/core/lettering/textScript.ts`.
+
+- Tiếng Việt chỉ được nhận khi có chữ riêng của tiếng Việt (ă đ ơ ư ạ ả ế…). Chữ á é ó ã ê ô cũng có trong tiếng Tây Ban Nha và Bồ Đào Nha, nên không tính.
+- Chữ Hán toàn bộ nằm trong JIS X 0208 (cấp 1 và 2) thì có thể là tiếng Nhật. Có một chữ ngoài JIS (你, 们, 說…) thì chắc chắn là tiếng Trung, rồi xem chữ giản thể hay phồn thể để chọn bên nào (`hanVariants.ts`).
+- Vẽ truyện (`fontForText`, `fontFamilies`, preset) không đọc ngôn ngữ giao diện, để cùng một truyện hiện giống nhau với mọi người. Chữ Hán có thể là tiếng Nhật thì dùng font Nhật trước, rồi đến font Trung. Tiếng Trung không rõ giản hay phồn thì dùng font phồn thể trước.
+- Nghe chương thì có đọc ngôn ngữ giao diện: giao diện tiếng Nhật đọc dòng toàn chữ Hán bằng giọng Nhật.
+
 ## Cách hoạt động
 
-Chữ trong code viết bằng tiếng Anh, và chính câu tiếng Anh là khóa. Bản dịch nằm ở `src/core/i18n/catalog/`, mỗi khu vực của app một file.
+Chữ trong code viết bằng tiếng Anh, và chính câu tiếng Anh là khóa. Mỗi ngôn ngữ khác là một file JSON trong `src/core/i18n/locales/`, ví dụ `vi.json`, `ko.json`, `zh-Hant.json`. Trong file, câu được chia theo khu vực của app:
+
+```json
+{
+  "canvas": { "Undo": "Hoàn tác", "Pen size": "Cỡ bút" },
+  "common": { "Cancel": "Hủy" }
+}
+```
+
+File của một ngôn ngữ chỉ được nạp khi người dùng chọn ngôn ngữ đó (`src/core/i18n/locales/index.ts`).
 
 ```ts
 import { msg, t, tn } from '../../core/i18n';
@@ -29,10 +49,16 @@ Không gọi `t()` ở ngoài component hay ngoài hàm: lúc file được nạ
 ## Thêm hoặc sửa chữ
 
 1. Viết câu tiếng Anh trong code, bọc bằng `t()`.
-2. Thêm bản dịch vào file của khu vực đó trong `src/core/i18n/catalog/`. Chữ dùng ở nhiều khu vực thì để ở `common.ts`.
+2. Thêm câu vào **cùng một khu vực** trong cả chín file JSON. Câu dùng ở nhiều khu vực thì để ở `common`.
 3. Chạy `npx jest __tests__/i18nCatalog.test.ts`.
 
-Test này đọc toàn bộ `src/` và báo lỗi khi: một câu chưa có bản dịch, danh mục còn câu không ai dùng, một câu nằm ở hai file, hoặc bản dịch thiếu biến `{...}`.
+Test lấy `vi.json` làm chuẩn về khu vực và khóa. Test báo lỗi khi:
+
+- Có câu chưa được dịch.
+- Có câu không còn ai dùng.
+- Một câu nằm ở hai khu vực.
+- Một ngôn ngữ thiếu câu, thừa câu, hoặc đặt câu sai khu vực so với tiếng Việt.
+- Bản dịch thiếu hoặc thừa biến `{...}`.
 
 ## Bảng thuật ngữ
 
@@ -78,6 +104,8 @@ Tiếng Việt: gọi người dùng là "bạn", câu ngắn, nút bấm không
 
 ## iOS và Android
 
-`Info.plist` khai `CFBundleLocalizations` gồm `en`, `vi`, `ja`, để App Store hiện đúng ba ngôn ngữ. Android không cần khai gì, vì chữ nằm trong JavaScript chứ không nằm trong `res/values`.
+`Info.plist` khai `CFBundleLocalizations` cho cả mười ngôn ngữ, để App Store và Cài đặt của iOS hiện đúng danh sách.
 
-Tên app, màn xin quyền của hệ thống và trang cửa hàng chưa được dịch.
+Android khai các ngôn ngữ trong `res/xml/locales_config.xml`, để Android 13 trở lên cho chọn ngôn ngữ riêng của app trong Cài đặt. Chữ hệ thống duy nhất của Android là tên kênh thông báo `reminder_channel`, có trong `values-*`. Tiếng Trung dùng `b+zh+Hans` và `b+zh+Hant`, tiếng Indonesia dùng `values-in`.
+
+Tên app, hộp xin quyền của hệ thống và trang cửa hàng chưa được dịch.
