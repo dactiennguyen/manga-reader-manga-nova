@@ -1,10 +1,19 @@
 import type { SkTypefaceFontProvider } from '@shopify/react-native-skia';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Image, PixelRatio, View, useWindowDimensions } from 'react-native';
 
 import { getLocale, t } from '../../core/i18n';
-import { BUBBLE_PRESETS, SFX_GROUPS, SFX_PRESETS, presetBubble, type LetteringPreset } from '../../core/lettering/presets';
+import {
+  BONUS_PRESETS,
+  BUBBLE_PRESETS,
+  SFX_GROUPS,
+  SFX_PRESETS,
+  presetBubble,
+  presetOffered,
+  type LetteringPreset,
+} from '../../core/lettering/presets';
 import { bubbleMeasure } from '../../render/drawBubble';
+import { useStudio } from '../../state/useStudio';
 import { Pressable, Sheet, Tabs, Text } from '../../ui';
 import { bubbleThumb, usePreview } from './previewImages';
 import type { LetteringController } from './useLetteringController';
@@ -89,6 +98,15 @@ function PresetGrid({
 export function PresetSheet({ c }: { c: LetteringController }) {
   const { state, dispatch, fonts } = c;
   const [tab, setTab] = useState<PresetTab>('bubbles');
+  const unlocked = useStudio(s => s.unlocked);
+  // Bonus presets won from studio gifts join the end of their list.
+  const { bubbles, sounds } = useMemo(() => {
+    const won = BONUS_PRESETS.filter(preset => presetOffered(preset, unlocked));
+    return {
+      bubbles: [...BUBBLE_PRESETS, ...won.filter(preset => preset.type !== 'sfx')],
+      sounds: [...SFX_PRESETS, ...won.filter(preset => preset.type === 'sfx')],
+    };
+  }, [unlocked]);
   const { width } = useWindowDimensions();
   const tile = Math.floor((Math.min(width, SHEET_MAX_W) - SIDE * 2 - GAP * (COLUMNS - 1)) / COLUMNS);
   return (
@@ -113,7 +131,7 @@ export function PresetSheet({ c }: { c: LetteringController }) {
           onChange={setTab}
         />
         {tab === 'bubbles' ? (
-          <PresetGrid presets={BUBBLE_PRESETS} width={tile} fonts={fonts} onPick={c.addPreset} />
+          <PresetGrid presets={bubbles} width={tile} fonts={fonts} onPick={c.addPreset} />
         ) : (
           SFX_GROUPS.map(group => (
             <View key={group.key} className="gap-2">
@@ -121,7 +139,7 @@ export function PresetSheet({ c }: { c: LetteringController }) {
                 {t(group.label)}
               </Text>
               <PresetGrid
-                presets={SFX_PRESETS.filter(preset => preset.group === group.key)}
+                presets={sounds.filter(preset => preset.group === group.key)}
                 width={tile}
                 fonts={fonts}
                 onPick={c.addPreset}

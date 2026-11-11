@@ -21,7 +21,7 @@ export function weekdayName(index: number): string {
   return t(WEEKDAYS[index] ?? '');
 }
 
-function formatDate(time: number, withWeekday = false): string {
+export function formatDate(time: number, withWeekday = false): string {
   const d = new Date(time);
   const date = t('{day}/{month}/{year}', {
     day: String(d.getDate()).padStart(2, '0'),

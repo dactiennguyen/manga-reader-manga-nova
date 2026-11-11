@@ -71,7 +71,8 @@
       "modulesProvider": {
         "NativeFiles": "NativeFilesModule",
         "NativeReminder": "NativeReminderModule",
-        "NativeScreen": "NativeScreenModule"
+        "NativeScreen": "NativeScreenModule",
+        "NativeSpeech": "NativeSpeechModule"
       }
     }
   }

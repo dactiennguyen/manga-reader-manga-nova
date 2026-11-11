@@ -27,6 +27,8 @@ export type LetteringPreset = {
   h?: number;
   tail?: boolean;
   style: PresetStyle;
+  /** Set on a bonus preset: the studio reward that unlocks it. The sheet hides it until then. */
+  unlock?: string;
 };
 
 const bubble = (
@@ -126,7 +128,23 @@ export const SFX_GROUPS: { key: SfxGroup; label: string }[] = [
   { key: 'quiet', label: msg('Quiet') },
 ];
 
-export const PRESETS: LetteringPreset[] = [...BUBBLE_PRESETS, ...SFX_PRESETS];
+/** Won from studio gifts (core/studio/rewards). Kept out of the lists above, which are always offered. */
+export const BONUS_PRESETS: LetteringPreset[] = [
+  { ...sfx('impact', msg('KABOOM'), HEAVY, 110, -6, 8), unlock: 'sfx:kaboom' },
+  { ...sfx('motion', msg('SWISH'), SLANT, 80, -8, 4, { skew: -0.3 }), unlock: 'sfx:swish' },
+  { ...sfx('feeling', msg('SPARKLE'), HAND, 60, -4, 3), unlock: 'sfx:sparkle' },
+  {
+    ...bubble('flashback', msg('Flashback'), msg('Back then…'), 'narration', 300, 90, { font: 'hand', fontSize: 28, narrationStyle: 'inverse' }),
+    unlock: 'bubble:flashback',
+  },
+];
+
+export const PRESETS: LetteringPreset[] = [...BUBBLE_PRESETS, ...SFX_PRESETS, ...BONUS_PRESETS];
+
+/** A preset is offered when it is not a bonus, or its reward has been won. */
+export function presetOffered(preset: Pick<LetteringPreset, 'unlock'>, unlocked: readonly string[]): boolean {
+  return !preset.unlock || unlocked.includes(preset.unlock);
+}
 
 const PANEL_PAD = 24;
 const TAIL_DROP = 50;

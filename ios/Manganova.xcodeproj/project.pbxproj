@@ -22,6 +22,7 @@
 		A81C0E96CF0DA64DD3BDD93D /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A1193224514E4E2688BE307 /* Inter-SemiBold.ttf */; };
 		A89B8265A64A8AE3E8FAFADE /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C6F102C1905A4E4788E503A /* Inter-Bold.ttf */; };
 		BA44EB367C1AA207A434695A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		D5DCC45EAC48E2EFA9C09390 /* NativeSpeechModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 892BBAFBB4E3776C17D03661 /* NativeSpeechModule.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Manganova/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Manganova/SceneDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Manganova/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		892BBAFBB4E3776C17D03661 /* NativeSpeechModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeSpeechModule.mm; path = Manganova/NativeSpeechModule.mm; sourceTree = "<group>"; };
 		9AB430CC482E58B9DE437B40 /* NativeFilesModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeFilesModule.mm; path = Manganova/NativeFilesModule.mm; sourceTree = "<group>"; };
 		A2C1E0F365EC2A25C73CD7F9 /* LinkPresentation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LinkPresentation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/LinkPresentation.framework; sourceTree = DEVELOPER_DIR; };
 		A6D8D20D49AF56133590D654 /* NativeScreenModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeScreenModule.mm; path = Manganova/NativeScreenModule.mm; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				A6D8D20D49AF56133590D654 /* NativeScreenModule.mm */,
 				9AB430CC482E58B9DE437B40 /* NativeFilesModule.mm */,
 				F87F75DA6B05D3A18DFA001A /* Manganova-Bridging-Header.h */,
+				892BBAFBB4E3776C17D03661 /* NativeSpeechModule.mm */,
 			);
 			name = Manganova;
 			sourceTree = "<group>";
@@ -308,6 +311,7 @@
 				8E48FCAF6E79520905D839E4 /* NativeScreenModule.mm in Sources */,
 				0B5CE951E65065E58E476AE0 /* NativeFilesModule.mm in Sources */,
 				8BDE3D8F6771DB2ACCBCA461 /* NativeReminderModule.mm in Sources */,
+				D5DCC45EAC48E2EFA9C09390 /* NativeSpeechModule.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

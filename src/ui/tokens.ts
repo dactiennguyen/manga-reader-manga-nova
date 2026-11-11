@@ -16,7 +16,10 @@ export type ColorToken =
   | 'success'
   | 'warning'
   | 'divider'
-  | 'control-border';
+  | 'control-border'
+  /** Printed cream paper and the ink on it: the same in both themes. */
+  | 'paper'
+  | 'on-paper';
 
 /** For props that need a real colour value, such as icons and Skia. */
 export function useColor(token: ColorToken): string {

@@ -31,6 +31,11 @@ export type RootStackParamList = {
   Export: { projectId: ID; chapterId?: ID };
   Trash: undefined;
   About: undefined;
+  Journey: undefined;
+  Club: { chapterId?: ID } | undefined;
+  Mailbox: undefined;
+  Cards: { characterId?: ID } | undefined;
+  Magazine: undefined;
 };
 
 export type AppNavigation = NativeStackNavigationProp<RootStackParamList>;

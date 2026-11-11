@@ -1,5 +1,5 @@
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback, useMemo } from 'react';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { chapterIdsOf, charactersOf } from '../core/model/selectors';
@@ -70,4 +70,18 @@ export function useStoryData(): StoryData {
     () => ({ projects, chapters, scenes, characters, relations, world, pages }),
     [projects, chapters, scenes, characters, relations, world, pages],
   );
+}
+
+/**
+ * The live value while the screen is in sight, and the last one it showed while it is not. A screen that
+ * stays mounted under another (Home under the canvas) uses it so nothing it derives is worked out again
+ * until it comes back.
+ */
+export function useWhileFocused<T>(live: T): T {
+  const focused = useIsFocused();
+  const [kept, setKept] = useState(live);
+  if (focused && kept !== live) {
+    setKept(live);
+  }
+  return focused ? live : kept;
 }

@@ -23,6 +23,11 @@ import { NewProjectScreen } from '../features/project/NewProjectScreen';
 import { ProjectScreen } from '../features/project/ProjectScreen';
 import { ScriptScreen } from '../features/script/ScriptScreen';
 import { StoryboardScreen } from '../features/storyboard/StoryboardScreen';
+import { CardsScreen } from '../features/studio/CardsScreen';
+import { ClubScreen } from '../features/studio/ClubScreen';
+import { JourneyScreen } from '../features/studio/JourneyScreen';
+import { MagazineScreen } from '../features/studio/MagazineScreen';
+import { MailboxScreen } from '../features/studio/MailboxScreen';
 import { WorldEntryScreen } from '../features/world/WorldEntryScreen';
 import { WorldScreen } from '../features/world/WorldScreen';
 import { useAppNavigation, type RootStackParamList, type TabParamList } from '../state/navigation';
@@ -116,6 +121,11 @@ export function RootNavigator() {
       <Stack.Screen name="Export" component={ExportScreen} />
       <Stack.Screen name="Trash" component={TrashScreen} />
       <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="Journey" component={JourneyScreen} />
+      <Stack.Screen name="Club" component={ClubScreen} />
+      <Stack.Screen name="Mailbox" component={MailboxScreen} />
+      <Stack.Screen name="Cards" component={CardsScreen} />
+      <Stack.Screen name="Magazine" component={MagazineScreen} />
     </Stack.Navigator>
   );
 }

@@ -35,7 +35,15 @@ export type JointName =
 
 export type PoseJoints = Partial<Record<JointName, readonly [number, number]>>;
 
-export type Pose = { id: string; label: string; aspect: number; headSize: number; joints: PoseJoints };
+export type Pose = {
+  id: string;
+  label: string;
+  aspect: number;
+  headSize: number;
+  joints: PoseJoints;
+  /** Set on a bonus pose: the studio reward that unlocks it. The sheet hides it until then. */
+  unlock?: string;
+};
 
 /** A soft blue that reads as a guide. A black and white story gets the gray, so nothing coloured slips in. */
 export const POSE_COLOR = '#5B9BD5';
@@ -259,6 +267,57 @@ export const POSES: Pose[] = [
     },
   },
 ];
+
+/** Won from studio gifts (core/studio/rewards). Same proportions as the poses above, which are always offered. */
+export const BONUS_POSES: Pose[] = [
+  {
+    id: 'victory',
+    label: msg('Victory'),
+    aspect: 0.356,
+    headSize: 0.1058,
+    unlock: 'pose:victory',
+    joints: {
+      head: [0.559, 0.246], neck: [0.559, 0.341], chest: [0.559, 0.415], pelvis: [0.559, 0.574],
+      shoulderL: [0.322, 0.354], shoulderR: [0.797, 0.354], elbowL: [0.045, 0.471], elbowR: [0.909, 0.206],
+      wristL: [0.353, 0.535], wristR: [0.94, 0.079], handL: [0.508, 0.567], handR: [0.955, 0.016],
+      hipL: [0.446, 0.597], hipR: [0.672, 0.597], kneeL: [0.351, 0.79], kneeR: [0.768, 0.79],
+      ankleL: [0.285, 0.958], ankleR: [0.834, 0.958], toeL: [0.175, 0.984], toeR: [0.944, 0.984],
+    },
+  },
+  {
+    id: 'thinking',
+    label: msg('Thinking'),
+    aspect: 0.309,
+    headSize: 0.128,
+    unlock: 'pose:thinking',
+    joints: {
+      head: [0.549, 0.083], neck: [0.498, 0.197], chest: [0.498, 0.287], pelvis: [0.498, 0.479],
+      shoulderL: [0.166, 0.213], shoulderR: [0.829, 0.213], elbowL: [0.062, 0.396], elbowR: [0.673, 0.392],
+      wristL: [0.559, 0.396], wristR: [0.604, 0.24], handL: [0.807, 0.396], handR: [0.57, 0.164],
+      hipL: [0.34, 0.507], hipR: [0.655, 0.507], kneeL: [0.34, 0.744], kneeR: [0.762, 0.742],
+      ankleL: [0.34, 0.949], ankleR: [0.785, 0.946], toeL: [0.187, 0.981], toeR: [0.938, 0.978],
+    },
+  },
+  {
+    id: 'waving',
+    label: msg('Waving'),
+    aspect: 0.428,
+    headSize: 0.1135,
+    unlock: 'pose:waving',
+    joints: {
+      head: [0.373, 0.187], neck: [0.373, 0.289], chest: [0.373, 0.369], pelvis: [0.373, 0.539],
+      shoulderL: [0.161, 0.303], shoulderR: [0.586, 0.303], elbowL: [0.081, 0.464], elbowR: [0.919, 0.22],
+      wristL: [0.054, 0.599], wristR: [0.946, 0.085], handL: [0.04, 0.667], handR: [0.96, 0.017],
+      hipL: [0.273, 0.564], hipR: [0.474, 0.564], kneeL: [0.238, 0.773], kneeR: [0.526, 0.773],
+      ankleL: [0.224, 0.955], ankleR: [0.555, 0.954], toeL: [0.126, 0.983], toeR: [0.653, 0.982],
+    },
+  },
+];
+
+/** The poses to offer: every built-in one, then the bonus poses whose reward has been won. */
+export function posesOffered(unlocked: readonly string[]): Pose[] {
+  return [...POSES, ...BONUS_POSES.filter(pose => !pose.unlock || unlocked.includes(pose.unlock))];
+}
 
 type XY = { x: number; y: number };
 

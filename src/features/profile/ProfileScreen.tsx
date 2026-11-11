@@ -1,7 +1,28 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
-import { AiIcon, AwakeIcon, CircleIcon, DataIcon, DeleteIcon, DeviceIcon, DoneIcon, EditIcon, HandIcon, IdeaIcon, InfoIcon, MoveToIcon, PaletteIcon, SlidersIcon, TranslateIcon } from '../../ui/icons';
+import {
+  AiIcon,
+  AwakeIcon,
+  CardsIcon,
+  CharactersIcon,
+  CircleIcon,
+  DataIcon,
+  DeleteIcon,
+  DeviceIcon,
+  DoneIcon,
+  EditIcon,
+  HandIcon,
+  IdeaIcon,
+  InfoIcon,
+  JourneyIcon,
+  MagazineIcon,
+  MailIcon,
+  MoveToIcon,
+  PaletteIcon,
+  SlidersIcon,
+  TranslateIcon,
+} from '../../ui/icons';
 
 import { ARCHIVE_EXTENSION } from '../../core/archive/bundle';
 import { LOCALES, LOCALE_NAME, msg, t, type LanguageChoice } from '../../core/i18n';
@@ -153,6 +174,14 @@ export function ProfileScreen() {
       </View>
 
       <StreakCard />
+
+      <Section title={t('Studio|section')}>
+        <ListItem icon={JourneyIcon} title={t('Mangaka journey')} chevron onPress={() => navigation.navigate('Journey')} />
+        <ListItem icon={CardsIcon} title={t('Character cards')} chevron onPress={() => navigation.navigate('Cards')} />
+        <ListItem icon={CharactersIcon} title={t('Reading club')} chevron onPress={() => navigation.navigate('Club')} />
+        <ListItem icon={MailIcon} title={t('Mailbox')} chevron onPress={() => navigation.navigate('Mailbox')} />
+        <ListItem icon={MagazineIcon} title={t('My magazine')} chevron onPress={() => navigation.navigate('Magazine')} />
+      </Section>
 
       <Section title={t('Appearance|settings')}>
         <ListItem

@@ -21,6 +21,7 @@ import { connectActivity } from '../state/useActivity';
 import { connectAssistant } from '../state/useAssistant';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
 import { connectStory, importEntities, useStory } from '../state/useStory';
+import { connectStudio } from '../state/useStudio';
 import { setHapticsEnabled, toast } from '../ui';
 
 const archiveStory: ArchiveStory = {
@@ -47,6 +48,7 @@ export async function boot(): Promise<void> {
   const meta = createMetaRepo(db);
   connectSettings(meta);
   connectActivity(meta);
+  connectStudio(meta);
   connectArt(createArtRepo(db));
   connectStory(
     createStoryRepo(db),

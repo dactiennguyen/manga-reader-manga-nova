@@ -24,6 +24,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 14 | [iOS](14-ios.md) | Chạy, build và phát hành bản iOS, khác biệt với Android |
 | 15 | [Ngôn ngữ giao diện](15-ngon-ngu.md) | Tiếng Anh, Việt, Nhật: cách thêm chữ, bảng thuật ngữ |
 | 16 | [Tính năng bổ sung](16-tinh-nang-bo-sung.md) | Truyện mẫu, câu trả lời mẫu của AI, ảnh mạng xã hội, phát lại quá trình vẽ |
+| 17 | [Xưởng vẽ trên Home](17-xuong-ve-tren-home.md) | Hành trình, huy hiệu, biên tập viên, hội đọc thử, thẻ nhân vật, tạp chí, trailer, nghe chương, hộp quà |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
 

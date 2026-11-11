@@ -2,10 +2,11 @@ import { Canvas, Picture } from '@shopify/react-native-skia';
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
-import { POSES, buildPoseStrokes, fitPoseBox, type Pose } from '../../core/art/poses';
+import { buildPoseStrokes, fitPoseBox, posesOffered, type Pose } from '../../core/art/poses';
 import { t } from '../../core/i18n';
 import { drawStroke, recordPicture } from '../../render/drawArt';
 import { INK } from '../../render/ink';
+import { useStudio } from '../../state/useStudio';
 import { Pressable, Sheet, Text } from '../../ui';
 
 const THUMB = 96;
@@ -33,10 +34,12 @@ export function PosesSheet({
   onClose: () => void;
   onPick: (pose: Pose) => void;
 }) {
+  const unlocked = useStudio(s => s.unlocked);
+  const poses = useMemo(() => posesOffered(unlocked), [unlocked]);
   return (
     <Sheet visible={visible} onClose={onClose} title={t('Poses')} subtitle={t('A mannequin to trace, on its own layer under your drawing')}>
       <View className="flex-row flex-wrap gap-3 px-4 pb-2 pt-3">
-        {POSES.map(pose => (
+        {poses.map(pose => (
           <Pressable
             key={pose.id}
             accessibilityLabel={t('Add {name}', { name: t(pose.label) })}
