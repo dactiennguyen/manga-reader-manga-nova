@@ -1,6 +1,6 @@
 name: Build Android (manual)
 
-run-name: Android ${{ inputs.format }} · ${{ inputs.version_name }} (${{ inputs.version_code || github.run_number }}) · ${{ github.ref_name }}
+run-name: Android ${{ inputs.format }} · ${{ inputs.version_name }} (${{ inputs.version_code || github.run_number }}) · ${{ github.ref_name }}${{ inputs.play_track != 'none' && format(' → Play {0}', inputs.play_track) || '' }}
 
 on:
   workflow_dispatch:
@@ -31,6 +31,25 @@ on:
         required: false
         type: string
         default: ''
+      play_track:
+        description: 'Đẩy AAB lên Google Play. none: không đẩy. internal: kiểm thử nội bộ. alpha: kiểm thử kín. beta: kiểm thử mở. production: phát hành'
+        required: true
+        type: choice
+        default: none
+        options:
+          - none
+          - internal
+          - alpha
+          - beta
+          - production
+      play_status:
+        description: 'completed: phát hành luôn trên kênh đã chọn. draft: chỉ tạo bản nháp, tự bấm phát hành trong Play Console. App chưa từng được duyệt thì phải chọn draft'
+        required: true
+        type: choice
+        default: completed
+        options:
+          - completed
+          - draft
 
 permissions:
   contents: read
@@ -55,7 +74,24 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.MANGANOVA_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.MANGANOVA_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.MANGANOVA_KEY_PASSWORD }}
+          PLAY_TRACK: ${{ inputs.play_track }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
+          # Checked before the long build, so a missing key fails in seconds, not after 20 minutes.
+          if [ "$PLAY_TRACK" != 'none' ]; then
+            if [ "$BUILD_FORMAT" != 'aab' ]; then
+              echo 'Google Play chỉ nhận AAB: chọn format aab khi đẩy lên Play' >&2
+              exit 1
+            fi
+            if [ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
+              echo 'Thiếu secret PLAY_SERVICE_ACCOUNT_JSON. Xem docs/10-kiem-thu-va-phat-hanh.md, mục Đẩy lên Google Play' >&2
+              exit 1
+            fi
+            if ! printf '%s' "$PLAY_SERVICE_ACCOUNT_JSON" | jq -e '.type == "service_account" and (.client_email | length > 0) and (.private_key | length > 0)' > /dev/null 2>&1; then
+              echo 'PLAY_SERVICE_ACCOUNT_JSON không phải file khóa JSON của service account (cần type, client_email, private_key)' >&2
+              exit 1
+            fi
+          fi
           if [ -n "$KEYSTORE_BASE64" ]; then
             if [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
               echo 'Thiếu MANGANOVA_KEYSTORE_PASSWORD, MANGANOVA_KEY_ALIAS hoặc MANGANOVA_KEY_PASSWORD' >&2
@@ -182,6 +218,25 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 1
+
+      - name: Upload to Google Play
+        if: inputs.play_track != 'none'
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.manganova.manga.reader.org
+          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          releaseName: ${{ steps.version.outputs.name }} (${{ steps.version.outputs.code }})
+          track: ${{ inputs.play_track }}
+          status: ${{ inputs.play_status }}
+          mappingFile: android/app/build/outputs/mapping/release/mapping.txt
+
+      - name: Note the Play release
+        if: inputs.play_track != 'none'
+        env:
+          PLAY_TRACK: ${{ inputs.play_track }}
+          PLAY_STATUS: ${{ inputs.play_status }}
+        run: echo "Uploaded to Google Play, track **$PLAY_TRACK**, status **$PLAY_STATUS**" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Remove the upload key
         if: always()
