@@ -46,7 +46,7 @@ GitHub Actions. Có ba workflow:
 | Workflow | Chạy khi nào | Làm gì |
 | --- | --- | --- |
 | `check.yml` | Mỗi lần đẩy code hoặc mở PR | `tsc`, `eslint`, `jest` |
-| `build-android.yml` | Bấm tay ở tab Actions, chọn **Build Android (manual)** | Kiểm tra như trên, rồi build APK hoặc AAB |
+| `build-android.yml` | Bấm tay ở tab Actions, chọn **Build Android (manual)** | Kiểm tra như trên, build APK hoặc AAB, và đẩy AAB lên Google Play nếu chọn |
 
 Tham số của `build-android.yml`:
 
@@ -56,6 +56,8 @@ Tham số của `build-android.yml`:
 | `architecture` | Chỉ dùng cho APK. AAB luôn gồm cả 4 loại CPU |
 | `version_name` | Ví dụ `1.0.1` |
 | `version_code` | Phải tăng mỗi lần nộp Play. Để trống thì dùng số lần chạy workflow |
+| `play_track` | `none` là không đẩy. `internal`, `alpha`, `beta`, `production` là đẩy AAB lên kênh tương ứng của Google Play. Xem [Đẩy lên Google Play](#đẩy-lên-google-play) |
+| `play_status` | `completed` phát hành luôn trên kênh đó. `draft` chỉ tạo bản nháp trong Play Console |
 
 Build xong, file nằm ở mục **Artifacts** của lần chạy và chỉ được giữ 1 ngày, nên hãy tải về ngay.
 
@@ -71,6 +73,25 @@ Vào **Settings → Secrets and variables → Actions** của repo và thêm:
 | `MANGANOVA_KEYSTORE_PASSWORD` | Mật khẩu keystore |
 | `MANGANOVA_KEY_ALIAS` | `manganova-upload` |
 | `MANGANOVA_KEY_PASSWORD` | Mật khẩu khóa |
+| `PLAY_SERVICE_ACCOUNT_JSON` | Toàn bộ nội dung file khóa JSON của service account. Chỉ cần khi đẩy lên Google Play |
+
+### Đẩy lên Google Play
+
+Chọn `format` là `aab` và `play_track` khác `none`: build xong, workflow tải AAB lên kênh đã chọn qua Google Play Developer API, kèm `mapping.txt` để Play đọc được stack trace của bản R8. Chỉ AAB đẩy được, APK thì workflow dừng ngay ở bước đầu.
+
+Cài đặt một lần:
+
+1. **Tải bản đầu tiên lên bằng tay.** API không tạo được app mới, nên app phải có sẵn trong Play Console và có ít nhất một AAB tải lên bằng tay. Bật Play App Signing ở lần này.
+2. **Tạo service account.** Vào [Google Cloud Console](https://console.cloud.google.com/), chọn hoặc tạo một project, bật **Google Play Android Developer API**. Vào **IAM & Admin → Service Accounts**, tạo một service account, rồi ở tab **Keys** chọn **Add key → JSON** và tải file về.
+3. **Cấp quyền trong Play Console.** Vào **Users and permissions → Invite new users**, nhập email của service account (đuôi `iam.gserviceaccount.com`). Ở tab **App permissions**, thêm app Manganova với quyền **Release apps to testing tracks**, và thêm **Release to production** nếu muốn đẩy lên production.
+4. **Thêm secret.** Mở file JSON, chép toàn bộ nội dung vào secret `PLAY_SERVICE_ACCOUNT_JSON`. Xong thì xóa file trên máy.
+
+Lưu ý:
+
+- App chưa từng được Google duyệt thì Play chỉ nhận bản nháp: chọn `play_status` là `draft`, rồi vào Play Console bấm phát hành.
+- `version_code` phải lớn hơn mọi bản đã tải lên, kể cả bản tải bằng tay. Số lần chạy workflow có thể nhỏ hơn, khi đó hãy điền `version_code`.
+- Chọn `production` với `completed` là phát hành ngay cho mọi người dùng. Nên đẩy lên `internal` trước, thử xong mới chuyển lên production ngay trong Play Console.
+- Workflow kiểm tra secret trước khi build, nên thiếu khóa hoặc khóa sai dạng sẽ dừng trong vài giây thay vì sau 20 phút.
 
 ## Ký app
 
