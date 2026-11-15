@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">お絵描きリマインダー</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">連続お絵描き日数</string>
+    <string name="widget_description">連続お絵描き日数、今日のストローク数、今日のお題。</string>
+    <string name="widget_empty">Manganovaを開いて、連続お絵描きを始めよう。</string>
+    <string name="widget_prompt_title">今日のお題</string>
+    <string name="widget_preview_streak">7日</string>
+    <string name="widget_preview_progress">今日 40/100</string>
+    <string name="widget_preview_prompt">自分が主人公だと思っている猫を描こう。</string>
 </resources>

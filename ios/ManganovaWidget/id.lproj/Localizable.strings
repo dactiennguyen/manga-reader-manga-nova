@@ -1,0 +1,9 @@
+/* The home screen widget's own text: its name and description in the widget gallery, what it shows before
+   the app has sent any data, and the gallery preview. Everything else comes from the app, already translated. */
+"Drawing streak" = "Streak menggambar";
+"Your drawing streak, today's strokes and today's prompt." = "Streak menggambar, goresan hari ini, dan tantangan hari ini.";
+"Open Manganova to start your drawing streak." = "Buka Manganova untuk memulai streak menggambar.";
+"Today's prompt" = "Tantangan hari ini";
+"7 days" = "7 hari";
+"40/100 today" = "40/100 hari ini";
+"Draw a cat that thinks it is the main character." = "Gambar kucing yang mengira dirinya tokoh utama.";

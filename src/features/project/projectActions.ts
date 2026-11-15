@@ -7,12 +7,12 @@ import type { StoryRoute } from '../../core/story/resume';
 import { toAbsolute } from '../../core/util/paths';
 import { MIME, RNFS, copyIntoImages, pickImage, removeFile, shareFile, stripFileScheme } from '../../native/files';
 import { exportArt } from '../../state/artStore';
-import type { AppNavigation } from '../../state/navigation';
+import type { AppNavigator } from '../../state/navigation';
 import { appServices } from '../../state/services';
 import { useStory } from '../../state/useStory';
 import { confirm, snackbar, toast } from '../../ui';
 
-export function openRoute(navigation: AppNavigation, route: StoryRoute): void {
+export function openRoute(navigation: AppNavigator, route: StoryRoute): void {
   navigation.dispatch(CommonActions.navigate(route.name, route.params));
 }
 

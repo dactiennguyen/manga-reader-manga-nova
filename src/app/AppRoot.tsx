@@ -18,6 +18,8 @@ import { t } from '../core/i18n';
 import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
 import { ReportHost } from '../features/aiReport/ReportHost';
+import { handleWidgetLink } from '../features/home/widgetLink';
+import { useWidgetSync } from '../features/home/widgetSync';
 import { handleNearbyLink } from '../features/nearby/deepLink';
 import { RoomFollower } from '../features/nearby/RoomFollower';
 import { syncReminder } from '../features/profile/reminder';
@@ -86,6 +88,7 @@ function useThemeMode() {
 
 function Shell() {
   const locale = useAppLocale();
+  useWidgetSync(locale);
   const { theme } = useUniwind();
   const dark = theme === 'dark';
   const [route, setRoute] = useState<string | undefined>();
@@ -113,9 +116,10 @@ function Shell() {
         flushActivity();
       }
     });
-    // manganova:// links (room QR codes, mangaka cards) first; anything else is a file to import.
+    // manganova:// links (the home screen widget, room QR codes, mangaka cards) first; anything else is a file
+    // to import.
     const openUrl = (url: string | null | undefined) => {
-      if (!handleNearbyLink(url, navigationRef)) {
+      if (!handleWidgetLink(url, navigationRef) && !handleNearbyLink(url, navigationRef)) {
         openArchive(url);
       }
     };

@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">Nhắc vẽ</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">Chuỗi ngày vẽ</string>
+    <string name="widget_description">Chuỗi ngày vẽ, số nét hôm nay và đề bài hôm nay.</string>
+    <string name="widget_empty">Mở Manganova để bắt đầu chuỗi ngày vẽ.</string>
+    <string name="widget_prompt_title">Đề bài hôm nay</string>
+    <string name="widget_preview_streak">7 ngày</string>
+    <string name="widget_preview_progress">Hôm nay 40/100</string>
+    <string name="widget_preview_prompt">Vẽ một con mèo tưởng mình là nhân vật chính.</string>
 </resources>

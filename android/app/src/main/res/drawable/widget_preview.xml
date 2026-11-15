@@ -1,0 +1,50 @@
+<!-- The widget in the picker before Android 12, which cannot show the live preview layout: paper, the flame,
+     the streak, the goal bar and the prompt card, drawn as blocks in the paper theme's colours (global.css). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="250dp"
+    android:height="110dp"
+    android:viewportWidth="250"
+    android:viewportHeight="110">
+    <!-- bg -->
+    <path
+        android:fillColor="#F6EFE3"
+        android:pathData="M24,0 H226 A24,24 0 0 1 250,24 V86 A24,24 0 0 1 226,110 H24 A24,24 0 0 1 0,86 V24 A24,24 0 0 1 24,0 Z" />
+    <!-- flame (Phosphor Flame fill, 24 at 14,14) in accent -->
+    <group
+        android:scaleX="0.09375"
+        android:scaleY="0.09375"
+        android:translateX="14"
+        android:translateY="14">
+        <path
+            android:fillColor="#BF3419"
+            android:fillType="evenOdd"
+            android:pathData="M173.79 51.48a221.3 221.3 0 0 0-41.67-34.34 8 8 0 0 0-8.24 0 221.3 221.3 0 0 0-41.67 34.34C54.59 80.48 40 112.47 40 144a88 88 0 0 0 176 0c0-31.53-14.59-63.52-42.21-92.52M96 184c0-27.67 22.53-47.28 32-54.3 9.48 7 32 26.63 32 54.3a32 32 0 0 1-64 0" />
+    </group>
+    <!-- streak and caption in text and text-muted -->
+    <path
+        android:fillColor="#1C1712"
+        android:pathData="M18,46 H72 A4,4 0 0 1 72,54 H18 A4,4 0 0 1 18,46 Z" />
+    <path
+        android:fillColor="#645A4C"
+        android:pathData="M17,62 H86 A3,3 0 0 1 86,68 H17 A3,3 0 0 1 17,62 Z" />
+    <!-- goal bar: divider track, accent fill -->
+    <path
+        android:fillColor="#DDD1BD"
+        android:pathData="M16,80 H100 A2,2 0 0 1 100,84 H16 A2,2 0 0 1 16,80 Z" />
+    <path
+        android:fillColor="#BF3419"
+        android:pathData="M16,80 H50 V84 H16 A2,2 0 0 1 16,80 Z" />
+    <path
+        android:fillColor="#4B4338"
+        android:pathData="M17,90 H64 A3,3 0 0 1 64,96 H17 A3,3 0 0 1 17,90 Z" />
+    <!-- prompt card in surface, with its title and lines -->
+    <path
+        android:fillColor="#FFFAF0"
+        android:pathData="M132,12 H222 A16,16 0 0 1 238,28 V82 A16,16 0 0 1 222,98 H132 A16,16 0 0 1 116,82 V28 A16,16 0 0 1 132,12 Z" />
+    <path
+        android:fillColor="#1C1712"
+        android:pathData="M131,26 H190 A3.5,3.5 0 0 1 190,33 H131 A3.5,3.5 0 0 1 131,26 Z" />
+    <path
+        android:fillColor="#4B4338"
+        android:pathData="M131,44 H222 A3,3 0 0 1 222,50 H131 A3,3 0 0 1 131,44 Z M131,56 H214 A3,3 0 0 1 214,62 H131 A3,3 0 0 1 131,56 Z M131,68 H184 A3,3 0 0 1 184,74 H131 A3,3 0 0 1 131,68 Z" />
+</vector>

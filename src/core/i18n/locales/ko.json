@@ -2889,5 +2889,8 @@
     "{count} people blocked": "{count}명 차단됨",
     "{count} person blocked": "{count}명 차단됨",
     "You will leave this room": "이 방에서 나가게 돼요"
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "Manganova를 열어 오늘의 과제를 확인하세요."
   }
 }

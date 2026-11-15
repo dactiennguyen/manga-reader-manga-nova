@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The streak widget at its smallest: the streak and today's strokes. StreakWidget.kt fills and colours it.
+     The texts here are only the picker preview. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/widget_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_shape"
+        android:tint="@color/widget_bg" />
+
+    <include layout="@layout/widget_streak_column" />
+
+</FrameLayout>

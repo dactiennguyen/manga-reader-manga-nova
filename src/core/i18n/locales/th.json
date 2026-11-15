@@ -2889,5 +2889,8 @@
     "{count} people blocked": "บล็อก {count} คน",
     "{count} person blocked": "บล็อก {count} คน",
     "You will leave this room": "คุณจะออกจากห้องนี้"
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "เปิด Manganova เพื่อดูโจทย์วันนี้"
   }
 }

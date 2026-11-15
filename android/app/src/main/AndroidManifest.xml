@@ -85,6 +85,21 @@
             <action android:name="android.intent.action.BOOT_COMPLETED" />
         </intent-filter>
       </receiver>
+      <!-- The home screen widget: the drawing streak and today's prompt. It redraws when the app sends new data,
+           at local midnight (its own alarm), and when the clock or time zone changes. -->
+      <receiver
+        android:name=".StreakWidgetProvider"
+        android:exported="false"
+        android:label="@string/widget_name">
+        <intent-filter>
+            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            <action android:name="android.intent.action.TIME_SET" />
+            <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+        </intent-filter>
+        <meta-data
+          android:name="android.appwidget.provider"
+          android:resource="@xml/widget_streak_info" />
+      </receiver>
       <!-- Shares exported files (PDF, CBZ, images) through the Android share sheet. -->
       <provider
         android:name="androidx.core.content.FileProvider"

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The streak widget when it is wide enough: the streak part, and today's prompt on a card beside it. A tap on
+     the card starts the prompt; a tap anywhere else opens Home. The texts here are only the picker preview. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/widget_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_shape"
+        android:tint="@color/widget_bg" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <include
+            layout="@layout/widget_streak_column"
+            android:layout_width="124dp"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/widget_prompt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/widget_card"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/widget_card_shape"
+                android:tint="@color/widget_card" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/widget_prompt_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="@string/widget_prompt_title"
+                    android:textColor="@color/widget_text"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/widget_prompt_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="4"
+                    android:text="@string/widget_preview_prompt"
+                    android:textColor="@color/widget_text_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/widget_prompt_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:textColor="@color/widget_text_secondary"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+</FrameLayout>

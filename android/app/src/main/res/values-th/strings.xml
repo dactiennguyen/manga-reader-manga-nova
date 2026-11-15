@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">เตือนให้วาด</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">วาดต่อเนื่อง</string>
+    <string name="widget_description">สถิติวาดต่อเนื่อง จำนวนเส้นวันนี้ และโจทย์วันนี้</string>
+    <string name="widget_empty">เปิด Manganova เพื่อเริ่มสถิติวาดต่อเนื่อง</string>
+    <string name="widget_prompt_title">โจทย์วันนี้</string>
+    <string name="widget_preview_streak">7 วัน</string>
+    <string name="widget_preview_progress">วันนี้ 40/100</string>
+    <string name="widget_preview_prompt">วาดแมวที่คิดว่าตัวเองเป็นตัวเอก</string>
 </resources>

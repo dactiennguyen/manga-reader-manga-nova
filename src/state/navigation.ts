@@ -57,6 +57,9 @@ export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 export type AppNavigation = NativeStackNavigationProp<RootStackParamList>;
 
+/** The part of the navigation that both a screen and `navigationRef` have, for actions run from either. */
+export type AppNavigator = Pick<AppNavigation, 'navigate' | 'dispatch'>;
+
 export type ScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;
 
 export function useAppNavigation(): AppNavigation {

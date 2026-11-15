@@ -1,0 +1,3 @@
+// Build settings file for the widget extension (both configurations). The extension has no CocoaPods
+// xcconfig, so the iOS workflow appends its signing settings here for Ad Hoc and TestFlight builds, as it does
+// for the app in Pods-Manganova.release.xcconfig. Leave it empty in the repo: local builds sign as usual.

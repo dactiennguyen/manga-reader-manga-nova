@@ -15,6 +15,7 @@ class AppPackage : BaseReactPackage() {
         NativeFilesModule.NAME -> NativeFilesModule(reactContext)
         NativeReminderModule.NAME -> NativeReminderModule(reactContext)
         NativeSpeechModule.NAME -> NativeSpeechModule(reactContext)
+        NativeWidgetModule.NAME -> NativeWidgetModule(reactContext)
         else -> null
       }
 
@@ -24,6 +25,7 @@ class AppPackage : BaseReactPackage() {
         NativeFilesModule.NAME,
         NativeReminderModule.NAME,
         NativeSpeechModule.NAME,
+        NativeWidgetModule.NAME,
     ).associateWith { name ->
       ReactModuleInfo(
           name = name,

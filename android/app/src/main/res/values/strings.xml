@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Manganova</string>
     <string name="reminder_channel">Drawing reminder</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">Drawing streak</string>
+    <string name="widget_description">Your drawing streak, today\'s strokes and today\'s prompt.</string>
+    <string name="widget_empty">Open Manganova to start your drawing streak.</string>
+    <string name="widget_prompt_title">Today\'s prompt</string>
+    <string name="widget_preview_streak">7 days</string>
+    <string name="widget_preview_progress">40/100 today</string>
+    <string name="widget_preview_prompt">Draw a cat that thinks it is the main character.</string>
 </resources>
