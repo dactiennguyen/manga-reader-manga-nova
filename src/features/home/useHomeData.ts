@@ -12,6 +12,7 @@ import { dayKey } from '../../core/util/time';
 import { panelHasArt, useArtVersion } from '../../state/artStore';
 import { useStoryData, useWhileFocused } from '../../state/hooks';
 import { useActivity } from '../../state/useActivity';
+import { useLessonsDone } from '../../state/useLessons';
 import { useStudioState } from '../../state/useMetrics';
 
 /** Everything the Home cards read, worked out once per change and passed down. */
@@ -53,12 +54,13 @@ export function useHomeData(): HomeData {
   );
   const { state, activity, artVersion, today } = useWhileFocused(live);
   const { promptDays, giftsOpened } = studio;
+  const lessonsDone = useLessonsDone();
 
   const m = useMemo(
-    () => metricsOf(state, activity, { ...EMPTY_STUDIO, promptDays, giftsOpened }, today, panelHasArt),
+    () => metricsOf(state, activity, { ...EMPTY_STUDIO, promptDays, giftsOpened }, today, panelHasArt, lessonsDone),
     // Art is not React state: artVersion is what says it changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, activity, promptDays, giftsOpened, artVersion, today],
+    [state, activity, promptDays, giftsOpened, artVersion, today, lessonsDone],
   );
   const projects = useMemo(() => activeProjects(state), [state]);
   const levelIndex = useMemo(() => levelIndexOf(m), [m]);

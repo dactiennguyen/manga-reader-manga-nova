@@ -6,6 +6,7 @@ import { dayKey } from '../core/util/time';
 import { panelHasArt, useArtVersion } from './artStore';
 import { useStoryData } from './hooks';
 import { useActivity } from './useActivity';
+import { useLessonsDone } from './useLessons';
 import { useStudio } from './useStudio';
 
 /** The studio's saved data without its actions, rebuilt only when a field changes. */
@@ -42,8 +43,8 @@ export function useStudioState(): StudioState {
 }
 
 /**
- * The studio counts for today, from the stories, the drawing activity, the studio record and which panels
- * have art. Worked out again only when one of those changes. The day is read on each render, so a screen
+ * The studio counts for today, from the stories, the drawing activity, the studio record, the lessons done
+ * and which panels have art. Worked out again only when one of those changes. The day is read on each render, so a screen
  * open past midnight moves to the new day on its next render.
  */
 export function useMetrics(): Metrics {
@@ -52,11 +53,12 @@ export function useMetrics(): Metrics {
   const promptDays = useStudio(s => s.promptDays);
   const giftsOpened = useStudio(s => s.giftsOpened);
   const artVersion = useArtVersion();
+  const lessonsDone = useLessonsDone();
   const today = dayKey();
   return useMemo(
-    () => metricsOf(state, activity, { ...EMPTY_STUDIO, promptDays, giftsOpened }, today, panelHasArt),
+    () => metricsOf(state, activity, { ...EMPTY_STUDIO, promptDays, giftsOpened }, today, panelHasArt, lessonsDone),
     // Art is not in React state: artVersion is what says it changed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, activity, promptDays, giftsOpened, artVersion, today],
+    [state, activity, promptDays, giftsOpened, artVersion, today, lessonsDone],
   );
 }

@@ -21,7 +21,7 @@ Không bao giờ được:
 | # | Tính năng | Logic | Giao diện |
 | --- | --- | --- | --- |
 | 1 | Hành trình mangaka, 6 cấp: Tân binh → Chuyển thể anime | `core/studio/journey.ts` | `JourneyCard`, `JourneyScreen` |
-| 2 | 35 huy hiệu đồng, bạc, vàng | `badges.ts` | `BadgesCard`, `JourneyScreen` |
+| 2 | 37 huy hiệu đồng, bạc, vàng | `badges.ts` | `BadgesCard`, `JourneyScreen` |
 | 3 | Tiến bộ: trang đầu đặt cạnh trang mới nhất, kèm "ngày này tháng trước" | `progress.ts` | `ProgressCard` |
 | 4 | Trailer: video dọc 720x1280 dựng từ khung đã vẽ | `trailer.ts`, `trailerPicks.ts` | `TrailerHero`, `TrailerSheet` |
 | 5 | Nghe chương: đọc kịch bản thành tiếng, mỗi nhân vật một giọng | `tableRead.ts`, `tableVoices.ts`, `specs/NativeSpeech.ts` | `ListenSheet` |
@@ -31,7 +31,7 @@ Không bao giờ được:
 | 9 | Hội đọc thử chấm điểm và nhận xét từng chương | `readers.ts` | `ClubCard`, `ClubScreen` |
 | 10 | Bảng xếp hạng chương của hội | `ranking.ts` | `MagazineCard`, `ClubScreen` |
 | 11 | Thư từ hội đọc thử | `fanMail.ts` | `LettersCard`, `MailboxScreen` |
-| 12 | Điểm Studio | `points.ts` | `JourneyCard`, `JourneyScreen` |
+| 12 | Điểm Studio, có cả bài tập vẽ đã xong ([20](20-bai-tap-ve.md)) | `points.ts` | `JourneyCard`, `JourneyScreen` |
 | 13 | Tạp chí của tôi: số mỗi tuần, bìa, mục lục, đếm ngược | `magazine.ts` | `MagazineCard`, `MagazineScreen` |
 | 14 | Thẻ nhân vật: chỉ số, độ hiếm, lật thẻ, chia sẻ ảnh | `cards.ts` | `CharacterCardsStrip`, `CardsScreen` |
 | 15 | Hộp quà: mở khóa bảng màu, khung thẻ, tiếng động, kiểu bóng thoại, tư thế | `gifts.ts`, `rewards.ts` | `GiftCard`, `JourneyScreen` |

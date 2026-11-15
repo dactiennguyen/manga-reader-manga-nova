@@ -37,6 +37,8 @@ export type Metrics = {
   activeDays: number;
   promptsDone: number;
   giftsOpened: number;
+  /** Drawing lessons finished with at least one star (core/lessons). */
+  lessonsDone: number;
 };
 
 export type MetricKey = keyof Metrics;

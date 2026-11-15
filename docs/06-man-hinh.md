@@ -29,6 +29,10 @@ Tab: `Home`, `Library`, `Assistant`, `Profile`. Nút (+) ở giữa Dock mở `N
 | `Profile` | | `profile` | 20 | Đổi giao diện |
 | `Trash` | | `profile` | | Đổi giao diện |
 | `About` | | `profile` | | Đổi giao diện |
+| `Courses` | | `lessons` | | Mới, xem [20](20-bai-tap-ve.md) |
+| `Lesson` | `lessonId` | `lessons` | | Mới |
+| `LessonPractice` | `lessonId` | `lessons` | | Mới |
+| `LessonResult` | `lessonId` | `lessons` | | Mới |
 
 Bỏ các tham số không ai dùng: `NewProject.blankCanvas`, `Project.tab`, `World.type`, `World.view`, `Preview.pageId`. Dàn khung và Thoại vẫn chuyển qua lại bằng `replace` trong `ModeSwitch`.
 

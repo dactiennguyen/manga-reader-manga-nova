@@ -36,6 +36,11 @@ export type RootStackParamList = {
   Mailbox: undefined;
   Cards: { characterId?: ID } | undefined;
   Magazine: undefined;
+  // Drawing lessons
+  Courses: undefined;
+  Lesson: { lessonId: string };
+  LessonPractice: { lessonId: string };
+  LessonResult: { lessonId: string };
   // Play together nearby
   Nearby: undefined;
   Room: undefined;

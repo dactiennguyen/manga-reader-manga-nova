@@ -12,6 +12,7 @@ import { GiftCard } from './GiftCard';
 import { HomeHero } from './HomeHero';
 import { IdeaSection } from './IdeaSection';
 import { JourneyCard } from './JourneyCard';
+import { LessonCard } from './LessonCard';
 import { LettersCard } from './LettersCard';
 import { MagazineCard } from './MagazineCard';
 import { PlayTogetherCard } from './PlayTogetherCard';
@@ -36,8 +37,8 @@ function StartCreating() {
 
 /**
  * Home reads top to bottom as a day at the studio: the latest page, the editor's note, a word from a
- * character, today's prompt and streak, the journey, where to continue, then the magazine, the club and
- * what has been won. Someone with no story yet gets the ways to start right under the editor's welcome.
+ * character, today's prompt and streak, today's drawing lesson, the journey, where to continue, then the
+ * magazine, the club and what has been won. Someone with no story yet gets the ways to start right under the editor's welcome.
  */
 export function HomeScreen() {
   const dockInset = useDockInset();
@@ -56,6 +57,7 @@ export function HomeScreen() {
         <PromptCard data={data} />
         <StreakMiniCard data={data} />
       </View>
+      <LessonCard data={data} />
       <JourneyCard data={data} />
       <ContinueSection data={data} />
       <CharacterCardsStrip data={data} />

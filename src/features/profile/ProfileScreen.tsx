@@ -17,6 +17,7 @@ import {
   IdeaIcon,
   InfoIcon,
   JourneyIcon,
+  LessonsIcon,
   MagazineIcon,
   MailIcon,
   MoveToIcon,
@@ -187,6 +188,7 @@ export function ProfileScreen() {
 
       <Section title={t('Studio|section')}>
         <ListItem icon={JourneyIcon} title={t('Mangaka journey')} chevron onPress={() => navigation.navigate('Journey')} />
+        <ListItem icon={LessonsIcon} title={t('Drawing lessons')} chevron onPress={() => navigation.navigate('Courses')} />
         <ListItem icon={CardsIcon} title={t('Character cards')} chevron onPress={() => navigation.navigate('Cards')} />
         <ListItem icon={CharactersIcon} title={t('Reading club')} chevron onPress={() => navigation.navigate('Club')} />
         <ListItem icon={MailIcon} title={t('Mailbox')} chevron onPress={() => navigation.navigate('Mailbox')} />

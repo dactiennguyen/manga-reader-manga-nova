@@ -27,6 +27,7 @@ const METRIC_NAME: Partial<Record<MetricKey, string>> = {
   bestStreak: msg('Best drawing streak'),
   activeDays: msg('Days with drawing'),
   promptsDone: msg('Daily prompts finished'),
+  lessonsDone: msg('Drawing lessons finished'),
 };
 
 const SHORT_LIST = 5;

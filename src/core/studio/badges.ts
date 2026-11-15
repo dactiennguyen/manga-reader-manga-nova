@@ -22,6 +22,7 @@ const TEXT: Partial<Record<MetricKey, string>> = {
   activeDays: msg('Draw on {count} different days'),
   promptsDone: msg('Finish {count} daily prompts'),
   giftsOpened: msg('Open {count} gifts'),
+  lessonsDone: msg('Finish {count} drawing lessons'),
 };
 
 /** The same asks for a count of one, which reads better without a number. */
@@ -32,6 +33,7 @@ const ONE: Partial<Record<MetricKey, string>> = {
   charactersFull: msg('Fill in one full character profile'),
   promptsDone: msg('Finish a daily prompt'),
   giftsOpened: msg('Open a gift'),
+  lessonsDone: msg('Finish a drawing lesson'),
 };
 
 const badge = (id: string, title: string, tier: BadgeTier, metric: MetricKey, count: number): Badge => ({
@@ -87,6 +89,9 @@ export const BADGES: Badge[] = [
   badge('prompt-habit', msg('Prompt habit'), 'silver', 'promptsDone', 20),
   badge('gift-wrapped', msg('Gift wrapped'), 'bronze', 'giftsOpened', 1),
   badge('collector', msg('Collector'), 'gold', 'giftsOpened', 12),
+  // Drawing lessons
+  badge('first-lesson', msg('First lesson'), 'bronze', 'lessonsDone', 1),
+  badge('star-pupil', msg('Star pupil'), 'silver', 'lessonsDone', 12),
 ];
 
 export function badgeText(item: Badge): string {
