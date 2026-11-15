@@ -4,6 +4,8 @@
  */
 import { z } from 'zod';
 
+import { cleanStroke } from '../art/presets';
+import type { Stroke } from '../model/types';
 import { GUESS_TEXT_MAX, INK_POINTS_MAX } from './guess';
 import { SCRIPT_BLOCKS_MAX, SCRIPT_CAST_MAX, SCRIPT_SCENES_MAX, SCRIPT_TEXT_MAX } from './scriptTogether';
 import type { Envelope, Message } from './types';
@@ -45,10 +47,17 @@ const stroke = z.object({
   opacity: num,
   points: z.array(num).max(60000),
   pressure: z.boolean().optional(),
-  tone: z.object({ density: num }).optional(),
+  // Checked field by field by cleanStroke, which drops or clamps whatever is wrong.
+  tone: z.looseObject({ density: num }).optional(),
+  brush: z.looseObject({}).optional(),
 });
 
-const remoteStroke = z.object({ pageId: id, panelId: id, layerKey: z.string().max(80), stroke });
+const remoteStroke = z.object({
+  pageId: id,
+  panelId: id,
+  layerKey: z.string().max(80),
+  stroke: stroke.transform(value => cleanStroke(value as Stroke)),
+});
 
 const scriptOps = [
   z.object({ t: z.literal('script.focus'), key: scriptKey.nullable() }),

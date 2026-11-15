@@ -1,6 +1,7 @@
 import type { PanelArt, Stroke } from '../model/types';
-import { isFillTool } from './artMath';
-import type { Easing, StrokeOptions } from './freehand';
+import { isFillTool, isShapeTool } from './artMath';
+import { brushStreamline, brushThinning, strokeBrush, usesDabs } from './brushes';
+import { linear, type Easing, type StrokeOptions } from './freehand';
 
 export const STROKE_POINT_LIMIT = 4096;
 
@@ -14,8 +15,34 @@ function penEasing(t: number): number {
   return Math.sin((t * Math.PI) / 2);
 }
 
-export function freehandOptions(stroke: Pick<Stroke, 'tool' | 'size' | 'pressure'>, last = true): StrokeOptions {
+/** How pressure maps to width for each tool. A custom pencil brush is an outline too, with plain easing. */
+export function toolEasing(tool: Stroke['tool'], brushed: boolean): Easing {
   'worklet';
+  if (tool === 'brush') {
+    return brushEasing;
+  }
+  return brushed && tool === 'pencil' ? linear : penEasing;
+}
+
+export function freehandOptions(
+  stroke: Pick<Stroke, 'tool' | 'size' | 'pressure' | 'brush'>,
+  last = true,
+): StrokeOptions {
+  'worklet';
+  const custom = strokeBrush(stroke);
+  if (custom) {
+    return {
+      size: stroke.size,
+      thinning: brushThinning(custom.pressureSize),
+      smoothing: 0.5,
+      streamline: brushStreamline(custom.smoothing),
+      easing: toolEasing(stroke.tool, true),
+      simulatePressure: !stroke.pressure,
+      start: { taper: stroke.size * custom.taperStart, cap: true },
+      end: { taper: stroke.size * custom.taperEnd, cap: true },
+      last,
+    };
+  }
   const brush = stroke.tool === 'brush';
   const easing: Easing = brush ? brushEasing : penEasing;
   return {
@@ -54,6 +81,24 @@ export function isOutlineTool(tool: Stroke['tool']): boolean {
 export function strokeKind(tool: Stroke['tool']): 'outline' | 'fill' | 'center' {
   'worklet';
   return isOutlineTool(tool) ? 'outline' : isFillTool(tool) ? 'fill' : 'center';
+}
+
+export type RenderKind = 'outline' | 'fill' | 'center' | 'shape' | 'dabs';
+
+/**
+ * How a stroke is drawn. A custom brush is always an outline, so pressure and taper work for a pencil
+ * too, unless it fades with pressure: then it is dabs (core/art/dabs).
+ */
+export function renderKind(stroke: Pick<Stroke, 'tool' | 'brush'>): RenderKind {
+  'worklet';
+  if (isShapeTool(stroke.tool)) {
+    return 'shape';
+  }
+  const custom = strokeBrush(stroke);
+  if (custom) {
+    return usesDabs(custom) ? 'dabs' : 'outline';
+  }
+  return strokeKind(stroke.tool);
 }
 
 export function appendPoint(points: number[], x: number, y: number, minDistance: number): boolean {

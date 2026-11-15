@@ -1,3 +1,5 @@
+import { normalizeBrush } from '../core/art/brushes';
+import { normalizeTone } from '../core/art/tone';
 import type { ArtRepo, Db, DbRow, LayerRow } from '../core/ports';
 import type { ArtLayer, ID, LayerImage, Stroke, StrokeTool } from '../core/model/types';
 import { uid } from '../core/util/id';
@@ -22,13 +24,47 @@ function decodeStroke(row: DbRow): Stroke {
   if (row.tone !== null && row.tone !== undefined) {
     stroke.tone = { density: row.tone as number };
   }
+  if (typeof row.style === 'string') {
+    applyStyle(stroke, row.style);
+  }
   return stroke;
+}
+
+/**
+ * The `style` column holds what the older columns cannot: a custom brush, and a tone that is more than a
+ * density. The `tone` column still gets the density, so a stroke always has a fallback.
+ */
+function encodeStyle(stroke: Stroke): string | null {
+  const tone = stroke.tone ? normalizeTone(stroke.tone) : undefined;
+  const brush = stroke.brush ? normalizeBrush(stroke.brush) : undefined;
+  const richTone = tone && tone.kind ? tone : undefined;
+  if (!richTone && !brush) {
+    return null;
+  }
+  return JSON.stringify({ ...(richTone ? { tone: richTone } : null), ...(brush ? { brush } : null) });
+}
+
+function applyStyle(stroke: Stroke, json: string): void {
+  let style: { tone?: unknown; brush?: unknown };
+  try {
+    style = JSON.parse(json) as typeof style;
+  } catch {
+    return;
+  }
+  const tone = normalizeTone(style?.tone);
+  if (tone) {
+    stroke.tone = tone;
+  }
+  const brush = normalizeBrush(style?.brush);
+  if (brush) {
+    stroke.brush = brush;
+  }
 }
 
 function insertStroke(db: Db, layerId: ID, gen: number, seq: number, stroke: Stroke): void {
   db.run(
-    `INSERT INTO strokes (layer_id, gen, seq, tool, color, size, opacity, flags, tone, points)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO strokes (layer_id, gen, seq, tool, color, size, opacity, flags, tone, style, points)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       layerId,
       gen,
@@ -39,6 +75,7 @@ function insertStroke(db: Db, layerId: ID, gen: number, seq: number, stroke: Str
       stroke.opacity,
       stroke.pressure ? FLAG_PRESSURE : 0,
       stroke.tone?.density ?? null,
+      encodeStyle(stroke),
       encodePoints(stroke.points),
     ],
   );

@@ -7,6 +7,7 @@ import { ScopedTheme } from 'uniwind';
 
 import type { SelectionOp } from '../../core/art/affine';
 import type { Box } from '../../core/art/artMath';
+import { isBrushBase } from '../../core/art/brushes';
 import { GUIDES, defaultGuide, type GuideKind } from '../../core/art/guides';
 import type { Pose } from '../../core/art/poses';
 import type { SessionEnv } from '../../core/art/session';
@@ -21,6 +22,7 @@ import { useCharacters, useLastOpened } from '../../state/hooks';
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
 import { useSettings } from '../../state/useSettings';
 import { EmptyState, Menu, MOTION, Screen, toast } from '../../ui';
+import { BrushSheet } from './BrushSheet';
 import { CanvasRail } from './CanvasRail';
 import { CanvasStage } from './CanvasStage';
 import { CanvasToolPanel } from './CanvasToolPanel';
@@ -39,6 +41,7 @@ import type { Material } from './materials';
 import { MaterialsSheet } from './MaterialsSheet';
 import { PosesSheet } from './PosesSheet';
 import { ReplaySheet } from './ReplaySheet';
+import { ToneSheet } from './ToneSheet';
 import { useCanvasDoc } from './useCanvasDoc';
 import { useCanvasEngine, type CanvasEngine, type EngineHandlers } from './useCanvasEngine';
 import { useCanvasEnv, useCanvasHandlers } from './useCanvasHandlers';
@@ -112,7 +115,7 @@ export function CanvasEditor({
   const [sizing, setSizing] = useState(false);
   const [reference, setReference] = useState<CanvasReference | null>(null);
   const [guide, setGuide] = useState<GuideKind | null>(null);
-  const [sheet, setSheet] = useState<'characters' | 'materials' | 'poses' | 'replay' | null>(null);
+  const [sheet, setSheet] = useState<'characters' | 'materials' | 'poses' | 'replay' | 'brushes' | 'tones' | null>(null);
   const [opacityPreview, setOpacityPreview] = useState<{ id: ID; value: number } | null>(null);
   const [banner, setBanner] = useState(false);
 
@@ -124,6 +127,7 @@ export function CanvasEditor({
       opacity: DEFAULT_OPACITY.pencil,
       color: GRAYS[0],
       tone: null,
+      brush: null,
       picking: false,
       stylusMode: false,
       pageW: ctx.size.w,
@@ -248,9 +252,9 @@ export function CanvasEditor({
   };
 
   // Leaving the Select tool, or tapping it again, closes the selection and keeps what was done to it.
-  const chooseTool = (next: CanvasTool) => {
+  const chooseTool = (next: CanvasTool, choose: () => void = () => tools.chooseTool(next)) => {
     selection.end(true);
-    tools.chooseTool(next);
+    choose();
   };
   const selectionControls = {
     count: selection.count,
@@ -316,6 +320,8 @@ export function CanvasEditor({
             selection={selectionControls}
             fade={fade}
             onPreview={setSizing}
+            onBrushes={() => setSheet('brushes')}
+            onTones={() => setSheet('tones')}
             onLayout={trackers.panel}
           />
           <CanvasTopBar
@@ -366,6 +372,13 @@ export function CanvasEditor({
       <ReplaySheet visible={sheet === 'replay'} panels={[{ panelId, shape }]} onClose={() => setSheet(null)} />
       <MaterialsSheet visible={sheet === 'materials'} onClose={() => setSheet(null)} onPick={addMaterial} />
       <PosesSheet visible={sheet === 'poses'} onClose={() => setSheet(null)} onPick={addPose} />
+      <BrushSheet
+        visible={sheet === 'brushes'}
+        tool={isBrushBase(tools.tool) ? tools.tool : 'gpen'}
+        onClose={() => setSheet(null)}
+        onChoose={(id, base) => chooseTool(base, () => tools.chooseBrush(id, base))}
+      />
+      <ToneSheet visible={sheet === 'tones'} value={tools.tone} onClose={() => setSheet(null)} onChoose={tools.setTone} />
       {tipsSeen ? null : <TipsOverlay onClose={() => useSettings.getState().set({ canvasTipsSeen: true })} />}
     </View>
   );

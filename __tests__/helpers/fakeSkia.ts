@@ -50,7 +50,10 @@ function makeRecorder() {
     },
     drawRect() {},
     drawImageRect() {},
-    drawCircle() {},
+    drawLine() {},
+    drawCircle(x: number, y: number, r: number, paint: { alpha?: number }) {
+      draws.push({ circle: [x, y, r], alpha: paint.alpha ?? 1 });
+    },
     save() {
       draws.push({ save: true });
     },
@@ -65,7 +68,8 @@ function makeRecorder() {
     beginRecording: () => canvas,
     finishRecordingAsPicture(): FakePicture {
       counters.pictures++;
-      return { draws, id: counters.pictures };
+      const picture = { draws, id: counters.pictures };
+      return Object.assign(picture, { makeShader: (...args: unknown[]) => ({ shader: 'picture', picture, args }) });
     },
   };
 }
@@ -73,12 +77,21 @@ function makeRecorder() {
 function makePaint() {
   const paint: Record<string, unknown> = {};
   const noop = () => {};
-  ['setAntiAlias', 'setBlendMode', 'setColor', 'setAlphaf', 'setShader', 'setStyle', 'setStrokeWidth'].forEach(name => {
+  ['setAntiAlias', 'setBlendMode', 'setColor', 'setStyle', 'setStrokeWidth'].forEach(name => {
     paint[name] = noop;
   });
   ['setStrokeCap', 'setStrokeJoin'].forEach(name => {
     paint[name] = noop;
   });
+  paint.setAlphaf = (alpha: number) => {
+    paint.alpha = alpha;
+  };
+  paint.setShader = (shader: unknown) => {
+    paint.shader = shader;
+  };
+  paint.setMaskFilter = (filter: unknown) => {
+    paint.maskFilter = filter;
+  };
   return paint;
 }
 
@@ -90,13 +103,22 @@ export const Skia = {
   Path: { Oval: () => ({ verbs: [] }), Rect: () => ({ verbs: [] }) },
   PictureRecorder: makeRecorder,
   Paint: makePaint,
-  Matrix: (values?: readonly number[]) => ({ values }),
+  Matrix: (values?: readonly number[]) => ({ values, rotate: () => {} }),
+  RuntimeEffect: {
+    Make: (source: string) => ({ source, makeShader: (uniforms: number[]) => ({ shader: 'runtime', uniforms }) }),
+  },
+  Shader: {
+    MakeBlend: (mode: number, one: unknown, two: unknown) => ({ shader: 'blend', mode, one, two }),
+    MakeColor: (color: unknown) => ({ shader: 'color', color }),
+  },
+  MaskFilter: { MakeBlur: (style: number, sigma: number, respectCTM: boolean) => ({ blur: sigma, style, respectCTM }) },
   Color: (value: string) => value,
   XYWHRect: (x: number, y: number, width: number, height: number) => ({ x, y, width, height }),
 };
 
 export const AlphaType = {};
-export const BlendMode = { Clear: 0 };
+export const BlendMode = { Clear: 0, SrcIn: 5, DstIn: 6, SrcOut: 7, DstOut: 8 };
+export const BlurStyle = { Normal: 0 };
 export const ColorType = {};
 export const FilterMode = {};
 export const PaintStyle = { Fill: 0, Stroke: 1 };

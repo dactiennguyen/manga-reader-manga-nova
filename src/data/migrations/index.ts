@@ -78,6 +78,14 @@ export const MIGRATIONS: Migration[] = [
       db.run('CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
     },
   },
+  {
+    // Custom brushes and tones: the parameters a stroke was drawn with, as JSON. Null for every older
+    // stroke, which keeps drawing from its tool and its `tone` density alone.
+    version: 2,
+    up: db => {
+      db.run('ALTER TABLE strokes ADD COLUMN style TEXT');
+    },
+  },
 ];
 
 export function userVersion(db: Db): number {

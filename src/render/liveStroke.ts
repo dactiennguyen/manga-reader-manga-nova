@@ -6,9 +6,12 @@ import {
   type SkPath,
   type SkPathBuilder,
   type SkPicture,
+  type SkShader,
 } from '@shopify/react-native-skia';
 
-import { boxCorners, isFillTool, isShapeTool, type Box } from '../core/art/artMath';
+import { boxCorners, type Box } from '../core/art/artMath';
+import { createDabWalker, dabSpecOf, feedDabs, settledDabs, type DabWalker } from '../core/art/dabs';
+import { strokeBrush } from '../core/art/brushes';
 import { guideHandles, type Guide, type Point } from '../core/art/guides';
 import type { Vec2 } from '../core/art/freehand';
 import {
@@ -19,10 +22,21 @@ import {
   readLiveTail,
   type LiveOutline,
 } from '../core/art/liveOutline';
-import { freehandOptions, isOutlineTool } from '../core/art/strokes';
+import { freehandOptions, renderKind } from '../core/art/strokes';
+import { fitToneToBox, pairsBox, resolveTone } from '../core/art/tone';
 import type { Stroke } from '../core/model/types';
-import { buildStrokePaint, buildStrokePath, makeToneShader, outlinePath, recordBounds, shapePath } from './drawArt';
+import {
+  WALK_START,
+  buildStrokePaint,
+  buildStrokePath,
+  drawDabs,
+  outlinePath,
+  recordBounds,
+  shapePath,
+  walkerEnd,
+} from './drawArt';
 import { PAPER } from './ink';
+import { gradientToneShader } from './strokeStyle';
 
 /**
  * The stroke under the pen, built on the UI thread. Finished geometry goes into `sealed` every SEAL_EVERY
@@ -32,8 +46,10 @@ import { PAPER } from './ink';
  */
 
 const SEAL_EVERY = 32;
+/** Settled dabs are recorded into a picture of their own in groups this size. */
+const SEAL_DABS = 64;
 
-type LiveKind = 'outline' | 'center' | 'fill' | 'shape';
+type LiveKind = 'outline' | 'center' | 'fill' | 'shape' | 'dabs';
 
 export type LiveStroke = {
   kind: LiveKind;
@@ -53,9 +69,16 @@ export type LiveStroke = {
   /** Outline: the last left and right indices inside the sealed ribbons, -1 before the first ribbon. */
   sealedLeft: number;
   sealedRight: number;
+  /** Dabs and spatter droplets, for a custom brush that has them. */
+  walker: DabWalker | null;
+  /** Settled dabs, recorded once. */
+  dabPictures: SkPicture[];
+  dabsSealed: { dabs: number; drops: number };
+  /** A gradient lasso fill re-fits its gradient to the area as it grows. */
+  gradientFill: boolean;
 };
 
-export type PendingStroke = { seq: number; path: SkPath | null; paint: SkPaint; layerId: string };
+export type PendingStroke = { seq: number; path: SkPath | null; paint: SkPaint; layerId: string; walk: DabWalker | null };
 
 export function emptyPicture(): SkPicture {
   'worklet';
@@ -64,21 +87,16 @@ export function emptyPicture(): SkPicture {
   return recorder.finishRecordingAsPicture();
 }
 
-function kindOf(stroke: Stroke): LiveKind {
+/**
+ * `shader` is the stroke's tone and texture, built on the JS thread for the current tool (see strokeShader),
+ * so starting a stroke records nothing.
+ */
+export function beginLiveStroke(stroke: Stroke, shader: SkShader | null = null): LiveStroke {
   'worklet';
-  if (isShapeTool(stroke.tool)) {
-    return 'shape';
-  }
-  if (isFillTool(stroke.tool)) {
-    return 'fill';
-  }
-  return isOutlineTool(stroke.tool) ? 'outline' : 'center';
-}
-
-export function beginLiveStroke(stroke: Stroke): LiveStroke {
-  'worklet';
-  const kind = kindOf(stroke);
-  const shader = stroke.tone ? makeToneShader(stroke.color, stroke.tone.density) : null;
+  const kind = renderKind(stroke);
+  const custom = strokeBrush(stroke);
+  const walker =
+    custom && (kind === 'dabs' || custom.grain === 'spatter') ? createDabWalker(dabSpecOf(stroke, custom)) : null;
   let edge: SkPaint | null = null;
   if (kind === 'fill') {
     edge = Skia.Paint();
@@ -101,6 +119,10 @@ export function beginLiveStroke(stroke: Stroke): LiveStroke {
     sealedQuads: 1,
     sealedLeft: -1,
     sealedRight: -1,
+    walker,
+    dabPictures: [],
+    dabsSealed: { dabs: 0, drops: 0 },
+    gradientFill: kind === 'fill' && stroke.tone?.kind === 'gradient',
   };
 }
 
@@ -252,6 +274,12 @@ function fillLivePath(live: LiveStroke): SkPath | null {
 
 function feed(live: LiveStroke, stroke: Stroke): void {
   'worklet';
+  if (live.walker) {
+    feedDabs(live.walker, stroke.points, live.step);
+  }
+  if (live.kind === 'dabs') {
+    return;
+  }
   const { points } = stroke;
   const { step } = live;
   for (let i = live.fed; i + step - 1 < points.length; i += step) {
@@ -268,6 +296,8 @@ function feed(live: LiveStroke, stroke: Stroke): void {
 function livePath(live: LiveStroke): SkPath | null {
   'worklet';
   switch (live.kind) {
+    case 'dabs':
+      return null;
     case 'shape':
       return shapePath(live.stroke);
     case 'outline':
@@ -279,12 +309,41 @@ function livePath(live: LiveStroke): SkPath | null {
   }
 }
 
+/** Records settled dabs once they make a full group, so each event only draws the unsettled ones. */
+function sealDabs(live: LiveStroke): void {
+  'worklet';
+  const w = live.walker as DabWalker;
+  const settled = settledDabs(w);
+  const from = live.dabsSealed;
+  if (settled.dabs - from.dabs < SEAL_DABS && settled.drops - from.drops < SEAL_DABS) {
+    return;
+  }
+  const recorder = Skia.PictureRecorder();
+  drawDabs(recorder.beginRecording(recordBounds()), w, live.paint, from, settled);
+  live.dabPictures.push(recorder.finishRecordingAsPicture());
+  live.dabsSealed = settled;
+}
+
+/** A gradient fill spans the box of the lasso so far, as it will once it is closed (see finishStroke). */
+function fitGradient(live: LiveStroke, stroke: Stroke): void {
+  'worklet';
+  if (!stroke.tone) {
+    return;
+  }
+  const fitted = fitToneToBox(stroke.tone, pairsBox(stroke.points));
+  live.paint.setShader(gradientToneShader(stroke.color, resolveTone(fitted)));
+  live.paint.setAlphaf(stroke.opacity);
+}
+
 /** Takes the latest stroke, since a shape's points are replaced rather than appended. */
 export function recordLiveStroke(live: LiveStroke, stroke: Stroke): SkPicture {
   'worklet';
   live.stroke = stroke;
   if (live.kind !== 'shape') {
     feed(live, stroke);
+  }
+  if (live.gradientFill) {
+    fitGradient(live, stroke);
   }
   const path = livePath(live);
   const recorder = Skia.PictureRecorder();
@@ -295,13 +354,25 @@ export function recordLiveStroke(live: LiveStroke, stroke: Stroke): SkPicture {
       canvas.drawPath(path, live.edge);
     }
   }
+  const w = live.walker;
+  if (w) {
+    sealDabs(live);
+    for (let i = 0; i < live.dabPictures.length; i++) {
+      canvas.drawPicture(live.dabPictures[i]);
+    }
+    drawDabs(canvas, w, live.paint, live.dabsSealed, walkerEnd(w));
+    live.paint.setAlphaf(stroke.opacity);
+  }
   return recorder.finishRecordingAsPicture();
 }
 
-/** The stroke as it will be stored. Runs once, on lift. */
+/** The stroke as it will be stored. Runs once, on lift. The walk already holds every point. */
 export function pendingFrom(live: LiveStroke, stroke: Stroke, seq: number, layerId: string): PendingStroke {
   'worklet';
-  return { seq, path: buildStrokePath(stroke, true), paint: live.paint, layerId };
+  if (live.walker) {
+    feedDabs(live.walker, stroke.points, live.step);
+  }
+  return { seq, path: buildStrokePath(stroke, true), paint: live.paint, layerId, walk: live.walker };
 }
 
 export function recordPending(list: PendingStroke[]): SkPicture {
@@ -309,9 +380,13 @@ export function recordPending(list: PendingStroke[]): SkPicture {
   const recorder = Skia.PictureRecorder();
   const canvas = recorder.beginRecording(recordBounds());
   for (let i = 0; i < list.length; i++) {
-    const path = list[i].path;
-    if (path) {
-      canvas.drawPath(path, list[i].paint);
+    const item = list[i];
+    if (item.path) {
+      canvas.drawPath(item.path, item.paint);
+    }
+    if (item.walk) {
+      drawDabs(canvas, item.walk, item.paint, WALK_START, walkerEnd(item.walk));
+      item.paint.setAlphaf(item.walk.spec.opacity);
     }
   }
   return recorder.finishRecordingAsPicture();

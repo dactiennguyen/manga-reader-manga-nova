@@ -1,18 +1,33 @@
-import { CaretDownIcon, CaretUpIcon } from '../../ui/icons';
+import { BrushIcon, CaretDownIcon, CaretUpIcon, ToneIcon } from '../../ui/icons';
 import { useState, type ReactNode } from 'react';
 import { ScrollView, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { type AnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TONE_DENSITIES } from '../../core/art/artMath';
-import { SIZE_MAX, SIZE_MIN, supportsTone } from '../../core/art/tools';
+import { isBrushBase } from '../../core/art/brushes';
+import { TOOLS, supportsTone } from '../../core/art/tools';
 import { t } from '../../core/i18n';
+import { findTone, legacyToneId, useArtPresets } from '../../state/useArtPresets';
 import { Chip, IconButton, Slider, Text, ToolPanel } from '../../ui';
+import { brushName } from './BrushSheet';
 import { CanvasColorRow } from './CanvasColorRow';
 import { CanvasSelectionBar, type SelectionControls } from './CanvasSelectionBar';
+import { toneName } from './ToneSheet';
 import type { CanvasTools } from './useCanvasTools';
 
-function TonePicker({ value, onChange }: { value: number | null; onChange: (value: number | null) => void }) {
+/** Solid, the four original densities, the chosen pattern if it is another one, and the way to all of them. */
+function TonePicker({
+  value,
+  onChange,
+  onMore,
+}: {
+  value: string | null;
+  onChange: (value: string | null) => void;
+  onMore: () => void;
+}) {
+  const presets = useArtPresets();
+  const chosen = findTone(presets, value);
   return (
     <View className="flex-row items-center gap-2 pr-2">
       <Chip label={t('Solid')} selected={value === null} onPress={() => onChange(null)} />
@@ -20,10 +35,12 @@ function TonePicker({ value, onChange }: { value: number | null; onChange: (valu
         <Chip
           key={density}
           label={`${Math.round(density * 100)}%`}
-          selected={value === density}
-          onPress={() => onChange(density)}
+          selected={value === legacyToneId(density)}
+          onPress={() => onChange(legacyToneId(density))}
         />
       ))}
+      {chosen ? <Chip label={toneName(chosen)} icon={ToneIcon} selected onPress={onMore} /> : null}
+      <Chip label={t('More tones')} icon={chosen ? undefined : ToneIcon} onPress={onMore} />
     </View>
   );
 }
@@ -48,6 +65,8 @@ export function CanvasToolPanel({
   selection,
   fade,
   onPreview,
+  onBrushes,
+  onTones,
   onLayout,
 }: {
   tools: CanvasTools;
@@ -55,11 +74,14 @@ export function CanvasToolPanel({
   selection: SelectionControls;
   fade: StyleProp<AnimatedStyle<ViewStyle>>;
   onPreview: (showing: boolean) => void;
+  onBrushes: () => void;
+  onTones: () => void;
   onLayout: (event: LayoutChangeEvent) => void;
 }) {
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(true);
-  const { tool, tone, size, opacity } = tools;
+  const { tool, tone, size, opacity, sizeRange } = tools;
+  const brushLabel = tools.brush ? brushName(tools.brush) : t(TOOLS.find(item => item.id === tool)?.label ?? '');
   const plain = tool === 'move' || tool === 'select';
   return (
     <Animated.View
@@ -79,7 +101,12 @@ export function CanvasToolPanel({
               <CanvasSelectionBar selection={selection} />
             ) : (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="items-center">
-                {supportsTone(tool) ? <TonePicker value={tone} onChange={tools.setTone} /> : null}
+                {isBrushBase(tool) ? (
+                  <View className="pr-2">
+                    <Chip label={brushLabel} icon={BrushIcon} selected={!!tools.brush} onPress={onBrushes} />
+                  </View>
+                ) : null}
+                {supportsTone(tool) ? <TonePicker value={tone} onChange={tools.setTone} onMore={onTones} /> : null}
                 <CanvasColorRow tools={tools} colored={colored} />
               </ScrollView>
             )}
@@ -96,12 +123,12 @@ export function CanvasToolPanel({
         {open && !plain ? (
           <View className="flex-row gap-3">
             {tool === 'fill' ? null : (
-              <LabeledSlider label={t('Size')} value={`${Math.round(size)}`}>
+              <LabeledSlider label={t('Size')} value={`${Math.round(size * 10) / 10}`}>
                 <Slider
                   label={t('Size')}
                   value={size}
-                  min={SIZE_MIN}
-                  max={SIZE_MAX}
+                  min={sizeRange.min}
+                  max={sizeRange.max}
                   onChange={value => {
                     onPreview(true);
                     tools.setSize(value);

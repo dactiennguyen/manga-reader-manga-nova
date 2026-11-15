@@ -87,6 +87,9 @@ Thêm deep link cho intent `.manganova` và `.mangaka`. Không có deep link nà
 - Đối xứng ghi hai nét trong một thay đổi, nên một lần Undo gỡ cả cặp.
 - Menu có Materials và Character reference. Vật liệu là mực đen trên nền trong suốt, chép vào `images/` để file xuất mang theo được. Nền đặt dưới cùng và giữ nguyên layer đang vẽ, hoa văn đặt trên cùng rồi chuyển sang công cụ Move.
 - Character reference ghim ảnh nhân vật cùng ghi chú ngoại hình vào cửa sổ nổi. Nhân vật có nhiều ảnh thì bấm mũi tên để chuyển.
+- Với G-pen, bút chì, cọ: chip tên bút ở đầu panel công cụ mở sheet Bút vẽ. Chọn một bút thì chuyển sang công cụ gốc của nó. Sửa bút ngay trong sheet, có nét mẫu ở trên.
+- Với cọ và lasso fill: chip "Thêm tông" mở sheet Tông. Tông đang chọn hiện thành một chip có tên.
+- Sửa hay xóa bút, tông chỉ áp dụng cho nét mới. Xem [Canvas](07-canvas.md#bút-tùy-chỉnh).
 
 ### Home
 

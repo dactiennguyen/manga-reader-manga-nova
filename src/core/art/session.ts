@@ -1,5 +1,5 @@
 import { msg } from '../i18n';
-import type { Stroke, StrokeTool, ID } from '../model/types';
+import type { Stroke, StrokeBrush, StrokeTone, StrokeTool, ID } from '../model/types';
 import {
   HIT_INSIDE,
   HIT_NONE,
@@ -42,7 +42,9 @@ import {
   type Guide,
   type Point,
 } from './guides';
+import { isBrushBase } from './brushes';
 import { STROKE_POINT_LIMIT, appendPoint } from './strokes';
+import { fitToneToBox, pairsBox } from './tone';
 import { screenToPage, type CanvasTool, type ViewState } from './tools';
 
 /**
@@ -94,7 +96,10 @@ export type SessionEnv = {
   size: number;
   opacity: number;
   color: string;
-  tone: number | null;
+  /** The tone to paint with, as it will be stored. Null paints solid. */
+  tone: StrokeTone | null;
+  /** The custom brush of the current tool, or null for the tool's own way of drawing. */
+  brush: StrokeBrush | null;
   picking: boolean;
   stylusMode: boolean;
   pageW: number;
@@ -439,7 +444,10 @@ function startDraw(s: SessionState, t: Touch, pressure: number, env: SessionEnv,
     stroke.pressure = true;
   }
   if (env.tone !== null && tool !== 'eraser') {
-    stroke.tone = { density: env.tone };
+    stroke.tone = env.tone;
+  }
+  if (env.brush !== null && isBrushBase(tool)) {
+    stroke.brush = env.brush;
   }
   s.stroke = stroke;
   s.holdArmed = true;
@@ -552,7 +560,12 @@ function finishStroke(s: SessionState, effects: SessionEffect[]): void {
     ? s.moved && stroke.points.length >= 4
     : !isFillTool(stroke.tool) || (s.moved && stroke.points.length >= 6);
   if (valid && layerId) {
-    effects.push({ kind: 'strokeCommit', stroke, layerId, mirror: mirrorAxis(s.guide) });
+    // A gradient fill runs across the area it covers, which is only known now.
+    const done =
+      stroke.tone && isFillTool(stroke.tool)
+        ? { ...stroke, tone: fitToneToBox(stroke.tone, pairsBox(stroke.points)) }
+        : stroke;
+    effects.push({ kind: 'strokeCommit', stroke: done, layerId, mirror: mirrorAxis(s.guide) });
   } else {
     effects.push({ kind: 'strokeCancel' });
   }

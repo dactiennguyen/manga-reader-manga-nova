@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { cleanArt } from '../art/presets';
 import { msg, t } from '../i18n';
 import type { ID, PanelArt } from '../model/types';
 import type { ProjectBundle } from './bundle';
@@ -84,7 +85,8 @@ export function parseProjectBundle(json: string): ProjectBundle {
   const art: Record<ID, PanelArt> = {};
   for (const [panelId, value] of Object.entries(parsed.data.art ?? {})) {
     if (panelId !== '__proto__') {
-      art[panelId] = value as unknown as PanelArt;
+      // Old files have no brush and only a density, and come back as they were.
+      art[panelId] = cleanArt(value as unknown as PanelArt);
     }
   }
   const story = parsed.data as unknown as ProjectBundle;

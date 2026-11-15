@@ -1,4 +1,5 @@
 import type { ArtLayer, LayerImage, Stroke, StrokeTool } from '../model/types';
+import { TONE_PITCH, mapToneSpan } from './tone';
 
 export type Box = { x: number; y: number; w: number; h: number };
 
@@ -6,7 +7,9 @@ export type LayerTransform = { s: number; tx: number; ty: number };
 
 export const IDENTITY_TRANSFORM: LayerTransform = { s: 1, tx: 0, ty: 0 };
 
-export const TONE_PITCH = 6;
+const SPATTER_REACH = 3.6;
+
+export { TONE_PITCH };
 export const TONE_DENSITIES = [0.1, 0.25, 0.4, 0.6];
 
 function round1(v: number): number {
@@ -79,7 +82,11 @@ export function transformStroke(stroke: Stroke, t: LayerTransform): Stroke {
     const v = stroke.points[i];
     points[i] = k === 0 ? round2(v * t.s + t.tx) : k === 1 ? round2(v * t.s + t.ty) : v;
   }
-  return { ...stroke, points, size: Math.max(0.1, Math.round(stroke.size * t.s * 100) / 100) };
+  const out: Stroke = { ...stroke, points, size: Math.max(0.1, Math.round(stroke.size * t.s * 100) / 100) };
+  if (stroke.tone?.span) {
+    out.tone = mapToneSpan(stroke.tone, (x, y) => ({ x: x * t.s + t.tx, y: y * t.s + t.ty }));
+  }
+  return out;
 }
 
 export function transformImage(image: LayerImage, t: LayerTransform): LayerImage {
@@ -120,7 +127,9 @@ export function layerBounds(layer: Pick<ArtLayer, 'strokes' | 'image'>): Box | n
       continue;
     }
     const step = strokeStep(stroke);
-    const pad = isFillTool(stroke.tool) ? 0 : stroke.size / 2;
+    // Spatter throws droplets up to about three and a half sizes from the line.
+    const reach = stroke.brush?.grain === 'spatter' ? SPATTER_REACH : 0.5;
+    const pad = isFillTool(stroke.tool) ? 0 : stroke.size * reach;
     for (let i = 0; i + 1 < stroke.points.length; i += step) {
       add(stroke.points[i], stroke.points[i + 1], pad);
     }

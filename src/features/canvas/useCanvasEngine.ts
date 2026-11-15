@@ -1,4 +1,4 @@
-import { type SkPath, type SkPicture } from '@shopify/react-native-skia';
+import { type SkPath, type SkPicture, type SkShader } from '@shopify/react-native-skia';
 import { useCallback, useMemo, type RefObject } from 'react';
 import {
   GestureStateManager,
@@ -57,6 +57,8 @@ export type ScenePictures = Record<ID, SkPicture>;
 export type CanvasEngine = {
   gesture: ReturnType<typeof useSimultaneousGestures>;
   env: SharedValue<SessionEnv>;
+  /** Tone and texture for the next stroke, built on the JS thread whenever the tool changes. */
+  shader: SharedValue<SkShader | null>;
   view: SharedValue<ViewState>;
   guide: SharedValue<Guide | null>;
   xform: SharedValue<LayerTransform>;
@@ -93,6 +95,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   const blank = useMemo(() => emptyPicture(), []);
   const session = useSharedValue<SessionState>(createSession(NO_VIEW));
   const env = useSharedValue<SessionEnv>(initialEnv);
+  const shader = useSharedValue<SkShader | null>(null);
   const view = useSharedValue<ViewState>(NO_VIEW);
   const guide = useSharedValue<Guide | null>(null);
   const xform = useSharedValue<LayerTransform>(IDENTITY_TRANSFORM);
@@ -149,6 +152,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         opacity: stroke.opacity,
         pressure: stroke.pressure,
         tone: stroke.tone,
+        brush: stroke.brush,
       };
       scheduleOnRN(toJsStroke, layerId, meta, new Float32Array(stroke.points), id, mirror);
     };
@@ -160,7 +164,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
         const effect = out.effects[i];
         switch (effect.kind) {
           case 'strokeBegin':
-            live.value = beginLiveStroke(out.state.stroke as Stroke);
+            live.value = beginLiveStroke(out.state.stroke as Stroke, shader.value);
             livePicture.value = recordLiveStroke(live.value, out.state.stroke as Stroke);
             break;
           case 'strokeExtend':
@@ -219,6 +223,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
     selMatrix,
     seq,
     session,
+    shader,
     toJsEffect,
     toJsStroke,
     toJsTransform,
@@ -343,6 +348,7 @@ export function useCanvasEngine(handlers: RefObject<EngineHandlers>, initialEnv:
   return {
     gesture,
     env,
+    shader,
     view,
     guide,
     xform,

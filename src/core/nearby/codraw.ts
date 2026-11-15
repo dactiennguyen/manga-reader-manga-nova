@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { mapBundleImages, remapBundleIds, type ProjectBundle } from '../archive/bundle';
 import { parseProjectBundle } from '../archive/parse';
+import { cleanStroke } from '../art/presets';
 import { collectPanelIds } from '../layout/layout';
 import type { ID, PanelArt, Project, Stroke, StoryData } from '../model/types';
 import { uid } from '../util/id';
@@ -163,7 +164,8 @@ const stroke = z.object({
   opacity: z.number().finite(),
   points: z.array(z.number().finite()),
   pressure: z.boolean().optional(),
-  tone: z.object({ density: z.number().finite() }).optional(),
+  tone: z.looseObject({ density: z.number().finite() }).optional(),
+  brush: z.looseObject({}).optional(),
 });
 
 const layerPayload = z.object({ strokes: z.array(stroke).max(20000) });
@@ -171,7 +173,7 @@ const layerPayload = z.object({ strokes: z.array(stroke).max(20000) });
 /** A whole layer sent again after its owner undid, cleared or moved their drawing. */
 export function parseLayerPayload(value: unknown): Stroke[] | null {
   const parsed = layerPayload.safeParse(value);
-  return parsed.success ? (parsed.data.strokes as Stroke[]) : null;
+  return parsed.success ? (parsed.data.strokes as Stroke[]).map(cleanStroke) : null;
 }
 
 /**

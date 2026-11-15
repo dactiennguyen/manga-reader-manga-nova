@@ -64,9 +64,10 @@ CREATE TABLE strokes (
   size      REAL NOT NULL,
   opacity   REAL NOT NULL,
   flags     INTEGER NOT NULL,   -- bit 0: có lực nhấn
-  tone      REAL,
+  tone      REAL,               -- mật độ tông, luôn ghi để có đường lui
   codec     INTEGER NOT NULL DEFAULT 1,  -- 1: Float32Array phẳng
   points    BLOB NOT NULL,
+  style     TEXT,               -- thêm ở migration 2: JSON { tone?, brush? } của bút và tông tùy chỉnh
   UNIQUE (layer_id, gen, seq)
 );
 
@@ -78,6 +79,8 @@ CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 Cấu hình khi mở: `journal_mode=WAL`, `synchronous=NORMAL`, `foreign_keys=ON`, `auto_vacuum=INCREMENTAL`.
 
 `meta` giữ cài đặt và thông tin onboarding. Đọc đồng bộ bằng `executeSync` để biết giao diện và màn đầu tiên trước khi vẽ khung hình đầu.
+
+Khóa `artPresets` trong `meta` giữ bút và tông người dùng tự tạo, dạng một bản JSON (`src/core/art/presets.ts`). Chúng dùng chung cho mọi truyện. Bút và tông có sẵn nằm trong code, không ghi xuống.
 
 ## Lưu nét vẽ
 
@@ -92,6 +95,8 @@ Nét vẽ không bao giờ bị sửa, chỉ thêm. Một lớp hiển thị cá
 | Xóa lớp, di chuyển hoặc co giãn nội dung lớp | Tạo `gen` mới với các nét đã biến đổi. Hoàn tác là trả `gen` và `head` về giá trị cũ |
 
 Vì vậy patch hoàn tác của tranh chỉ là một dòng `art_layers`, tranh không cần xử lý riêng.
+
+Cột `style` chỉ có giá trị khi nét dùng bút tùy chỉnh hoặc tông khác chấm mặc định. Nét cũ để `NULL` và vẽ đúng như trước từ `tool` và mật độ trong `tone`. Nét lưu đủ thông số đã dùng để vẽ, không lưu id của preset. Sửa hay xóa preset không làm đổi tranh đã vẽ. Khi đọc, `style` được kiểm tra và kẹp về khoảng hợp lệ. JSON hỏng thì bỏ qua, nét vẫn hiện.
 
 `points` là `Float32Array` phẳng, đúng thứ tự `x,y` hoặc `x,y,pressure` như mảng `points` cũ, tính theo đơn vị trang (bề rộng trang là 1000). Cột `flags` cho biết bước nhảy 2 hay 3. Thử 2.000 nét giả lập cho thấy kích thước giảm từ 17,1 xuống 12 byte mỗi điểm. Lợi ích chính không nằm ở dung lượng mà ở chỗ không phải ghi lại cả khung. Cột `codec` để dành nếu sau này cần nén, chưa làm bây giờ.
 
@@ -147,8 +152,11 @@ Khi nhập:
 1. Kiểm tra toàn bộ cấu trúc bằng `zod`. `parseProjectBundle` cũ chỉ kiểm tra id và danh sách cấp đầu.
 2. Đổi toàn bộ id sang id mới, gồm cả `layer.id` và `activeLayerId`. **Bẫy:** id lớp lặp lại giữa các khung, nên không dùng nguyên được làm khóa chính của `art_layers`.
 3. Kiểm tra `points` có độ dài chia hết cho bước nhảy (2 hoặc 3).
-4. Chuẩn hóa đường dẫn ảnh về dạng tương đối.
-5. Ghi tất cả trong một transaction. Lỗi thì không để lại gì.
-6. Trùng tên thì thêm hậu tố (F-28).
+4. Kiểm tra `tone` và `brush` của từng nét bằng `cleanStroke`: bỏ cái hỏng, kẹp số vượt khoảng. Nét của file cũ giữ nguyên.
+5. Chuẩn hóa đường dẫn ảnh về dạng tương đối.
+6. Ghi tất cả trong một transaction. Lỗi thì không để lại gì.
+7. Trùng tên thì thêm hậu tố (F-28).
+
+File `.manganova` mang theo `tone` và `brush` đầy đủ của từng nét, nên tranh mở ở máy khác trông giống hệt. App bản cũ đọc file mới vẫn được: nó bỏ qua `brush` và vẽ tông bằng `density`.
 
 Thao tác nhập chưa từng được thử trên máy thật ở app cũ (`docs/status.md`). Xem bước kiểm tra ở [09-lo-trinh.md](09-lo-trinh.md#giai-đoạn-0-bảo-toàn-dữ-liệu-cũ).
