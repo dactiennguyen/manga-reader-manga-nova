@@ -16,6 +16,7 @@ export { ProhibitIcon as BlockPersonIcon } from 'phosphor-react-native/src/icons
 export { TextBIcon as BoldIcon } from 'phosphor-react-native/src/icons/TextB';
 export { PaintBrushIcon as BrushIcon } from 'phosphor-react-native/src/icons/PaintBrush';
 export { ChatCircleIcon as BubbleIcon } from 'phosphor-react-native/src/icons/ChatCircle';
+export { CalendarBlankIcon as CalendarIcon } from 'phosphor-react-native/src/icons/CalendarBlank';
 export { CardsIcon as CardsIcon } from 'phosphor-react-native/src/icons/Cards';
 export { CaretDownIcon as CaretDownIcon } from 'phosphor-react-native/src/icons/CaretDown';
 export { CaretLeftIcon as CaretLeftIcon } from 'phosphor-react-native/src/icons/CaretLeft';
@@ -33,6 +34,7 @@ export { WifiHighIcon as ConnectionIcon } from 'phosphor-react-native/src/icons/
 export { CopyIcon as CopyIcon } from 'phosphor-react-native/src/icons/Copy';
 export { ScissorsIcon as CutIcon } from 'phosphor-react-native/src/icons/Scissors';
 export { DatabaseIcon as DataIcon } from 'phosphor-react-native/src/icons/Database';
+export { FlagCheckeredIcon as DeadlineIcon } from 'phosphor-react-native/src/icons/FlagCheckered';
 export { TrashIcon as DeleteIcon } from 'phosphor-react-native/src/icons/Trash';
 export { DeviceMobileIcon as DeviceIcon } from 'phosphor-react-native/src/icons/DeviceMobile';
 export { FileTextIcon as DocumentIcon } from 'phosphor-react-native/src/icons/FileText';

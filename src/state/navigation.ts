@@ -43,6 +43,11 @@ export type RootStackParamList = {
   Lesson: { lessonId: string };
   LessonPractice: { lessonId: string };
   LessonResult: { lessonId: string };
+  // Creation calendar and deadlines
+  Calendar: undefined;
+  ChapterPlan: { chapterId: ID };
+  /** `week` is the Monday of the week shown, the current week when missing. */
+  WeekSummary: { week?: string } | undefined;
   // Play together nearby
   Nearby: undefined;
   Room: undefined;

@@ -2,6 +2,7 @@ import { View } from 'react-native';
 
 import { t } from '../../core/i18n';
 import { Screen, SectionHeader, useDockInset } from '../../ui';
+import { TodayPlanCard, WeekSummaryCard } from '../planner/HomePlanCards';
 import { BadgesCard } from './BadgesCard';
 import { CharacterCardsStrip } from './CharacterCardsStrip';
 import { CharacterMessageCard } from './CharacterMessageCard';
@@ -57,6 +58,8 @@ export function HomeScreen() {
         <PromptCard data={data} />
         <StreakMiniCard data={data} />
       </View>
+      <WeekSummaryCard data={data} />
+      <TodayPlanCard data={data} />
       <LessonCard data={data} />
       <JourneyCard data={data} />
       <ContinueSection data={data} />

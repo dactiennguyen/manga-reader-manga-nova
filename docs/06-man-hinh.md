@@ -37,6 +37,9 @@ Tab: `Home`, `Library`, `Assistant`, `Profile`. Nút (+) ở giữa Dock mở `N
 | `LessonResult` | `lessonId` | `lessons` | | Mới |
 | `RefBoards` | `projectId?`, `characterId?` | `refBoards` | | Mới, xem [Thư viện tham khảo](22-thu-vien-tham-khao.md) |
 | `RefBoard` | `boardId` | `refBoards` | | Mới |
+| `Calendar` | | `planner` | | Mới, xem [23-lich-sang-tac.md](23-lich-sang-tac.md) |
+| `ChapterPlan` | `chapterId` | `planner` | | Mới |
+| `WeekSummary` | `week?` | `planner` | | Mới |
 
 Bỏ các tham số không ai dùng: `NewProject.blankCanvas`, `Project.tab`, `World.type`, `World.view`, `Preview.pageId`. Dàn khung và Thoại vẫn chuyển qua lại bằng `replace` trong `ModeSwitch`.
 

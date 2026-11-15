@@ -30,6 +30,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 20 | [Thống kê sáng tác](20-thong-ke-sang-tac.md) | Màn thống kê theo tuần, tháng, năm: số liệu lấy từ đâu, cái nào mới bắt đầu ghi, lưu ở đâu |
 | 21 | [Bài tập vẽ có hướng dẫn](21-bai-tap-ve.md) | 6 khóa, 18 bài đồ nét cho người mới: màn hình, cách chấm điểm, nối với chuỗi ngày vẽ và điểm Studio |
 | 22 | [Thư viện tham khảo](22-thu-vien-tham-khao.md) | Bảng ghim ảnh theo nhân vật, bối cảnh, tư thế; cửa sổ nổi khi vẽ; bảng SQLite, thư mục `refs/`, file `.manganova` |
+| 23 | [Lịch sáng tác và hạn chót](23-lich-sang-tac.md) | Hạn chót cho từng chương, chia trang theo ngày, lịch tháng, tổng kết tuần, nhắc theo kế hoạch |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
 
