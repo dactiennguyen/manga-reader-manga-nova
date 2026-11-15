@@ -22,6 +22,7 @@ import { handleWidgetLink } from '../features/home/widgetLink';
 import { useWidgetSync } from '../features/home/widgetSync';
 import { handleNearbyLink } from '../features/nearby/deepLink';
 import { RoomFollower } from '../features/nearby/RoomFollower';
+import { usePlannerUpkeep } from '../features/planner/usePlannerUpkeep';
 import { syncReminder } from '../features/profile/reminder';
 import { navigationRef } from '../state/navigation';
 import { appServices } from '../state/services';
@@ -89,6 +90,7 @@ function useThemeMode() {
 function Shell() {
   const locale = useAppLocale();
   useWidgetSync(locale);
+  usePlannerUpkeep();
   const { theme } = useUniwind();
   const dark = theme === 'dark';
   const [route, setRoute] = useState<string | undefined>();

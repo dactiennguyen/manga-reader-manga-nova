@@ -97,7 +97,7 @@ Thông báo cục bộ, không cần server. Giờ chọn trong danh sách 08:00
 | Android | `AlarmManager.setWindow` với cửa sổ 30 phút, nên không cần quyền báo thức chính xác. Mỗi lần báo thì tự hẹn ngày hôm sau. `ReminderReceiver` hẹn lại sau khi máy khởi động. Android 13 trở lên hỏi quyền `POST_NOTIFICATIONS` lúc bật |
 | iOS | `UNCalendarNotificationTrigger` lặp mỗi ngày. Hỏi quyền lúc bật |
 
-Chữ của thông báo cố định lúc hẹn, nên `AppRoot` hẹn lại mỗi khi mở app hoặc đổi ngôn ngữ. Người dùng từ chối quyền thì công tắc tự tắt và app báo cách bật lại.
+Chữ của thông báo cố định lúc hẹn, nên `AppRoot` hẹn lại mỗi khi mở app hoặc đổi ngôn ngữ. Khi có kế hoạch chương, câu nhắc nói số trang của ngày đó hoặc hạn chót sắp tới, và được hẹn lại cả khi sửa kế hoạch hay app vào nền (xem [20-lich-sang-tac.md](20-lich-sang-tac.md)). Người dùng từ chối quyền thì công tắc tự tắt và app báo cách bật lại.
 
 Đã thử trên emulator Android: hộp thoại xin quyền, báo thức được đăng ký, thông báo hiện lúc 20:00 (chỉnh đồng hồ emulator) và tự hẹn sang ngày sau.
 

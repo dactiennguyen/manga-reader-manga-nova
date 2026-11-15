@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { ArrowDownIcon, ArrowUpIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon, WarningIcon } from '../../ui/icons';
+import { ArrowDownIcon, ArrowUpIcon, CopyIcon, DeadlineIcon, DeleteIcon, EditIcon, PlusIcon, WarningIcon } from '../../ui/icons';
 
 import { t } from '../../core/i18n';
 import { CHAPTER_STATUS_LABEL, LIMITS } from '../../core/model/constants';
 import { chapterIdsOf, chapterName, chapterProgress, chapterStatus, scriptOutdated } from '../../core/model/selectors';
 import type { ID, Project, StoryData } from '../../core/model/types';
+import { doneOnDay } from '../../core/planner/data';
+import { viewPlan } from '../../core/planner/plan';
+import { STATUS_TONE, deadlineText, todayText } from '../../core/planner/words';
 import { actForNewChapter, canMoveChapterDown, canMoveChapterUp, chapterMove } from '../../core/story/chapterOrder';
+import { dayKey } from '../../core/util/time';
 import { useAppNavigation } from '../../state/navigation';
+import { usePlanner } from '../../state/usePlanner';
 import { undoStory, useStory } from '../../state/useStory';
 import {
   Badge,
@@ -25,6 +30,27 @@ import {
   toast,
   type MenuItem,
 } from '../../ui';
+
+/** The chapter's plan in one line: today's pages and the deadline. Nothing without a plan. */
+function PlanLine({ state, chapterId }: { state: StoryData; chapterId: ID }) {
+  const plan = usePlanner(s => s.plans[chapterId]);
+  const doneLog = usePlanner(s => s.doneLog);
+  if (!plan) {
+    return null;
+  }
+  const today = dayKey();
+  const { done } = chapterProgress(state, chapterId);
+  const view = viewPlan(plan, done, doneOnDay(doneLog, state, chapterId, today), today);
+  const tone = STATUS_TONE[view.status] === 'accent' ? 'secondary' : STATUS_TONE[view.status];
+  return (
+    <View className="flex-row items-center gap-1">
+      <Icon icon={DeadlineIcon} size={ICON.xs} color={tone === 'secondary' ? 'text-secondary' : tone} />
+      <Text variant="caption" tone={tone} numberOfLines={1} className="flex-1">
+        {`${todayText(view)} · ${t('Due {date}', { date: deadlineText(plan.deadline) })}`}
+      </Text>
+    </View>
+  );
+}
 
 function ChapterRow({
   state,
@@ -78,6 +104,7 @@ function ChapterRow({
           </Text>
         </View>
       )}
+      <PlanLine state={state} chapterId={chapterId} />
       {hasPages && (
         <View className="flex-row items-center gap-2">
           <View className="flex-1">
@@ -88,7 +115,7 @@ function ChapterRow({
           </Text>
         </View>
       )}
-      <View className="flex-row gap-2">
+      <View className="flex-row flex-wrap gap-2">
         <Button title={t('Script')} variant="ghost" small onPress={() => navigation.navigate('Script', { chapterId })} />
         <Button
           title={t('Storyboard')}
@@ -96,6 +123,7 @@ function ChapterRow({
           small
           onPress={() => navigation.navigate('Storyboard', { chapterId })}
         />
+        <Button title={t('Deadline')} variant="ghost" small onPress={() => navigation.navigate('ChapterPlan', { chapterId })} />
       </View>
     </Card>
   );

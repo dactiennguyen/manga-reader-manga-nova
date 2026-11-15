@@ -25,6 +25,7 @@ import { connectAssistant } from '../state/useAssistant';
 import { connectDubClips } from '../state/useDubClips';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
 import { connectNearbyShare, dropBorrowedStories } from '../state/useNearbyShare';
+import { connectPlanner } from '../state/usePlanner';
 import { connectStory, importEntities, useStory } from '../state/useStory';
 import { connectStudio } from '../state/useStudio';
 import { setHapticsEnabled, toast } from '../ui';
@@ -106,6 +107,8 @@ export async function boot(): Promise<void> {
   setHapticsEnabled(useSettings.getState().haptics);
   useSettings.subscribe(state => setHapticsEnabled(state.haptics));
   useStory.getState().purgeTrash();
+  // After the stories and the trash: it drops plans of deleted chapters and watches pages being marked done.
+  connectPlanner(meta);
   if (__DEV__) {
     console.log('GC dry run', collectGarbage(db, useStory.getState(), Date.now()));
   }

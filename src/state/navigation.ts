@@ -36,6 +36,11 @@ export type RootStackParamList = {
   Mailbox: undefined;
   Cards: { characterId?: ID } | undefined;
   Magazine: undefined;
+  // Creation calendar and deadlines
+  Calendar: undefined;
+  ChapterPlan: { chapterId: ID };
+  /** `week` is the Monday of the week shown, the current week when missing. */
+  WeekSummary: { week?: string } | undefined;
   // Play together nearby
   Nearby: undefined;
   Room: undefined;

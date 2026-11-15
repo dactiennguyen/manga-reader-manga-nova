@@ -15,6 +15,9 @@ import { PreferencesScreen } from '../features/onboarding/PreferencesScreen';
 import { WelcomeScreen } from '../features/onboarding/WelcomeScreen';
 import { OutlineScreen } from '../features/outline/OutlineScreen';
 import { PanelLayoutScreen } from '../features/page/PanelLayoutScreen';
+import { CalendarScreen } from '../features/planner/CalendarScreen';
+import { ChapterPlanScreen } from '../features/planner/ChapterPlanScreen';
+import { WeekSummaryScreen } from '../features/planner/WeekSummaryScreen';
 import { PreviewScreen } from '../features/preview/PreviewScreen';
 import { AboutScreen } from '../features/profile/AboutScreen';
 import { ProfileScreen } from '../features/profile/ProfileScreen';
@@ -140,6 +143,9 @@ export function RootNavigator() {
       <Stack.Screen name="Mailbox" component={MailboxScreen} />
       <Stack.Screen name="Cards" component={CardsScreen} />
       <Stack.Screen name="Magazine" component={MagazineScreen} />
+      <Stack.Screen name="Calendar" component={CalendarScreen} />
+      <Stack.Screen name="ChapterPlan" component={ChapterPlanScreen} />
+      <Stack.Screen name="WeekSummary" component={WeekSummaryScreen} />
       <Stack.Screen name="Nearby" component={NearbyScreen} />
       <Stack.Screen name="Room" component={RoomScreen} />
       <Stack.Screen name="CoDraw" component={CoDrawScreen} options={{ gestureEnabled: false, animation: 'fade' }} />

@@ -82,6 +82,8 @@ Cấu hình khi mở: `journal_mode=WAL`, `synchronous=NORMAL`, `foreign_keys=ON
 
 Khóa `artPresets` trong `meta` giữ bút và tông người dùng tự tạo, dạng một bản JSON (`src/core/art/presets.ts`). Chúng dùng chung cho mọi truyện. Bút và tông có sẵn nằm trong code, không ghi xuống.
 
+Khóa `planner` giữ kế hoạch và hạn chót của các chương, ngày từng trang được đánh dấu xong, và số trang dự kiến của các ngày đã qua. Không đi theo file `.manganova`. Xem [20-lich-sang-tac.md](20-lich-sang-tac.md).
+
 ## Lưu nét vẽ
 
 Nét vẽ không bao giờ bị sửa, chỉ thêm. Một lớp hiển thị các nét thỏa `gen = layer.gen AND seq < layer.head`.
