@@ -14,6 +14,7 @@ import {
   type SessionState,
   type Touch,
 } from '../src/core/art/session';
+import { DEFAULT_BRUSH } from '../src/core/art/brushes';
 import { STROKE_POINT_LIMIT } from '../src/core/art/strokes';
 import { screenToPage } from '../src/core/art/tools';
 
@@ -25,6 +26,7 @@ const baseEnv: SessionEnv = {
   opacity: 1,
   color: '#000000',
   tone: null,
+  brush: null,
   picking: false,
   stylusMode: false,
   pageW: 1000,
@@ -315,12 +317,44 @@ describe('drawing', () => {
   });
 
   it('adds tone to tools that take it, never to the eraser', () => {
-    const r = rig({ tool: 'brush', tone: 0.25 });
+    const r = rig({ tool: 'brush', tone: { density: 0.25 } });
     r.down(1, 300, 300);
     expect(r.state.stroke?.tone).toEqual({ density: 0.25 });
-    const e = rig({ tool: 'eraser', tone: 0.25 });
+    const e = rig({ tool: 'eraser', tone: { density: 0.25 } });
     e.down(1, 300, 300);
     expect(e.state.stroke?.tone).toBeUndefined();
+  });
+
+  it('adds a custom brush to the tools that take it, never to the eraser, shapes or fill', () => {
+    const custom = { ...DEFAULT_BRUSH, grain: 'pencil' as const };
+    for (const tool of ['gpen', 'pencil', 'brush'] as const) {
+      const r = rig({ tool, brush: custom });
+      r.down(1, 300, 300);
+      expect(r.state.stroke?.brush).toEqual(custom);
+    }
+    for (const tool of ['eraser', 'line', 'fill'] as const) {
+      const r = rig({ tool, brush: custom });
+      r.down(1, 300, 300);
+      expect(r.state.stroke?.brush).toBeUndefined();
+    }
+  });
+
+  it('lays a gradient fill over the area the lasso closed around', () => {
+    const tone = { density: 0.05, kind: 'gradient' as const, density2: 0.6, pitch: 6, angle: 45, span: [300, 100, 300, 500] as [number, number, number, number] };
+    const r = rig({ tool: 'fill', tone });
+    r.down(1, 200, 200);
+    r.move(1, 260, 200);
+    r.move(1, 260, 300);
+    r.move(1, 200, 300);
+    r.up(1);
+    const commit = r.find('strokeCommit');
+    expect(commit.stroke.tone?.span).toEqual([230, 200, 230, 300]);
+    // A brush paints through a gradient laid over the panel, as chosen.
+    const b = rig({ tool: 'brush', tone });
+    b.down(1, 200, 200);
+    b.move(1, 260, 200);
+    b.up(1);
+    expect(b.find('strokeCommit').stroke.tone?.span).toEqual([300, 100, 300, 500]);
   });
 
   it('refuses a locked, hidden or missing layer', () => {

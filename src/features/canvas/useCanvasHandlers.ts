@@ -5,8 +5,11 @@ import { HOLD_MS, TAP_MS, type SessionEnv } from '../../core/art/session';
 import { t } from '../../core/i18n';
 import type { PanelShape } from '../../core/layout/layout';
 import type { ID } from '../../core/model/types';
+import { strokeToolOf } from '../../core/art/tools';
 import { sampleArtColor } from '../../render/drawArt';
+import { strokeShader } from '../../render/strokeStyle';
 import { loadArt, redoArt, undoArt } from '../../state/artStore';
+import { toneForChoice, useArtPresets } from '../../state/useArtPresets';
 import { toast } from '../../ui';
 import type { CanvasDoc } from './useCanvasDoc';
 import type { CanvasEngine, EngineHandlers, JsEffect, StrokeMeta } from './useCanvasEngine';
@@ -159,9 +162,13 @@ export function useCanvasEnv({
   stylusMode: boolean;
   area: { w: number; h: number };
 }): void {
-  const { env, frameBox } = engine;
+  const { env, frameBox, shader } = engine;
   const { active } = doc;
   const { tool, size, opacity, color, activeTone, picking } = tools;
+  const brush = tools.brush?.brush ?? null;
+  const presets = useArtPresets();
+  // Recomputed when the chosen preset is edited, so the next stroke uses the new numbers.
+  const tone = useMemo(() => toneForChoice(presets, activeTone, shape.bbox), [activeTone, presets, shape.bbox]);
   const moving = tool === 'move';
   const bounds = useMemo(() => {
     // From the store: doc.art does not follow every stroke.
@@ -175,7 +182,8 @@ export function useCanvasEnv({
       size,
       opacity,
       color,
-      tone: activeTone,
+      tone,
+      brush,
       picking,
       stylusMode,
       pageW,
@@ -184,8 +192,10 @@ export function useCanvasEnv({
       poly: shape.poly,
       layer: active ? { id: active.id, locked: active.locked, visible: active.visible, bounds } : null,
     };
+    // Built here, on the JS thread, so the UI thread records nothing when a stroke starts.
+    shader.value = strokeShader({ tool: strokeToolOf(tool), color, tone: tone ?? undefined, brush: brush ?? undefined });
     env.value = next;
-  }, [active, activeTone, area, bounds, color, env, opacity, pageW, picking, shape, size, stylusMode, tool]);
+  }, [active, area, bounds, brush, color, env, opacity, pageW, picking, shader, shape, size, stylusMode, tone, tool]);
 
   useEffect(() => {
     frameBox.value = active?.visible ? bounds : null;

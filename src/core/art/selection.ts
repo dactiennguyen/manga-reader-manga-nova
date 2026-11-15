@@ -1,6 +1,7 @@
 import type { Stroke } from '../model/types';
 import { affineScale, applyAffine, keepsAxes, type Affine } from './affine';
 import { layerBounds, shapeBox, strokeStep, type Box } from './artMath';
+import { mapToneSpan } from './tone';
 
 /**
  * Picking strokes with a lasso and writing a transform into them. A stroke is selected when more than half
@@ -180,6 +181,14 @@ export function ellipseOutline(stroke: Pick<Stroke, 'points'>): number[] {
  * describe it, so the rectangle becomes a filled ring and the ellipse a freehand outline of the same shape.
  */
 export function transformStrokeAffine(stroke: Stroke, m: Affine): Stroke {
+  const moved = transformShape(stroke, m);
+  if (stroke.tone?.span) {
+    moved.tone = mapToneSpan(stroke.tone, (x, y) => applyAffine(m, x, y));
+  }
+  return moved;
+}
+
+function transformShape(stroke: Stroke, m: Affine): Stroke {
   const size = Math.max(0.1, round2(stroke.size * affineScale(m)));
   if ((stroke.tool === 'rect' || stroke.tool === 'ellipse') && stroke.points.length >= 4 && !keepsAxes(m)) {
     // Neither result has pressure values in its points.

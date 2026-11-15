@@ -1,12 +1,17 @@
 import * as affine from '../src/core/art/affine';
 import * as artMath from '../src/core/art/artMath';
+import * as brushes from '../src/core/art/brushes';
+import * as dabs from '../src/core/art/dabs';
 import * as freehand from '../src/core/art/freehand';
 import * as liveOutline from '../src/core/art/liveOutline';
 import * as session from '../src/core/art/session';
 import * as strokes from '../src/core/art/strokes';
+import * as tone from '../src/core/art/tone';
+import * as guides from '../src/core/art/guides';
 import * as drawArt from '../src/render/drawArt';
 import * as liveStroke from '../src/render/liveStroke';
 import * as selectionScene from '../src/render/selectionScene';
+import * as strokeStyle from '../src/render/strokeStyle';
 
 jest.mock('@shopify/react-native-skia', () => require('./helpers/fakeSkia'));
 
@@ -55,6 +60,27 @@ describe('worklet closures', () => {
     ['buildStrokePath', drawArt.buildStrokePath],
     ['buildStrokePaint', drawArt.buildStrokePaint],
     ['makeToneShader', drawArt.makeToneShader],
+    ['drawDabs', drawArt.drawDabs],
+    ['buildStrokeWalk', drawArt.buildStrokeWalk],
+    ['walkerEnd', drawArt.walkerEnd],
+    ['gradientToneShader', strokeStyle.gradientToneShader],
+    ['renderKind', strokes.renderKind],
+    ['toolEasing', strokes.toolEasing],
+    ['strokeBrush', brushes.strokeBrush],
+    ['resolveBrush', brushes.resolveBrush],
+    ['edgeSoftness', brushes.edgeSoftness],
+    ['createDabWalker', dabs.createDabWalker],
+    ['dabSpecOf', dabs.dabSpecOf],
+    ['feedDabs', dabs.feedDabs],
+    ['settledDabs', dabs.settledDabs],
+    ['dabRadius', dabs.dabRadius],
+    ['walkStroke', dabs.walkStroke],
+    ['resolveTone', tone.resolveTone],
+    ['fitToneToBox', tone.fitToneToBox],
+    ['pairsBox', tone.pairsBox],
+    ['mapToneSpan', tone.mapToneSpan],
+    ['hash01', tone.hash01],
+    ['mirrorStroke', guides.mirrorStroke],
     ['beginLiveStroke', liveStroke.beginLiveStroke],
     ['recordLiveStroke', liveStroke.recordLiveStroke],
     ['pendingFrom', liveStroke.pendingFrom],

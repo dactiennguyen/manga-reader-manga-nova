@@ -219,7 +219,50 @@ export type Page = {
 
 export type StrokeTool = 'gpen' | 'pencil' | 'brush' | 'eraser' | 'line' | 'rect' | 'ellipse' | 'fill';
 
-export type StrokeTone = { density: number };
+export type ToneKind = 'dots' | 'lines' | 'cross' | 'noise' | 'gradient';
+
+/**
+ * The screentone a stroke is painted with. Strokes from before custom tones carry only `density`: dots
+ * TONE_PITCH apart at 45 degrees. Every other field is the parameter the tone was drawn with, so editing
+ * or deleting a tone preset never changes a stroke. Rules and limits are in core/art/tone.
+ */
+export type StrokeTone = {
+  /** Share of the area inked, 0 to 1. Lines and cross-hatch keep weight / pitch here for older readers. */
+  density: number;
+  /** Missing on old strokes, which are dots. */
+  kind?: ToneKind;
+  /** Distance between dots or lines, or the grain size of sand, in page units. */
+  pitch?: number;
+  /** Screen angle in degrees. */
+  angle?: number;
+  /** Line width of lines and cross-hatch, in page units. */
+  weight?: number;
+  /** Gradient: the density at the far end. */
+  density2?: number;
+  /** Gradient: where it starts and ends on the page, as x0, y0, x1, y1. */
+  span?: [number, number, number, number];
+};
+
+export type BrushGrain = 'none' | 'pencil' | 'dry' | 'charcoal' | 'spatter';
+
+/**
+ * How a custom brush draws, stored on each of its strokes for the same reason as StrokeTone. A stroke
+ * without it draws the way its tool always did. Rules and limits are in core/art/brushes.
+ */
+export type StrokeBrush = {
+  /** 0 to 1: how much pressure changes the width. */
+  pressureSize: number;
+  /** 0 to 1: how much light pressure fades the ink. */
+  pressureOpacity: number;
+  /** 0 to 1: 1 is a crisp edge, lower blurs it. */
+  hardness: number;
+  /** Length of the thin start and end, in multiples of the size. */
+  taperStart: number;
+  taperEnd: number;
+  /** 0 to 1: higher steadies the line and trails the pen more. */
+  smoothing: number;
+  grain: BrushGrain;
+};
 
 export type Stroke = {
   tool: StrokeTool;
@@ -229,6 +272,7 @@ export type Stroke = {
   points: number[];
   pressure?: boolean;
   tone?: StrokeTone;
+  brush?: StrokeBrush;
 };
 
 export type LayerImage = { uri: string; x: number; y: number; w: number; h: number };

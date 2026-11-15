@@ -20,6 +20,7 @@ const baseEnv: SessionEnv = {
   opacity: 1,
   color: '#000000',
   tone: null,
+  brush: null,
   picking: false,
   stylusMode: false,
   pageW: 1000,

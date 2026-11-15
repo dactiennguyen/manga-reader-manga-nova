@@ -1,13 +1,12 @@
 import {
   AlphaType,
   BlendMode,
+  BlurStyle,
   ColorType,
-  FilterMode,
   PaintStyle,
   Skia,
   StrokeCap,
   StrokeJoin,
-  TileMode,
   type SkCanvas,
   type SkPaint,
   type SkPath,
@@ -15,11 +14,16 @@ import {
   type SkShader,
 } from '@shopify/react-native-skia';
 
-import { TONE_PITCH, isFillTool, isShapeTool, shapeBox, toneRadius } from '../core/art/artMath';
+import { shapeBox } from '../core/art/artMath';
+import { edgeSoftness, strokeBrush } from '../core/art/brushes';
+import { DAB_STRIDE, DROP_STRIDE, dabRadius, walkStroke, type DabWalker } from '../core/art/dabs';
 import { getStroke } from '../core/art/freehand';
-import { freehandOptions, isOutlineTool, toTriples } from '../core/art/strokes';
+import { freehandOptions, renderKind, toTriples } from '../core/art/strokes';
 import type { ArtLayer, ID, PanelArt, Stroke } from '../core/model/types';
 import { getImage } from './images';
+import { makeToneShader, strokeShader } from './strokeStyle';
+
+export { makeToneShader };
 
 export type ArtDrawOptions = { skipLayerId?: ID; onlyLayerIds?: ID[] };
 
@@ -101,38 +105,27 @@ export function closedPath(points: number[][]): SkPath | null {
   return builder.build();
 }
 
+/** The stroke's filled or stroked path. Null for a dab stroke, which has no single path (see drawDabs). */
 export function buildStrokePath(stroke: Stroke, last: boolean): SkPath | null {
   'worklet';
-  if (isShapeTool(stroke.tool)) {
+  const kind = renderKind(stroke);
+  if (kind === 'shape') {
     return shapePath(stroke);
   }
-  if (isFillTool(stroke.tool)) {
+  if (kind === 'fill') {
     return closedPath(toTriples({ points: stroke.points }));
+  }
+  if (kind === 'dabs') {
+    return null;
   }
   const points = toTriples(stroke);
   if (!points.length) {
     return null;
   }
-  if (isOutlineTool(stroke.tool)) {
+  if (kind === 'outline') {
     return outlinePath(getStroke(points, freehandOptions(stroke, last)));
   }
   return centerPath(points);
-}
-
-export function makeToneShader(color: string, density: number): SkShader {
-  'worklet';
-  const rect = Skia.XYWHRect(0, 0, TONE_PITCH, TONE_PITCH);
-  const recorder = Skia.PictureRecorder();
-  const canvas = recorder.beginRecording(rect);
-  const paint = Skia.Paint();
-  paint.setAntiAlias(true);
-  paint.setColor(Skia.Color(color));
-  canvas.drawCircle(TONE_PITCH / 2, TONE_PITCH / 2, toneRadius(density), paint);
-  const matrix = Skia.Matrix();
-  matrix.rotate(Math.PI / 4);
-  return recorder
-    .finishRecordingAsPicture()
-    .makeShader(TileMode.Repeat, TileMode.Repeat, FilterMode.Linear, matrix, rect);
 }
 
 export function buildStrokePaint(stroke: Stroke, shader: SkShader | null): SkPaint {
@@ -148,7 +141,16 @@ export function buildStrokePaint(stroke: Stroke, shader: SkShader | null): SkPai
       paint.setShader(shader);
     }
   }
-  if (isOutlineTool(stroke.tool) || isFillTool(stroke.tool)) {
+  const custom = strokeBrush(stroke);
+  if (custom) {
+    const soft = edgeSoftness(custom, stroke.size);
+    if (soft > 0) {
+      // Follows the zoom, so a soft edge looks the same on screen and in an export.
+      paint.setMaskFilter(Skia.MaskFilter.MakeBlur(BlurStyle.Normal, soft, true));
+    }
+  }
+  const kind = renderKind(stroke);
+  if (kind === 'outline' || kind === 'fill' || kind === 'dabs') {
     paint.setStyle(PaintStyle.Fill);
   } else {
     paint.setStyle(PaintStyle.Stroke);
@@ -159,24 +161,69 @@ export function buildStrokePaint(stroke: Stroke, shader: SkShader | null): SkPai
   return paint;
 }
 
-const toneCache = new Map<string, SkShader>();
-
-export function toneShader(color: string, density: number): SkShader {
-  const key = `${color}|${density}`;
-  const cached = toneCache.get(key);
-  if (cached) {
-    return cached;
-  }
-  const shader = makeToneShader(color, density);
-  if (toneCache.size >= 64) {
-    toneCache.clear();
-  }
-  toneCache.set(key, shader);
-  return shader;
+export function strokePaint(stroke: Stroke): SkPaint {
+  return buildStrokePaint(stroke, strokeShader(stroke));
 }
 
-export function strokePaint(stroke: Stroke): SkPaint {
-  return buildStrokePaint(stroke, stroke.tone ? toneShader(stroke.color, stroke.tone.density) : null);
+/**
+ * Draws dabs and droplets from `from` up to `to`, with the end taper for the walk's current length. Dab
+ * alpha replaces the paint's own, which is the stroke's opacity, so droplets get that back.
+ */
+export function drawDabs(
+  canvas: SkCanvas,
+  w: DabWalker,
+  paint: SkPaint,
+  from: { dabs: number; drops: number },
+  to: { dabs: number; drops: number },
+): void {
+  'worklet';
+  const { dabs, drops } = w;
+  for (let i = from.dabs; i < to.dabs; i++) {
+    const at = i * DAB_STRIDE;
+    const r = dabRadius(w, dabs[at + 2], dabs[at + 4]);
+    if (r > 0.02) {
+      paint.setAlphaf(dabs[at + 3]);
+      canvas.drawCircle(dabs[at], dabs[at + 1], r, paint);
+    }
+  }
+  if (to.drops > from.drops) {
+    paint.setAlphaf(w.spec.opacity);
+    for (let i = from.drops; i < to.drops; i++) {
+      const at = i * DROP_STRIDE;
+      const r = dabRadius(w, drops[at + 2], drops[at + 3]);
+      if (r > 0.02) {
+        canvas.drawCircle(drops[at], drops[at + 1], r, paint);
+      }
+    }
+  }
+}
+
+export function walkerEnd(w: DabWalker): { dabs: number; drops: number } {
+  'worklet';
+  return { dabs: Math.floor(w.dabs.length / DAB_STRIDE), drops: Math.floor(w.drops.length / DROP_STRIDE) };
+}
+
+export const WALK_START = { dabs: 0, drops: 0 };
+
+/** The dab walk of a stroke that has dabs or spatter, or null. */
+export function buildStrokeWalk(stroke: Stroke): DabWalker | null {
+  'worklet';
+  const custom = strokeBrush(stroke);
+  if (!custom || (renderKind(stroke) !== 'dabs' && custom.grain !== 'spatter')) {
+    return null;
+  }
+  return walkStroke(stroke, custom);
+}
+
+const walkCache = new WeakMap<Stroke, DabWalker | null>();
+
+function strokeWalk(stroke: Stroke): DabWalker | null {
+  if (walkCache.has(stroke)) {
+    return walkCache.get(stroke) ?? null;
+  }
+  const walk = buildStrokeWalk(stroke);
+  walkCache.set(stroke, walk);
+  return walk;
 }
 
 const pathCache = new WeakMap<Stroke, SkPath | null>();
@@ -190,9 +237,34 @@ export function strokePath(stroke: Stroke): SkPath | null {
   return path;
 }
 
+const dabPictures = new WeakMap<Stroke, SkPicture>();
+
+/**
+ * A stroke with dabs is recorded once into its own picture. A layer re-records its unsealed strokes after
+ * every new stroke, and replaying hundreds of dabs each time would stall the JS thread.
+ */
+function dabPicture(stroke: Stroke, path: SkPath | null, walk: DabWalker): SkPicture {
+  const cached = dabPictures.get(stroke);
+  if (cached) {
+    return cached;
+  }
+  const picture = recordPicture(canvas => {
+    const paint = strokePaint(stroke);
+    if (path) {
+      canvas.drawPath(path, paint);
+    }
+    drawDabs(canvas, walk, paint, WALK_START, walkerEnd(walk));
+  });
+  dabPictures.set(stroke, picture);
+  return picture;
+}
+
 export function drawStroke(canvas: SkCanvas, stroke: Stroke): void {
   const path = strokePath(stroke);
-  if (path) {
+  const walk = strokeWalk(stroke);
+  if (walk) {
+    canvas.drawPicture(dabPicture(stroke, path, walk));
+  } else if (path) {
     canvas.drawPath(path, strokePaint(stroke));
   }
 }

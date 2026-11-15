@@ -1,6 +1,7 @@
 import { msg } from '../i18n';
 import type { Stroke } from '../model/types';
 import { isFillTool, isShapeTool, type Box } from './artMath';
+import { mapToneSpan } from './tone';
 
 /**
  * Rulers for the canvas. Symmetry repeats a stroke across a vertical axis. Perspective bends a stroke onto
@@ -149,5 +150,9 @@ export function mirrorStroke(stroke: Stroke, axis: number): Stroke {
   for (let i = 0; i < points.length; i += step) {
     points[i] = Math.round((axis * 2 - points[i]) * 10) / 10;
   }
-  return { ...stroke, points };
+  const out: Stroke = { ...stroke, points };
+  if (stroke.tone?.span) {
+    out.tone = mapToneSpan(stroke.tone, (x, y) => ({ x: axis * 2 - x, y }));
+  }
+  return out;
 }

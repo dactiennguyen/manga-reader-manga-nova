@@ -148,6 +148,7 @@ export { StopCircleIcon as StopIcon } from 'phosphor-react-native/src/icons/Stop
 export { FlameIcon as StreakIcon } from 'phosphor-react-native/src/icons/Flame';
 export { SquaresFourIcon as TemplatesIcon } from 'phosphor-react-native/src/icons/SquaresFour';
 export { ClockIcon as TimeIcon } from 'phosphor-react-native/src/icons/Clock';
+export { DotsNineIcon as ToneIcon } from 'phosphor-react-native/src/icons/DotsNine';
 export { FilmSlateIcon as TrailerIcon } from 'phosphor-react-native/src/icons/FilmSlate';
 export { TranslateIcon as TranslateIcon } from 'phosphor-react-native/src/icons/Translate';
 export { ArrowUUpLeftIcon as UndoIcon } from 'phosphor-react-native/src/icons/ArrowUUpLeft';

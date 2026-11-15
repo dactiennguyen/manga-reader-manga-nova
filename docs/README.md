@@ -14,7 +14,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 4 | [Dữ liệu](04-du-lieu.md) | Schema SQLite, lưu nét vẽ, dọn rác, nhập file `.manganova` |
 | 5 | [Design system](05-design-system.md) | Token màu, chữ, thành phần, bố cục Studio |
 | 6 | [Màn hình](06-man-hinh.md) | Route, việc của từng màn, hành vi phải giữ |
-| 7 | [Canvas](07-canvas.md) | Thiết kế engine vẽ và các ngưỡng kiểm chứng |
+| 7 | [Canvas](07-canvas.md) | Thiết kế engine vẽ, bút và tông tùy chỉnh, các ngưỡng kiểm chứng |
 | 8 | [Chuyển code cũ](08-chuyen-code-cu.md) | File nào chép, sửa, viết lại; lỗi cũ phải sửa |
 | 9 | [Lộ trình](09-lo-trinh.md) | Các giai đoạn và điều kiện hoàn thành |
 | 10 | [Kiểm thử và phát hành](10-kiem-thu-va-phat-hanh.md) | Test, CI, ký app, đưa lên Google Play |
