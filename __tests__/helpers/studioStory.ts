@@ -36,6 +36,7 @@ export function zeroMetrics(patch: Partial<Metrics> = {}): Metrics {
     activeDays: 0,
     promptsDone: 0,
     giftsOpened: 0,
+    lessonsDone: 0,
     ...patch,
   };
 }

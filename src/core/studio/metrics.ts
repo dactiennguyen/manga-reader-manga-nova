@@ -78,13 +78,14 @@ export function wordCount(text: string): number {
   return count;
 }
 
-/** Every count the studio rules read, from what the person made and how often they drew. */
+/** Every count the studio rules read, from what the person made, how often they drew and the lessons done. */
 export function metricsOf(
   state: StoryData,
   activity: Activity,
   studio: StudioState,
   today: string,
   hasArt: (panelId: ID) => boolean,
+  lessonsDone = 0,
 ): Metrics {
   const live = liveProjectIds(state);
   const projects = Object.values(state.projects).filter(project => live.has(project.id));
@@ -163,6 +164,7 @@ export function metricsOf(
     activeDays: Object.keys(activity.days).length,
     promptsDone: Object.keys(studio.promptDays).length,
     giftsOpened: studio.giftsOpened.length,
+    lessonsDone,
   };
 }
 

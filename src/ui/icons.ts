@@ -40,11 +40,13 @@ export { CheckCircleIcon as DoneIcon } from 'phosphor-react-native/src/icons/Che
 export { NotePencilIcon as EditFileIcon } from 'phosphor-react-native/src/icons/NotePencil';
 export { PencilSimpleIcon as EditIcon } from 'phosphor-react-native/src/icons/PencilSimple';
 export { WindIcon as EffectIcon } from 'phosphor-react-native/src/icons/Wind';
+export { EyeIcon as EyesIcon } from 'phosphor-react-native/src/icons/Eye';
 export { EraserIcon as EraserIcon } from 'phosphor-react-native/src/icons/Eraser';
 export { CalendarDotsIcon as EventIcon } from 'phosphor-react-native/src/icons/CalendarDots';
 export { ArrowsOutIcon as ExpandIcon } from 'phosphor-react-native/src/icons/ArrowsOut';
 export { ExportIcon as ExportIcon } from 'phosphor-react-native/src/icons/Export';
 export { EyedropperIcon as EyedropperIcon } from 'phosphor-react-native/src/icons/Eyedropper';
+export { SmileyIcon as FaceIcon } from 'phosphor-react-native/src/icons/Smiley';
 export { PaintBucketIcon as FillIcon } from 'phosphor-react-native/src/icons/PaintBucket';
 export { CornersOutIcon as FitIcon } from 'phosphor-react-native/src/icons/CornersOut';
 export { FlagIcon as FlagIcon } from 'phosphor-react-native/src/icons/Flag';
@@ -54,6 +56,7 @@ export { ArrowRightIcon as ForwardIcon } from 'phosphor-react-native/src/icons/A
 export { PenNibIcon as GPenIcon } from 'phosphor-react-native/src/icons/PenNib';
 export { GridFourIcon as GridIcon } from 'phosphor-react-native/src/icons/GridFour';
 export { HandIcon as HandIcon } from 'phosphor-react-native/src/icons/Hand';
+export { HandPalmIcon as HandsIcon } from 'phosphor-react-native/src/icons/HandPalm';
 export { EyeSlashIcon as HiddenIcon } from 'phosphor-react-native/src/icons/EyeSlash';
 export { ClockCounterClockwiseIcon as HistoryIcon } from 'phosphor-react-native/src/icons/ClockCounterClockwise';
 export { HouseIcon as HomeIcon } from 'phosphor-react-native/src/icons/House';
@@ -66,6 +69,7 @@ export { PathIcon as JourneyIcon } from 'phosphor-react-native/src/icons/Path';
 export { LassoIcon as LassoIcon } from 'phosphor-react-native/src/icons/Lasso';
 export { StackIcon as LayersIcon } from 'phosphor-react-native/src/icons/Stack';
 export { SignOutIcon as LeaveIcon } from 'phosphor-react-native/src/icons/SignOut';
+export { GraduationCapIcon as LessonsIcon } from 'phosphor-react-native/src/icons/GraduationCap';
 export { BooksIcon as LibraryIcon } from 'phosphor-react-native/src/icons/Books';
 export { LineSegmentIcon as LineIcon } from 'phosphor-react-native/src/icons/LineSegment';
 export { ListIcon as ListIcon } from 'phosphor-react-native/src/icons/List';
@@ -93,6 +97,7 @@ export { PaletteIcon as PaletteIcon } from 'phosphor-react-native/src/icons/Pale
 export { FrameCornersIcon as PanelFrameIcon } from 'phosphor-react-native/src/icons/FrameCorners';
 export { LayoutIcon as PanelsIcon } from 'phosphor-react-native/src/icons/Layout';
 export { PauseIcon as PauseIcon } from 'phosphor-react-native/src/icons/Pause';
+export { ScribbleLoopIcon as PenControlIcon } from 'phosphor-react-native/src/icons/ScribbleLoop';
 export { PencilLineIcon as PenLineIcon } from 'phosphor-react-native/src/icons/PencilLine';
 export { PencilIcon as PencilToolIcon } from 'phosphor-react-native/src/icons/Pencil';
 export { MapPinIcon as PlaceIcon } from 'phosphor-react-native/src/icons/MapPin';

@@ -25,6 +25,7 @@ export const POINT_WEIGHTS: Partial<Record<MetricKey, number>> = {
   bestStreak: 20,
   activeDays: 10,
   promptsDone: 25,
+  lessonsDone: 20,
 };
 
 /** Points from each metric, largest first, for a breakdown. */

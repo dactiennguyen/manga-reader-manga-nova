@@ -9,6 +9,10 @@ import { CanvasScreen } from '../features/canvas/CanvasScreen';
 import { CharacterScreen } from '../features/characters/CharacterScreen';
 import { ExportScreen } from '../features/export/ExportScreen';
 import { HomeScreen } from '../features/home/HomeScreen';
+import { CoursesScreen } from '../features/lessons/CoursesScreen';
+import { LessonScreen } from '../features/lessons/LessonScreen';
+import { PracticeScreen } from '../features/lessons/PracticeScreen';
+import { ResultScreen } from '../features/lessons/ResultScreen';
 import { LetteringScreen } from '../features/lettering/LetteringScreen';
 import { LibraryScreen } from '../features/library/LibraryScreen';
 import { PreferencesScreen } from '../features/onboarding/PreferencesScreen';
@@ -142,6 +146,10 @@ export function RootNavigator() {
       <Stack.Screen name="Mailbox" component={MailboxScreen} />
       <Stack.Screen name="Cards" component={CardsScreen} />
       <Stack.Screen name="Magazine" component={MagazineScreen} />
+      <Stack.Screen name="Courses" component={CoursesScreen} />
+      <Stack.Screen name="Lesson" component={LessonScreen} />
+      <Stack.Screen name="LessonPractice" component={PracticeScreen} options={{ gestureEnabled: false, animation: 'fade' }} />
+      <Stack.Screen name="LessonResult" component={ResultScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="Nearby" component={NearbyScreen} />
       <Stack.Screen name="Room" component={RoomScreen} />
       <Stack.Screen name="CoDraw" component={CoDrawScreen} options={{ gestureEnabled: false, animation: 'fade' }} />
