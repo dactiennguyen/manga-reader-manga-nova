@@ -8,7 +8,7 @@ import type { BlockType, Bubble, DialogueKind, ID, Stroke } from '../model/types
 import type { ScriptDoc, ScriptOp, SharedBlock } from './scriptTogether';
 
 /** Bumped when a message changes shape, so an older app can say "update to join" instead of breaking. */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 /** The Bonjour / NSD service type rooms are advertised under. Info.plist NSBonjourServices must match. */
 export const SERVICE_TYPE = '_manganova._tcp';
@@ -22,6 +22,8 @@ export type Member = {
   /** Index into a fixed set of ink colours, so each person's cursor and strokes are told apart. */
   color: number;
   host: boolean;
+  /** A random key this person's phone keeps (safety.ts), so someone blocked stays blocked in later rooms. Set by the host. */
+  key?: string;
 };
 
 export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'guess' | 'script' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka';
@@ -61,9 +63,10 @@ export type RemoteStroke = { pageId: ID; panelId: ID; layerKey: string; stroke: 
 export type Message =
   // Joining and leaving
   /** `rejoin` is the member id a guest had before a short Wi-Fi blip, so it keeps its colour and place. */
-  | { t: 'hello'; v: number; token: string; name: string; app: string; rejoin?: MemberId }
+  | { t: 'hello'; v: number; token: string; name: string; app: string; rejoin?: MemberId; key?: string }
   | { t: 'welcome'; v: number; you: MemberId; room: RoomState }
-  | { t: 'refused'; reason: 'token' | 'version' | 'full' | 'started' }
+  /** `removed`: the host took this person out of the room, or blocked them. Also sent mid-room, before the link closes. */
+  | { t: 'refused'; reason: 'token' | 'version' | 'full' | 'started' | 'removed' }
   | { t: 'room'; room: RoomState }
   | { t: 'bye'; from: MemberId }
   /** `at` is the guest's clock when it pinged; the host echoes it with its own clock, for clock sync. */

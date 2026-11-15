@@ -12,6 +12,7 @@
 		0C80B921A6F3F58F76C31292 /* libPods-Manganova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-Manganova.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2927F33507FF7D6BE6912C81 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1396CC6D18D6A36F83C82739 /* Inter-Regular.ttf */; };
+		51E51E512617D7796EA16B88 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C3CF3A9027A3DFAFFC7FAB57 /* InfoPlist.strings */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
 		784CEAA1ACC1C5F09521FEC6 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5231BB6E1456161C48C1C6D8 /* Inter-Medium.ttf */; };
@@ -31,8 +32,12 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Manganova/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Manganova/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Manganova/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		20E5DBDB99F0FA15DB450122 /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = Manganova/id.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		28A7A40529703ADC7716925A /* th */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = th; path = Manganova/th.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3A1193224514E4E2688BE307 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-Manganova.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Manganova.debug.xcconfig"; path = "Target Support Files/Pods-Manganova/Pods-Manganova.debug.xcconfig"; sourceTree = "<group>"; };
+		3BAB79E674E8712E2FE45340 /* ja */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ja; path = Manganova/ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		42D09651C423B78EFE88CA3E /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = Manganova/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4B6B358A749F7DD9C731A022 /* lantern.manganova */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = lantern.manganova; path = ../android/app/src/main/assets/sample/lantern.manganova; sourceTree = "<group>"; };
 		5231BB6E1456161C48C1C6D8 /* Inter-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-Manganova.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Manganova.release.xcconfig"; path = "Target Support Files/Pods-Manganova/Pods-Manganova.release.xcconfig"; sourceTree = "<group>"; };
@@ -42,11 +47,17 @@
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Manganova/SceneDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Manganova/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		892BBAFBB4E3776C17D03661 /* NativeSpeechModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeSpeechModule.mm; path = Manganova/NativeSpeechModule.mm; sourceTree = "<group>"; };
+		8AE113E612B29AA314425B91 /* vi */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = vi; path = Manganova/vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9AB430CC482E58B9DE437B40 /* NativeFilesModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeFilesModule.mm; path = Manganova/NativeFilesModule.mm; sourceTree = "<group>"; };
 		A2C1E0F365EC2A25C73CD7F9 /* LinkPresentation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LinkPresentation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/LinkPresentation.framework; sourceTree = DEVELOPER_DIR; };
+		A3D0AC7D34C2185BFD69D951 /* pt-BR */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "Manganova/pt-BR.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		A6D8D20D49AF56133590D654 /* NativeScreenModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeScreenModule.mm; path = Manganova/NativeScreenModule.mm; sourceTree = "<group>"; };
+		CAC56D197E48C80CE8FF367D /* zh-Hant */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Manganova/zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		D1F0B210EF4808D2473FA108 /* NativeReminderModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = NativeReminderModule.mm; path = Manganova/NativeReminderModule.mm; sourceTree = "<group>"; };
+		E3D55C45947050260C2C29FB /* es */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = es; path = Manganova/es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F33CB0F288422F91B961FE54 /* ko */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ko; path = Manganova/ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F562CC6BF9A07F1BDE6BBEB2 /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Manganova/zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		F87F75DA6B05D3A18DFA001A /* Manganova-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "Manganova-Bridging-Header.h"; path = "Manganova/Manganova-Bridging-Header.h"; sourceTree = "<group>"; };
 		FB533DA9115CACD99C92368D /* NativeScreenModule.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = NativeScreenModule.h; path = Manganova/NativeScreenModule.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +101,7 @@
 				9AB430CC482E58B9DE437B40 /* NativeFilesModule.mm */,
 				F87F75DA6B05D3A18DFA001A /* Manganova-Bridging-Header.h */,
 				892BBAFBB4E3776C17D03661 /* NativeSpeechModule.mm */,
+				C3CF3A9027A3DFAFFC7FAB57 /* InfoPlist.strings */,
 			);
 			name = Manganova;
 			sourceTree = "<group>";
@@ -197,6 +209,15 @@
 			knownRegions = (
 				en,
 				Base,
+				vi,
+				ja,
+				"zh-Hans",
+				"zh-Hant",
+				ko,
+				es,
+				"pt-BR",
+				id,
+				th,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -221,6 +242,7 @@
 				A89B8265A64A8AE3E8FAFADE /* Inter-Bold.ttf in Resources */,
 				BA44EB367C1AA207A434695A /* PrivacyInfo.xcprivacy in Resources */,
 				0801C5B6B1D1ECAEA42BA0E8 /* lantern.manganova in Resources */,
+				51E51E512617D7796EA16B88 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,6 +338,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		C3CF3A9027A3DFAFFC7FAB57 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				42D09651C423B78EFE88CA3E /* en */,
+				8AE113E612B29AA314425B91 /* vi */,
+				3BAB79E674E8712E2FE45340 /* ja */,
+				F562CC6BF9A07F1BDE6BBEB2 /* zh-Hans */,
+				CAC56D197E48C80CE8FF367D /* zh-Hant */,
+				F33CB0F288422F91B961FE54 /* ko */,
+				E3D55C45947050260C2C29FB /* es */,
+				A3D0AC7D34C2185BFD69D951 /* pt-BR */,
+				20E5DBDB99F0FA15DB450122 /* id */,
+				28A7A40529703ADC7716925A /* th */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {

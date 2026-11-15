@@ -28,7 +28,7 @@ Màn phòng (`RoomScreen`) cho chủ phòng chọn hoạt động. `RoomFollower
 - **Định dạng.** Mỗi dòng là một JSON `{m, from?, to?}`, được kiểm tra bằng zod trong `schema.ts`. Dữ liệu lớn (truyện, ảnh, tiếng) được chia thành `blob` 48 KB. Có ba đường dừng một blob: người nhận bỏ dở thì sau `BLOB_IDLE_TIMEOUT` blob tự hủy, người gửi gọi `cancel()`, hoặc mạng rớt thì blob báo lỗi chứ không im lặng mất.
 - **Giữ kết nối.** Khách ping 3 giây một lần. Không thấy ping trong 10 giây thì coi là mất. Khách rớt mạng được giữ chỗ 8 giây (`REJOIN_GRACE`) để quay lại với đúng màu và vai cũ. Chỉ có thể nhận lại chỗ của một thành viên đang trong thời gian giữ chỗ, hoặc của chính máy đó (cùng địa chỉ IP).
 - **Đồng hồ.** Mỗi lần pong, khách đo độ lệch giữa đồng hồ của mình và của chủ phòng (`clockOffset`). Nhờ vậy thi vẽ nhanh bắt đầu cùng lúc trên mọi máy.
-- **Phiên bản.** Khi tin nhắn đổi cấu trúc thì tăng `PROTOCOL_VERSION`. Máy cũ khi đó được báo "cập nhật app" thay vì bị lỗi. Bản 2 thêm hai hoạt động mới.
+- **Phiên bản.** Khi tin nhắn đổi cấu trúc thì tăng `PROTOCOL_VERSION`. Máy cũ khi đó được báo "cập nhật app" thay vì bị lỗi. Bản 2 thêm hai hoạt động mới. Bản 3 thêm mã an toàn của máy và việc mời người ra khỏi phòng.
 - **Tin gửi từ trong lúc đang xử lý một tin khác.** Chủ phòng xử lý tin của chính mình trước, rồi mới chuyển tin đó cho các máy khác. Vì vậy một tin chủ phòng gửi ngay trong lúc đang xử lý (ví dụ kết thúc lượt ngay khi có người đoán đúng) sẽ tới máy khác **trước** tin gốc. Hãy gửi những tin này sau một microtask, như `soon()` trong `guessSession.ts` và `closeIfDone` trong `battleSession.ts`.
 
 ## Vào phòng
@@ -72,6 +72,20 @@ Chủ phòng đổi chế độ thì quảng bá cũ bị gỡ và một quảng
 | Android | `RECORD_AUDIO` | Lồng tiếng |
 | iOS | `NSCameraUsageDescription` | Quét mã QR trong app |
 | Android | `CAMERA` (`uses-feature` không bắt buộc) | Quét mã QR trong app |
+
+## Mời ra, chặn và báo cáo
+
+Người dùng gửi tranh, chữ và tiếng cho nhau, nên app có đủ ba việc App Store (điều 1.2) và Google Play đòi hỏi với nội dung do người dùng tạo. Chạm vào tên một người trong danh sách phòng để mở bảng thao tác (`features/nearby/safety/MemberSheet.tsx`).
+
+- **Mời ra khỏi phòng (chỉ chủ phòng).** Chủ phòng gửi `refused: removed` cho người đó rồi đóng kết nối. Mọi máy thấy người đó rời phòng. Người bị mời ra không vào lại được phòng này: chủ phòng giữ lại mã an toàn, mã thành viên và địa chỉ của họ.
+- **Chặn.** Mỗi máy có một mã ngẫu nhiên (`Member.key`), tạo một lần và giữ mãi (`state/useNearbySafety.ts`). Danh sách chặn lưu trên máy theo mã này, không theo tên.
+  - Chủ phòng từ chối ngay khi người bị chặn xin vào phòng. Nếu người đó đang ở trong phòng thì bị mời ra luôn.
+  - Khách vừa vào phòng do người mình đã chặn làm chủ thì bị đưa ra ngay, kèm thông báo.
+  - Khách ở cùng phòng với người mình đã chặn thì thấy thông báo, có nút rời phòng.
+  - Bỏ chặn ở Hồ sơ → Người đã chặn và báo cáo.
+- **Báo cáo.** Chọn lý do và ghi chú, có thể chặn luôn. Báo cáo lưu trên máy. Khi `SUPPORT_EMAIL` có giá trị thì gửi được cho nhà phát triển qua email.
+
+Trên iOS, hộp xác nhận không mở được khi một bảng đang mở, nên bảng đóng trước rồi mới hỏi.
 
 ## Báo cáo câu trả lời AI
 

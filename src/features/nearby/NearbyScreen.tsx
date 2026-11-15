@@ -7,7 +7,7 @@ import type { NearbyRoom, RoomAddress } from '../../core/nearby/types';
 import { useAppNavigation } from '../../state/navigation';
 import { localWifiAddress, useNearbyRooms, useRoom } from '../../state/useRoom';
 import { useSettings } from '../../state/useSettings';
-import { AppBar, ArtBanner, Banner, Button, Card, Dialog, Divider, FieldLabel, ListItem, Screen, Section, Text, TextField, useColor } from '../../ui';
+import { AppBar, ArtBanner, Banner, Button, Card, Dialog, Divider, FieldLabel, ListItem, Screen, Section, Text, TextField, toast, useColor } from '../../ui';
 import { LockIcon, PlayTogetherIcon, ScanIcon, WifiIcon } from '../../ui/icons';
 import { NEARBY_ART } from '../../ui/nearbyArt';
 import { JoinModeChoice } from './JoinModeChoice';
@@ -30,6 +30,14 @@ function useEnterRoom() {
   };
 }
 
+/** The banner sits at the top of the page, often scrolled away when joining from the list. */
+function showRoomError() {
+  const { error } = useRoom.getState();
+  if (error) {
+    toast(error);
+  }
+}
+
 function HostCard() {
   const navigation = useAppNavigation();
   const myName = useMyName();
@@ -43,7 +51,8 @@ function HostCard() {
       await hostRoom(myName, name.trim() || myName, joinMode);
       navigation.navigate('Room');
     } catch {
-      // The error is in the store and shown as a banner.
+      // The error is in the store and shown as a banner at the top; the toast is seen wherever the page is scrolled.
+      showRoomError();
     } finally {
       setBusy(false);
     }
@@ -236,7 +245,7 @@ export function NearbyScreen() {
       await joinRoom(address, myName);
       enterRoom();
     } catch {
-      // Shown as a banner from the store.
+      showRoomError();
     } finally {
       setJoining(null);
     }

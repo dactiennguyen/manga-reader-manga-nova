@@ -1,0 +1,4 @@
+/* Shown by iOS when Manganova asks for a permission. Keep in step with Info.plist. */
+"NSCameraUsageDescription" = "Manganova는 방의 QR 코드나 친구의 만화가 카드를 스캔할 때만 카메라를 사용해요.";
+"NSMicrophoneUsageDescription" = "Manganova는 함께 더빙에서 말풍선 목소리를 녹음할 때만 마이크를 사용해요.";
+"NSLocalNetworkUsageDescription" = "Manganova는 Wi-Fi로 근처 친구의 방을 찾아 함께 놀아요. 인터넷이나 서버는 사용하지 않아요.";

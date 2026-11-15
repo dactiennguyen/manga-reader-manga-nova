@@ -1,0 +1,4 @@
+/* Shown by iOS when Manganova asks for a permission. Keep in step with Info.plist. */
+"NSCameraUsageDescription" = "Manganova 只會在掃描房間 QR 碼或好友的漫畫家名片時使用相機。";
+"NSMicrophoneUsageDescription" = "Manganova 只會在你為「一起配音」中的對話框錄音時使用麥克風。";
+"NSLocalNetworkUsageDescription" = "Manganova 透過 Wi-Fi 尋找附近好友的房間並一起玩，不需要網際網路，也沒有伺服器。";

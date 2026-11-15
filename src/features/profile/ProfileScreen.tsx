@@ -23,6 +23,7 @@ import {
   PaletteIcon,
   SlidersIcon,
   TranslateIcon,
+  BlockPersonIcon,
 } from '../../ui/icons';
 
 import { ARCHIVE_EXTENSION } from '../../core/archive/bundle';
@@ -34,6 +35,7 @@ import { formatBytes } from '../../core/util/format';
 import { DIRS, dirSize } from '../../native/files';
 import { useAppNavigation } from '../../state/navigation';
 import { useAiReports } from '../../state/useAiReports';
+import { useNearbySafety } from '../../state/useNearbySafety';
 import { useSettings, type CreatorRole, type Handedness, type ThemeMode } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import {
@@ -51,6 +53,7 @@ import {
   useDockInset,
 } from '../../ui';
 import { ReportsSheet } from '../aiReport/ReportsSheet';
+import { BlockedPeopleSheet } from '../nearby/safety/BlockedPeopleSheet';
 import { AiServerSheet } from './AiServerSheet';
 import { ReminderRows } from './ReminderRows';
 import { StreakCard } from './StreakCard';
@@ -111,6 +114,8 @@ export function ProfileScreen() {
   const [aiSheet, setAiSheet] = useState(false);
   const [reportsSheet, setReportsSheet] = useState(false);
   const reportCount = useAiReports(s => s.reports.length);
+  const [blockedSheet, setBlockedSheet] = useState(false);
+  const blockedCount = useNearbySafety(s => s.blocked.length);
   const [usedBytes, setUsedBytes] = useState<number | null>(null);
   const { importing, onImport } = useImportArchive();
 
@@ -275,6 +280,13 @@ export function ProfileScreen() {
         />
         <ListItem icon={DeleteIcon} title={t('Trash ({count})', { count: stats.trashed })} chevron onPress={() => navigation.navigate('Trash')} />
         <ListItem
+          icon={BlockPersonIcon}
+          title={t('Blocked and reported people')}
+          subtitle={blockedCount ? tn(blockedCount, '{count} person blocked', '{count} people blocked') : t('From Play together')}
+          chevron
+          onPress={() => setBlockedSheet(true)}
+        />
+        <ListItem
           icon={DataIcon}
           title={t('Storage used')}
           right={<Value>{usedBytes === null ? '…' : formatBytes(usedBytes)}</Value>}
@@ -317,6 +329,7 @@ export function ProfileScreen() {
       />
       <AiServerSheet visible={aiSheet} onClose={() => setAiSheet(false)} />
       <ReportsSheet visible={reportsSheet} onClose={() => setReportsSheet(false)} />
+      <BlockedPeopleSheet visible={blockedSheet} onClose={() => setBlockedSheet(false)} />
       <PromptDialog
         visible={editingName}
         onClose={() => setEditingName(false)}

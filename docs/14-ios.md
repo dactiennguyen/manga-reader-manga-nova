@@ -36,6 +36,7 @@ Mở bằng Xcode thì mở `ios/Manganova.xcworkspace`, không mở file `.xcod
 | Lùi màn | Nút Back cứng, chặn bằng `BackHandler` | Vuốt từ mép trái. Đã tắt ở các màn vẽ và màn nhiều bước, vì `BackHandler` không chạy trên iOS |
 | Mở file truyện | intent-filter | Khai `com.manganova.project` (`.manganova`) và `com.manganova.legacy-project` (`.mangaka`) trong `Info.plist`. iOS chép file vào `Documents/Inbox` rồi mở bằng URL `file://`. App xóa bản chép đó sau khi nhập |
 | Truyện mẫu | Asset `sample/lantern.manganova` | Cùng file đó, Xcode trỏ tới thư mục của Android và đóng vào bundle |
+| Lời xin quyền | Hộp xin quyền của hệ thống, app không có lời riêng | `Info.plist` giữ bản tiếng Anh. Bản dịch cho 9 ngôn ngữ còn lại nằm ở `ios/Manganova/<ngôn ngữ>.lproj/InfoPlist.strings`. Sửa lời trong `Info.plist` thì phải sửa cả các file này |
 | Phông giao diện | `android/app/src/main/assets/fonts` | Cùng các file đó, Xcode trỏ tới thư mục của Android và khai ở `UIAppFonts` |
 
 ## Module native

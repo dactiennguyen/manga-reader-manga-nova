@@ -8,7 +8,7 @@
  *   phones[1].getState().send({ t: 'codraw.react', from: '', emoji: '👏' });
  *   await flush();
  */
-import { roomStateCreator, type RoomStateCreator, type RoomStoreState } from './room';
+import { roomStateCreator, type RoomSafety, type RoomStateCreator, type RoomStoreState } from './room';
 import { realClock, type Advert, type Clock, type Connection, type Discovery, type Network, type Server } from './transport';
 import type { NearbyRoom } from './types';
 
@@ -212,12 +212,15 @@ export type LoopbackPhones = {
 };
 
 /** N phones on one Wi-Fi, each with its own room store. Phone 0 usually hosts. */
-export function createLoopbackPhones(count: number, options: { fragment?: boolean; clock?: Clock } = {}): LoopbackPhones {
+export function createLoopbackPhones(
+  count: number,
+  options: { fragment?: boolean; clock?: Clock; safety?: (index: number) => RoomSafety | undefined } = {},
+): LoopbackPhones {
   const network = createLoopbackNetwork(options);
   const ip = (index: number) => `192.168.1.${10 + index}`;
   const discovery = network.discovery();
   const phones = Array.from({ length: count }, (_, index) =>
-    createRoomStore(roomStateCreator({ network: network.phone(ip(index)), discovery, clock: options.clock ?? realClock })),
+    createRoomStore(roomStateCreator({ network: network.phone(ip(index)), discovery, clock: options.clock ?? realClock, safety: options.safety?.(index) })),
   );
   const flush = async () => {
     for (let i = 0; i < 20; i++) {

@@ -16,6 +16,11 @@ export type SessionEvents = {
 
 type Peer = { channel: Channel; member: Member; lastSeen: number };
 
+/** Who the host keeps out: people this phone blocked (safety.ts), by their phone's key. */
+export type HostPolicy = { blocked(key: string): boolean };
+
+const NO_POLICY: HostPolicy = { blocked: () => false };
+
 const HELLO_TIMEOUT = 5000;
 const MAX_WRONG_TOKENS = 5;
 const WRONG_TOKEN_COOLDOWN = 60000;
@@ -40,6 +45,11 @@ export class HostSession {
   private wrongTokens = new Map<string, { count: number; until: number }>();
   private heartbeat: unknown;
   private ended = false;
+  /** Taken out of this room: kept out by their key, their old member id and their address. */
+  private removedKeys = new Set<string>();
+  private removedIds = new Set<MemberId>();
+  private removedRemotes = new Set<string>();
+  private remotes = new Map<MemberId, string>();
   room: RoomState;
 
   constructor(
@@ -51,6 +61,7 @@ export class HostSession {
     private readonly events: SessionEvents,
     private readonly clock: Clock,
     private readonly newId: () => string,
+    private readonly policy: HostPolicy = NO_POLICY,
   ) {
     this.room = { roomId, name: roomName, members: [me], activity: 'lobby', options: {} };
     server.onConnection(connection => this.accept(connection));
@@ -103,6 +114,37 @@ export class HostSession {
   setRoom(patch: Partial<Pick<RoomState, 'activity' | 'options' | 'name'>>): void {
     this.room = { ...this.room, ...patch };
     this.broadcastRoom();
+  }
+
+  /**
+   * Takes a guest out of the room: they are told, their link closes, everyone sees them go, and they cannot
+   * come back to this room (by key, member id or address). False for the host itself or someone not here.
+   */
+  removeMember(id: MemberId): boolean {
+    const member = this.room.members.find(item => item.id === id);
+    if (this.ended || !member || member.host) {
+      return false;
+    }
+    if (member.key) {
+      this.removedKeys.add(member.key);
+    }
+    this.removedIds.add(id);
+    const remote = this.remotes.get(id);
+    if (remote) {
+      this.removedRemotes.add(remote);
+    }
+    const peer = this.peers.get(id);
+    if (peer) {
+      this.peers.delete(id);
+      peer.channel.send({ m: { t: 'refused', reason: 'removed' }, from: this.me.id });
+      this.clock.setTimeout(() => peer.channel.close(), 50);
+    }
+    if (this.away.has(id)) {
+      this.clock.clearTimeout(this.away.get(id));
+      this.away.delete(id);
+    }
+    this.remove(id);
+    return true;
   }
 
   /** Ends the room for everyone: each guest is told before the links close. */
@@ -190,6 +232,14 @@ export class HostSession {
       this.wrongTokens.set(channel.remote, { count, until: now + WRONG_TOKEN_COOLDOWN });
       return this.refuse(channel, 'token');
     }
+    const key = hello.key;
+    const keptOut =
+      (!!key && (this.removedKeys.has(key) || this.policy.blocked(key))) ||
+      (!!hello.rejoin && this.removedIds.has(hello.rejoin)) ||
+      (!!channel.remote && this.removedRemotes.has(channel.remote));
+    if (keptOut) {
+      return this.refuse(channel, 'removed');
+    }
     const name = hello.name.trim().slice(0, 40);
     // Only a member whose link dropped (still in the grace window) can be taken back, or one whose old link
     // the host has not noticed is dead yet, coming back from the same phone. A rejoin naming a member who
@@ -212,9 +262,15 @@ export class HostSession {
       }
       const fallback = `Guest ${this.room.members.length + 1}`;
       member = { id: this.newId(), name: name || fallback, color: freeColor(this.room.members), host: false };
+      if (key) {
+        member.key = key;
+      }
       this.room = { ...this.room, members: [...this.room.members, member] };
     }
     this.peers.set(member.id, { channel, member, lastSeen: now });
+    if (channel.remote) {
+      this.remotes.set(member.id, channel.remote);
+    }
     channel.send({ m: { t: 'welcome', v: PROTOCOL_VERSION, you: member.id, room: this.room }, from: this.me.id });
     this.broadcastRoom();
     return member.id;
@@ -269,6 +325,7 @@ export class HostSession {
   }
 
   private remove(id: MemberId) {
+    this.remotes.delete(id);
     this.room = { ...this.room, members: this.room.members.filter(member => member.id !== id) };
     this.events.deliver({ t: 'bye', from: id }, id);
     this.forward({ m: { t: 'bye', from: id }, from: id }, undefined, undefined);

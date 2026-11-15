@@ -1,0 +1,4 @@
+/* Shown by iOS when Manganova asks for a permission. Keep in step with Info.plist. */
+"NSCameraUsageDescription" = "O Manganova usa a câmera só para ler o QR code de uma sala ou o cartão de mangaká de um amigo.";
+"NSMicrophoneUsageDescription" = "O Manganova usa o microfone só quando você grava uma voz para um balão de fala em Dublar juntos.";
+"NSLocalNetworkUsageDescription" = "O Manganova usa seu Wi-Fi para encontrar salas de amigos por perto e jogar juntos, sem internet e sem servidor.";

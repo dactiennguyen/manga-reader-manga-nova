@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { DeleteIcon } from '../../ui/icons';
 
@@ -11,6 +12,8 @@ const reasonLabel = (id: string) => t(REPORT_REASONS.find(item => item.id === id
 /** The AI answers reported on this device, from Profile. */
 export function ReportsSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const reports = useAiReports(s => s.reports);
+  // A confirm dialog cannot open over the sheet on iOS, so the sheet closes first.
+  const afterClose = useRef<(() => void) | null>(null);
 
   const clearAll = async () => {
     const ok = await confirm(t('Clear all reports?'), t('This removes the list from this device. Hidden answers show again.'), {
@@ -23,7 +26,17 @@ export function ReportsSheet({ visible, onClose }: { visible: boolean; onClose: 
   };
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={t('Reported AI answers')} subtitle={t('Saved on this device only')}>
+    <Sheet
+      visible={visible}
+      onClose={onClose}
+      onClosed={() => {
+        const run = afterClose.current;
+        afterClose.current = null;
+        run?.();
+      }}
+      title={t('Reported AI answers')}
+      subtitle={t('Saved on this device only')}
+    >
       <View className="gap-3 px-4 pb-2">
         {reports.length === 0 && (
           <Text tone="secondary" className="py-6 text-center">
@@ -42,7 +55,17 @@ export function ReportsSheet({ visible, onClose }: { visible: boolean; onClose: 
             </Text>
           </View>
         ))}
-        {reports.length > 0 && <Button title={t('Clear all reports')} icon={DeleteIcon} variant="danger" onPress={clearAll} />}
+        {reports.length > 0 && (
+          <Button
+            title={t('Clear all reports')}
+            icon={DeleteIcon}
+            variant="danger"
+            onPress={() => {
+              afterClose.current = clearAll;
+              onClose();
+            }}
+          />
+        )}
       </View>
     </Sheet>
   );

@@ -12,6 +12,7 @@ export { ArrowDownIcon as ArrowDownIcon } from 'phosphor-react-native/src/icons/
 export { ArrowUpIcon as ArrowUpIcon } from 'phosphor-react-native/src/icons/ArrowUp';
 export { SunIcon as AwakeIcon } from 'phosphor-react-native/src/icons/Sun';
 export { ArrowLeftIcon as BackIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
+export { ProhibitIcon as BlockPersonIcon } from 'phosphor-react-native/src/icons/Prohibit';
 export { TextBIcon as BoldIcon } from 'phosphor-react-native/src/icons/TextB';
 export { PaintBrushIcon as BrushIcon } from 'phosphor-react-native/src/icons/PaintBrush';
 export { ChatCircleIcon as BubbleIcon } from 'phosphor-react-native/src/icons/ChatCircle';
@@ -109,6 +110,7 @@ export { MicrophoneIcon as RecordIcon } from 'phosphor-react-native/src/icons/Mi
 export { ArrowUUpRightIcon as RedoIcon } from 'phosphor-react-native/src/icons/ArrowUUpRight';
 export { ArrowsClockwiseIcon as RefreshIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
 export { BellIcon as ReminderIcon } from 'phosphor-react-native/src/icons/Bell';
+export { UserMinusIcon as RemovePersonIcon } from 'phosphor-react-native/src/icons/UserMinus';
 export { RepeatIcon as RepeatIcon } from 'phosphor-react-native/src/icons/Repeat';
 export { FilmStripIcon as ReplayIcon } from 'phosphor-react-native/src/icons/FilmStrip';
 export { ArrowCounterClockwiseIcon as RestoreIcon } from 'phosphor-react-native/src/icons/ArrowCounterClockwise';

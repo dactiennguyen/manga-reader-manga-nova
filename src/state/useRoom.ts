@@ -10,11 +10,18 @@ import { parseRoomLink, roomLink } from '../core/nearby/link';
 import { roomStateCreator, type RoomStoreState } from '../core/nearby/room';
 import type { NearbyRoom } from '../core/nearby/types';
 import { nativeDiscovery, nativeNetwork } from '../native/nearby';
+import { useNearbySafety } from './useNearbySafety';
 
 export type { RoomStatus, RoomStoreState } from '../core/nearby/room';
 export { parseRoomLink, roomLink };
 
-export const useRoom = create<RoomStoreState>()(roomStateCreator({ network: nativeNetwork, discovery: nativeDiscovery }));
+export const useRoom = create<RoomStoreState>()(
+  roomStateCreator({
+    network: nativeNetwork,
+    discovery: nativeDiscovery,
+    safety: { key: () => useNearbySafety.getState().key, blocked: key => useNearbySafety.getState().isBlocked(key) },
+  }),
+);
 
 /** Rooms announced on this Wi-Fi, watched while the calling screen is mounted. Code-only rooms have no token. */
 export function useNearbyRooms(): NearbyRoom[] {

@@ -19,6 +19,7 @@ import { connectScriptHistory } from '../state/scriptHistory';
 import { configureServices } from '../state/services';
 import { connectActivity } from '../state/useActivity';
 import { connectAiReports } from '../state/useAiReports';
+import { connectNearbySafety } from '../state/useNearbySafety';
 import { connectAssistant } from '../state/useAssistant';
 import { connectDubClips } from '../state/useDubClips';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
@@ -54,6 +55,7 @@ export async function boot(): Promise<void> {
   connectStudio(meta);
   connectDubClips(meta);
   connectAiReports(meta);
+  connectNearbySafety(meta);
   connectArt(createArtRepo(db));
   connectStory(
     createStoryRepo(db),

@@ -40,6 +40,8 @@ export type RoomStoreState = {
   setJoinMode(joinMode: JoinMode): void;
   joinRoom(address: RoomAddress, name: string): Promise<void>;
   leaveRoom(): void;
+  /** Host only: takes a guest out of the room for good (they cannot rejoin it). False when it could not. */
+  removeMember(id: MemberId): boolean;
   send(message: Message, to?: MemberId): void;
   onMessage<T extends MessageType>(type: T | '*', handler: (message: Extract<Message, { t: T }>, from: MemberId) => void): () => void;
   sendBlob(kind: RoomBlob['kind'], base64: string, meta?: Record<string, unknown>, to?: MemberId): Promise<string>;
@@ -68,7 +70,10 @@ export type OutgoingBlob = { id: string; done: Promise<string>; cancel(): void }
 /** The shape of a zustand state creator, spelled out so core does not depend on zustand. */
 export type RoomStateCreator = (set: (partial: Partial<RoomStoreState>) => void, get: () => RoomStoreState) => RoomStoreState;
 
-export type RoomDeps = { network: Network; discovery?: Discovery; clock?: Clock; newId?: () => string };
+/** This phone's safety key and block list (safety.ts), read when a room starts and when someone knocks. */
+export type RoomSafety = { key(): string; blocked(key: string): boolean };
+
+export type RoomDeps = { network: Network; discovery?: Discovery; clock?: Clock; newId?: () => string; safety?: RoomSafety };
 
 /** A native step that never answers (a stuck socket or network query) must not leave the hub waiting forever. */
 const STEP_TIMEOUT_MS = 8000;
@@ -120,6 +125,10 @@ function endMessage(reason: GuestEndReason): string {
       return t('This room is full.');
     case 'started':
       return t('This room is in the middle of an activity. Try again in a moment.');
+    case 'removed':
+      return t("You can't join this room.");
+    case 'kicked':
+      return t('The host removed you from the room.');
     case 'unreachable':
       return t("Can't reach that room. Check that both phones are on the same Wi-Fi.");
     case 'lost':
@@ -231,8 +240,13 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
         try {
           const token = newToken();
           const me: Member = { id: newId(), name: name.trim() || t('Host'), color: 0, host: true };
+          const key = deps.safety?.key();
+          if (key) {
+            me.key = key;
+          }
           const title = (roomName ?? name).trim() || me.name;
-          host = new HostSession(server, token, me, newId(), title, { deliver, room: room => set({ room }) }, clock, newId);
+          const policy = { blocked: (other: string) => deps.safety?.blocked(other) ?? false };
+          host = new HostSession(server, token, me, newId(), title, { deliver, room: room => set({ room }) }, clock, newId, policy);
           const address: RoomAddress = { host: ip, port: server.port, token, name: title };
           advertise(address, joinMode);
           startSweeper();
@@ -264,6 +278,7 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
             },
           },
           clock,
+          deps.safety?.key(),
         );
         guest = session;
         try {
@@ -276,6 +291,13 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
           }
           throw error;
         }
+        // A room hosted by someone this phone blocked: out again before anything is shared.
+        const roomHost = get().room?.members.find(member => member.host);
+        if (roomHost?.key && deps.safety?.blocked(roomHost.key)) {
+          teardown();
+          set({ ...IDLE, status: 'error', error: t('You blocked the host of this room.') });
+          throw new Error('blocked host');
+        }
         startSweeper();
         set({ status: 'joined' });
       },
@@ -283,6 +305,10 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
       leaveRoom() {
         teardown();
         set(IDLE);
+      },
+
+      removeMember(id) {
+        return host?.removeMember(id) ?? false;
       },
 
       reset() {

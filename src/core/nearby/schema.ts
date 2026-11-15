@@ -14,7 +14,8 @@ export const CHUNK_CHARS = 48 * 1024;
 const id = z.string().min(1).max(80);
 const name = z.string().max(60);
 const num = z.number().finite();
-const member = z.object({ id, name, color: z.number().int().min(0).max(63), host: z.boolean() });
+const safetyKey = z.string().regex(/^[A-Za-z0-9_-]{8,32}$/);
+const member = z.object({ id, name, color: z.number().int().min(0).max(63), host: z.boolean(), key: safetyKey.optional() });
 const activity = z.enum(['lobby', 'codraw', 'relay', 'battle', 'guess', 'script', 'read', 'dub', 'send', 'cards', 'mangaka']);
 const meta = z.record(z.string().max(80), z.unknown()).optional();
 const turn = z.number().int().min(0).max(1000);
@@ -59,9 +60,9 @@ const scriptOps = [
 ] as const;
 
 const message = z.discriminatedUnion('t', [
-  z.object({ t: z.literal('hello'), v: num, token: z.string().max(32), name, app: z.string().max(40), rejoin: id.optional() }),
+  z.object({ t: z.literal('hello'), v: num, token: z.string().max(32), name, app: z.string().max(40), rejoin: id.optional(), key: safetyKey.optional() }),
   z.object({ t: z.literal('welcome'), v: num, you: id, room }),
-  z.object({ t: z.literal('refused'), reason: z.enum(['token', 'version', 'full', 'started']) }),
+  z.object({ t: z.literal('refused'), reason: z.enum(['token', 'version', 'full', 'started', 'removed']) }),
   z.object({ t: z.literal('room'), room }),
   z.object({ t: z.literal('bye'), from: id }),
   z.object({ t: z.literal('ping'), at: num.optional() }),

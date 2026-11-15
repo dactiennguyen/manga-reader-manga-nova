@@ -21,7 +21,8 @@ export type GuestEvents = {
   ended(reason: GuestEndReason): void;
 };
 
-export type GuestEndReason = 'hostLeft' | 'lost' | Extract<Message, { t: 'refused' }>['reason'] | 'unreachable';
+/** `removed`: kept out when joining. `kicked`: taken out of the room while in it. */
+export type GuestEndReason = 'hostLeft' | 'lost' | 'kicked' | Extract<Message, { t: 'refused' }>['reason'] | 'unreachable';
 
 export class GuestRefused extends Error {
   constructor(readonly reason: GuestEndReason) {
@@ -45,6 +46,8 @@ export class GuestSession {
     private readonly name: string,
     private readonly events: GuestEvents,
     private readonly clock: Clock,
+    /** This phone's safety key (safety.ts), so a host that blocked this person can keep them out. */
+    private readonly key?: string,
   ) {}
 
   /** Resolves once welcomed; rejects with GuestRefused when the host says no or cannot be reached. */
@@ -145,7 +148,10 @@ export class GuestSession {
             },
           );
           channel = opened;
-          const hello: Message = { t: 'hello', v: PROTOCOL_VERSION, token: this.address.token, name: this.name, app: APP_ID };
+          const hello: Extract<Message, { t: 'hello' }> = { t: 'hello', v: PROTOCOL_VERSION, token: this.address.token, name: this.name, app: APP_ID };
+          if (this.key) {
+            hello.key = this.key;
+          }
           opened.send({ m: rejoin ? { ...hello, rejoin } : hello });
         },
         () => settle(new GuestRefused('unreachable')),
@@ -183,10 +189,15 @@ export class GuestSession {
     switch (message.t) {
       case 'pong':
         return this.pong(message);
+      case 'refused':
+        // The host took this phone out of the room; the link closes right after.
+        if (message.reason === 'removed') {
+          this.finish('kicked');
+        }
+        return;
       case 'ping':
       case 'hello':
       case 'welcome':
-      case 'refused':
         return;
       case 'room':
         return this.events.room(message.room, this.me!);
@@ -250,7 +261,8 @@ export class GuestSession {
       } catch (error) {
         const reason = error instanceof GuestRefused ? error.reason : 'lost';
         if (reason !== 'unreachable') {
-          return this.finish(reason);
+          // Kept out on the way back in: the host removed this phone while its link was down.
+          return this.finish(reason === 'removed' ? 'kicked' : reason);
         }
         await new Promise(resolve => this.clock.setTimeout(() => resolve(undefined), RETRY_EVERY));
       }
