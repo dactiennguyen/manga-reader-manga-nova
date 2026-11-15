@@ -2,9 +2,9 @@
 
 Tài liệu cho lập trình viên làm tiếp phần chơi nhiều người. Mọi thứ chạy trên máy, không có server: một máy mở phòng, các máy khác vào phòng qua mạng Wi-Fi chung.
 
-Cập nhật: 2026-11-11, nhánh `develop`.
+Cập nhật: 2026-11-15, nhánh `develop`.
 
-## 10 hoạt động
+## 11 hoạt động
 
 | Hoạt động | Logic (`src/core/nearby`) | Màn hình (`src/features/nearby`) |
 | --- | --- | --- |
@@ -12,6 +12,7 @@ Cập nhật: 2026-11-11, nhánh `develop`.
 | Tiếp sức: mỗi người vẽ một khung, chỉ thấy khung ngay trước | `relay.ts`, `relaySession.ts` | `RelayScreen`, `relay/*` |
 | Thi vẽ nhanh: cùng đề, bấm giờ, bình chọn (không tự bầu cho mình) | `battle.ts`, `battleSession.ts` | `BattleScreen`, `battle/*` |
 | Đoán tranh: lần lượt vẽ một từ bí mật, người khác gõ câu đoán | `guess.ts`, `guessSession.ts` | `GuessScreen`, `guess/*` |
+| Điền thoại: một người vẽ khung có bóng thoại trống, người khác bí mật viết lời, cả phòng bầu bản hài nhất | `fill.ts`, `fillSession.ts` | `FillScreen`, `fill/*` |
 | Cùng viết kịch bản: cả phòng viết kịch bản một chương cùng lúc | `scriptTogether.ts`, `scriptSession.ts` | `ScriptTogetherScreen`, `script/*` |
 | Đọc cùng nhau: chủ phòng lật trang, mọi người dán nhãn góp ý | `readTogether.ts`, `reviewNotes.ts` | `ReadTogetherScreen`, `share/TogetherReader.tsx` |
 | Lồng tiếng: chia vai, mỗi người thu lời thoại của mình, ghép thành bản nghe | `dub.ts`, `dubClips.ts`, `dubRoom.ts`, `dubPlay.ts` | `DubScreen`, `dub/*` |
@@ -55,6 +56,19 @@ Chủ phòng đổi chế độ thì quảng bá cũ bị gỡ và một quảng
 - **Cách tính điểm:** dựa vào thứ tự đoán đúng (100, 80, 60, rồi 50 cho những người sau). Người vẽ được 25 điểm cho mỗi người đoán đúng. Mọi máy tự tính ra cùng một kết quả.
 - **Từ để vẽ:** 48 từ, nằm trong phần `guessWords` của các file ngôn ngữ. Một bản dịch có thể kèm cách viết khác sau dấu `|`, ví dụ `猫|ねこ|ネコ`. Cách viết đầu được hiển thị, cách nào cũng tính là đúng. Từ khóa tiếng Anh luôn được chấp nhận. Khi so sánh, app bỏ dấu, chữ hoa, khoảng trắng và chuyển katakana thành hiragana.
 - **Nét vẽ:** gửi từng đoạn khoảng 70 ms một lần, tính theo đơn vị bảng 1000×1000.
+
+## Điền thoại
+
+Mỗi lượt một người làm **họa sĩ**: vẽ một khung không chữ trên bảng vuông của Đoán tranh, rồi đặt 1 đến 3 bóng thoại trống (lời nói, suy nghĩ, hét; vẽ bằng `render/drawBubble.ts` của phần lettering). Những người còn lại bí mật viết lời cho từng bóng. Các bản được chiếu lần lượt trên mọi máy, giấu tên người viết, rồi cả phòng bầu bản hài nhất (không tự bầu cho mình). Chủ phòng chọn số vòng, thời gian vẽ và thời gian viết.
+
+- **Luồng tin nhắn.** Chủ phòng gửi `fill.start` rồi `fill.turn`. Họa sĩ gửi nét vẽ cho cả phòng (`fill.ink`, `fill.undo`, `fill.clear`, giống `guess.ink`), nhưng máy khác chỉ hiện khung khi họa sĩ gửi `fill.done` kèm các bóng thoại. Chủ phòng mở phần viết (`fill.write`). Người viết gửi lời **riêng cho chủ phòng** (`fill.lines`, có `to`), gửi lại được để sửa. Chủ phòng báo cho cả phòng ai đã viết (`fill.wrote`, không kèm chữ), rồi công bố mọi bản cùng lúc, đã xáo trộn và không kèm tên (`fill.reveal`). Sau đó chủ phòng mở bầu chọn (`fill.ballot`). Phiếu bầu gửi cho cả phòng (`fill.vote`). Cuối lượt, chủ phòng công bố tác giả và các phiếu hợp lệ (`fill.result`), hoặc bỏ qua lượt (`fill.skip`), và cuối ván gửi `fill.over`.
+- **Ai biết bản nào của mình:** máy người viết tự tạo một mã ngẫu nhiên cho bản của mình (`mine`). Mã này đi kèm lời gửi cho chủ phòng và hiện lại trong `fill.reveal`. Nhờ vậy mỗi máy biết bản nào của mình mà không ai khác biết. Chủ phòng không nhận một mã đã thuộc về người khác.
+- **Ai giữ đồng hồ:** chủ phòng. Khi hết giờ vẽ, máy họa sĩ tự gửi khung (thêm một bóng thoại nếu chưa đặt bóng nào). Nếu sau `DONE_GRACE_MS` khung vẫn chưa tới thì chủ phòng bỏ qua lượt. Khi hết giờ viết, máy người viết tự gửi phần đang gõ dở. Chủ phòng chờ thêm `LINES_GRACE_MS` rồi công bố. Mỗi bản hiện `SHOW_MS`, bầu chọn kéo dài tối đa `VOTE_MS`.
+- **Không ai phải chờ người đã đi.** Phần viết kết thúc sớm khi mọi người viết còn trong phòng đã gửi. Bầu chọn kết thúc sớm khi mọi người còn trong phòng đã bầu. Họa sĩ rời phòng khi đang vẽ thì lượt bị bỏ qua. Họa sĩ rời phòng sau khi đã gửi khung thì lượt vẫn tiếp tục. Bản của người đã rời phòng vẫn được chiếu và vẫn được tính phiếu. Người vào giữa ván chỉ xem: chủ phòng bỏ qua lời và phiếu của họ.
+- **Cách tính điểm:** mỗi phiếu được 100 điểm cho tác giả. Bản nhiều phiếu nhất được thêm 50 điểm, nếu hòa thì mọi bản hòa đều được. Họa sĩ được 25 điểm cho mỗi bản được viết trên khung của mình. Phiếu tự bầu cho mình, phiếu của người ngoài ván và phiếu cho bản không tồn tại đều không được tính. Danh sách tác giả và phiếu của chủ phòng là danh sách cuối cùng, nên mọi máy tính ra cùng một điểm.
+- **Lưu lại:** ở màn kết quả, ai cũng lưu được bản đang xem (mặc định là bản thắng) thành một trang mới trong truyện "Điền thoại" (`fill/fillPage.ts`). Nét vẽ thành nét bút chì trên một layer mang tên họa sĩ, bóng thoại thành bóng thoại thật, nên trang vẫn vẽ và sửa chữ tiếp được.
+- **Giới hạn:** tối đa 3 bóng thoại mỗi khung, 80 ký tự mỗi lời, 16 bản mỗi lượt. Nét vẽ dùng chung giới hạn với Đoán tranh: 2.000 số mỗi tin, 600 nét mỗi khung. Bóng thoại phải nằm trong bảng 1000×1000.
+- **Hình minh họa:** thẻ hoạt động đang tạm dùng hình của Lồng tiếng (`NEARBY_ART.fill`). Cần vẽ một hình riêng.
 
 ## Cùng viết kịch bản
 
@@ -108,4 +122,5 @@ Khi `SUPPORT_EMAIL` trong `core/model/constants.ts` có giá trị, khung báo c
 - **Dữ liệu trong phòng không mã hóa.** Mã bí mật chỉ có 16 bit và chỉ dùng để chặn người vào nhầm, không chống được người cố tình nghe lén trên cùng mạng. Nếu cần bảo mật thật thì phải thêm TLS (thư viện có hỗ trợ) hoặc mã hóa bằng khóa trao đổi qua QR.
 - **QR dùng scheme riêng** (`manganova://`). Một số app camera trên Android không mở được loại link này. Trình quét trong app khắc phục việc đó. Muốn app camera nào cũng mở được thì cần link `https://` kèm App Links.
 - **Cùng viết kịch bản** giới hạn một chương khoảng 180.000 ký tự, để cả kịch bản vừa một tin nhắn.
+- **Đoán tranh và Điền thoại** không gửi lại nét vẽ cho người vào lại sau khi rớt mạng: nét vẽ trong lúc họ vắng sẽ không có trên máy họ. Người vào giữa ván chỉ xem từ ván sau.
 - **Ghép tiếng thành video** cần native: iOS dùng AVFoundation, Android dùng `AudioJoiner.kt` (MediaMuxer).

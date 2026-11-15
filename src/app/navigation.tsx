@@ -23,6 +23,7 @@ import { BattleScreen } from '../features/nearby/BattleScreen';
 import { CardSwapScreen } from '../features/nearby/CardSwapScreen';
 import { CoDrawScreen } from '../features/nearby/CoDrawScreen';
 import { DubScreen } from '../features/nearby/DubScreen';
+import { FillScreen } from '../features/nearby/FillScreen';
 import { GuessScreen } from '../features/nearby/GuessScreen';
 import { MangakaCardScreen } from '../features/nearby/MangakaCardScreen';
 import { NearbyScreen } from '../features/nearby/NearbyScreen';
@@ -145,6 +146,7 @@ export function RootNavigator() {
       <Stack.Screen name="Relay" component={RelayScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="Battle" component={BattleScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="Guess" component={GuessScreen} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="FillBubbles" component={FillScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="ScriptTogether" component={ScriptTogetherScreen} />
       <Stack.Screen name="ReadTogether" component={ReadTogetherScreen} options={{ animation: 'fade' }} />
       <Stack.Screen name="Dub" component={DubScreen} />

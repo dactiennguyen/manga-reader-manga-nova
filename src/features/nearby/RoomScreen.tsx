@@ -148,6 +148,8 @@ function ActivityGrid({ isHost, onPick }: { isHost: boolean; onPick: (card: Acti
           {row.map(card => (
             <ActivityTile key={card.activity} card={card} isHost={isHost} onPick={() => onPick(card)} />
           ))}
+          {/* An odd last tile keeps the width of the others. */}
+          {row.length < 2 && <View className="flex-1" />}
         </View>
       ))}
     </View>

@@ -5,6 +5,7 @@
  * whole story or an image travel as numbered chunks of a `blob` and are put back together on arrival.
  */
 import type { BlockType, Bubble, DialogueKind, ID, Stroke } from '../model/types';
+import type { FillBubble, FillVersion } from './fill';
 import type { ScriptDoc, ScriptOp, SharedBlock } from './scriptTogether';
 
 /** Bumped when a message changes shape, so an older app can say "update to join" instead of breaking. */
@@ -26,7 +27,7 @@ export type Member = {
   key?: string;
 };
 
-export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'guess' | 'script' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka';
+export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'guess' | 'fill' | 'script' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka';
 
 /** What a phone can see of a room before joining: from discovery, a QR code or a typed code. */
 export type RoomAddress = {
@@ -105,6 +106,29 @@ export type Message =
   | { t: 'guess.end'; turn: number; hits: MemberId[] }
   | { t: 'guess.reveal'; turn: number; word: string }
   | { t: 'guess.over'; scores: Record<MemberId, number> }
+  // Fill the bubbles (fill.ts). `turn` ties each message to one turn, so a late one cannot leak into the next.
+  | { t: 'fill.start'; rounds: number; drawSeconds: number; writeSeconds: number; order: MemberId[] }
+  | { t: 'fill.turn'; turn: number; artist: MemberId; endsAt: number }
+  /** Artist to all: the panel's strokes, sent in pieces while drawing (shown to the others once it is done). */
+  | { t: 'fill.ink'; turn: number; id: number; size: number; color: string; points: number[]; done: boolean }
+  | { t: 'fill.undo'; turn: number }
+  | { t: 'fill.clear'; turn: number }
+  /** Artist to all: the panel is finished, with its empty bubbles. */
+  | { t: 'fill.done'; turn: number; bubbles: FillBubble[] }
+  | { t: 'fill.write'; turn: number; endsAt: number }
+  /** Writer to host only: one line per bubble, under the version id the writer's phone picked. Sent again to change them. */
+  | { t: 'fill.lines'; turn: number; id: string; lines: string[] }
+  /** Host to all: this player has sent lines (never what they wrote). */
+  | { t: 'fill.wrote'; turn: number; member: MemberId }
+  /** Host to all: every version, shuffled, without names. `at` is when the reveal started, on the host's clock. */
+  | { t: 'fill.reveal'; turn: number; versions: FillVersion[]; at: number }
+  | { t: 'fill.ballot'; turn: number; endsAt: number }
+  | { t: 'fill.vote'; turn: number; version: string }
+  /** Host to all: who wrote which version, and the votes that count, so every phone scores the same turn. */
+  | { t: 'fill.result'; turn: number; authors: { version: string; member: MemberId }[]; votes: { member: MemberId; version: string }[] }
+  /** Host to all: no panel this turn (the artist left or their phone never sent it). */
+  | { t: 'fill.skip'; turn: number }
+  | { t: 'fill.over'; scores: Record<MemberId, number> }
   // Writing a script together (scriptTogether.ts). The host orders every change; `key` is a line (b:id) or a scene heading (s:id).
   | { t: 'script.doc'; doc: ScriptDoc; rev: number; locks: Record<string, MemberId> }
   /** Guest to host: send me the script again (joined late, or missed it). */

@@ -4,7 +4,8 @@
  */
 import { z } from 'zod';
 
-import { GUESS_TEXT_MAX, INK_POINTS_MAX } from './guess';
+import { FILL_BUBBLES_MAX, FILL_LINE_MAX, FILL_VERSIONS_MAX } from './fill';
+import { BOARD_UNITS, GUESS_TEXT_MAX, INK_POINTS_MAX } from './guess';
 import { SCRIPT_BLOCKS_MAX, SCRIPT_CAST_MAX, SCRIPT_SCENES_MAX, SCRIPT_TEXT_MAX } from './scriptTogether';
 import type { Envelope, Message } from './types';
 
@@ -16,7 +17,7 @@ const name = z.string().max(60);
 const num = z.number().finite();
 const safetyKey = z.string().regex(/^[A-Za-z0-9_-]{8,32}$/);
 const member = z.object({ id, name, color: z.number().int().min(0).max(63), host: z.boolean(), key: safetyKey.optional() });
-const activity = z.enum(['lobby', 'codraw', 'relay', 'battle', 'guess', 'script', 'read', 'dub', 'send', 'cards', 'mangaka']);
+const activity = z.enum(['lobby', 'codraw', 'relay', 'battle', 'guess', 'fill', 'script', 'read', 'dub', 'send', 'cards', 'mangaka']);
 const meta = z.record(z.string().max(80), z.unknown()).optional();
 const turn = z.number().int().min(0).max(1000);
 const blockType = z.enum(['setting', 'action', 'dialogue', 'narration', 'sfx']);
@@ -29,6 +30,25 @@ const scriptDoc = z.object({
   characters: z.array(z.object({ id, name: z.string().max(80) })).max(SCRIPT_CAST_MAX),
   scenes: z.array(z.object({ id, description: z.string().max(SCRIPT_TEXT_MAX), blocks: z.array(sharedBlock).max(SCRIPT_BLOCKS_MAX) })).max(SCRIPT_SCENES_MAX),
 });
+
+const boardUnit = num.min(0).max(BOARD_UNITS);
+const fillBubble = z.object({
+  kind: z.enum(['speak', 'think', 'shout']),
+  x: boardUnit,
+  y: boardUnit,
+  w: boardUnit,
+  h: boardUnit,
+  tail: z.object({ x: boardUnit, y: boardUnit }),
+});
+const fillLines = z.array(z.string().max(FILL_LINE_MAX)).max(FILL_BUBBLES_MAX);
+const inkFields = {
+  turn,
+  id: z.number().int().min(0),
+  size: num,
+  color: z.string().max(32),
+  points: z.array(num).max(INK_POINTS_MAX),
+  done: z.boolean(),
+};
 
 const room = z.object({
   roomId: id,
@@ -91,15 +111,7 @@ const message = z.discriminatedUnion('t', [
   z.object({ t: z.literal('guess.turn'), turn, drawer: id, chooseUntil: num }),
   z.object({ t: z.literal('guess.picked'), turn, mask: z.string().max(GUESS_TEXT_MAX) }),
   z.object({ t: z.literal('guess.draw'), turn, mask: z.string().max(GUESS_TEXT_MAX), endsAt: num }),
-  z.object({
-    t: z.literal('guess.ink'),
-    turn,
-    id: z.number().int().min(0),
-    size: num,
-    color: z.string().max(32),
-    points: z.array(num).max(INK_POINTS_MAX),
-    done: z.boolean(),
-  }),
+  z.object({ t: z.literal('guess.ink'), ...inkFields }),
   z.object({ t: z.literal('guess.undo'), turn }),
   z.object({ t: z.literal('guess.clear'), turn }),
   z.object({ t: z.literal('guess.try'), turn, text: z.string().max(GUESS_TEXT_MAX) }),
@@ -109,6 +121,32 @@ const message = z.discriminatedUnion('t', [
   z.object({ t: z.literal('guess.end'), turn, hits: z.array(id).max(16) }),
   z.object({ t: z.literal('guess.reveal'), turn, word: z.string().max(GUESS_TEXT_MAX) }),
   z.object({ t: z.literal('guess.over'), scores: z.record(id, num) }),
+  z.object({
+    t: z.literal('fill.start'),
+    rounds: z.number().int().min(1).max(5),
+    drawSeconds: z.number().int().min(20).max(300),
+    writeSeconds: z.number().int().min(15).max(300),
+    order: z.array(id).max(16),
+  }),
+  z.object({ t: z.literal('fill.turn'), turn, artist: id, endsAt: num }),
+  z.object({ t: z.literal('fill.ink'), ...inkFields }),
+  z.object({ t: z.literal('fill.undo'), turn }),
+  z.object({ t: z.literal('fill.clear'), turn }),
+  z.object({ t: z.literal('fill.done'), turn, bubbles: z.array(fillBubble).min(1).max(FILL_BUBBLES_MAX) }),
+  z.object({ t: z.literal('fill.write'), turn, endsAt: num }),
+  z.object({ t: z.literal('fill.lines'), turn, id, lines: fillLines }),
+  z.object({ t: z.literal('fill.wrote'), turn, member: id }),
+  z.object({ t: z.literal('fill.reveal'), turn, versions: z.array(z.object({ id, lines: fillLines })).max(FILL_VERSIONS_MAX), at: num }),
+  z.object({ t: z.literal('fill.ballot'), turn, endsAt: num }),
+  z.object({ t: z.literal('fill.vote'), turn, version: id }),
+  z.object({
+    t: z.literal('fill.result'),
+    turn,
+    authors: z.array(z.object({ version: id, member: id })).max(FILL_VERSIONS_MAX),
+    votes: z.array(z.object({ member: id, version: id })).max(16),
+  }),
+  z.object({ t: z.literal('fill.skip'), turn }),
+  z.object({ t: z.literal('fill.over'), scores: z.record(id, num) }),
   z.object({ t: z.literal('script.doc'), doc: scriptDoc, rev: z.number().int().min(0), locks: z.record(scriptKey, id) }),
   z.object({ t: z.literal('script.want') }),
   ...scriptOps,

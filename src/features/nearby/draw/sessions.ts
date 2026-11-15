@@ -6,6 +6,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { BattleSession, type BattleSnapshot } from '../../../core/nearby/battleSession';
+import { FillSession, type FillSnapshot } from '../../../core/nearby/fillSession';
 import { GuessSession, type GuessSnapshot } from '../../../core/nearby/guessSession';
 import { RelaySession, type RelaySnapshot } from '../../../core/nearby/relaySession';
 import { ScriptSession, type ScriptSnapshot } from '../../../core/nearby/scriptSession';
@@ -20,6 +21,7 @@ export const battleSession = new BattleSession(useRoom, realClock, () => useRoom
 export const coDrawSession = new CoDrawSession(useRoom).start();
 export const guessSession = new GuessSession(useRoom, guessWords).start();
 export const scriptSession = new ScriptSession(useRoom).start();
+export const fillSession = new FillSession(useRoom).start();
 
 // Leaving the room, or the room moving on to something else, forgets the finished activity.
 useRoom.subscribe((state, previous) => {
@@ -37,6 +39,9 @@ useRoom.subscribe((state, previous) => {
   }
   if (left || (was === 'guess' && now !== 'guess')) {
     guessSession.reset();
+  }
+  if (left || (was === 'fill' && now !== 'fill')) {
+    fillSession.reset();
   }
   if (left || (was === 'script' && now !== 'script')) {
     scriptSession.reset();
@@ -57,6 +62,10 @@ export function useCoDraw(): CoDrawSnapshot {
 
 export function useGuess(): GuessSnapshot {
   return useSyncExternalStore(guessSession.subscribe, guessSession.getSnapshot);
+}
+
+export function useFill(): FillSnapshot {
+  return useSyncExternalStore(fillSession.subscribe, fillSession.getSnapshot);
 }
 
 export function useScriptTogether(): ScriptSnapshot {

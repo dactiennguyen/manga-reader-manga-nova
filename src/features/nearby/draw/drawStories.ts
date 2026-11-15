@@ -1,6 +1,7 @@
 /**
- * The stories playing together saves into: "Drawn together", "Relay pages", "Speed battles". Each is an
- * ordinary story in the library, found again by its title so pages from many sessions gather in one.
+ * The stories playing together saves into: "Drawn together", "Relay pages", "Speed battles", "Fill the
+ * bubbles". Each is an ordinary story in the library, found again by its title so pages from many
+ * sessions gather in one.
  */
 import { msg, t } from '../../../core/i18n';
 import type { ID } from '../../../core/model/types';
@@ -9,6 +10,7 @@ import { useStory } from '../../../state/useStory';
 export const DRAWN_TOGETHER = msg('Drawn together');
 export const RELAY_PAGES = msg('Relay pages');
 export const SPEED_BATTLES = msg('Speed battles');
+export const FILL_BUBBLES = msg('Fill the bubbles');
 
 function createStory(title: string): ID {
   return useStory.getState().createProject({
@@ -42,7 +44,7 @@ export function addStoryPage(projectId: ID, templateId: string): ID | null {
 
 /** Whether a story is one of the holders above, in the language it was made in or the current one. */
 function isHolder(title: string): boolean {
-  return [DRAWN_TOGETHER, RELAY_PAGES, SPEED_BATTLES].some(key => title === key || title === t(key));
+  return [DRAWN_TOGETHER, RELAY_PAGES, SPEED_BATTLES, FILL_BUBBLES].some(key => title === key || title === t(key));
 }
 
 /**

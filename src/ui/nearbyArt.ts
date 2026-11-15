@@ -8,6 +8,8 @@ export const NEARBY_ART = {
   relay: require('../assets/art/nearby/relay.webp'),
   battle: require('../assets/art/nearby/battle.webp'),
   guess: require('../assets/art/nearby/guess.webp'),
+  /** Fill the bubbles. A stand-in (the dubbing art, with its empty bubbles) until it has a print of its own. */
+  fill: require('../assets/art/nearby/dub.webp'),
   script: require('../assets/art/nearby/script.webp'),
   read: require('../assets/art/nearby/read.webp'),
   dub: require('../assets/art/nearby/dub.webp'),

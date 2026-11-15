@@ -43,6 +43,7 @@ export type RootStackParamList = {
   Relay: undefined;
   Battle: undefined;
   Guess: undefined;
+  FillBubbles: undefined;
   ScriptTogether: undefined;
   ReadTogether: { projectId: ID } | undefined;
   Dub: { chapterId?: ID } | undefined;
