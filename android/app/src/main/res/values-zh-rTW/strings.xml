@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">繪畫提醒</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">連續作畫</string>
+    <string name="widget_description">連續作畫天數、今天的筆數和今日題目。</string>
+    <string name="widget_empty">打開 Manganova，開始你的連續作畫。</string>
+    <string name="widget_prompt_title">今日題目</string>
+    <string name="widget_preview_streak">7 天</string>
+    <string name="widget_preview_progress">今天 40/100</string>
+    <string name="widget_preview_prompt">畫一隻以為自己是主角的貓。</string>
 </resources>

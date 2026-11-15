@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">Lembrete de desenho</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">Sequência de desenho</string>
+    <string name="widget_description">Sua sequência de desenho, os traços de hoje e o desafio de hoje.</string>
+    <string name="widget_empty">Abra o Manganova para começar sua sequência de desenho.</string>
+    <string name="widget_prompt_title">Desafio de hoje</string>
+    <string name="widget_preview_streak">7 dias</string>
+    <string name="widget_preview_progress">40/100 hoje</string>
+    <string name="widget_preview_prompt">Desenhe um gato que se acha o protagonista.</string>
 </resources>

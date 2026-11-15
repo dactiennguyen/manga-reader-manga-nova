@@ -12,7 +12,7 @@ import { confirm, toast } from '../../ui';
 type Ref = NavigationContainerRefWithCurrent<RootStackParamList>;
 
 /** A link can arrive while the app is still starting: wait a little for the navigator. */
-function whenReady(ref: Ref, run: () => void, triesLeft = 50) {
+export function whenReady(ref: Ref, run: () => void, triesLeft = 50) {
   if (ref.isReady()) {
     run();
   } else if (triesLeft > 0) {

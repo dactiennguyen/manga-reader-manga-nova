@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">Pengingat menggambar</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">Streak menggambar</string>
+    <string name="widget_description">Streak menggambar, goresan hari ini, dan tantangan hari ini.</string>
+    <string name="widget_empty">Buka Manganova untuk memulai streak menggambar.</string>
+    <string name="widget_prompt_title">Tantangan hari ini</string>
+    <string name="widget_preview_streak">7 hari</string>
+    <string name="widget_preview_progress">40/100 hari ini</string>
+    <string name="widget_preview_prompt">Gambar kucing yang mengira dirinya tokoh utama.</string>
 </resources>

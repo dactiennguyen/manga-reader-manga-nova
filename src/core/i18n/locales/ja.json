@@ -2929,5 +2929,8 @@
     "Nobody wrote any lines this time": "今回は誰もセリフを書きませんでした",
     "Save this panel to my library": "このコマをライブラリに保存",
     "You joined during this game. Watch this one and play in the next.": "ゲームの途中で参加しました。今回は観戦して、次のゲームから参加しましょう。"
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "Manganovaを開いて今日のお題を見よう。"
   }
 }

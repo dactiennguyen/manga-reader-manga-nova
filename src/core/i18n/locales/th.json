@@ -2929,5 +2929,8 @@
     "Nobody wrote any lines this time": "ตานี้ไม่มีใครเขียนคำพูด",
     "Save this panel to my library": "บันทึกช่องนี้ลงในคลังของฉัน",
     "You joined during this game. Watch this one and play in the next.": "คุณเข้ามาระหว่างเกม ดูเกมนี้ไปก่อนแล้วเล่นด้วยกันในเกมหน้า"
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "เปิด Manganova เพื่อดูโจทย์วันนี้"
   }
 }

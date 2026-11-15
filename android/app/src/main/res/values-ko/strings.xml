@@ -1,3 +1,11 @@
 <resources>
     <string name="reminder_channel">그리기 알림</string>
+    <!-- Home screen widget: the name and description in the widget picker, and what it shows before the app has sent any data. The preview texts fill the picker preview. -->
+    <string name="widget_name">연속 그리기</string>
+    <string name="widget_description">연속 그리기 기록, 오늘 그은 획 수, 오늘의 과제.</string>
+    <string name="widget_empty">Manganova를 열고 연속 그리기를 시작하세요.</string>
+    <string name="widget_prompt_title">오늘의 과제</string>
+    <string name="widget_preview_streak">7일</string>
+    <string name="widget_preview_progress">오늘 40/100</string>
+    <string name="widget_preview_prompt">자기가 주인공인 줄 아는 고양이 그리기.</string>
 </resources>

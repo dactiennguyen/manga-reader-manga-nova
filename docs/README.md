@@ -26,6 +26,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 16 | [Tính năng bổ sung](16-tinh-nang-bo-sung.md) | Truyện mẫu, câu trả lời mẫu của AI, ảnh mạng xã hội, phát lại quá trình vẽ |
 | 17 | [Xưởng vẽ trên Home](17-xuong-ve-tren-home.md) | Hành trình, huy hiệu, biên tập viên, hội đọc thử, thẻ nhân vật, tạp chí, trailer, nghe chương, hộp quà |
 | 18 | [Chơi cùng nhau trên cùng Wi-Fi](18-choi-cung-nhau.md) | 10 hoạt động nhiều người không cần server (có Đoán tranh, Cùng viết kịch bản), quét QR trong app, phòng chỉ vào bằng mã, báo cáo câu trả lời AI |
+| 19 | [Widget trên màn hình chính](19-widget.md) | Widget chuỗi ngày vẽ và đề bài hôm nay trên iOS và Android: dữ liệu đi thế nào, qua nửa đêm, màu, ngôn ngữ |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
 

@@ -82,7 +82,8 @@
         "NativeFiles": "NativeFilesModule",
         "NativeReminder": "NativeReminderModule",
         "NativeScreen": "NativeScreenModule",
-        "NativeSpeech": "NativeSpeechModule"
+        "NativeSpeech": "NativeSpeechModule",
+        "NativeWidget": "NativeWidgetModule"
       }
     }
   }

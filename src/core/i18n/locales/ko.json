@@ -2929,5 +2929,8 @@
     "Nobody wrote any lines this time": "이번에는 아무도 대사를 쓰지 않았어요",
     "Save this panel to my library": "이 칸을 내 서재에 저장",
     "You joined during this game. Watch this one and play in the next.": "게임 도중에 들어왔어요. 이번 판은 구경하고 다음 판에 함께해요."
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "Manganova를 열어 오늘의 과제를 확인하세요."
   }
 }

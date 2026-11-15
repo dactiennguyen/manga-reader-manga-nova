@@ -2,12 +2,12 @@ import { t } from '../../core/i18n';
 import { chapterIdsOf } from '../../core/model/selectors';
 import type { ArtStyle, Page } from '../../core/model/types';
 import { QUICK_START_TITLE, unusedQuickStart } from '../../core/story/quickStart';
-import type { AppNavigation } from '../../state/navigation';
+import type { AppNavigator } from '../../state/navigation';
 import { panelHasArt } from '../../state/artStore';
 import { useStory } from '../../state/useStory';
 import { toast } from '../../ui';
 
-function blankPage(navigation: AppNavigation, style: ArtStyle): Page | undefined {
+function blankPage(navigation: AppNavigator, style: ArtStyle): Page | undefined {
   const unused = unusedQuickStart(useStory.getState(), panelHasArt);
   if (unused) {
     return unused;
@@ -31,7 +31,7 @@ function blankPage(navigation: AppNavigation, style: ArtStyle): Page | undefined
   return useStory.getState().pages[pageId];
 }
 
-export function openBlankCanvas(navigation: AppNavigation, style: ArtStyle): void {
+export function openBlankCanvas(navigation: AppNavigator, style: ArtStyle): void {
   const page = blankPage(navigation, style);
   if (!page) {
     return;
@@ -45,7 +45,7 @@ export function openBlankCanvas(navigation: AppNavigation, style: ArtStyle): voi
   navigation.navigate('Canvas', { pageId: page.id, panelId });
 }
 
-export function openBlankLayout(navigation: AppNavigation, style: ArtStyle): void {
+export function openBlankLayout(navigation: AppNavigator, style: ArtStyle): void {
   const page = blankPage(navigation, style);
   if (page) {
     navigation.navigate('PanelLayout', { pageId: page.id, mode: 'panels' });

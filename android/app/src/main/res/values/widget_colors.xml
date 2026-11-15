@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The home screen widget's colours, copied from the Studio tokens in global.css (light and dark). The widget
+     runs outside React Native, so it cannot read them there. Keep both in step. StreakWidget.kt has the same
+     values for when the app's theme is set to light or dark instead of following the phone. -->
+<resources>
+    <!-- Paper theme: bg, surface, text, text-secondary, text-muted, accent, success, divider -->
+    <color name="widget_light_bg">#F6EFE3</color>
+    <color name="widget_light_card">#FFFAF0</color>
+    <color name="widget_light_text">#1C1712</color>
+    <color name="widget_light_text_secondary">#4B4338</color>
+    <color name="widget_light_text_muted">#645A4C</color>
+    <color name="widget_light_accent">#BF3419</color>
+    <color name="widget_light_success">#1D6A40</color>
+    <color name="widget_light_track">#DDD1BD</color>
+
+    <!-- Ink theme -->
+    <color name="widget_dark_bg">#15120E</color>
+    <color name="widget_dark_card">#1F1B16</color>
+    <color name="widget_dark_text">#F6EFE3</color>
+    <color name="widget_dark_text_secondary">#CFC5B4</color>
+    <color name="widget_dark_text_muted">#ACA190</color>
+    <color name="widget_dark_accent">#FF7A5C</color>
+    <color name="widget_dark_success">#86D29A</color>
+    <color name="widget_dark_track">#40392F</color>
+
+    <!-- What the layouts use: these follow the phone's dark mode (values-night). -->
+    <color name="widget_bg">@color/widget_light_bg</color>
+    <color name="widget_card">@color/widget_light_card</color>
+    <color name="widget_text">@color/widget_light_text</color>
+    <color name="widget_text_secondary">@color/widget_light_text_secondary</color>
+    <color name="widget_text_muted">@color/widget_light_text_muted</color>
+    <color name="widget_accent">@color/widget_light_accent</color>
+    <color name="widget_track">@color/widget_light_track</color>
+</resources>

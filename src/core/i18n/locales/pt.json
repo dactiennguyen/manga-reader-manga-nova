@@ -2929,5 +2929,8 @@
     "Nobody wrote any lines this time": "Ninguém escreveu falas desta vez",
     "Save this panel to my library": "Salvar este quadro na minha biblioteca",
     "You joined during this game. Watch this one and play in the next.": "Você entrou no meio desta partida. Assista a esta e jogue na próxima."
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "Abra o Manganova para ver o desafio de hoje."
   }
 }

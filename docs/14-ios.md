@@ -12,6 +12,7 @@ Bản iOS dùng chung toàn bộ code TypeScript với Android. Phần riêng c�
 | Máy thật, Apple Pencil | **Chưa thử** |
 | Build `simulator` qua CI | Lệnh build đã chạy thử trên máy, Xcode 26.1 |
 | Ad Hoc, TestFlight qua CI | **Chưa chạy**, cần tài khoản Apple Developer |
+| Widget (extension `ManganovaWidget`) | Build Debug cho simulator được. **Chưa thử** hiển thị. Xem [Widget](19-widget.md) |
 
 ## Chạy trên máy
 
@@ -47,6 +48,16 @@ Mở bằng Xcode thì mở `ios/Manganova.xcworkspace`, không mở file `.xcod
 | --- | --- |
 | `ios/Manganova/NativeFilesModule.mm` | Zip theo thứ tự tên (đọc CBZ cần đúng thứ tự), unzip, ghép ảnh thành PDF, ghép ảnh thành video MP4, bảng chia sẻ có tiêu đề, clipboard. `mimeType` của `shareFile` chỉ dùng trên Android, iOS lấy loại file từ đuôi |
 | `ios/Manganova/NativeScreenModule.mm` | Khóa xoay màn, giữ màn hình sáng. Các hàm còn lại không làm gì trên iOS. Trên iPad, iPadOS bỏ qua khóa xoay khi app đang chạy đa nhiệm |
+| `ios/Manganova/NativeWidgetModule.mm` | Ghi dữ liệu của widget vào App Group rồi nhờ `WidgetReloader.swift` gọi `WidgetCenter`. `WidgetCenter` chỉ có API Swift, nên `WidgetReloader.h` khai lớp Swift đó cho Objective-C++ |
+
+## Widget
+
+Widget là một app extension riêng, target `ManganovaWidget` trong project Xcode, code ở `ios/ManganovaWidget/`. Extension được nhúng vào app ở bước "Embed Foundation Extensions". App và extension dùng chung dữ liệu qua App Group `group.com.manganova.manga.reader.org`, khai trong `Manganova/Manganova.entitlements` và `ManganovaWidget/ManganovaWidget.entitlements`. Cách widget chạy nằm ở [Widget](19-widget.md).
+
+- Build cho simulator không cần tài khoản Apple. Xcode tự ký tạm cả hai target.
+- Chạy trên iPhone thật bằng Xcode thì chọn Team cho cả hai target, và bật App Groups cho cả hai.
+- Target `ManganovaWidget` không có trong `Podfile`, vì extension không dùng pod nào.
+- Sửa project Xcode bằng gem `xcodeproj` hoặc bằng Xcode. Đường dẫn file trong project tính từ thư mục `ios/`.
 
 Đổi chữ ký hàm trong `specs/` thì phải sửa cả hai bản. Tên hàm Objective-C phải khớp file sinh ra ở `ios/build/generated/ios/ReactCodegen/ManganovaSpecs/ManganovaSpecs.h` sau khi chạy `pod install`.
 
@@ -61,10 +72,14 @@ Thêm file vào `ios/Manganova/` thì phải thêm vào project Xcode, vì Xcode
 ### Việc của bạn
 
 1. Đăng ký Apple Developer Program, 99 USD mỗi năm.
-2. Trên App Store Connect, tạo app với bundle id `com.manganova.manga.reader.org`.
-3. Tạo chứng chỉ **Apple Distribution**, xuất ra file `.p12` có mật khẩu.
-4. Tạo provisioning profile loại **App Store** cho bundle id trên. Muốn cài thẳng lên iPhone mà không qua TestFlight thì tạo thêm một profile loại **Ad Hoc**, chọn các máy đã đăng ký UDID.
-5. Trong App Store Connect → Users and Access → Integrations, tạo API key quyền App Manager, tải file `.p8`.
+2. Trên developer.apple.com → Certificates, Identifiers & Profiles → Identifiers:
+   - Tạo App Group `group.com.manganova.manga.reader.org`.
+   - Tạo App ID `com.manganova.manga.reader.org` cho app. Bật **App Groups** và chọn group trên.
+   - Tạo App ID `com.manganova.manga.reader.org.widget` cho widget. Bật **App Groups** và chọn cùng group đó.
+3. Trên App Store Connect, tạo app với bundle id `com.manganova.manga.reader.org`. Widget đi kèm app, không tạo app riêng.
+4. Tạo chứng chỉ **Apple Distribution**, xuất ra file `.p12` có mật khẩu.
+5. Tạo provisioning profile loại **App Store** cho từng bundle id: một cho app, một cho widget. Muốn cài thẳng lên iPhone mà không qua TestFlight thì tạo thêm hai profile loại **Ad Hoc**, cũng một cho app và một cho widget, chọn các máy đã đăng ký UDID. Tạo profile **sau khi** bật App Groups, vì profile tạo trước đó không có quyền này.
+6. Trong App Store Connect → Users and Access → Integrations, tạo API key quyền App Manager, tải file `.p8`.
 
 ### Build bằng GitHub Actions
 
@@ -73,8 +88,8 @@ Chạy workflow **Build iOS (manual)** ở tab Actions, chọn nhánh và `mode`
 | `mode` | Kết quả | Cần gì |
 | --- | --- | --- |
 | `simulator` | `Manganova-simulator.zip` chứa `Manganova.app` cho iOS Simulator | Không cần gì |
-| `adhoc` | `Manganova.ipa` cài thẳng lên iPhone đã đăng ký, không qua TestFlight | Chứng chỉ, Team ID, profile Ad Hoc |
-| `testflight` | IPA được đẩy lên TestFlight | Chứng chỉ, Team ID, profile App Store, API key |
+| `adhoc` | `Manganova.ipa` cài thẳng lên iPhone đã đăng ký, không qua TestFlight | Chứng chỉ, Team ID, hai profile Ad Hoc (app và widget) |
+| `testflight` | IPA được đẩy lên TestFlight | Chứng chỉ, Team ID, hai profile App Store (app và widget), API key |
 
 File build nằm ở mục Artifacts của lần chạy, giữ 3 ngày. Trang tóm tắt của lần chạy có lệnh cài. Bỏ chọn `run_checks` để bỏ qua typecheck, lint và test khi chỉ cần build lại nhanh.
 
@@ -87,10 +102,11 @@ xcrun simctl install booted Manganova.app
 
 Cài bản `adhoc`: cắm iPhone vào Mac rồi kéo file `.ipa` vào máy trong Finder, hoặc chạy `xcrun devicectl device install app --device <UDID> Manganova.ipa`. Máy phải nằm trong profile Ad Hoc. Muốn thêm máy thì đăng ký UDID trên developer.apple.com, tạo lại profile Ad Hoc, rồi cập nhật secret. Mỗi năm Apple cho đăng ký tối đa 100 iPhone.
 
-Trước khi ký, workflow đọc profile và dừng sớm, kèm lý do, khi gặp một trong các lỗi sau:
-- Profile sai Team ID hoặc sai bundle id.
+Trước khi ký, workflow đọc cả hai profile và dừng sớm, kèm tên secret và lý do, khi gặp một trong các lỗi sau:
+- Profile sai Team ID hoặc sai bundle id. Hay gặp nhất là đặt nhầm profile của app vào secret của widget.
 - Profile đã hết hạn.
 - Dùng profile Ad Hoc cho TestFlight, hoặc ngược lại.
+- Profile không có App Group `group.com.manganova.manga.reader.org`.
 
 ### GitHub Secrets
 
@@ -101,13 +117,15 @@ Trước khi ký, workflow đọc profile và dừng sớm, kèm lý do, khi g�
 | `IOS_TEAM_ID` | Team ID, 10 ký tự, ở trang Membership | `adhoc`, `testflight` |
 | `IOS_ADHOC_PROFILE_BASE64` | `base64 -i adhoc.mobileprovision \| pbcopy`, profile loại **Ad Hoc** | `adhoc` |
 | `IOS_PROVISIONING_PROFILE_BASE64` | `base64 -i appstore.mobileprovision \| pbcopy`, profile loại **App Store** | `testflight` |
+| `IOS_WIDGET_ADHOC_PROFILE_BASE64` | `base64 -i widget-adhoc.mobileprovision \| pbcopy`, profile **Ad Hoc** của `com.manganova.manga.reader.org.widget` | `adhoc` |
+| `IOS_WIDGET_PROFILE_BASE64` | `base64 -i widget-appstore.mobileprovision \| pbcopy`, profile **App Store** của `com.manganova.manga.reader.org.widget` | `testflight` |
 | `ASC_KEY_ID` | Key ID của API key | `testflight` |
 | `ASC_ISSUER_ID` | Issuer ID ở cùng trang | `testflight` |
 | `ASC_KEY_P8_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` | `testflight` |
 
-Một chứng chỉ Apple Distribution dùng được cho cả `adhoc` và `testflight`. Workflow ghi thông tin ký vào xcconfig riêng của app, vì nếu truyền qua dòng lệnh thì các target Pods cũng nhận và báo lỗi. Cache CocoaPods được lưu ngay sau `pod install`, trước bước ký, nên thông tin ký không lọt vào cache. Mỗi lần đẩy lên TestFlight phải tăng `build_number`.
+Một chứng chỉ Apple Distribution dùng được cho cả `adhoc` và `testflight`, cho cả app và widget. Workflow ghi thông tin ký vào xcconfig riêng của từng target, vì nếu truyền qua dòng lệnh thì các target Pods cũng nhận và báo lỗi. App dùng `Pods-Manganova.release.xcconfig`, widget dùng `ios/ManganovaWidget/ManganovaWidget.xcconfig`. File của widget để trống trong repo. Cache CocoaPods được lưu ngay sau `pod install`, trước bước ký, nên thông tin ký không lọt vào cache. Mỗi lần đẩy lên TestFlight phải tăng `build_number`.
 
-Phần `adhoc` và `testflight` chưa chạy thật lần nào, vì chưa có tài khoản. Lần đầu chạy có thể phải sửa. Phần `simulator` đã build thử trên máy với đúng lệnh của workflow.
+Phần `adhoc` và `testflight` chưa chạy thật lần nào, vì chưa có tài khoản. Phần ký widget cũng vậy. Bước kiểm tra profile đã chạy thử với profile giả. Lần đầu chạy có thể phải sửa. Phần `simulator` đã build thử trên máy với đúng lệnh của workflow.
 
 ### Trên App Store Connect
 

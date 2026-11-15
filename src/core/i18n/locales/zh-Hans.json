@@ -2929,5 +2929,8 @@
     "Nobody wrote any lines this time": "这一轮没有人写台词",
     "Save this panel to my library": "把这格保存到我的书库",
     "You joined during this game. Watch this one and play in the next.": "你在游戏进行中加入。先观看这一局，下一局再一起玩。"
+  },
+  "widget": {
+    "Open Manganova for today's prompt.": "打开 Manganova 查看今日题目。"
   }
 }
