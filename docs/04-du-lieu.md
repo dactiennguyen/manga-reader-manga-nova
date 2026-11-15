@@ -82,6 +82,8 @@ Cấu hình khi mở: `journal_mode=WAL`, `synchronous=NORMAL`, `foreign_keys=ON
 
 Khóa `artPresets` trong `meta` giữ bút và tông người dùng tự tạo, dạng một bản JSON (`src/core/art/presets.ts`). Chúng dùng chung cho mọi truyện. Bút và tông có sẵn nằm trong code, không ghi xuống.
 
+Khóa `statsProgress` và `drawSessions` trong `meta` giữ dữ liệu thống kê sáng tác: tổng mỗi ngày và các buổi vẽ. Không cần migration. Xem [20-thong-ke-sang-tac.md](20-thong-ke-sang-tac.md).
+
 ## Lưu nét vẽ
 
 Nét vẽ không bao giờ bị sửa, chỉ thêm. Một lớp hiển thị các nét thỏa `gen = layer.gen AND seq < layer.head`.

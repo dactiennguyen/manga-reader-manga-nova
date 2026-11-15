@@ -140,9 +140,9 @@ export function ProfileScreen() {
   const themeLabel = t(THEME_OPTIONS.find(option => option.value === themeMode)?.label ?? '');
   const handLabel = t(HAND_OPTIONS.find(option => option.value === handedness)?.label ?? '');
   const statItems = [
-    { value: stats.projectCount, label: t('stories') },
-    { value: stats.donePages, label: t('pages done') },
-    { value: stats.characterCount, label: t('characters') },
+    { value: stats.projectCount, label: t('stories'), open: () => navigation.navigate('Stats') },
+    { value: stats.donePages, label: t('pages done'), open: () => navigation.navigate('StatsMetric', { metric: 'pagesDone' }) },
+    { value: stats.characterCount, label: t('characters'), open: () => navigation.navigate('Stats') },
   ];
 
   return (
@@ -174,7 +174,12 @@ export function ProfileScreen() {
 
       <View className="flex-row gap-3">
         {statItems.map(item => (
-          <Card key={item.label} className="flex-1 items-center px-1 py-3">
+          <Card
+            key={item.label}
+            onPress={item.open}
+            accessibilityLabel={`${item.value} ${item.label}. ${t('Statistics')}`}
+            className="flex-1 items-center px-1 py-3"
+          >
             <Text variant="display">{item.value}</Text>
             <Text variant="caption" tone="secondary" numberOfLines={1}>
               {item.label}

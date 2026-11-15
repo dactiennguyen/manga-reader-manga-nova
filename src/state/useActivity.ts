@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { EMPTY_ACTIVITY, addStrokes, parseActivity, type Activity } from '../core/story/activity';
 import type { MetaRepo } from '../core/ports';
 import { dayKey } from '../core/util/time';
+import { noteSessionStrokesNow } from './useStats';
 
 const KEY = 'activity';
 const SAVE_DELAY_MS = 3000;
@@ -29,6 +30,7 @@ export function flushActivity(): void {
 /** Counts strokes for today. Saving is delayed, because this runs on every pen lift. */
 export function noteStrokes(count: number): void {
   useActivity.setState(addStrokes(useActivity.getState(), dayKey(), count), true);
+  noteSessionStrokesNow(count);
   if (!timer) {
     timer = setTimeout(() => {
       timer = null;

@@ -27,6 +27,7 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 17 | [Xưởng vẽ trên Home](17-xuong-ve-tren-home.md) | Hành trình, huy hiệu, biên tập viên, hội đọc thử, thẻ nhân vật, tạp chí, trailer, nghe chương, hộp quà |
 | 18 | [Chơi cùng nhau trên cùng Wi-Fi](18-choi-cung-nhau.md) | 10 hoạt động nhiều người không cần server (có Đoán tranh, Cùng viết kịch bản), quét QR trong app, phòng chỉ vào bằng mã, báo cáo câu trả lời AI |
 | 19 | [Widget trên màn hình chính](19-widget.md) | Widget chuỗi ngày vẽ và đề bài hôm nay trên iOS và Android: dữ liệu đi thế nào, qua nửa đêm, màu, ngôn ngữ |
+| 20 | [Thống kê sáng tác](20-thong-ke-sang-tac.md) | Màn thống kê theo tuần, tháng, năm: số liệu lấy từ đâu, cái nào mới bắt đầu ghi, lưu ở đâu |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
 

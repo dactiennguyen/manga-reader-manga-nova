@@ -2,6 +2,8 @@ import { createNavigationContainerRef, useNavigation, useRoute, type NavigatorSc
 import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import type { ID } from '../core/model/types';
+import type { StatMetric } from '../core/stats/overview';
+import type { PeriodKind as StatsPeriodKind } from '../core/stats/period';
 
 export type TabParamList = {
   Home: undefined;
@@ -51,6 +53,9 @@ export type RootStackParamList = {
   MangakaCard: undefined;
   SendStory: undefined;
   ScanCode: undefined;
+  // Creation statistics
+  Stats: { period?: StatsPeriodKind } | undefined;
+  StatsMetric: { metric: StatMetric; period?: StatsPeriodKind };
 };
 
 /** The app's one navigator, for code that runs outside a screen: links opened from another app or a scanned code. */

@@ -36,6 +36,8 @@ import { SendStoryScreen } from '../features/nearby/SendStoryScreen';
 import { NewProjectScreen } from '../features/project/NewProjectScreen';
 import { ProjectScreen } from '../features/project/ProjectScreen';
 import { ScriptScreen } from '../features/script/ScriptScreen';
+import { StatsMetricScreen } from '../features/stats/StatsMetricScreen';
+import { StatsScreen } from '../features/stats/StatsScreen';
 import { StoryboardScreen } from '../features/storyboard/StoryboardScreen';
 import { CardsScreen } from '../features/studio/CardsScreen';
 import { ClubScreen } from '../features/studio/ClubScreen';
@@ -154,6 +156,8 @@ export function RootNavigator() {
       <Stack.Screen name="MangakaCard" component={MangakaCardScreen} />
       <Stack.Screen name="SendStory" component={SendStoryScreen} />
       <Stack.Screen name="ScanCode" component={ScanCodeScreen} />
+      <Stack.Screen name="Stats" component={StatsScreen} />
+      <Stack.Screen name="StatsMetric" component={StatsMetricScreen} />
     </Stack.Navigator>
   );
 }

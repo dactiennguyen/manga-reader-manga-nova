@@ -26,6 +26,7 @@ import { connectDubClips } from '../state/useDubClips';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
 import { connectNearbyShare, dropBorrowedStories } from '../state/useNearbyShare';
 import { connectStory, importEntities, useStory } from '../state/useStory';
+import { connectStats } from '../state/useStats';
 import { connectStudio } from '../state/useStudio';
 import { setHapticsEnabled, toast } from '../ui';
 
@@ -66,6 +67,8 @@ export async function boot(): Promise<void> {
       removeProjectExports(projectId).catch(() => {});
     },
   );
+  // After the stories load, so they are the baseline for what gets made from here on.
+  connectStats(meta, useStory);
   connectNearbyShare(meta, path => {
     removeFile(path).catch(() => {});
   });
