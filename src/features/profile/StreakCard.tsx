@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { CircleIcon, DoneIcon } from '../../ui/icons';
+import { CircleIcon, DoneIcon, StatsIcon } from '../../ui/icons';
 
 import { t, tn } from '../../core/i18n';
 import { DAILY_GOALS, bestStreak, currentStreak, goalProgress, lastWeek } from '../../core/story/activity';
 import { dayKey, weekdayName } from '../../core/util/time';
+import { useAppNavigation } from '../../state/navigation';
 import { useActivity } from '../../state/useActivity';
 import { useSettings } from '../../state/useSettings';
-import { Button, Card, Menu, ProgressBar, Text } from '../../ui';
+import { Button, Card, Menu, ProgressBar, Pressable, Text } from '../../ui';
 
 const BAR_HEIGHT = 48;
 
@@ -17,6 +18,7 @@ function goalLabel(goal: number): string {
 
 /** How often the person draws: today against the goal, the streak, and the last week. */
 export function StreakCard() {
+  const navigation = useAppNavigation();
   const activity = useActivity();
   const goal = useSettings(s => s.dailyGoal);
   const [picking, setPicking] = useState(false);
@@ -45,9 +47,10 @@ export function StreakCard() {
         </View>
       </View>
 
-      <View
-        accessible
+      <Pressable
         accessibilityLabel={t('Strokes drawn in the last seven days')}
+        accessibilityHint={t('Opens the chart with the numbers per day')}
+        onPress={() => navigation.navigate('StatsMetric', { metric: 'strokes', period: 'week' })}
         className="flex-row items-end gap-2"
       >
         {week.map(bar => (
@@ -63,7 +66,7 @@ export function StreakCard() {
             </Text>
           </View>
         ))}
-      </View>
+      </Pressable>
 
       {goal > 0 && (
         <View className="gap-1">
@@ -75,13 +78,10 @@ export function StreakCard() {
           </Text>
         </View>
       )}
-      <Button
-        title={goalLabel(goal)}
-        variant="secondary"
-        small
-        onPress={() => setPicking(true)}
-        className="self-start"
-      />
+      <View className="flex-row flex-wrap gap-2">
+        <Button title={goalLabel(goal)} variant="secondary" small onPress={() => setPicking(true)} />
+        <Button title={t('All statistics')} icon={StatsIcon} variant="ghost" small onPress={() => navigation.navigate('Stats')} />
+      </View>
 
       <Menu
         visible={picking}

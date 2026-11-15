@@ -8,7 +8,7 @@ import { Card, ICON, Icon, ProgressBar, Text } from '../../ui';
 import { StreakIcon } from '../../ui/icons';
 import type { HomeData } from './useHomeData';
 
-/** The drawing streak and today's strokes against the daily goal. The full chart and the goal live in Profile. */
+/** The drawing streak and today's strokes against the daily goal. Opens the creation statistics; the goal lives in Profile. */
 export const StreakMiniCard = memo(function StreakMiniCardView({ data }: { data: HomeData }) {
   const navigation = useAppNavigation();
   const goal = useSettings(s => s.dailyGoal);
@@ -22,7 +22,7 @@ export const StreakMiniCard = memo(function StreakMiniCardView({ data }: { data:
   return (
     <Card
       accessibilityLabel={`${t('Drawing streak')}: ${days}. ${todayText}`}
-      onPress={() => navigation.navigate('Tabs', { screen: 'Profile' })}
+      onPress={() => navigation.navigate('Stats')}
       className="w-32 gap-1 p-3"
     >
       <Icon icon={StreakIcon} size={ICON.lg} color={drawn > 0 ? 'accent' : 'text-muted'} weight={drawn > 0 ? 'fill' : 'regular'} />

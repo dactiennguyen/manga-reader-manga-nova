@@ -26,6 +26,7 @@ import { syncReminder } from '../features/profile/reminder';
 import { navigationRef } from '../state/navigation';
 import { appServices } from '../state/services';
 import { flushActivity } from '../state/useActivity';
+import { flushStats } from '../state/useStats';
 import { useAppLocale, useSettings } from '../state/useSettings';
 import { flushStory } from '../state/useStory';
 import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
@@ -114,6 +115,7 @@ function Shell() {
       if (next !== 'active') {
         flushStory();
         flushActivity();
+        flushStats();
       }
     });
     // manganova:// links (the home screen widget, room QR codes, mangaka cards) first; anything else is a file

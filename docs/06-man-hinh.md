@@ -29,6 +29,8 @@ Tab: `Home`, `Library`, `Assistant`, `Profile`. Nút (+) ở giữa Dock mở `N
 | `Profile` | | `profile` | 20 | Đổi giao diện |
 | `Trash` | | `profile` | | Đổi giao diện |
 | `About` | | `profile` | | Đổi giao diện |
+| `Stats` | `period?` | `stats` | | Mới, xem [20-thong-ke-sang-tac.md](20-thong-ke-sang-tac.md) |
+| `StatsMetric` | `metric`, `period?` | `stats` | | Mới |
 
 Bỏ các tham số không ai dùng: `NewProject.blankCanvas`, `Project.tab`, `World.type`, `World.view`, `Preview.pageId`. Dàn khung và Thoại vẫn chuyển qua lại bằng `replace` trong `ModeSwitch`.
 
