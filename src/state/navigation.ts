@@ -61,6 +61,9 @@ export type RootStackParamList = {
   // Creation statistics
   Stats: { period?: StatsPeriodKind } | undefined;
   StatsMetric: { metric: StatMetric; period?: StatsPeriodKind };
+  // Reference boards
+  RefBoards: { projectId?: ID; characterId?: ID } | undefined;
+  RefBoard: { boardId: ID };
 };
 
 /** The app's one navigator, for code that runs outside a screen: links opened from another app or a scanned code. */

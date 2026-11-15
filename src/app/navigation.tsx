@@ -39,6 +39,8 @@ import { ScriptTogetherScreen } from '../features/nearby/ScriptTogetherScreen';
 import { SendStoryScreen } from '../features/nearby/SendStoryScreen';
 import { NewProjectScreen } from '../features/project/NewProjectScreen';
 import { ProjectScreen } from '../features/project/ProjectScreen';
+import { RefBoardScreen } from '../features/refBoards/RefBoardScreen';
+import { RefBoardsScreen } from '../features/refBoards/RefBoardsScreen';
 import { ScriptScreen } from '../features/script/ScriptScreen';
 import { StatsMetricScreen } from '../features/stats/StatsMetricScreen';
 import { StatsScreen } from '../features/stats/StatsScreen';
@@ -166,6 +168,9 @@ export function RootNavigator() {
       <Stack.Screen name="ScanCode" component={ScanCodeScreen} />
       <Stack.Screen name="Stats" component={StatsScreen} />
       <Stack.Screen name="StatsMetric" component={StatsMetricScreen} />
+      {/* Reference boards */}
+      <Stack.Screen name="RefBoards" component={RefBoardsScreen} />
+      <Stack.Screen name="RefBoard" component={RefBoardScreen} />
     </Stack.Navigator>
   );
 }

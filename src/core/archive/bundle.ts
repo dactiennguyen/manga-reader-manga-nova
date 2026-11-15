@@ -12,6 +12,7 @@ import type {
   StoryData,
   WorldEntry,
 } from '../model/types';
+import { mapBoardImages, remapBoardBundles, type RefBoardBundle } from '../refBoards/archive';
 import { uid } from '../util/id';
 
 export const ARCHIVE_EXTENSION = 'manganova';
@@ -36,6 +37,8 @@ export type ProjectBundle = {
   world: WorldEntry[];
   pages: Page[];
   art: Record<ID, PanelArt>;
+  /** Reference boards linked to the story. Missing in older files. */
+  refBoards?: RefBoardBundle[];
 };
 
 type PathMapper = (path: string) => string | undefined;
@@ -123,6 +126,7 @@ export function mapBundleImages(bundle: ProjectBundle, mapPath: PathMapper): Pro
       images: (entry.images ?? []).map(mapPath).filter((path): path is string => !!path),
     })),
     art,
+    ...(bundle.refBoards ? { refBoards: mapBoardImages(bundle.refBoards, mapPath) } : {}),
   };
 }
 
@@ -239,7 +243,11 @@ export function remapBundleIds(bundle: ProjectBundle, newId: () => ID = uid): Pr
     art[map(panelId)] = panelArt;
   }
 
-  return { ...bundle, project, chapters, scenes, characters, relations, world, pages, art };
+  const refBoards = bundle.refBoards
+    ? { refBoards: remapBoardBundles(bundle.refBoards, map, project.id, new Set(bundle.characters.map(item => item.id))) }
+    : {};
+
+  return { ...bundle, project, chapters, scenes, characters, relations, world, pages, art, ...refBoards };
 }
 
 export function uniqueTitle(title: string, taken: Iterable<string>): string {

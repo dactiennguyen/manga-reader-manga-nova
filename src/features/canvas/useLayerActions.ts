@@ -17,7 +17,7 @@ import { pickImage } from '../../native/files';
 import { loadImage } from '../../render/images';
 import { addLayer, editLayer, loadArt, rewriteLayer, setActiveLayer } from '../../state/artStore';
 import { confirm, toast } from '../../ui';
-import type { CanvasReference } from './CanvasOverlays';
+import type { CanvasReference } from './RefFloat';
 import { importBundledImage } from './materialFile';
 import type { Material } from './materials';
 
@@ -68,7 +68,7 @@ export function useLayerActions(
   const addReference = useCallback(async () => {
     const path = await pickImage();
     if (path) {
-      showReference({ id: path, images: [path] });
+      showReference({ id: path, images: [{ path }] });
     }
   }, [showReference]);
 

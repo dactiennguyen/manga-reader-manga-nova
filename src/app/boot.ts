@@ -7,11 +7,12 @@ import { createArtRepo } from '../data/artRepo';
 import { openDatabase } from '../data/database';
 import { collectGarbage } from '../data/gc';
 import { createMetaRepo } from '../data/metaRepo';
+import { createRefBoardRepo } from '../data/refBoardRepo';
 import { createScriptVersionRepo } from '../data/scriptVersions';
 import { createStoryRepo } from '../data/storyRepo';
 import { createThreadRepo } from '../data/threads';
 import { removeProjectExports } from '../features/export/exportFiles';
-import { RNFS, removeFile } from '../native/files';
+import { DIRS, RNFS, removeFile, storeRefFile } from '../native/files';
 import { configureRender } from '../render/config';
 import { connectArt, exportArt, importArt, loadArt } from '../state/artStore';
 import { usePage, useProjectOfPage } from '../state/hooks';
@@ -22,6 +23,7 @@ import { connectAiReports } from '../state/useAiReports';
 import { connectArtPresets } from '../state/useArtPresets';
 import { connectLessons } from '../state/useLessons';
 import { connectNearbySafety } from '../state/useNearbySafety';
+import { connectRefBoards, exportRefBoards, importRefBoards } from '../state/useRefBoards';
 import { connectAssistant } from '../state/useAssistant';
 import { connectDubClips } from '../state/useDubClips';
 import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
@@ -36,6 +38,7 @@ const archiveStory: ArchiveStory = {
   merge: importEntities,
   exportArt,
   importArt,
+  refBoards: { export: exportRefBoards, import: importRefBoards },
 };
 
 const SAMPLE_NOTE_GAP_MS = 20000;
@@ -75,6 +78,15 @@ export async function boot(): Promise<void> {
     removeFile(path).catch(() => {});
   });
   dropBorrowedStories();
+  connectRefBoards(
+    createRefBoardRepo(db),
+    {
+      adopt: (path, boardId) => storeRefFile(path, boardId, true),
+      remove: removeFile,
+      removeBoard: boardId => removeFile(`${DIRS.refs}/${boardId}`),
+    },
+    () => toast(t("Couldn't save the reference board.")),
+  );
   connectAssistant(createThreadRepo(db));
   connectScriptHistory(createScriptVersionRepo(db));
   const server = createAiClient(() => {
@@ -87,7 +99,7 @@ export async function boot(): Promise<void> {
       (aiServerSet() || !useSettings.getState().aiDemo ? server : demo).complete(request, signal),
   });
   configureServices({
-    exportProject: projectId => exportProjectArchive(archiveStory, projectId),
+    exportProject: (projectId, options) => exportProjectArchive(archiveStory, projectId, options),
     importProject: path => importProjectArchive(archiveStory, path),
     testAiConnection: testConnection,
   });

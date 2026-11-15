@@ -35,6 +35,8 @@ Tab: `Home`, `Library`, `Assistant`, `Profile`. Nút (+) ở giữa Dock mở `N
 | `Lesson` | `lessonId` | `lessons` | | Mới |
 | `LessonPractice` | `lessonId` | `lessons` | | Mới |
 | `LessonResult` | `lessonId` | `lessons` | | Mới |
+| `RefBoards` | `projectId?`, `characterId?` | `refBoards` | | Mới, xem [Thư viện tham khảo](22-thu-vien-tham-khao.md) |
+| `RefBoard` | `boardId` | `refBoards` | | Mới |
 
 Bỏ các tham số không ai dùng: `NewProject.blankCanvas`, `Project.tab`, `World.type`, `World.view`, `Preview.pageId`. Dàn khung và Thoại vẫn chuyển qua lại bằng `replace` trong `ModeSwitch`.
 
@@ -93,6 +95,7 @@ Thêm deep link cho intent `.manganova` và `.mangaka`. Không có deep link nà
 - Đối xứng ghi hai nét trong một thay đổi, nên một lần Undo gỡ cả cặp.
 - Menu có Materials và Character reference. Vật liệu là mực đen trên nền trong suốt, chép vào `images/` để file xuất mang theo được. Nền đặt dưới cùng và giữ nguyên layer đang vẽ, hoa văn đặt trên cùng rồi chuyển sang công cụ Move.
 - Character reference ghim ảnh nhân vật cùng ghi chú ngoại hình vào cửa sổ nổi. Nhân vật có nhiều ảnh thì bấm mũi tên để chuyển.
+- Nút ghim trên thanh trên mở sheet thư viện tham khảo: chọn một bảng, ảnh nhân vật hoặc một ảnh từ máy. Cửa sổ nổi kéo được, đổi cỡ ở góc, có độ đục, lật ngang, thu thành thẻ ở mép. Xem [Thư viện tham khảo](22-thu-vien-tham-khao.md#cửa-sổ-nổi-khi-vẽ).
 - Với G-pen, bút chì, cọ: chip tên bút ở đầu panel công cụ mở sheet Bút vẽ. Chọn một bút thì chuyển sang công cụ gốc của nó. Sửa bút ngay trong sheet, có nét mẫu ở trên.
 - Với cọ và lasso fill: chip "Thêm tông" mở sheet Tông. Tông đang chọn hiện thành một chip có tên.
 - Sửa hay xóa bút, tông chỉ áp dụng cho nét mới. Xem [Canvas](07-canvas.md#bút-tùy-chỉnh).

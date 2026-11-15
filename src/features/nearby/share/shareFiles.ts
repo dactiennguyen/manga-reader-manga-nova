@@ -16,7 +16,8 @@ const FACE_SIZE = 160;
  */
 export const storyFiles: StoryFiles = {
   async pack(projectId: ID) {
-    const path = await appServices().exportProject(projectId);
+    // A story sent nearby is the story only: reference pictures stay on this phone.
+    const path = await appServices().exportProject(projectId, { refBoards: false });
     try {
       const [base64, bytes] = await Promise.all([RNFS.readFile(path, 'base64'), fileSize(path)]);
       const title = useStory.getState().projects[projectId]?.title.trim() ?? '';

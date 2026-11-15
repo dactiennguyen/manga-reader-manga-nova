@@ -6,6 +6,7 @@ import {
   uniqueTitle,
 } from '../core/archive/bundle';
 import { parseProjectBundle } from '../core/archive/parse';
+import type { RefBoardBundle } from '../core/refBoards/archive';
 import { msg, t } from '../core/i18n';
 import type { ID, PanelArt, Project, StoryData } from '../core/model/types';
 import { uid, slugify } from '../core/util/id';
@@ -32,6 +33,11 @@ export type ArchiveStory = {
   merge: (data: Partial<StoryData>) => void;
   exportArt: (panelIds: ID[]) => Record<ID, PanelArt>;
   importArt: (art: Record<ID, PanelArt>) => void;
+  /** Reference boards linked to the story. Optional, so a story archives the same way without them. */
+  refBoards?: {
+    export: (projectId: ID) => RefBoardBundle[];
+    import: (bundles: RefBoardBundle[]) => Promise<void>;
+  };
 };
 
 /** Inside the story's own folder, so the file leaves with the story like every other export. */
@@ -55,11 +61,17 @@ function byId<T extends { id: ID }>(items: T[]): Record<ID, T> {
   return out;
 }
 
-export async function exportProjectArchive(story: ArchiveStory, projectId: ID): Promise<string> {
-  const bundle = buildProjectBundle(story.data(), projectId, story.exportArt);
-  if (!bundle) {
+export async function exportProjectArchive(
+  story: ArchiveStory,
+  projectId: ID,
+  options: { refBoards?: boolean } = {},
+): Promise<string> {
+  const built = buildProjectBundle(story.data(), projectId, story.exportArt);
+  if (!built) {
     throw new Error(t('Story not found.'));
   }
+  const refBoards = options.refBoards === false ? [] : (story.refBoards?.export(projectId) ?? []);
+  const bundle = refBoards.length ? { ...built, refBoards } : built;
   await ensureDirs();
   const tmpDir = `${DIRS.tmp}/archive-${uid()}`;
   await resetDir(tmpDir);
@@ -139,6 +151,10 @@ export async function importProjectArchive(story: ArchiveStory, archivePath: str
       world: byId(local.world),
       pages: byId(local.pages),
     });
+    if (local.refBoards?.length && story.refBoards) {
+      // The story is in; a board that fails to come in must not undo it.
+      await story.refBoards.import(local.refBoards).catch(() => {});
+    }
     return project.id;
   } finally {
     await removeFile(tmpDir);

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { cleanArt } from '../art/presets';
 import { msg, t } from '../i18n';
 import type { ID, PanelArt } from '../model/types';
+import { cleanBoardBundles } from '../refBoards/archive';
 import type { ProjectBundle } from './bundle';
 
 const INVALID_MESSAGE = msg("This file can't be read or isn't a Manganova project");
@@ -92,10 +93,12 @@ export function parseProjectBundle(json: string): ProjectBundle {
   const story = parsed.data as unknown as ProjectBundle;
   // Rows without a chapter were unreachable in the old app and would break the foreign keys here.
   const chapterIds = new Set(story.chapters.map(chapter => chapter.id));
+  const refBoards = (data as { refBoards?: unknown }).refBoards;
   return {
     ...story,
     scenes: story.scenes.filter(scene => chapterIds.has(scene.chapterId)),
     pages: story.pages.filter(page => chapterIds.has(page.chapterId)),
     art,
+    ...(refBoards === undefined ? {} : { refBoards: cleanBoardBundles(refBoards, Date.now()) }),
   };
 }

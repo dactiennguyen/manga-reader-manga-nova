@@ -83,7 +83,7 @@ describe('strokes on disk', () => {
     const db = v1Database();
     expect(userVersion(db)).toBe(1);
     migrate(db);
-    expect(userVersion(db)).toBe(2);
+    expect(userVersion(db)).toBe(MIGRATIONS[MIGRATIONS.length - 1].version);
     const art = createArtRepo(db).loadPanel('panel');
     expect(art?.layers[0].strokes).toEqual(oldStrokes);
     // Old strokes keep exactly their old fields: no brush, a density-only tone.
