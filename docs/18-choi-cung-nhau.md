@@ -4,7 +4,7 @@ Tài liệu cho lập trình viên làm tiếp phần chơi nhiều người. M�
 
 Cập nhật: 2026-11-15, nhánh `develop`.
 
-## 11 hoạt động
+## 12 hoạt động
 
 | Hoạt động | Logic (`src/core/nearby`) | Màn hình (`src/features/nearby`) |
 | --- | --- | --- |
@@ -19,6 +19,7 @@ Cập nhật: 2026-11-15, nhánh `develop`.
 | Đổi thẻ nhân vật | `cardSwap.ts` | `CardSwapScreen` |
 | Danh thiếp mangaka có QR, thêm bạn bè | `friendLink.ts`, `friends.ts` | `MangakaCardScreen`, `share/FriendSheet.tsx` |
 | Gửi cả truyện qua Wi-Fi | `sendStory.ts` | `SendStoryScreen` |
+| Chia sẻ bút: gửi một bộ bút và tông cho một người | `brushShare.ts` | `brushLibrary/ShareBrushesScreen` |
 
 Màn phòng (`RoomScreen`) cho chủ phòng chọn hoạt động. `RoomFollower` đưa mọi máy, kể cả chủ phòng, tới màn của hoạt động đang chạy. Khi đang chơi mà ai đó quay về màn phòng, thanh "Đang chơi: …" có nút Mở để vào lại.
 
@@ -75,6 +76,18 @@ Mỗi lượt một người làm **họa sĩ**: vẽ một khung không chữ t
 - **Thứ tự:** khách gửi mỗi thay đổi riêng cho chủ phòng. Chủ phòng phát lại cho cả phòng dưới dạng `script.apply`, kèm tên người viết. Mọi máy chỉ áp dụng các tin `apply`, theo cùng một thứ tự, nên không cần ghép bản. Khách không tự áp dụng thay đổi của mình trước: nếu làm vậy, khi hai người cùng giành một dòng, cả hai đều tưởng mình đã giữ được.
 - **Giữ dòng:** chạm vào một dòng hoặc tiêu đề cảnh là giữ chỗ đó. Chỉ người đang giữ mới gõ được, người khác thấy tên họ và chữ hiện ngay khi họ gõ. Chỗ giữ được nhả khi chuyển sang dòng khác, rời màn hình hoặc rời phòng.
 - **Lưu:** chủ phòng lưu vào chương của mình, và kịch bản cũ được giữ lại thành một phiên bản (`snapshotScript`). Mã của các dòng được giữ nguyên, nên bóng thoại đã gắn với dòng không bị mất liên kết. Người vào muộn được chủ phòng gửi bản hiện tại.
+
+## Chia sẻ bút
+
+Gửi một bộ bút và tông (tệp `.mnbrush`, xem [Canvas](07-canvas.md#kho-bút-và-tông)) cho một người trong phòng. Giống gửi truyện nhưng nhỏ hơn nhiều.
+
+- **Luồng tin nhắn.** Người gửi gửi `brushes.offer` (tên bộ, số bút, số tông) riêng cho người nhận. Người nhận bấm Nhận thì gửi `brushes.accept`, bấm Để sau thì gửi `brushes.cancel` (`declined`). Có `accept` thì người gửi mới gửi blob `brushes` có `meta.offer`. Máy nhận kiểm tra tệp rồi gửi `brushes.done`, tệp hỏng thì gửi `brushes.cancel` (`failed`).
+- **Không nhập gì ngay.** Tệp nhận được chờ ở thẻ "Xem và nhập". Người nhận tự chọn cái muốn giữ ở màn nhập.
+- **Blob không ai nhận thì bỏ qua.** Blob `brushes` không khớp một lời mời đã nhận bị bỏ.
+- **Giới hạn.** Schema chặn blob `brushes` quá 8 phần (`BRUSH_BLOB_CHUNKS_MAX`), tên bộ quá 40 ký tự và số bút, tông quá 60. Máy nhận đọc lại tệp bằng `parseBrushFile`.
+- **Ai nhận được.** Chỉ máy đang mở màn Chia sẻ bút. Chủ phòng chọn hoạt động này cho cả phòng, hoặc bấm "Mở cho mọi người" khi tự mở từ một bộ. Khách tự mở thì thấy lời nhắc nhờ chủ phòng.
+- **Hình minh họa:** thẻ hoạt động đang tạm dùng hình của Gửi truyện (`NEARBY_ART.brushes`). Cần vẽ một hình riêng.
+- `PROTOCOL_VERSION` vẫn là 3 vì bản 3 chưa phát hành.
 
 ## Quyền
 

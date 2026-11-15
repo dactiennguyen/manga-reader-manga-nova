@@ -5,7 +5,19 @@ import type { RoomStoreState } from '../../core/nearby/room';
 import type { Activity } from '../../core/nearby/types';
 import { NEARBY_ART } from '../../ui/nearbyArt';
 
-type ActivityRoute = 'CoDraw' | 'Relay' | 'Battle' | 'Guess' | 'FillBubbles' | 'ScriptTogether' | 'ReadTogether' | 'Dub' | 'CardSwap' | 'MangakaCard' | 'SendStory';
+type ActivityRoute =
+  | 'CoDraw'
+  | 'Relay'
+  | 'Battle'
+  | 'Guess'
+  | 'FillBubbles'
+  | 'ScriptTogether'
+  | 'ReadTogether'
+  | 'Dub'
+  | 'CardSwap'
+  | 'MangakaCard'
+  | 'SendStory'
+  | 'ShareBrushes';
 
 export type ActivityCard = { activity: Exclude<Activity, 'lobby'>; route: ActivityRoute; title: string; blurb: string; art: ImageSourcePropType };
 
@@ -22,6 +34,7 @@ export const ACTIVITY_CARDS: readonly ActivityCard[] = [
   { activity: 'cards', route: 'CardSwap', title: msg('Card swap'), blurb: msg('Trade character cards with friends'), art: NEARBY_ART.cards },
   { activity: 'mangaka', route: 'MangakaCard', title: msg('Mangaka cards'), blurb: msg('Show your card, scan a friend'), art: NEARBY_ART.mangakaCard },
   { activity: 'send', route: 'SendStory', title: msg('Send a story'), blurb: msg('Give a whole story to a friend over Wi-Fi'), art: NEARBY_ART.send },
+  { activity: 'brushes', route: 'ShareBrushes', title: msg('Share brushes'), blurb: msg('Send a set of your brushes and tones to a friend'), art: NEARBY_ART.brushes },
 ];
 
 /**

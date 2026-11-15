@@ -8,4 +8,6 @@
     <string name="widget_preview_streak">7 hari</string>
     <string name="widget_preview_progress">40/100 hari ini</string>
     <string name="widget_preview_prompt">Gambar kucing yang mengira dirinya tokoh utama.</string>
+    <!-- Shown in "Open with" for a shared set of brushes and tones (.mnbrush). -->
+    <string name="brush_file_label">Kuas Manganova</string>
 </resources>

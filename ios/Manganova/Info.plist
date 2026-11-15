@@ -36,6 +36,18 @@
 				<string>com.manganova.legacy-project</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Manganova brushes</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.manganova.brushes</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
@@ -151,6 +163,24 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>manganova</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Manganova brushes</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.manganova.brushes</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>mnbrush</string>
 				</array>
 			</dict>
 		</dict>

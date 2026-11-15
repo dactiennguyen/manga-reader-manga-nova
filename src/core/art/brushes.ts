@@ -42,6 +42,8 @@ export type BrushPreset = {
   sizeMax: number;
   opacity: number;
   brush: StrokeBrush;
+  /** The set it is kept in (presets.ts). Built-ins have none. */
+  set?: string;
 };
 
 export const DEFAULT_BRUSH: StrokeBrush = {
@@ -257,5 +259,14 @@ export function normalizeBrushPreset(raw: unknown): BrushPreset | null {
     sizeMax: hi,
     opacity: num(value.opacity, 0.05, 1, 1),
     brush: normalizeBrush(value.brush) ?? { ...DEFAULT_BRUSH },
+    ...presetSetField(value.set),
   };
+}
+
+/** Max length of a set id. */
+export const SET_ID_MAX = 80;
+
+/** The `set` field of a stored preset, or nothing when it has none or a broken one. */
+export function presetSetField(raw: unknown): { set?: string } {
+  return typeof raw === 'string' && raw.length > 0 && raw.length <= SET_ID_MAX ? { set: raw } : {};
 }

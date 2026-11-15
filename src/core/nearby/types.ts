@@ -27,7 +27,7 @@ export type Member = {
   key?: string;
 };
 
-export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'guess' | 'fill' | 'script' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka';
+export type Activity = 'lobby' | 'codraw' | 'relay' | 'battle' | 'guess' | 'fill' | 'script' | 'read' | 'dub' | 'send' | 'cards' | 'mangaka' | 'brushes';
 
 /** What a phone can see of a room before joining: from discovery, a QR code or a typed code. */
 export type RoomAddress = {
@@ -73,8 +73,8 @@ export type Message =
   /** `at` is the guest's clock when it pinged; the host echoes it with its own clock, for clock sync. */
   | { t: 'ping'; at?: number }
   | { t: 'pong'; at?: number; hostAt?: number }
-  // Large payloads, in chunks: a story bundle, a page image, an audio clip, a card
-  | { t: 'blob'; id: string; kind: 'story' | 'image' | 'audio' | 'card' | 'page'; index: number; count: number; data: string; meta?: Record<string, unknown> }
+  // Large payloads, in chunks: a story bundle, a page image, an audio clip, a card, a set of brushes (.mnbrush)
+  | { t: 'blob'; id: string; kind: 'story' | 'image' | 'audio' | 'card' | 'page' | 'brushes'; index: number; count: number; data: string; meta?: Record<string, unknown> }
   // Activities: each activity owns the messages whose `t` starts with its name
   | { t: 'codraw.stroke'; from: MemberId; item: RemoteStroke }
   | { t: 'codraw.cursor'; from: MemberId; panelId: ID; x: number; y: number }
@@ -169,7 +169,13 @@ export type Message =
   | { t: 'send.cancel'; from: MemberId; blobId: string; reason?: 'declined' | 'cancelled' | 'failed' | 'busy' }
   | { t: 'send.done'; from: MemberId; blobId: string }
   // Added by share: the receiver kept the offered card, so the giver can say so.
-  | { t: 'cards.keep'; from: MemberId; blobId: string };
+  | { t: 'cards.keep'; from: MemberId; blobId: string }
+  // Sharing brushes (brushShare.ts): offer a set to one person, send the 'brushes' blob once they say yes.
+  | { t: 'brushes.offer'; from: MemberId; blobId: string; name: string; brushes: number; tones: number }
+  | { t: 'brushes.accept'; from: MemberId; blobId: string }
+  | { t: 'brushes.cancel'; from: MemberId; blobId: string; reason?: 'declined' | 'cancelled' | 'failed' }
+  /** Receiver to sender: the set arrived and checked out. Importing it is the receiver's own choice later. */
+  | { t: 'brushes.done'; from: MemberId; blobId: string };
 
 export type MessageType = Message['t'];
 

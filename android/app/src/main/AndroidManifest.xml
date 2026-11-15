@@ -65,6 +65,17 @@
             <data android:pathPattern=".*\\.mangaka" />
             <data android:pathPattern=".*\\..*\\.mangaka" />
         </intent-filter>
+        <!-- Opens shared sets of brushes and tones (.mnbrush). The content decides: a brush file is JSON, a story a zip. -->
+        <intent-filter android:label="@string/brush_file_label">
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="content" />
+            <data android:scheme="file" />
+            <data android:host="*" />
+            <data android:mimeType="*/*" />
+            <data android:pathPattern=".*\\.mnbrush" />
+            <data android:pathPattern=".*\\..*\\.mnbrush" />
+        </intent-filter>
         <!-- Play together: manganova://join (room QR codes) and manganova://friend (mangaka cards). -->
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />

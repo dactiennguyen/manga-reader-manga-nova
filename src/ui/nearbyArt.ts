@@ -16,6 +16,8 @@ export const NEARBY_ART = {
   cards: require('../assets/art/nearby/cards.webp'),
   mangakaCard: require('../assets/art/nearby/mangaka-card.webp'),
   send: require('../assets/art/nearby/send.webp'),
+  /** Share brushes. A stand-in (the send art) until it has a print of its own. */
+  brushes: require('../assets/art/nearby/send.webp'),
   /** Two phones on the same Wi-Fi, for the connection hint. */
   wifi: require('../assets/art/nearby/wifi.webp'),
 } satisfies Record<string, ImageSourcePropType>;

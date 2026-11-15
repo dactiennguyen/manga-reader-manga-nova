@@ -105,6 +105,32 @@ Tông dùng được ở cọ tô tông và lasso fill, như trước. Hàng chi
 
 **Hiệu năng.** Shader của tông và chất liệu tạo ở luồng JS, có cache, rồi chuyển sang luồng UI qua `engine.shader` mỗi khi đổi công cụ. Bắt đầu một nét không phải ghi picture nào. Shader chuyển sắc được biên dịch một lần khi nạp module.
 
+## Kho bút và tông
+
+Màn "Bút và tông của tôi" (`src/features/brushLibrary`). Logic thuần ở `src/core/art/presetSets.ts` và `brushFile.ts`.
+
+- **Bộ.** Mỗi bút, tông nằm trong đúng một bộ (`set`). Bộ "Chung" (id `default`) luôn có, không xóa được, đổi tên được. Tối đa 30 bộ.
+- **Thứ tự.** Thứ tự trong bộ là thứ tự trong danh sách chung. Chuyển lên xuống chỉ đổi chỗ với preset cùng bộ. Chuyển sang bộ khác thì nằm cuối bộ đó.
+- **Xóa bộ** xóa cả bút, tông trong bộ, có hỏi trước. Bút đang chọn bị xóa thì công cụ về cách vẽ gốc. Tranh đã vẽ không đổi.
+- **Có sẵn** là một bộ ảo, không lưu, chỉ chép ra được: từng cái, hoặc "Chép tất cả vào bộ mới".
+- **Tìm** theo tên, bỏ dấu và chữ hoa.
+
+**Tệp `.mnbrush`.** Một bộ chia sẻ thành tệp JSON nhỏ:
+
+```json
+{ "format": "manganova.brushes", "version": 1, "name": "Đi nét",
+  "brushes": [{ "name", "base", "size", "sizeMin", "sizeMax", "opacity", "brush" }],
+  "tones": [{ "name", "kind", "density", "pitch", "angle", "weight", "density2", "direction" }] }
+```
+
+- Không có id và bộ: khi nhập, mỗi preset nhận id mới.
+- Đọc tối đa 256 KB và 60 bút, 60 tông. `version` lớn hơn bản app hiểu thì báo cập nhật app.
+- Mỗi preset đi qua `normalizeBrushPreset`, `normalizeTonePreset` như dữ liệu đã lưu: cái hỏng bị bỏ và đếm, số vượt khoảng bị kẹp.
+- Chia sẻ qua bảng chia sẻ của hệ thống với kiểu `application/octet-stream`. Mở từ app khác: `AppRoot` chép tệp vào cache rồi xem byte đầu. `{` là tệp bút, còn lại là truyện như cũ.
+- iOS khai báo kiểu `com.manganova.brushes` (đuôi `mnbrush`, tên dịch trong `InfoPlist.strings`). Android thêm một intent-filter cho đuôi `.mnbrush`, nhãn dịch trong `strings.xml`.
+
+**Nhập.** Màn xem trước cho chọn từng cái, chọn bộ đích (bộ mới mang tên tệp, hoặc bộ đang có). Không ghi đè gì: tên đã có thì thêm "(2)", "(3)". Vượt 60 bút, 60 tông hoặc 30 bộ thì không nhập gì và nói còn chỗ cho bao nhiêu.
+
 ## Giới hạn
 
 | Thứ | Giới hạn |
@@ -114,6 +140,8 @@ Tông dùng được ở cọ tô tông và lasso fill, như trước. Hàng chi
 | Bước hoàn tác | 50 |
 | Khung giữ trong bộ nhớ | 3 |
 | Bút và tông tự tạo | 60 mỗi loại |
+| Bộ bút và tông | 30 |
+| Tệp `.mnbrush` | 256 KB |
 | Chấm của một nét | 16.000 |
 
 ## Ngưỡng ở giai đoạn 1

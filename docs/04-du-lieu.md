@@ -82,6 +82,8 @@ Cấu hình khi mở: `journal_mode=WAL`, `synchronous=NORMAL`, `foreign_keys=ON
 
 Khóa `artPresets` trong `meta` giữ bút và tông người dùng tự tạo, dạng một bản JSON (`src/core/art/presets.ts`). Chúng dùng chung cho mọi truyện. Bút và tông có sẵn nằm trong code, không ghi xuống.
 
+Bản 2 của `artPresets` thêm `sets` (danh sách bộ `{ id, name }`) và trường `set` trên mỗi bút, tông. Bộ mặc định có id `default` luôn tồn tại. Bản ghi bản 1 được đọc với mọi preset trong bộ mặc định, rồi ghi lại một lần ở dạng bản 2 khi mở app. Preset trỏ tới bộ không còn thì về bộ mặc định.
+
 ## Lưu nét vẽ
 
 Nét vẽ không bao giờ bị sửa, chỉ thêm. Một lớp hiển thị các nét thỏa `gen = layer.gen AND seq < layer.head`.

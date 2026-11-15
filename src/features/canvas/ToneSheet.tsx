@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 
 import { TONE_DENSITIES } from '../../core/art/artMath';
@@ -14,7 +14,9 @@ import {
 } from '../../core/art/tone';
 import { t } from '../../core/i18n';
 import type { ToneKind } from '../../core/model/types';
+import { setContents } from '../../core/art/presetSets';
 import { uid } from '../../core/util/id';
+import { useAppNavigation } from '../../state/navigation';
 import {
   PRESETS_MAX,
   duplicateTone,
@@ -25,7 +27,7 @@ import {
   saveTone,
   useArtPresets,
 } from '../../state/useArtPresets';
-import { BackIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon } from '../../ui/icons';
+import { BackIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon, PresetsIcon } from '../../ui/icons';
 import {
   Button,
   Chip,
@@ -40,6 +42,7 @@ import {
   confirm,
   toast,
 } from '../../ui';
+import { setLabel } from '../brushLibrary/labels';
 import { EditorSection, SettingSlider, ToneThumb, oneDecimal, percent } from './presetThumbs';
 
 const THUMB = 48;
@@ -50,12 +53,13 @@ export function toneName(preset: TonePreset): string {
   return isBuiltinTone(preset.id) ? t(preset.name) : preset.name;
 }
 
-function summary(preset: TonePreset): string {
+export function toneSummary(preset: TonePreset): string {
   const parts = toneSummaryParts(preset);
   return `${t(parts.kind)} · ${parts.value}`;
 }
 
-function ToneEditor({
+/** Edits one of the person's tones. Also used by the brush library (features/brushLibrary). */
+export function ToneEditor({
   draft,
   onChange,
   onSave,
@@ -177,8 +181,18 @@ export function ToneSheet({
 }) {
   const presets = useArtPresets();
   const update = useArtPresets(s => s.update);
+  const navigation = useAppNavigation();
   const [draft, setDraft] = useState<TonePreset | null>(null);
   const box = { x: 0, y: 0, w: THUMB, h: THUMB };
+  // The library is a screen: the sheet closes first, then it opens.
+  const afterClose = useRef<(() => void) | null>(null);
+  const manage = () => {
+    afterClose.current = () => navigation.navigate('BrushLibrary');
+    onClose();
+  };
+  const groups = presets.sets
+    .map(set => ({ set, tones: setContents(presets, set.id).tones }))
+    .filter(group => group.tones.length > 0);
 
   useEffect(() => {
     if (!visible) {
@@ -236,7 +250,9 @@ export function ToneSheet({
     }
   };
 
-  const index = draft ? presets.tones.findIndex(item => item.id === draft.id) : -1;
+  // Moving goes among the tones of the same set, the order the library shows.
+  const peers = draft ? setContents(presets, presets.tones.find(item => item.id === draft.id)?.set ?? '').tones : [];
+  const index = draft ? peers.findIndex(item => item.id === draft.id) : -1;
   const pick = (choice: string | null) => {
     onChoose(choice);
     onClose();
@@ -246,6 +262,11 @@ export function ToneSheet({
     <Sheet
       visible={visible}
       onClose={onClose}
+      onClosed={() => {
+        const run = afterClose.current;
+        afterClose.current = null;
+        run?.();
+      }}
       title={draft ? undefined : t('Tones')}
       subtitle={draft ? undefined : t('Your tones work in every story.')}
       maxHeight="80%"
@@ -263,7 +284,7 @@ export function ToneSheet({
           onDelete={remove}
           onMove={delta => update(p => moveTone(p, draft.id, delta))}
           canMoveUp={index > 0}
-          canMoveDown={index >= 0 && index < presets.tones.length - 1}
+          canMoveDown={index >= 0 && index < peers.length - 1}
         />
       ) : (
         <View className="gap-4 px-4 pb-4">
@@ -289,7 +310,7 @@ export function ToneSheet({
               <ListItem
                 key={preset.id}
                 title={t(preset.name)}
-                subtitle={summary(preset)}
+                subtitle={toneSummary(preset)}
                 left={<ToneThumb tone={toneFromPreset(preset, box)} width={THUMB} height={THUMB} />}
                 selected={value === preset.id}
                 onPress={() => pick(preset.id)}
@@ -304,30 +325,39 @@ export function ToneSheet({
               />
             ))}
           </Section>
-          <Section
-            title={t('My tones')}
-            footer={presets.tones.length ? undefined : t('Nothing here yet. Duplicate a tone above or make a new one.')}
-          >
-            {presets.tones.map(preset => (
-              <ListItem
-                key={preset.id}
-                title={preset.name}
-                subtitle={summary(preset)}
-                left={<ToneThumb tone={toneFromPreset(preset, box)} width={THUMB} height={THUMB} />}
-                selected={value === preset.id}
-                onPress={() => pick(preset.id)}
-                right={
-                  <IconButton
-                    icon={EditIcon}
-                    color="text-muted"
-                    onPress={() => setDraft(preset)}
-                    accessibilityLabel={t('Edit {name}', { name: preset.name })}
+          {groups.length === 0 ? (
+            <Section title={t('My tones')} footer={t('Nothing here yet. Duplicate a tone above or make a new one.')}>
+              {null}
+            </Section>
+          ) : (
+            // One section per set, in the person's order; with only the default set it reads "My tones".
+            groups.map(({ set, tones }) => (
+              <Section key={set.id} title={presets.sets.length > 1 ? setLabel(set) : t('My tones')}>
+                {tones.map(preset => (
+                  <ListItem
+                    key={preset.id}
+                    title={preset.name}
+                    subtitle={toneSummary(preset)}
+                    left={<ToneThumb tone={toneFromPreset(preset, box)} width={THUMB} height={THUMB} />}
+                    selected={value === preset.id}
+                    onPress={() => pick(preset.id)}
+                    right={
+                      <IconButton
+                        icon={EditIcon}
+                        color="text-muted"
+                        onPress={() => setDraft(preset)}
+                        accessibilityLabel={t('Edit {name}', { name: preset.name })}
+                      />
+                    }
                   />
-                }
-              />
-            ))}
-          </Section>
-          <Button title={t('New tone')} icon={PlusIcon} variant="secondary" onPress={create} />
+                ))}
+              </Section>
+            ))
+          )}
+          <View className="flex-row flex-wrap gap-2">
+            <Button title={t('New tone')} icon={PlusIcon} variant="secondary" className="flex-1" onPress={create} />
+            <Button title={t('Manage…|brushes')} icon={PresetsIcon} variant="secondary" className="flex-1" onPress={manage} />
+          </View>
         </View>
       )}
     </Sheet>

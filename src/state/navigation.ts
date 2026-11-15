@@ -51,6 +51,11 @@ export type RootStackParamList = {
   MangakaCard: undefined;
   SendStory: undefined;
   ScanCode: undefined;
+  // My brushes and tones (features/brushLibrary). ShareBrushes is also the room's "Share brushes" activity.
+  BrushLibrary: undefined;
+  BrushSet: { setId: string };
+  BrushImport: { text: string };
+  ShareBrushes: { setId?: string } | undefined;
 };
 
 /** The app's one navigator, for code that runs outside a screen: links opened from another app or a scanned code. */

@@ -286,6 +286,8 @@ export type TonePreset = {
   density2: number;
   /** Gradient: 0 runs left to right, 90 top to bottom. */
   direction: number;
+  /** The set it is kept in (presets.ts). Built-ins have none. */
+  set?: string;
 };
 
 const makeTone = (id: string, name: string, kind: ToneKind, more: Partial<TonePreset>): TonePreset => ({
