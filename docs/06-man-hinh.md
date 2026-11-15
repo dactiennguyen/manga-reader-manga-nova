@@ -40,6 +40,10 @@ Tab: `Home`, `Library`, `Assistant`, `Profile`. Nút (+) ở giữa Dock mở `N
 | `Calendar` | | `planner` | | Mới, xem [23-lich-sang-tac.md](23-lich-sang-tac.md) |
 | `ChapterPlan` | `chapterId` | `planner` | | Mới |
 | `WeekSummary` | `week?` | `planner` | | Mới |
+| `BrushLibrary` | | `brushLibrary` | | Mới |
+| `BrushSet` | `setId` | `brushLibrary` | | Mới |
+| `BrushImport` | `text` | `brushLibrary` | | Mới |
+| `ShareBrushes` | `setId?` | `brushLibrary` | | Mới, cũng là hoạt động "Chia sẻ bút" của Chơi cùng nhau |
 
 Bỏ các tham số không ai dùng: `NewProject.blankCanvas`, `Project.tab`, `World.type`, `World.view`, `Preview.pageId`. Dàn khung và Thoại vẫn chuyển qua lại bằng `replace` trong `ModeSwitch`.
 
@@ -102,6 +106,15 @@ Thêm deep link cho intent `.manganova` và `.mangaka`. Không có deep link nà
 - Với G-pen, bút chì, cọ: chip tên bút ở đầu panel công cụ mở sheet Bút vẽ. Chọn một bút thì chuyển sang công cụ gốc của nó. Sửa bút ngay trong sheet, có nét mẫu ở trên.
 - Với cọ và lasso fill: chip "Thêm tông" mở sheet Tông. Tông đang chọn hiện thành một chip có tên.
 - Sửa hay xóa bút, tông chỉ áp dụng cho nét mới. Xem [Canvas](07-canvas.md#bút-tùy-chỉnh).
+- Sheet Bút vẽ và Tông chia "của tôi" theo bộ. Nút "Quản lý…" đóng sheet rồi mở Kho bút và tông.
+
+### Kho bút và tông
+
+- Mở từ nút "Quản lý…" trong sheet Bút vẽ, Tông, và từ Hồ sơ → Viết và vẽ → Bút và tông của tôi.
+- `BrushLibrary`: tìm theo tên (không phân biệt hoa thường, dấu), danh sách bộ có ảnh xem trước và số lượng, bộ "Có sẵn" chỉ xem. Menu của bộ: chia sẻ, đổi tên, chuyển lên xuống, xóa.
+- `BrushSet`: bút và tông trong một bộ. Chạm để sửa bằng chính trình sửa của canvas, trong một sheet. Menu: nhân bản, chuyển lên xuống, chuyển sang bộ khác, xóa. Bộ "Có sẵn" chỉ chép sang bộ của mình.
+- `BrushImport`: xem trước một bộ từ tệp hoặc từ bạn trong phòng, chọn cái muốn lấy, chọn bộ đích rồi nhập.
+- Trên iOS, hộp xác nhận chỉ mở sau khi sheet sửa hoặc menu đã đóng.
 
 ### Home
 

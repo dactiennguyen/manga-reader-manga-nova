@@ -2,3 +2,5 @@
 "NSCameraUsageDescription" = "Manganova ใช้กล้องเพื่อสแกนคิวอาร์โค้ดของห้องหรือนามบัตรนักวาดของเพื่อนเท่านั้น";
 "NSMicrophoneUsageDescription" = "Manganova ใช้ไมโครโฟนเฉพาะตอนที่คุณอัดเสียงให้บอลลูนคำพูดใน พากย์ด้วยกัน";
 "NSLocalNetworkUsageDescription" = "Manganova ใช้ Wi-Fi เพื่อหาห้องของเพื่อนที่อยู่ใกล้ ๆ และเล่นด้วยกัน โดยไม่ใช้อินเทอร์เน็ตหรือเซิร์ฟเวอร์";
+/* The name of a .mnbrush file (a shared set of brushes and tones) in Files and the share sheet. */
+"Manganova brushes" = "แปรง Manganova";

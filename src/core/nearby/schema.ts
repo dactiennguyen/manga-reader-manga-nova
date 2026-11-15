@@ -4,7 +4,7 @@
  */
 import { z } from 'zod';
 
-import { cleanStroke } from '../art/presets';
+import { PRESETS_MAX, SET_NAME_MAX, cleanStroke } from '../art/presets';
 import type { Stroke } from '../model/types';
 import { FILL_BUBBLES_MAX, FILL_LINE_MAX, FILL_VERSIONS_MAX } from './fill';
 import { BOARD_UNITS, GUESS_TEXT_MAX, INK_POINTS_MAX } from './guess';
@@ -13,13 +13,15 @@ import type { Envelope, Message } from './types';
 
 /** Base64 per blob chunk. Kept well below MAX_LINE so a chunk plus its envelope always fits one line. */
 export const CHUNK_CHARS = 48 * 1024;
+/** Chunks a 'brushes' blob may have: a 256 KB brush file is under 8 chunks of base64 (brushShare.ts). */
+export const BRUSH_BLOB_CHUNKS_MAX = 8;
 
 const id = z.string().min(1).max(80);
 const name = z.string().max(60);
 const num = z.number().finite();
 const safetyKey = z.string().regex(/^[A-Za-z0-9_-]{8,32}$/);
 const member = z.object({ id, name, color: z.number().int().min(0).max(63), host: z.boolean(), key: safetyKey.optional() });
-const activity = z.enum(['lobby', 'codraw', 'relay', 'battle', 'guess', 'fill', 'script', 'read', 'dub', 'send', 'cards', 'mangaka']);
+const activity = z.enum(['lobby', 'codraw', 'relay', 'battle', 'guess', 'fill', 'script', 'read', 'dub', 'send', 'cards', 'mangaka', 'brushes']);
 const meta = z.record(z.string().max(80), z.unknown()).optional();
 const turn = z.number().int().min(0).max(1000);
 const blockType = z.enum(['setting', 'action', 'dialogue', 'narration', 'sfx']);
@@ -96,15 +98,18 @@ const message = z.discriminatedUnion('t', [
   z.object({ t: z.literal('bye'), from: id }),
   z.object({ t: z.literal('ping'), at: num.optional() }),
   z.object({ t: z.literal('pong'), at: num.optional(), hostAt: num.optional() }),
-  z.object({
-    t: z.literal('blob'),
-    id,
-    kind: z.enum(['story', 'image', 'audio', 'card', 'page']),
-    index: z.number().int().min(0),
-    count: z.number().int().min(1).max(4096),
-    data: z.string().max(CHUNK_CHARS).regex(/^[A-Za-z0-9+/=]*$/),
-    meta,
-  }),
+  z
+    .object({
+      t: z.literal('blob'),
+      id,
+      kind: z.enum(['story', 'image', 'audio', 'card', 'page', 'brushes']),
+      index: z.number().int().min(0),
+      count: z.number().int().min(1).max(4096),
+      data: z.string().max(CHUNK_CHARS).regex(/^[A-Za-z0-9+/=]*$/),
+      meta,
+    })
+    // A set of brushes is small: a 'brushes' blob of more chunks is refused before any of it is kept.
+    .refine(blob => blob.kind !== 'brushes' || blob.count <= BRUSH_BLOB_CHUNKS_MAX),
   z.object({ t: z.literal('codraw.stroke'), from: id, item: remoteStroke }),
   z.object({ t: z.literal('codraw.cursor'), from: id, panelId: id, x: num, y: num }),
   z.object({ t: z.literal('codraw.react'), from: id, emoji: z.string().max(16) }),
@@ -184,6 +189,17 @@ const message = z.discriminatedUnion('t', [
   z.object({ t: z.literal('send.cancel'), from: id, blobId: id, reason: z.enum(['declined', 'cancelled', 'failed', 'busy']).optional() }),
   z.object({ t: z.literal('send.done'), from: id, blobId: id }),
   z.object({ t: z.literal('cards.keep'), from: id, blobId: id }),
+  z.object({
+    t: z.literal('brushes.offer'),
+    from: id,
+    blobId: id,
+    name: z.string().max(SET_NAME_MAX),
+    brushes: z.number().int().min(0).max(PRESETS_MAX),
+    tones: z.number().int().min(0).max(PRESETS_MAX),
+  }),
+  z.object({ t: z.literal('brushes.accept'), from: id, blobId: id }),
+  z.object({ t: z.literal('brushes.cancel'), from: id, blobId: id, reason: z.enum(['declined', 'cancelled', 'failed']).optional() }),
+  z.object({ t: z.literal('brushes.done'), from: id, blobId: id }),
 ]);
 
 /**

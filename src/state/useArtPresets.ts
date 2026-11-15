@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { EMPTY_PRESETS, parsePresets, serializePresets, type ArtPresets } from '../core/art/presets';
+import { EMPTY_PRESETS, parsePresets, presetsNeedMigration, serializePresets, type ArtPresets } from '../core/art/presets';
 import type { MetaRepo } from '../core/ports';
 
 export * from '../core/art/presets';
@@ -15,7 +15,7 @@ type ArtPresetsStore = ArtPresets & {
 };
 
 function pick(state: ArtPresets): ArtPresets {
-  return { brushes: state.brushes, tones: state.tones, active: state.active };
+  return { brushes: state.brushes, tones: state.tones, active: state.active, sets: state.sets };
 }
 
 /** The person's brushes and tones, shared by every story. */
@@ -34,5 +34,11 @@ export const useArtPresets = create<ArtPresetsStore>()((set, get) => ({
 
 export function connectArtPresets(next: MetaRepo | null): void {
   repo = next;
-  useArtPresets.setState(parsePresets(next?.get(KEY)));
+  const stored = next?.get(KEY);
+  const presets = parsePresets(stored);
+  useArtPresets.setState(presets);
+  // A record from before sets is written once in the new form, with every preset in the default set.
+  if (next && presetsNeedMigration(stored)) {
+    next.set(KEY, serializePresets(presets));
+  }
 }

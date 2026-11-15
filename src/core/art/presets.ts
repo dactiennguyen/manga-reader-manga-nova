@@ -6,6 +6,7 @@ import {
   isBrushBase,
   normalizeBrush,
   normalizeBrushPreset,
+  presetSetField,
   type BrushBase,
   type BrushPreset,
 } from './brushes';
@@ -17,17 +18,37 @@ import { BUILTIN_TONES, TONE_LIMITS, normalizeAngle, normalizeTone, toneFromPres
  * a preset: each stroke keeps its own numbers.
  */
 
+/**
+ * A named group of the person's brushes and tones, such as "Inking" or "Backgrounds". Each preset is in
+ * exactly one set (its `set` field). The default set always exists, so a preset always has a home.
+ */
+export type PresetSet = {
+  id: string;
+  /** Empty for the default set until the person renames it: the screen shows a translated name. */
+  name: string;
+};
+
 export type ArtPresets = {
-  /** In the order the person put them. */
+  /** In the order the person put them. Within a set, this order is the set's order. */
   brushes: BrushPreset[];
   tones: TonePreset[];
   /** The brush each tool draws with. Missing means the tool's own way of drawing. */
   active: Partial<Record<BrushBase, string>>;
+  /** In the order the person put them. Never empty: the default set is always here. */
+  sets: PresetSet[];
 };
 
-export const EMPTY_PRESETS: ArtPresets = { brushes: [], tones: [], active: {} };
+export const DEFAULT_SET_ID = 'default';
+/** The built-ins, shown as a read-only set. Never stored. */
+export const BUILTIN_SET_ID = 'builtin';
+
+export const EMPTY_PRESETS: ArtPresets = { brushes: [], tones: [], active: {}, sets: [{ id: DEFAULT_SET_ID, name: '' }] };
 
 export const PRESETS_MAX = 60;
+export const SETS_MAX = 30;
+export const SET_NAME_MAX = 40;
+/** Version 2 added sets. Version 1 records have none: every preset goes into the default set. */
+export const PRESETS_VERSION = 2;
 
 /** Tone ids for the four densities the app always had. They store `{ density }` like old strokes. */
 export const LEGACY_TONE_PREFIX = 'density:';
@@ -65,7 +86,52 @@ export function normalizeTonePreset(raw: unknown): TonePreset | null {
     weight: num(v.weight, TONE_LIMITS.weight.min, Math.max(TONE_LIMITS.weight.min, pitch * 0.9), 1.2),
     density2: num(v.density2, 0, TONE_LIMITS.density.max, 0.6),
     direction: num(v.direction, -360, 360, 90),
+    ...presetSetField(v.set),
   };
+}
+
+function parseSets(raw: unknown): PresetSet[] {
+  const seen = new Set<string>();
+  const sets: PresetSet[] = [];
+  for (const item of Array.isArray(raw) ? raw : []) {
+    if (!item || typeof item !== 'object') {
+      continue;
+    }
+    const v = item as Record<string, unknown>;
+    const id = presetSetField(v.id).set;
+    if (!id || id === BUILTIN_SET_ID || seen.has(id)) {
+      continue;
+    }
+    seen.add(id);
+    sets.push({ id, name: typeof v.name === 'string' ? v.name.trim().slice(0, SET_NAME_MAX) : '' });
+  }
+  const kept = sets.slice(0, SETS_MAX);
+  if (!kept.some(set => set.id === DEFAULT_SET_ID)) {
+    // The default set comes first when it was missing, so the presets that fall into it stay easy to find.
+    kept.unshift({ id: DEFAULT_SET_ID, name: '' });
+    if (kept.length > SETS_MAX) {
+      kept.pop();
+    }
+  }
+  return kept;
+}
+
+/** The preset with a set that exists: a missing or unknown one is the default set. */
+export function inKnownSet<T extends { set?: string }>(sets: PresetSet[], item: T): T {
+  return item.set && sets.some(set => set.id === item.set) ? item : { ...item, set: DEFAULT_SET_ID };
+}
+
+/** True when a stored record is from before sets, so it is written again in the current form. */
+export function presetsNeedMigration(json: string | null | undefined): boolean {
+  if (!json) {
+    return false;
+  }
+  try {
+    const data = JSON.parse(json) as { version?: unknown } | null;
+    return !!data && typeof data === 'object' && data.version !== PRESETS_VERSION;
+  } catch {
+    return false;
+  }
 }
 
 /** Reads the stored record. Anything broken is dropped rather than failing the app. */
@@ -91,23 +157,29 @@ export function parsePresets(json: string | null | undefined): ArtPresets {
     seen.add(item.id);
     return true;
   };
+  const sets = parseSets(value.sets);
   const brushes = (Array.isArray(value.brushes) ? value.brushes : [])
     .map(normalizeBrushPreset)
     .filter(unique)
-    .slice(0, PRESETS_MAX);
-  const tones = (Array.isArray(value.tones) ? value.tones : []).map(normalizeTonePreset).filter(unique).slice(0, PRESETS_MAX);
+    .slice(0, PRESETS_MAX)
+    .map(item => inKnownSet(sets, item));
+  const tones = (Array.isArray(value.tones) ? value.tones : [])
+    .map(normalizeTonePreset)
+    .filter(unique)
+    .slice(0, PRESETS_MAX)
+    .map(item => inKnownSet(sets, item));
   const active: ArtPresets['active'] = {};
   const rawActive = value.active && typeof value.active === 'object' ? (value.active as Record<string, unknown>) : {};
   for (const [base, id] of Object.entries(rawActive)) {
-    if (isBrushBase(base) && typeof id === 'string' && findBrush({ brushes, tones, active: {} }, id)?.base === base) {
+    if (isBrushBase(base) && typeof id === 'string' && findBrush({ brushes, tones, active: {}, sets }, id)?.base === base) {
       active[base] = id;
     }
   }
-  return { brushes, tones, active };
+  return { brushes, tones, active, sets };
 }
 
 export function serializePresets(presets: ArtPresets): string {
-  return JSON.stringify({ version: 1, ...presets });
+  return JSON.stringify({ version: PRESETS_VERSION, ...presets });
 }
 
 export function findBrush(presets: ArtPresets, id: string | undefined): BrushPreset | undefined {
@@ -142,12 +214,21 @@ function cleanName(name: string): string {
   return name.trim().slice(0, PRESET_NAME_MAX);
 }
 
-/** Adds a copy of any preset, built-in or not, right after the original when it is the person's own. */
-export function duplicateBrush(presets: ArtPresets, source: BrushPreset, id: string, name: string): ArtPresets {
+/**
+ * Adds a copy of any preset, built-in or not, right after the original when it is the person's own. The copy
+ * stays in the original's set, or goes into `setId` when given (a built-in has no set: the default one).
+ */
+export function duplicateBrush(presets: ArtPresets, source: BrushPreset, id: string, name: string, setId?: string): ArtPresets {
   if (presets.brushes.length >= PRESETS_MAX) {
     return presets;
   }
-  const copy: BrushPreset = { ...source, brush: { ...source.brush }, id, name: uniqueName(name, presets.brushes.map(b => b.name)) };
+  const copy: BrushPreset = inKnownSet(presets.sets, {
+    ...source,
+    brush: { ...source.brush },
+    id,
+    name: uniqueName(name, presets.brushes.map(b => b.name)),
+    set: setId ?? source.set,
+  });
   const at = presets.brushes.findIndex(item => item.id === source.id);
   const brushes = [...presets.brushes];
   brushes.splice(at < 0 ? brushes.length : at + 1, 0, copy);
@@ -155,10 +236,11 @@ export function duplicateBrush(presets: ArtPresets, source: BrushPreset, id: str
 }
 
 export function saveBrush(presets: ArtPresets, preset: BrushPreset): ArtPresets {
-  const clean = normalizeBrushPreset({ ...preset, name: cleanName(preset.name) });
-  if (!clean) {
+  const normal = normalizeBrushPreset({ ...preset, name: cleanName(preset.name) });
+  if (!normal) {
     return presets;
   }
+  const clean = inKnownSet(presets.sets, normal);
   const exists = presets.brushes.some(item => item.id === clean.id);
   if (!exists && presets.brushes.length >= PRESETS_MAX) {
     return presets;
@@ -194,15 +276,20 @@ export function removeBrush(presets: ArtPresets, id: string): ArtPresets {
   return { ...presets, brushes: presets.brushes.filter(item => item.id !== id), active };
 }
 
-function move<T extends { id: string }>(list: T[], id: string, delta: number): T[] {
+/** Moves a preset among the others in its own set, which is the order the set shows. */
+function move<T extends { id: string; set?: string }>(list: T[], id: string, delta: number): T[] {
   const from = list.findIndex(item => item.id === id);
-  const to = from + delta;
-  if (from < 0 || to < 0 || to >= list.length) {
+  if (from < 0) {
+    return list;
+  }
+  const peers = list.flatMap((item, index) => (item.set === list[from].set ? [index] : []));
+  const to = peers.indexOf(from) + delta;
+  if (to < 0 || to >= peers.length || delta === 0) {
     return list;
   }
   const next = [...list];
   const [item] = next.splice(from, 1);
-  next.splice(to, 0, item);
+  next.splice(peers[to], 0, item);
   return next;
 }
 
@@ -228,11 +315,16 @@ export function activeBrush(presets: ArtPresets, base: BrushBase): BrushPreset |
   return found && found.base === base ? found : undefined;
 }
 
-export function duplicateTone(presets: ArtPresets, source: TonePreset, id: string, name: string): ArtPresets {
+export function duplicateTone(presets: ArtPresets, source: TonePreset, id: string, name: string, setId?: string): ArtPresets {
   if (presets.tones.length >= PRESETS_MAX) {
     return presets;
   }
-  const copy: TonePreset = { ...source, id, name: uniqueName(name, presets.tones.map(item => item.name)) };
+  const copy: TonePreset = inKnownSet(presets.sets, {
+    ...source,
+    id,
+    name: uniqueName(name, presets.tones.map(item => item.name)),
+    set: setId ?? source.set,
+  });
   const at = presets.tones.findIndex(item => item.id === source.id);
   const tones = [...presets.tones];
   tones.splice(at < 0 ? tones.length : at + 1, 0, copy);
@@ -240,10 +332,11 @@ export function duplicateTone(presets: ArtPresets, source: TonePreset, id: strin
 }
 
 export function saveTone(presets: ArtPresets, preset: TonePreset): ArtPresets {
-  const clean = normalizeTonePreset({ ...preset, name: cleanName(preset.name) });
-  if (!clean) {
+  const normal = normalizeTonePreset({ ...preset, name: cleanName(preset.name) });
+  if (!normal) {
     return presets;
   }
+  const clean = inKnownSet(presets.sets, normal);
   const exists = presets.tones.some(item => item.id === clean.id);
   if (!exists && presets.tones.length >= PRESETS_MAX) {
     return presets;

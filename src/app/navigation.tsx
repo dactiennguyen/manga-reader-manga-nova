@@ -5,6 +5,10 @@ import { useWindowDimensions } from 'react-native';
 
 import { msg, t } from '../core/i18n';
 import { AssistantScreen } from '../features/assistant/AssistantScreen';
+import { BrushImportScreen } from '../features/brushLibrary/BrushImportScreen';
+import { BrushLibraryScreen } from '../features/brushLibrary/BrushLibraryScreen';
+import { BrushSetScreen } from '../features/brushLibrary/BrushSetScreen';
+import { ShareBrushesScreen } from '../features/brushLibrary/ShareBrushesScreen';
 import { CanvasScreen } from '../features/canvas/CanvasScreen';
 import { CharacterScreen } from '../features/characters/CharacterScreen';
 import { ExportScreen } from '../features/export/ExportScreen';
@@ -177,6 +181,10 @@ export function RootNavigator() {
       {/* Reference boards */}
       <Stack.Screen name="RefBoards" component={RefBoardsScreen} />
       <Stack.Screen name="RefBoard" component={RefBoardScreen} />
+      <Stack.Screen name="BrushLibrary" component={BrushLibraryScreen} />
+      <Stack.Screen name="BrushSet" component={BrushSetScreen} />
+      <Stack.Screen name="BrushImport" component={BrushImportScreen} />
+      <Stack.Screen name="ShareBrushes" component={ShareBrushesScreen} />
     </Stack.Navigator>
   );
 }

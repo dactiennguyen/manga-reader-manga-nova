@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 
 import {
@@ -18,6 +18,8 @@ import { DEFAULT_OPACITY, DEFAULT_SIZES } from '../../core/art/tools';
 import { t } from '../../core/i18n';
 import type { BrushGrain, StrokeBrush } from '../../core/model/types';
 import { uid } from '../../core/util/id';
+import { setContents } from '../../core/art/presetSets';
+import { useAppNavigation } from '../../state/navigation';
 import {
   PRESETS_MAX,
   activeBrush,
@@ -28,13 +30,7 @@ import {
   saveBrush,
   useArtPresets,
 } from '../../state/useArtPresets';
-import {
-  BackIcon,
-  CopyIcon,
-  DeleteIcon,
-  EditIcon,
-  PlusIcon,
-} from '../../ui/icons';
+import { BackIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon, PresetsIcon } from '../../ui/icons';
 import {
   Button,
   Chip,
@@ -50,6 +46,7 @@ import {
   confirm,
   toast,
 } from '../../ui';
+import { setLabel } from '../brushLibrary/labels';
 import { BrushThumb, EditorSection, SettingSlider, oneDecimal, percent } from './presetThumbs';
 
 const THUMB_W = 96;
@@ -61,11 +58,12 @@ export function brushName(preset: BrushPreset): string {
   return isBuiltinBrush(preset.id) ? t(preset.name) : preset.name;
 }
 
-function baseLabel(base: BrushBase): string {
+export function baseLabel(base: BrushBase): string {
   return t(BRUSH_BASES.find(item => item.id === base)?.label ?? '');
 }
 
-function BrushEditor({
+/** Edits one of the person's brushes. Also used by the brush library (features/brushLibrary). */
+export function BrushEditor({
   draft,
   onChange,
   onSave,
@@ -183,8 +181,18 @@ export function BrushSheet({
 }) {
   const presets = useArtPresets();
   const update = useArtPresets(s => s.update);
+  const navigation = useAppNavigation();
   const [draft, setDraft] = useState<BrushPreset | null>(null);
   const current = activeBrush(presets, tool);
+  // The library is a screen: the sheet closes first, then it opens.
+  const afterClose = useRef<(() => void) | null>(null);
+  const manage = () => {
+    afterClose.current = () => navigation.navigate('BrushLibrary');
+    onClose();
+  };
+  const groups = presets.sets
+    .map(set => ({ set, brushes: setContents(presets, set.id).brushes }))
+    .filter(group => group.brushes.length > 0);
 
   useEffect(() => {
     if (!visible) {
@@ -248,7 +256,9 @@ export function BrushSheet({
     }
   };
 
-  const index = draft ? presets.brushes.findIndex(item => item.id === draft.id) : -1;
+  // Moving goes among the brushes of the same set, the order the library shows.
+  const peers = draft ? setContents(presets, presets.brushes.find(item => item.id === draft.id)?.set ?? '').brushes : [];
+  const index = draft ? peers.findIndex(item => item.id === draft.id) : -1;
 
   const pick = (id: string | null, base: BrushBase) => {
     onChoose(id, base);
@@ -259,6 +269,11 @@ export function BrushSheet({
     <Sheet
       visible={visible}
       onClose={onClose}
+      onClosed={() => {
+        const run = afterClose.current;
+        afterClose.current = null;
+        run?.();
+      }}
       title={draft ? undefined : t('Brushes')}
       subtitle={draft ? undefined : t('Your brushes work in every story.')}
       maxHeight="80%"
@@ -276,7 +291,7 @@ export function BrushSheet({
           onDelete={remove}
           onMove={delta => update(p => moveBrush(p, draft.id, delta))}
           canMoveUp={index > 0}
-          canMoveDown={index >= 0 && index < presets.brushes.length - 1}
+          canMoveDown={index >= 0 && index < peers.length - 1}
         />
       ) : (
         <View className="gap-4 px-4 pb-4">
@@ -311,30 +326,39 @@ export function BrushSheet({
               />
             ))}
           </Section>
-          <Section
-            title={t('My brushes')}
-            footer={presets.brushes.length ? undefined : t('Nothing here yet. Duplicate a brush above or make a new one.')}
-          >
-            {presets.brushes.map(preset => (
-              <ListItem
-                key={preset.id}
-                title={preset.name}
-                subtitle={baseLabel(preset.base)}
-                left={<BrushThumb base={preset.base} preset={preset} width={THUMB_W} height={THUMB_H} />}
-                selected={current?.id === preset.id}
-                onPress={() => pick(preset.id, preset.base)}
-                right={
-                  <IconButton
-                    icon={EditIcon}
-                    color="text-muted"
-                    onPress={() => setDraft(preset)}
-                    accessibilityLabel={t('Edit {name}', { name: preset.name })}
+          {groups.length === 0 ? (
+            <Section title={t('My brushes')} footer={t('Nothing here yet. Duplicate a brush above or make a new one.')}>
+              {null}
+            </Section>
+          ) : (
+            // One section per set, in the person's order; with only the default set it reads "My brushes".
+            groups.map(({ set, brushes }) => (
+              <Section key={set.id} title={presets.sets.length > 1 ? setLabel(set) : t('My brushes')}>
+                {brushes.map(preset => (
+                  <ListItem
+                    key={preset.id}
+                    title={preset.name}
+                    subtitle={baseLabel(preset.base)}
+                    left={<BrushThumb base={preset.base} preset={preset} width={THUMB_W} height={THUMB_H} />}
+                    selected={current?.id === preset.id}
+                    onPress={() => pick(preset.id, preset.base)}
+                    right={
+                      <IconButton
+                        icon={EditIcon}
+                        color="text-muted"
+                        onPress={() => setDraft(preset)}
+                        accessibilityLabel={t('Edit {name}', { name: preset.name })}
+                      />
+                    }
                   />
-                }
-              />
-            ))}
-          </Section>
-          <Button title={t('New brush')} icon={PlusIcon} variant="secondary" onPress={create} />
+                ))}
+              </Section>
+            ))
+          )}
+          <View className="flex-row flex-wrap gap-2">
+            <Button title={t('New brush')} icon={PlusIcon} variant="secondary" className="flex-1" onPress={create} />
+            <Button title={t('Manage…|brushes')} icon={PresetsIcon} variant="secondary" className="flex-1" onPress={manage} />
+          </View>
         </View>
       )}
     </Sheet>

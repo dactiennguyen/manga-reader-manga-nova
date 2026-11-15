@@ -87,7 +87,10 @@ Cấu hình khi mở: `journal_mode=WAL`, `synchronous=NORMAL`, `foreign_keys=ON
 
 Khóa `artPresets` trong `meta` giữ bút và tông người dùng tự tạo, dạng một bản JSON (`src/core/art/presets.ts`). Chúng dùng chung cho mọi truyện. Bút và tông có sẵn nằm trong code, không ghi xuống.
 
+Bản 2 của `artPresets` thêm `sets` (danh sách bộ `{ id, name }`) và trường `set` trên mỗi bút, tông. Bộ mặc định có id `default` luôn tồn tại. Bản ghi bản 1 được đọc với mọi preset trong bộ mặc định, rồi ghi lại một lần ở dạng bản 2 khi mở app. Preset trỏ tới bộ không còn thì về bộ mặc định.
+
 Khóa `statsProgress` và `drawSessions` trong `meta` giữ dữ liệu thống kê sáng tác: tổng mỗi ngày và các buổi vẽ. Không cần migration. Xem [20-thong-ke-sang-tac.md](20-thong-ke-sang-tac.md).
+
 Khóa `planner` giữ kế hoạch và hạn chót của các chương, ngày từng trang được đánh dấu xong, và số trang dự kiến của các ngày đã qua. Không đi theo file `.manganova`. Xem [23-lich-sang-tac.md](23-lich-sang-tac.md).
 
 ## Lưu nét vẽ

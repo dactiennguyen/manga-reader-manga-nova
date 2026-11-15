@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import {
   AiIcon,
   AwakeIcon,
+  BrushIcon,
   CalendarIcon,
   CardsIcon,
   CharactersIcon,
@@ -38,6 +39,7 @@ import { formatBytes } from '../../core/util/format';
 import { DIRS, dirSize } from '../../native/files';
 import { useAppNavigation } from '../../state/navigation';
 import { useAiReports } from '../../state/useAiReports';
+import { useArtPresets } from '../../state/useArtPresets';
 import { useNearbySafety } from '../../state/useNearbySafety';
 import { useSettings, type CreatorRole, type Handedness, type ThemeMode } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
@@ -56,6 +58,7 @@ import {
   useDockInset,
 } from '../../ui';
 import { ReportsSheet } from '../aiReport/ReportsSheet';
+import { countLabel } from '../brushLibrary/labels';
 import { BlockedPeopleSheet } from '../nearby/safety/BlockedPeopleSheet';
 import { AiServerSheet } from './AiServerSheet';
 import { ReminderRows } from './ReminderRows';
@@ -119,6 +122,8 @@ export function ProfileScreen() {
   const reportCount = useAiReports(s => s.reports.length);
   const [blockedSheet, setBlockedSheet] = useState(false);
   const blockedCount = useNearbySafety(s => s.blocked.length);
+  const brushCount = useArtPresets(s => s.brushes.length);
+  const toneCount = useArtPresets(s => s.tones.length);
   const [usedBytes, setUsedBytes] = useState<number | null>(null);
   const { importing, onImport } = useImportArchive();
 
@@ -242,6 +247,13 @@ export function ProfileScreen() {
           subtitle={`${t(ROLE_NAME[role])} · ${t(ART_STYLE_LABEL[defaultStyle])}`}
           chevron
           onPress={() => navigation.navigate('Preferences', { edit: true })}
+        />
+        <ListItem
+          icon={BrushIcon}
+          title={t('My brushes and tones')}
+          subtitle={countLabel(brushCount, toneCount)}
+          chevron
+          onPress={() => navigation.navigate('BrushLibrary')}
         />
         <SwitchRow
           icon={AwakeIcon}

@@ -18,6 +18,7 @@ import { t } from '../core/i18n';
 import { copyUriToCache, removeFile, stripFileScheme } from '../native/files';
 import { hideSplash, setSystemBarsDarkIcons } from '../native/screen';
 import { ReportHost } from '../features/aiReport/ReportHost';
+import { isBrushFileAt, openBrushFile } from '../features/brushLibrary/brushFiles';
 import { handleWidgetLink } from '../features/home/widgetLink';
 import { useWidgetSync } from '../features/home/widgetSync';
 import { handleNearbyLink } from '../features/nearby/deepLink';
@@ -38,12 +39,26 @@ function rootRoute(state: NavigationState | undefined): string | undefined {
   return state?.routes[state.index]?.name;
 }
 
+/** A file opened from another app can arrive at launch, before the first screen is up. */
+async function navigationReady(): Promise<void> {
+  for (let i = 0; i < 50 && !navigationRef.isReady(); i++) {
+    await new Promise<void>(resolve => setTimeout(() => resolve(), 100));
+  }
+}
+
 async function openArchive(url: string | null | undefined): Promise<void> {
   if (!url || !/^(content|file):/.test(url)) {
     return;
   }
+  let path: string | null = null;
   try {
-    const path = await copyUriToCache(url, 'incoming.manganova');
+    path = await copyUriToCache(url, 'incoming.manganova');
+    // A .mnbrush set is JSON, a story is a zip: the content decides, since many apps hand over no file name.
+    if (await isBrushFileAt(path)) {
+      await navigationReady();
+      await openBrushFile(path, navigationRef);
+      return;
+    }
     const projectId = await appServices().importProject(path);
     if (navigationRef.isReady()) {
       navigationRef.navigate('Project', { projectId });
@@ -52,6 +67,9 @@ async function openArchive(url: string | null | undefined): Promise<void> {
   } catch (error) {
     toast(error instanceof Error ? error.message : t("This file can't be read."));
   } finally {
+    if (path) {
+      removeFile(path).catch(() => undefined);
+    }
     // iOS copies a file opened from another app into Documents/Inbox and leaves it there.
     if (url.startsWith('file://') && url.includes('/Documents/Inbox/')) {
       removeFile(stripFileScheme(url)).catch(() => undefined);
