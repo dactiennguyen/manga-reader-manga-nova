@@ -21,6 +21,7 @@ import {
   MailIcon,
   MoveToIcon,
   PaletteIcon,
+  RefBoardIcon,
   SlidersIcon,
   TranslateIcon,
   BlockPersonIcon,
@@ -191,6 +192,13 @@ export function ProfileScreen() {
         <ListItem icon={CharactersIcon} title={t('Reading club')} chevron onPress={() => navigation.navigate('Club')} />
         <ListItem icon={MailIcon} title={t('Mailbox')} chevron onPress={() => navigation.navigate('Mailbox')} />
         <ListItem icon={MagazineIcon} title={t('My magazine')} chevron onPress={() => navigation.navigate('Magazine')} />
+        <ListItem
+          icon={RefBoardIcon}
+          title={t('Reference boards')}
+          subtitle={t('Pictures to draw from, by character, place and pose')}
+          chevron
+          onPress={() => navigation.navigate('RefBoards')}
+        />
       </Section>
 
       <Section title={t('Appearance|settings')}>

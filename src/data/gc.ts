@@ -5,6 +5,12 @@ import type { StoryData } from '../core/model/types';
 const DAY = 24 * 60 * 60 * 1000;
 const SOFT_DELETE_DAYS = 7;
 
+/**
+ * The only folders a file sweep may ever look in. Reference board pictures live in `refs/` and are never
+ * swept: a board owns its folder, and deleting the board removes it (see state/useRefBoards).
+ */
+export const SWEPT_DIRS = ['images', 'thumbs'] as const;
+
 export type GcReport = {
   orphanPanels: string[];
   expiredRows: number;

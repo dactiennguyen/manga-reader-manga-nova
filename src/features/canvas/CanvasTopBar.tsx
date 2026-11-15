@@ -1,4 +1,4 @@
-import { CheckIcon, LayersIcon, MoreIcon, RedoIcon, UndoIcon } from '../../ui/icons';
+import { CheckIcon, LayersIcon, MoreIcon, RedoIcon, RefBoardIcon, UndoIcon } from '../../ui/icons';
 import { memo, useEffect } from 'react';
 import { View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { type AnimatedStyle } from 'react-native-reanimated';
@@ -44,6 +44,8 @@ export function CanvasTopBar({
   fade,
   onDone,
   onLayers,
+  onRefs,
+  refsActive,
   onMore,
   onLayout,
 }: {
@@ -53,6 +55,9 @@ export function CanvasTopBar({
   fade: StyleProp<AnimatedStyle<ViewStyle>>;
   onDone: () => void;
   onLayers: () => void;
+  /** Opens the reference boards; shown as active while a reference window is open. */
+  onRefs: () => void;
+  refsActive: boolean;
   onMore: () => void;
   onLayout: (event: LayoutChangeEvent) => void;
 }) {
@@ -71,6 +76,7 @@ export function CanvasTopBar({
         </Text>
       </View>
       <HistoryButtons panelId={panelId} />
+      <IconButton icon={RefBoardIcon} onPress={onRefs} active={refsActive} accessibilityLabel={t('Reference boards')} />
       <IconButton icon={LayersIcon} onPress={onLayers} active={layersOpen} accessibilityLabel={t('Layers')} />
       <IconButton icon={MoreIcon} onPress={onMore} accessibilityLabel={t('More')} />
     </Animated.View>

@@ -1,4 +1,4 @@
-import { AddImageIcon, CharactersIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon, MaterialsIcon, PoseIcon, ReplayIcon } from '../../ui/icons';
+import { AddImageIcon, CharactersIcon, DeleteIcon, EditIcon, FlipIcon, GridIcon, ImageIcon, MaterialsIcon, PoseIcon, RefBoardIcon, ReplayIcon } from '../../ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { BackHandler, View, type LayoutChangeEvent } from 'react-native';
 import { useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -20,6 +20,7 @@ import type { PageContext } from '../../render/drawPage';
 import { usePageContext } from '../../render/PageView';
 import { useCharacters, useLastOpened } from '../../state/hooks';
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
+import { useBoardImages, useRefBoards } from '../../state/useRefBoards';
 import { useSettings } from '../../state/useSettings';
 import { EmptyState, Menu, MOTION, Screen, toast } from '../../ui';
 import { BrushSheet } from './BrushSheet';
@@ -27,19 +28,14 @@ import { CanvasRail } from './CanvasRail';
 import { CanvasStage } from './CanvasStage';
 import { CanvasToolPanel } from './CanvasToolPanel';
 import { ArtRevWatcher, CanvasTopBar } from './CanvasTopBar';
-import {
-  BrushPreview,
-  DescriptionBanner,
-  ReferenceWindow,
-  TipsOverlay,
-  ZoomBadge,
-  type CanvasReference,
-} from './CanvasOverlays';
+import { BrushPreview, DescriptionBanner, TipsOverlay, ZoomBadge } from './CanvasOverlays';
 import { CharacterRefSheet, characterReference } from './CharacterRefSheet';
 import { LayerPanel } from './LayerPanel';
 import type { Material } from './materials';
 import { MaterialsSheet } from './MaterialsSheet';
 import { PosesSheet } from './PosesSheet';
+import { RefFloat, type CanvasReference } from './RefFloat';
+import { RefPickSheet, type RefPick } from './RefPickSheet';
 import { ReplaySheet } from './ReplaySheet';
 import { ToneSheet } from './ToneSheet';
 import { useCanvasDoc } from './useCanvasDoc';
@@ -115,7 +111,7 @@ export function CanvasEditor({
   const [sizing, setSizing] = useState(false);
   const [reference, setReference] = useState<CanvasReference | null>(null);
   const [guide, setGuide] = useState<GuideKind | null>(null);
-  const [sheet, setSheet] = useState<'characters' | 'materials' | 'poses' | 'replay' | 'brushes' | 'tones' | null>(null);
+  const [sheet, setSheet] = useState<'characters' | 'materials' | 'poses' | 'replay' | 'brushes' | 'tones' | 'refs' | null>(null);
   const [opacityPreview, setOpacityPreview] = useState<{ id: ID; value: number } | null>(null);
   const [banner, setBanner] = useState(false);
 
@@ -222,6 +218,30 @@ export function CanvasEditor({
 
   const closeReference = useCallback(() => setReference(null), []);
 
+  // A board's pictures are read live, so pictures pinned in the meantime show up in the window.
+  const boardImages = useBoardImages(reference?.boardId);
+  const shownReference = useMemo<CanvasReference | null>(() => {
+    if (!reference?.boardId) {
+      return reference;
+    }
+    const images = boardImages.map(item => ({ path: item.path, caption: item.caption, width: item.width, height: item.height }));
+    return images.length ? { ...reference, images } : null;
+  }, [reference, boardImages]);
+
+  const pickReference = (pick: RefPick) => {
+    if (pick.kind === 'character') {
+      setSheet('characters');
+    } else if (pick.kind === 'device') {
+      addReference();
+    } else if (pick.kind === 'manage') {
+      navigation.navigate('RefBoards', { projectId: ctx.project.id });
+    } else {
+      const { board } = pick;
+      useRefBoards.getState().setSession({ boardId: board.id });
+      setReference({ id: board.id, boardId: board.id, title: board.name, images: [] });
+    }
+  };
+
   const chooseGuide = (kind: GuideKind) => {
     const next = kind === guide ? null : kind;
     setGuide(next);
@@ -286,12 +306,13 @@ export function CanvasEditor({
       {embed?.renderOverlay?.(engine)}
       {sizing ? <BrushPreview size={tools.size} view={view} /> : null}
       {banner && panel?.description ? <DescriptionBanner text={panel.description} top={railTop} /> : null}
-      {reference ? (
-        <ReferenceWindow
-          key={reference.id}
-          reference={reference}
-          initialX={side === 'left' ? Math.max(0, area.w - 164) : 8}
-          initialY={railTop}
+      {shownReference && area.w > 0 ? (
+        <RefFloat
+          key={shownReference.id}
+          reference={shownReference}
+          area={area}
+          side={otherSide}
+          top={railTop}
           onClose={closeReference}
         />
       ) : null}
@@ -331,6 +352,8 @@ export function CanvasEditor({
             fade={fade}
             onDone={done}
             onLayers={() => setLayersOpen(value => !value)}
+            onRefs={() => setSheet('refs')}
+            refsActive={!!shownReference}
             onMore={() => setMenuOpen(true)}
             onLayout={trackers.top}
           />
@@ -353,6 +376,7 @@ export function CanvasEditor({
         items={[
           { label: t('Materials'), icon: MaterialsIcon, onPress: () => setSheet('materials') },
           { label: t('Poses'), icon: PoseIcon, onPress: () => setSheet('poses') },
+          { label: t('Reference boards'), icon: RefBoardIcon, onPress: () => setSheet('refs') },
           { label: t('Character reference'), icon: CharactersIcon, onPress: () => setSheet('characters') },
           { label: t('Flip view horizontally'), icon: FlipIcon, onPress: () => setFlip(value => !value) },
           { label: grid ? t('Hide grid') : t('Show grid'), icon: GridIcon, onPress: () => setGrid(value => !value) },
@@ -369,6 +393,7 @@ export function CanvasEditor({
         onClose={() => setSheet(null)}
         onPick={showCharacter}
       />
+      <RefPickSheet visible={sheet === 'refs'} projectId={ctx.project.id} onClose={() => setSheet(null)} onPick={pickReference} />
       <ReplaySheet visible={sheet === 'replay'} panels={[{ panelId, shape }]} onClose={() => setSheet(null)} />
       <MaterialsSheet visible={sheet === 'materials'} onClose={() => setSheet(null)} onPick={addMaterial} />
       <PosesSheet visible={sheet === 'poses'} onClose={() => setSheet(null)} onPick={addPose} />

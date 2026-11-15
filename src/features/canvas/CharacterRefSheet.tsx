@@ -2,13 +2,18 @@ import { t } from '../../core/i18n';
 import { ROLE_LABEL } from '../../core/model/constants';
 import type { Character } from '../../core/model/types';
 import { Avatar, EmptyState, ListItem, Sheet } from '../../ui';
-import type { CanvasReference } from './CanvasOverlays';
+import type { CanvasReference } from './RefFloat';
 
 /** The face first, then the body and each expression drawn on the character's sheet. */
 export function characterReference(character: Character): CanvasReference {
   const { face, body, expressions } = character.sheet;
   const images = [face, body, ...Object.values(expressions)].filter((path): path is string => !!path);
-  return { id: character.id, images, title: character.name || t('Unnamed'), note: character.appearance.trim() || undefined };
+  return {
+    id: character.id,
+    images: images.map(path => ({ path })),
+    title: character.name || t('Unnamed'),
+    note: character.appearance.trim() || undefined,
+  };
 }
 
 export function CharacterRefSheet({

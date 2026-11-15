@@ -85,9 +85,11 @@ export { DotsThreeIcon as MoreHorizontalIcon } from 'phosphor-react-native/src/i
 export { DotsThreeVerticalIcon as MoreIcon } from 'phosphor-react-native/src/icons/DotsThreeVertical';
 export { ArrowsOutCardinalIcon as MoveIcon } from 'phosphor-react-native/src/icons/ArrowsOutCardinal';
 export { FolderOpenIcon as MoveToIcon } from 'phosphor-react-native/src/icons/FolderOpen';
+export { ArrowLineUpIcon as MoveToStartIcon } from 'phosphor-react-native/src/icons/ArrowLineUp';
 export { SkipForwardIcon as NextLineIcon } from 'phosphor-react-native/src/icons/SkipForward';
 export { NoteIcon as NoteIcon } from 'phosphor-react-native/src/icons/Note';
 export { NotebookIcon as NotesIcon } from 'phosphor-react-native/src/icons/Notebook';
+export { DropHalfIcon as OpacityIcon } from 'phosphor-react-native/src/icons/DropHalf';
 export { ListNumbersIcon as OrderIcon } from 'phosphor-react-native/src/icons/ListNumbers';
 export { PaletteIcon as PaletteIcon } from 'phosphor-react-native/src/icons/Palette';
 export { FrameCornersIcon as PanelFrameIcon } from 'phosphor-react-native/src/icons/FrameCorners';
@@ -108,10 +110,12 @@ export { BookOpenIcon as ReadIcon } from 'phosphor-react-native/src/icons/BookOp
 export { RectangleIcon as RectIcon } from 'phosphor-react-native/src/icons/Rectangle';
 export { MicrophoneIcon as RecordIcon } from 'phosphor-react-native/src/icons/Microphone';
 export { ArrowUUpRightIcon as RedoIcon } from 'phosphor-react-native/src/icons/ArrowUUpRight';
+export { PushPinIcon as RefBoardIcon } from 'phosphor-react-native/src/icons/PushPin';
 export { ArrowsClockwiseIcon as RefreshIcon } from 'phosphor-react-native/src/icons/ArrowsClockwise';
 export { BellIcon as ReminderIcon } from 'phosphor-react-native/src/icons/Bell';
 export { UserMinusIcon as RemovePersonIcon } from 'phosphor-react-native/src/icons/UserMinus';
 export { RepeatIcon as RepeatIcon } from 'phosphor-react-native/src/icons/Repeat';
+export { ArrowDownRightIcon as ResizeIcon } from 'phosphor-react-native/src/icons/ArrowDownRight';
 export { FilmStripIcon as ReplayIcon } from 'phosphor-react-native/src/icons/FilmStrip';
 export { ArrowCounterClockwiseIcon as RestoreIcon } from 'phosphor-react-native/src/icons/ArrowCounterClockwise';
 export { ArrowClockwiseIcon as RotateIcon } from 'phosphor-react-native/src/icons/ArrowClockwise';
@@ -146,6 +150,7 @@ export { SmileyMeltingIcon as StickerWowIcon } from 'phosphor-react-native/src/i
 export { ChartBarIcon as StatsIcon } from 'phosphor-react-native/src/icons/ChartBar';
 export { StopCircleIcon as StopIcon } from 'phosphor-react-native/src/icons/StopCircle';
 export { FlameIcon as StreakIcon } from 'phosphor-react-native/src/icons/Flame';
+export { TagIcon as TagIcon } from 'phosphor-react-native/src/icons/Tag';
 export { SquaresFourIcon as TemplatesIcon } from 'phosphor-react-native/src/icons/SquaresFour';
 export { ClockIcon as TimeIcon } from 'phosphor-react-native/src/icons/Clock';
 export { DotsNineIcon as ToneIcon } from 'phosphor-react-native/src/icons/DotsNine';

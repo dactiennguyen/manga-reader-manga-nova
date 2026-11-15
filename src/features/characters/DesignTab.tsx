@@ -10,6 +10,7 @@ import { fileUri } from '../../core/util/paths';
 import { pickImage } from '../../native/files';
 import { useStory } from '../../state/useStory';
 import { Banner, Button, Icon, Menu, Pressable, SectionHeader, Text, confirm, toast } from '../../ui';
+import { CharacterBoards } from '../refBoards/CharacterBoards';
 import { AutoField, ImageViewer, useSticky } from './fields';
 
 const BIG_FRAME = { aspectRatio: 3 / 4 };
@@ -184,6 +185,10 @@ export function DesignTab({ character }: { character: Character }) {
           {t('Add {face} and {body} images to lock them as reference.', { face: t(slotLabel('face')), body: t(slotLabel('body')) })}
         </Text>
       )}
+
+      <View className="mt-3">
+        <CharacterBoards character={character} />
+      </View>
 
       <Menu
         visible={!!menuSlot}

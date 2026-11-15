@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, MarkDoneIcon, MoreIcon, PaletteIcon, PlayIcon } from '../../ui/icons';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, MarkDoneIcon, MoreIcon, PaletteIcon, PlayIcon, RefBoardIcon } from '../../ui/icons';
 
 import { msg, t } from '../../core/i18n';
 import { ART_STYLE_LABEL, ART_STYLES } from '../../core/model/constants';
@@ -106,6 +106,7 @@ export function ProjectScreen({ navigation, route }: ScreenProps<'Project'>) {
         items={[
           { label: t('Edit details'), icon: EditIcon, onPress: () => setEditing(true) },
           { label: t('Change cover'), icon: ImageIcon, onPress: () => changeProjectCover(projectId) },
+          { label: t('Reference boards'), icon: RefBoardIcon, onPress: () => navigation.navigate('RefBoards', { projectId }) },
           {
             label: t('Change art style'),
             subtitle: t(ART_STYLE_LABEL[project.style]),

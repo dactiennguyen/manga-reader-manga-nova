@@ -74,6 +74,11 @@ CREATE TABLE strokes (
 CREATE TABLE script_versions (id TEXT PRIMARY KEY, chapter_id TEXT NOT NULL, doc TEXT NOT NULL, created_at INTEGER NOT NULL);
 CREATE TABLE assistant_threads (id TEXT PRIMARY KEY, project_id TEXT, doc TEXT NOT NULL, updated_at INTEGER NOT NULL);
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+
+-- Thêm ở migration 3: thư viện tham khảo, xem 20-thu-vien-tham-khao.md
+CREATE TABLE ref_boards (id TEXT PRIMARY KEY, project_id TEXT, character_id TEXT, doc TEXT NOT NULL, updated_at INTEGER NOT NULL);
+CREATE TABLE ref_images (id TEXT PRIMARY KEY, board_id TEXT NOT NULL REFERENCES ref_boards(id) ON DELETE CASCADE,
+  pos INTEGER NOT NULL, doc TEXT NOT NULL, updated_at INTEGER NOT NULL);
 ```
 
 Cấu hình khi mở: `journal_mode=WAL`, `synchronous=NORMAL`, `foreign_keys=ON`, `auto_vacuum=INCREMENTAL`.
@@ -106,6 +111,7 @@ Cột `style` chỉ có giá trị khi nét dùng bút tùy chỉnh hoặc tông
 <filesDir>/manganova/
 ├── manganova.db
 ├── images/    ảnh người dùng thêm: bìa, bảng thiết kế, ảnh thế giới, ảnh lớp
+├── refs/      ảnh của thư viện tham khảo, mỗi bảng một thư mục <boardId>/
 ├── thumbs/    thumbnail, tạo lại được
 ├── exports/   file đã xuất, mỗi truyện một thư mục <projectId>/, gồm cả .manganova
 └── backups/   bản sao DB trước migration
@@ -123,7 +129,8 @@ Dữ liệu chỉ lưu **đường dẫn tương đối** với `<filesDir>/mang
 | Truyện trong Thùng rác | Giữ theo `LIMITS.trashDays` như app cũ, hết hạn thì xóa hẳn |
 | Dòng có `deleted_at` khác | Xóa hẳn sau 7 ngày |
 | `gen` cũ, đuôi nét làm lại | Xóa khi không còn tham chiếu nào. Lịch sử chỉ ở trong bộ nhớ nên lúc khởi động không còn ai cần |
-| File trong `images/`, `thumbs/` | Quét đánh dấu: file không dòng nào trỏ tới thì xóa |
+| File trong `images/`, `thumbs/` | Quét đánh dấu: file không dòng nào trỏ tới thì xóa. Chỉ hai thư mục này (`SWEPT_DIRS` trong `src/data/gc.ts`) |
+| File trong `refs/` | GC không bao giờ quét. Gỡ ảnh khỏi bảng thì xóa file, xóa bảng thì xóa thư mục `refs/<boardId>/` |
 | File trong `exports/` | Xóa cả thư mục `<projectId>/` khi truyện bị xóa hẳn, qua hook của `connectStory`. Lịch sử xuất có nút xóa. App cũ không bao giờ xóa các file này |
 
 GC chỉ chạy lúc khởi động lạnh, sau khi nạp xong dữ liệu. Nó cũng xử lý luôn phần `deleteProjectForever` của app cũ để sót lại.
@@ -146,6 +153,8 @@ GC chỉ chạy lúc khởi động lạnh, sau khi nạp xong dữ liệu. Nó 
 **Bản 2 (app mới):** cùng cấu trúc, nhưng tranh tách thành `art/<panelId>.json`. App cũ dồn tất cả nét vào một chuỗi JSON, dễ tràn bộ nhớ với truyện dài.
 
 App mới ghi bản 2, đọc được cả hai. **Giữ bộ nhập bản 1 vĩnh viễn.**
+
+`story.json` có thể có thêm trường `refBoards`: các bảng tham khảo đã liên kết với truyện, kèm ảnh. File cũ không có trường này vẫn nhập bình thường. Xem [Thư viện tham khảo](20-thu-vien-tham-khao.md#file-manganova).
 
 Khi nhập:
 

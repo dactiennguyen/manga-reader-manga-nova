@@ -11,6 +11,8 @@ setFilesRoot(`${RNFS.DocumentDirectoryPath}/manganova`);
 export const DIRS = {
   root: filesRoot(),
   images: `${filesRoot()}/images`,
+  /** Reference board pictures, one folder per board. Kept out of images/ so its clean-up never sees them. */
+  refs: `${filesRoot()}/refs`,
   thumbs: `${filesRoot()}/thumbs`,
   exports: `${filesRoot()}/exports`,
   backups: `${filesRoot()}/backups`,
@@ -104,6 +106,46 @@ export async function copyIntoImages(sourcePath: string): Promise<string> {
   await ensureDirs();
   const dest = `${DIRS.images}/${uid()}.${extensionOf(sourcePath)}`;
   await RNFS.copyFile(toAbsolute(sourcePath), dest);
+  return toRelative(dest);
+}
+
+/** Several images at once, copied into the cache. Resolves with none when the picker is closed. */
+export async function pickImagesToCache(max: number): Promise<{ path: string; name: string }[]> {
+  try {
+    const picked = (await pick({ type: types.images, allowMultiSelection: true })).slice(0, max);
+    const named = picked.map(file => ({ uri: file.uri, fileName: file.name ?? `image-${uid()}.jpg` }));
+    if (!named.length) {
+      return [];
+    }
+    const copies = await keepLocalCopy({
+      files: named as [{ uri: string; fileName: string }, ...{ uri: string; fileName: string }[]],
+      destination: 'cachesDirectory',
+    });
+    return copies.flatMap((copy, index) =>
+      copy.status === 'success' ? [{ path: stripFileScheme(copy.localUri), name: named[index].fileName }] : [],
+    );
+  } catch (error) {
+    if (isCancel(error)) {
+      return [];
+    }
+    throw error;
+  }
+}
+
+/**
+ * Puts a file into a board's folder and returns its stored path. A file from the cache is moved; a file
+ * the app already keeps (a character sheet, a world image) is copied, so the two never share a file.
+ */
+export async function storeRefFile(source: string, boardId: string, move: boolean): Promise<string> {
+  await ensureDirs();
+  const dir = `${DIRS.refs}/${boardId}`;
+  await RNFS.mkdir(dir);
+  const dest = `${dir}/${uid()}.${extensionOf(source)}`;
+  if (move) {
+    await RNFS.moveFile(toAbsolute(source), dest);
+  } else {
+    await RNFS.copyFile(toAbsolute(source), dest);
+  }
   return toRelative(dest);
 }
 

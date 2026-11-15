@@ -1,20 +1,10 @@
-import { CaretRightIcon, CloseIcon, MaximizeIcon, MinimizeIcon } from '../../ui/icons';
-import { useState } from 'react';
-import { Image, StyleSheet, TextInput, View } from 'react-native';
-import { GestureDetector, usePanGesture, useSimultaneousGestures, useTapGesture } from 'react-native-gesture-handler';
-import Animated, { useAnimatedProps, useAnimatedStyle, useSharedValue, type SharedValue } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
+import { StyleSheet, TextInput, View } from 'react-native';
+import Animated, { useAnimatedProps, useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
 
 import { fitView, type SessionEnv } from '../../core/art/session';
 import type { ViewState } from '../../core/art/tools';
 import { msg, t } from '../../core/i18n';
-import { fileUri } from '../../core/util/paths';
-import { ICON, IconButton, Pressable, Text } from '../../ui';
-
-const REF_SIZES = [152, 224];
-
-/** A picture to draw from, or a character with their sheet and appearance notes. */
-export type CanvasReference = { id: string; images: string[]; title?: string; note?: string };
+import { Pressable, Text } from '../../ui';
 
 const TIPS = [
   [msg('One finger'), msg('Draw. Press and hold to pick a color.')],
@@ -28,87 +18,6 @@ const TIPS = [
 ];
 
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
-
-export function ReferenceWindow({
-  reference,
-  initialX,
-  initialY,
-  onClose,
-}: {
-  reference: CanvasReference;
-  initialX: number;
-  initialY: number;
-  onClose: () => void;
-}) {
-  const x = useSharedValue(initialX);
-  const y = useSharedValue(initialY);
-  const [big, setBig] = useState(false);
-  const [shown, setShown] = useState(0);
-  const size = REF_SIZES[big ? 1 : 0];
-  const { images, title, note } = reference;
-  const path = images[shown];
-  const pan = usePanGesture({
-    onUpdate: e => {
-      'worklet';
-      x.value = Math.max(0, x.value + e.changeX);
-      y.value = Math.max(0, y.value + e.changeY);
-    },
-  });
-  const doubleTap = useTapGesture({
-    numberOfTaps: 2,
-    onActivate: () => {
-      'worklet';
-      scheduleOnRN(onClose);
-    },
-  });
-  const gesture = useSimultaneousGestures(pan, doubleTap);
-  const place = useAnimatedStyle(() => ({ left: x.value, top: y.value }));
-  return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View className="absolute overflow-hidden rounded-sm border-2 border-raised bg-raised" style={[{ width: size }, place]}>
-        {path ? (
-          <Image
-            source={{ uri: fileUri(path) }}
-            style={{ width: size - 4, height: size - 4 }}
-            resizeMode="contain"
-            accessibilityLabel={title ? t('{name} reference', { name: title }) : t('Reference image')}
-          />
-        ) : null}
-        {title || note ? (
-          <View className="gap-0.5 px-2 pt-1">
-            {title ? (
-              <Text variant="label" numberOfLines={1}>
-                {title}
-              </Text>
-            ) : null}
-            {note ? (
-              <Text variant="caption" tone="secondary" numberOfLines={big ? 8 : 4}>
-                {note}
-              </Text>
-            ) : null}
-          </View>
-        ) : null}
-        <View className="flex-row justify-between">
-          <IconButton
-            icon={big ? MinimizeIcon : MaximizeIcon}
-            size={ICON.sm}
-            onPress={() => setBig(value => !value)}
-            accessibilityLabel={big ? t('Shrink reference image') : t('Enlarge reference image')}
-          />
-          {images.length > 1 ? (
-            <IconButton
-              icon={CaretRightIcon}
-              size={ICON.sm}
-              onPress={() => setShown(value => (value + 1) % images.length)}
-              accessibilityLabel={t('Next reference image')}
-            />
-          ) : null}
-          <IconButton icon={CloseIcon} size={ICON.sm} onPress={onClose} accessibilityLabel={t('Hide reference image')} />
-        </View>
-      </Animated.View>
-    </GestureDetector>
-  );
-}
 
 export function TipsOverlay({ onClose }: { onClose: () => void }) {
   return (

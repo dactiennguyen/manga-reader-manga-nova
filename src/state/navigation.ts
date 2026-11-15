@@ -51,6 +51,9 @@ export type RootStackParamList = {
   MangakaCard: undefined;
   SendStory: undefined;
   ScanCode: undefined;
+  // Reference boards
+  RefBoards: { projectId?: ID; characterId?: ID } | undefined;
+  RefBoard: { boardId: ID };
 };
 
 /** The app's one navigator, for code that runs outside a screen: links opened from another app or a scanned code. */

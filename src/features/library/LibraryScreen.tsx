@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlayTogetherIcon, PlusIcon, ReadIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
+import { CopyIcon, DeleteIcon, EditIcon, ExportIcon, ImageIcon, ListIcon, MarkDoneIcon, MoreIcon, MoveToIcon, PlayTogetherIcon, PlusIcon, ReadIcon, RefBoardIcon, SearchIcon, SortIcon, TemplatesIcon } from '../../ui/icons';
 
 import { t, tn } from '../../core/i18n';
 import { LIMITS, PROJECT_STATUS_LABEL } from '../../core/model/constants';
@@ -208,6 +208,7 @@ export function LibraryScreen() {
         items={[
           { label: t('Import project (.manganova)'), icon: MoveToIcon, onPress: importProject },
           { label: t('Open the sample story'), icon: ReadIcon, onPress: openSample },
+          { label: t('Reference boards'), icon: RefBoardIcon, onPress: () => navigation.navigate('RefBoards') },
           { label: t('Trash'), icon: DeleteIcon, onPress: () => navigation.navigate('Trash') },
           {
             label: layout === 'grid' ? t('List view') : t('Grid view'),

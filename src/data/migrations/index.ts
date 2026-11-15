@@ -86,6 +86,25 @@ export const MIGRATIONS: Migration[] = [
       db.run('ALTER TABLE strokes ADD COLUMN style TEXT');
     },
   },
+  {
+    // Reference boards: pinned pictures to draw from. Self-contained, so this step can take another number
+    // if a parallel branch lands first. The files live in refs/<boardId>/, never in images/.
+    version: 3,
+    up: db => {
+      db.run(`CREATE TABLE IF NOT EXISTS ref_boards (
+        id TEXT PRIMARY KEY, project_id TEXT, character_id TEXT, doc TEXT NOT NULL, updated_at INTEGER NOT NULL
+      )`);
+      db.run(`CREATE TABLE IF NOT EXISTS ref_images (
+        id          TEXT PRIMARY KEY,
+        board_id    TEXT NOT NULL REFERENCES ref_boards(id) ON DELETE CASCADE,
+        pos         INTEGER NOT NULL,
+        doc         TEXT NOT NULL,
+        updated_at  INTEGER NOT NULL
+      )`);
+      db.run('CREATE INDEX IF NOT EXISTS idx_ref_images_board ON ref_images(board_id, pos)');
+      db.run('CREATE INDEX IF NOT EXISTS idx_ref_boards_project ON ref_boards(project_id)');
+    },
+  },
 ];
 
 export function userVersion(db: Db): number {

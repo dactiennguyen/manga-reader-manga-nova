@@ -2,7 +2,8 @@ import type { ID } from '../core/model/types';
 
 /** Work that needs the data layer, wired by src/app so screens never import it. */
 export type Services = {
-  exportProject: (projectId: ID) => Promise<string>;
+  /** Linked reference boards go in unless `refBoards` is false, as for a story sent to a friend. */
+  exportProject: (projectId: ID, options?: { refBoards?: boolean }) => Promise<string>;
   importProject: (archivePath: string) => Promise<ID>;
   testAiConnection: (config: { baseUrl: string; apiKey: string; model: string }) => Promise<string>;
 };
