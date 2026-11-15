@@ -14,6 +14,8 @@ const ESM_PACKAGES = [
 module.exports = {
   preset: '@react-native/jest-preset',
   setupFiles: ['<rootDir>/jest.setup.js'],
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/__tests__/helpers/'],
+  // Agent worktrees under .claude/ hold whole copies of the repo.
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/__tests__/helpers/', '<rootDir>/.claude/'],
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
   transformIgnorePatterns: [`node_modules/(?!(${ESM_PACKAGES.join('|')})/)`],
 };

@@ -79,3 +79,6 @@ yarn-error.log
 
 # Personal Claude Code settings
 .claude/settings.local.json
+
+# Agent worktrees
+.claude/worktrees/
