@@ -6,7 +6,7 @@ import { pick } from '../studio/seed';
 import { dayKeyToDate, formatDate } from '../util/time';
 import type { DayEntry, WeekSummary } from './calendar';
 import type { PlanItem } from './data';
-import { daysBetween, type Month } from './days';
+import { addDays, daysBetween, type Month } from './days';
 import { pagesOn, type PlanStatus, type PlanView } from './plan';
 
 export const STATUS_LABEL: Record<PlanStatus, string> = {
@@ -164,11 +164,8 @@ export function planReminderText(
   fireDay: string,
   today: string,
 ): string | null {
-  const open = items.filter(item => item.status !== 'done' && item.status !== 'overdue');
-  const due = open.find(item => {
-    const left = daysBetween(fireDay, item.plan.deadline);
-    return left >= 0 && left <= 1;
-  });
+  const open = items.filter(isOpen);
+  const due = dueNear(items, fireDay);
   if (due) {
     return t('{chapter} is due {date}. {pages} to go.', {
       chapter: nameOf(due.plan.chapterId),
@@ -187,4 +184,57 @@ export function planReminderText(
   }
   const total = work.reduce((sum, entry) => sum + entry.pages, 0);
   return t('Today: {pages} across {count} chapters.', { pages: pagesText(total), count: work.length });
+}
+
+/** Still pages to draw and the deadline not passed. */
+function isOpen(item: PlanItem): boolean {
+  return item.status !== 'done' && item.status !== 'overdue' && item.remaining > 0;
+}
+
+/** The plan the daily reminder names on `fireDay`: the first open one due that day or the next. */
+export function dueNear(items: readonly PlanItem[], fireDay: string): PlanItem | undefined {
+  return items.filter(isOpen).find(item => {
+    const left = daysBetween(fireDay, item.plan.deadline);
+    return left >= 0 && left <= 1;
+  });
+}
+
+/** The system keeps a limited number of waiting notifications (64 on iOS), so only the nearest go. */
+export const MAX_DEADLINE_REMINDERS = 20;
+
+export type DeadlineReminder = { id: string; chapterId: ID; day: string; at: number; body: string };
+
+/**
+ * One-off notifications for the day before each open deadline, at the reminder time, so the warning
+ * comes even when the app has not been opened for days. A moment already past is left out, and so is
+ * `skip`: the chapter the daily reminder already names on that day (see dueNear), so it is not said twice.
+ */
+export function deadlineReminders(
+  items: readonly PlanItem[],
+  nameOf: (chapterId: ID) => string,
+  options: { now: number; hour: number; minute: number; skip?: { day: string; chapterId: ID } },
+): DeadlineReminder[] {
+  const { now, hour, minute, skip } = options;
+  const result: DeadlineReminder[] = [];
+  for (const item of items) {
+    if (!isOpen(item)) {
+      continue;
+    }
+    const { chapterId, deadline } = item.plan;
+    const day = addDays(deadline, -1);
+    const date = dayKeyToDate(day);
+    date.setHours(hour, minute, 0, 0);
+    const at = date.getTime();
+    if (at <= now || (skip && skip.day === day && skip.chapterId === chapterId)) {
+      continue;
+    }
+    result.push({
+      id: `deadline-${chapterId}`,
+      chapterId,
+      day,
+      at,
+      body: t('{chapter} is due tomorrow. {pages} to go.', { chapter: nameOf(chapterId), pages: pagesText(item.remaining) }),
+    });
+  }
+  return result.sort((a, b) => a.at - b.at).slice(0, MAX_DEADLINE_REMINDERS);
 }

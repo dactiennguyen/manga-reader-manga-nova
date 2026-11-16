@@ -13,7 +13,7 @@ import { t } from '../../core/i18n';
 import { LIMITS } from '../../core/model/constants';
 import type { PanelShape } from '../../core/layout/layout';
 import type { ArtLayer, ID } from '../../core/model/types';
-import { pickImage } from '../../native/files';
+import { pickImage, pickPhoto } from '../../native/files';
 import { loadImage } from '../../render/images';
 import { addLayer, editLayer, loadArt, rewriteLayer, setActiveLayer } from '../../state/artStore';
 import { confirm, toast } from '../../ui';
@@ -65,12 +65,20 @@ export function useLayerActions(
     }
   }, [active, panelId]);
 
-  const addReference = useCallback(async () => {
-    const path = await pickImage();
-    if (path) {
-      showReference({ id: path, images: [{ path }] });
-    }
-  }, [showReference]);
+  /** One picture beside the page, from the photo library or, with 'files', through the system file picker. */
+  const addReference = useCallback(
+    async (from: 'photos' | 'files' = 'photos') => {
+      try {
+        const path = await (from === 'photos' ? pickPhoto() : pickImage());
+        if (path) {
+          showReference({ id: path, images: [{ path }] });
+        }
+      } catch {
+        toast(t('Could not load the image'));
+      }
+    },
+    [showReference],
+  );
 
   /** A background goes under the drawing and leaves the current layer active. A pattern goes on top. */
   const placeMaterial = useCallback(

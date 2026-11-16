@@ -34,6 +34,7 @@ Các giá trị này lấy từ template chính thức `@react-native-community/
 | Bàn phím | `react-native-keyboard-controller` | 1.23.0 |
 | File | `@dr.pogodin/react-native-fs` | 2.41.0 |
 | Chọn file, ảnh | `@react-native-documents/picker` | 12.0.3 |
+| Chọn ảnh từ thư viện Ảnh | `react-native-image-picker` | 8.3.1 |
 | SVG, icon | `react-native-svg`, `phosphor-react-native` | 15.16.1, 3.0.6 |
 | Style | `uniwind` + `tailwindcss` | 1.13.2 + 4.3.5 |
 

@@ -3,7 +3,7 @@ import { Image } from 'react-native';
 import { t, tn } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { fileUri } from '../../core/util/paths';
-import { pickImagesToCache, removeFile, storeRefFile } from '../../native/files';
+import { pickImagesToCache, pickPhotosToCache, removeFile, storeRefFile } from '../../native/files';
 import { REF_LIMITS, imagesOf, useRefBoards, type ImageInput, type RefImageSource } from '../../state/useRefBoards';
 import { toast } from '../../ui';
 
@@ -44,9 +44,13 @@ async function pin(boardId: ID, sources: { path: string; move: boolean; source: 
   return added;
 }
 
-export async function addFromDevice(boardId: ID): Promise<number> {
+/** Where pictures on the device come from: the photo library, or image files through the system file picker. */
+export type DeviceSource = 'photos' | 'files';
+
+export async function addFromDevice(boardId: ID, from: DeviceSource = 'photos'): Promise<number> {
   try {
-    const picked = await pickImagesToCache(Math.min(REF_LIMITS.pickAtOnce, Math.max(1, roomOn(boardId))));
+    const max = Math.min(REF_LIMITS.pickAtOnce, Math.max(1, roomOn(boardId)));
+    const picked = await (from === 'photos' ? pickPhotosToCache(max) : pickImagesToCache(max));
     return picked.length ? await pin(boardId, picked.map(item => ({ path: item.path, move: true, source: 'device' }))) : 0;
   } catch {
     toast(t('Could not load the image'));

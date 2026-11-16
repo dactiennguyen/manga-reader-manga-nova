@@ -1,6 +1,6 @@
 # Lịch sáng tác và hạn chót
 
-Người dùng đặt hạn chót cho từng chương: cần xong bao nhiêu trang, trước ngày nào, vẽ vào những thứ nào trong tuần. App chia số trang còn lại thành kế hoạch từng ngày, tính lại khi trang được đánh dấu xong hoặc khi bỏ lỡ một ngày, và nhắc qua thông báo hằng ngày có sẵn.
+Người dùng đặt hạn chót cho từng chương: cần xong bao nhiêu trang, trước ngày nào, vẽ vào những thứ nào trong tuần. App chia số trang còn lại thành kế hoạch từng ngày, tính lại khi trang được đánh dấu xong hoặc khi bỏ lỡ một ngày, và nhắc qua thông báo hằng ngày có sẵn, cộng một thông báo riêng vào ngày trước mỗi hạn chót.
 
 ## Màn hình
 
@@ -48,18 +48,35 @@ Lưu ở bảng `meta`, khóa `planner`, một bản JSON (`src/core/planner/dat
 
 ## Nhắc nhở
 
-Dùng lại thông báo hằng ngày (`src/features/profile/reminder.ts`), không sửa code native.
+Hai loại thông báo, cùng bật tắt bằng công tắc nhắc vẽ ở Profile và cùng giờ nhắc (`syncReminder` trong `src/features/profile/reminder.ts`).
+
+Thông báo hằng ngày:
 
 - Có kế hoạch thì nội dung thông báo nói về ngày thông báo sẽ hiện: hôm nay nếu chưa tới giờ nhắc, ngày mai nếu đã qua.
 - Hạn chót rơi vào ngày đó hoặc ngày hôm sau: "Chapter 3 is due 20/11/2026. 4 pages to go." Ghi rõ ngày, để câu vẫn đúng nếu thông báo lặp lại mà người dùng chưa mở app.
 - Không thì số trang của ngày đó: "Today: 2 pages of Chapter 3." Nhiều chương thì cộng lại.
 - Không có kế hoạch, hoặc hôm nay đã xong phần của mình, thì giữ câu nhắc giữ chuỗi như cũ.
-- Thông báo được hẹn lại khi mở app, đổi ngôn ngữ, sửa kế hoạch và khi app vào nền. Chữ giống lần trước thì không hẹn lại.
 
-Giới hạn: API native chỉ có một thông báo lặp mỗi ngày với chữ cố định. Nếu người dùng không mở app nhiều ngày, thông báo lặp lại câu cũ. Muốn nhắc riêng trước hạn chót một ngày thì phải thêm lịch thông báo một lần vào `specs/NativeReminder.ts` trên cả iOS và Android.
+Thông báo một lần trước hạn chót:
+
+- Mỗi kế hoạch còn trang và chưa quá hạn có một thông báo vào giờ nhắc của ngày trước hạn chót: "Chapter 3 is due tomorrow. 4 pages to go." Thông báo này đã hẹn sẵn, nên vẫn hiện dù người dùng không mở app nhiều ngày, khi câu của thông báo hằng ngày đã cũ.
+- Bỏ qua khi thời điểm đó đã qua, kế hoạch đã xong, hoặc chương đó đã được thông báo hằng ngày nhắc tên vào đúng ngày đó (`dueNear`), để không nói hai lần.
+- Chỉ giữ 20 thông báo gần nhất (`MAX_DEADLINE_REMINDERS`), vì iOS chỉ giữ 64 thông báo đang chờ.
+- Logic thuần là `deadlineReminders` trong `src/core/planner/words.ts`.
+
+Hẹn lại:
+
+- Cả hai được hẹn lại khi mở app, đổi ngôn ngữ, sửa kế hoạch và khi app vào nền. Chữ và giờ giống lần trước thì không hẹn lại.
+- Thông báo một lần luôn được thay **cả bộ** (`replaceOnce` trong `specs/NativeReminder.ts`), vì kế hoạch đổi, xong hay bị bỏ bất cứ lúc nào. Tắt nhắc vẽ thì hủy cả thông báo hằng ngày lẫn mọi thông báo một lần.
+- `replaceOnce` không hỏi quyền. Nó chỉ chạy sau khi thông báo hằng ngày được hẹn thành công, tức là quyền đã có.
+
+| Nền tảng | Thông báo một lần |
+| --- | --- |
+| iOS | `UNCalendarNotificationTrigger` không lặp, theo ngày giờ địa phương. Id có tiền tố `once-reminder:`, nên thay bộ một lần không đụng tới thông báo hằng ngày |
+| Android | Mỗi thông báo một `AlarmManager.setWindow` cửa sổ 30 phút như thông báo hằng ngày, nên không cần quyền báo thức chính xác. Danh sách lưu trong SharedPreferences `reminder`, khóa `once`. `ReminderReceiver` đăng ký lại sau khi máy khởi động và bỏ những cái đã qua giờ lúc máy tắt, vì "ngày mai" có thể không còn đúng |
 
 ## Kiểm thử
 
-- `__tests__/planner.test.ts`: chia trang, bỏ qua cuối tuần, bỏ lỡ ngày, chậm và vượt, hạn chót đã qua, hết trang, ngày hạn chót, dùng ngày nghỉ, ranh giới tuần, lịch và tổng kết tuần, câu nhắc.
+- `__tests__/planner.test.ts`: chia trang, bỏ qua cuối tuần, bỏ lỡ ngày, chậm và vượt, hạn chót đã qua, hết trang, ngày hạn chót, dùng ngày nghỉ, ranh giới tuần, lịch và tổng kết tuần, câu nhắc, thông báo một lần trước hạn chót.
 - `__tests__/plannerStore.test.ts`: ghi ngày xong trang, lưu và bỏ kế hoạch, dọn kế hoạch của chương đã xóa.
 - `__tests__/plannerDst.test.ts`: chạy lại các phép tính ngày trong một tiến trình Jest con với múi giờ New York, Berlin và Sydney, quanh mỗi lần đổi giờ năm 2026. Jest chép `process.env` cho từng file, nên đặt `TZ` trong file test không có tác dụng.

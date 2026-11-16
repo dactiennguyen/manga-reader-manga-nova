@@ -10,7 +10,7 @@ Nơi ghim ảnh để vẽ theo. Ảnh nằm trong từng bảng, mỗi bảng c
 | Library, menu ⋯ | Danh sách mọi bảng |
 | Project, menu ⋯ | Danh sách, lọc sẵn theo truyện này (bỏ lọc bằng chip tên truyện) |
 | Character, tab Design, mục "Thư viện tham khảo" | Bảng của nhân vật này. Nút "Bảng mới" tạo bảng đã liên kết và đặt tên theo nhân vật |
-| Canvas, nút ghim trên thanh trên, hoặc menu ⋯ | Sheet chọn bảng, ảnh nhân vật hoặc một ảnh từ máy |
+| Canvas, nút ghim trên thanh trên, hoặc menu ⋯ | Sheet chọn bảng, ảnh nhân vật, một ảnh từ thư viện Ảnh hoặc từ Tệp. Mục "Thêm ảnh tham khảo" trong menu ⋯ mở thẳng thư viện Ảnh |
 
 Route: `RefBoards` (`projectId?`, `characterId?`) và `RefBoard` (`boardId`). Code ở `src/features/refBoards/`, logic thuần ở `src/core/refBoards/`.
 
@@ -24,7 +24,9 @@ Route: `RefBoards` (`projectId?`, `characterId?`) và `RefBoard` (`boardId`). Co
 ## Trong một bảng
 
 - Ảnh xếp kiểu masonry: mỗi ảnh vào cột đang ngắn nhất. Điện thoại 2 cột, máy tính bảng nhiều hơn. Ảnh quá cao hoặc quá rộng bị cắt về tỉ lệ 0,6 đến 1,8.
-- Thêm ảnh: từ máy (chọn nhiều ảnh một lần, tối đa 20), hoặc từ truyện (ảnh trong bảng tạo hình nhân vật và mục thế giới). Bảng đã liên kết truyện thì chỉ hiện ảnh của truyện đó.
+- Thêm ảnh: từ thư viện Ảnh, từ Tệp (chọn nhiều ảnh một lần, tối đa 20, và không quá số chỗ còn trống của bảng), hoặc từ truyện (ảnh trong bảng tạo hình nhân vật và mục thế giới). Bảng đã liên kết truyện thì chỉ hiện ảnh của truyện đó.
+- Thư viện Ảnh dùng `react-native-image-picker` (`launchImageLibrary`, `pickPhotosToCache` trong `src/native/files.ts`). iOS mở PHPicker, Android mở trình chọn ảnh của hệ thống. Cả hai chạy ngoài app nên **không hỏi quyền** và không cần `NSPhotoLibraryUsageDescription`: app không bật `includeExtra`, tùy chọn duy nhất của thư viện cần quyền Ảnh. Ảnh HEIC được đổi sang JPEG (`assetRepresentationMode: 'compatible'`). Android bản cũ không có trình chọn ảnh thì thư viện mở trình chọn file, không giữ giới hạn số ảnh, nên app cắt bớt.
+- Tệp dùng `@react-native-documents/picker` như trước, cho ảnh nằm trong iCloud Drive, Google Drive hay thư mục Tải về.
 - Nhấn giữ một ảnh: sửa ghi chú và thẻ, chuyển lên đầu, lên trước, ra sau, gỡ khỏi bảng.
 - Menu ⋯ có "Sắp xếp lại ảnh": danh sách với nút lên, xuống cho từng ảnh.
 - Có thẻ thì hiện hàng chip để lọc ảnh theo thẻ.
@@ -66,7 +68,7 @@ Liên kết truyện và nhân vật là tùy chọn, không có khóa ngoại. 
 ## File ảnh
 
 - Ảnh của bảng nằm ở `refs/<boardId>/`, không nằm trong `images/`. Dọn rác chỉ được quét `images/` và `thumbs/` (`SWEPT_DIRS` trong `src/data/gc.ts`), nên không bao giờ xóa nhầm ảnh tham khảo.
-- Ảnh lấy từ máy được chuyển từ cache vào thư mục của bảng. Ảnh lấy từ nhân vật hay thế giới được **chép**, nên xóa nhân vật không làm hỏng bảng và xóa bảng không làm mất ảnh nhân vật.
+- Ảnh lấy từ máy (thư viện Ảnh hay Tệp) được chuyển từ cache vào thư mục của bảng. Ảnh lấy từ nhân vật hay thế giới được **chép**, nên xóa nhân vật không làm hỏng bảng và xóa bảng không làm mất ảnh nhân vật.
 - Gỡ một ảnh xóa file của nó. Xóa bảng xóa cả thư mục `refs/<boardId>/`.
 
 ## File `.manganova`
@@ -80,5 +82,4 @@ Quyết định: file xuất của một truyện mang theo các bảng **đã l
 
 ## Chưa làm
 
-- Trên iOS, nút "Từ máy của bạn" mở trình chọn file, không mở thẳng thư viện Ảnh. Muốn chọn từ Ảnh cần thêm thư viện native (ví dụ một image picker), phải hỏi trước.
 - Sắp xếp bằng kéo thả trong lưới masonry. Hiện dùng nút lên, xuống.

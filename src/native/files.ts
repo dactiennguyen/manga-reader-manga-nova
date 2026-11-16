@@ -1,5 +1,6 @@
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import { errorCodes, isErrorWithCode, keepLocalCopy, pick, saveDocuments, types } from '@react-native-documents/picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 import { t } from '../core/i18n';
 import { filesRoot, setFilesRoot, toAbsolute, toRelative, fileUri } from '../core/util/paths';
@@ -109,7 +110,7 @@ export async function copyIntoImages(sourcePath: string): Promise<string> {
   return toRelative(dest);
 }
 
-/** Several images at once, copied into the cache. Resolves with none when the picker is closed. */
+/** Several image files at once from the document picker (Files), copied into the cache. Resolves with none when the picker is closed. */
 export async function pickImagesToCache(max: number): Promise<{ path: string; name: string }[]> {
   try {
     const picked = (await pick({ type: types.images, allowMultiSelection: true })).slice(0, max);
@@ -130,6 +131,38 @@ export async function pickImagesToCache(max: number): Promise<{ path: string; na
     }
     throw error;
   }
+}
+
+/**
+ * Pictures from the photo library, copied into the cache: PHPicker on iOS and the system photo picker on
+ * Android, which both run outside the app, so no photo permission is asked. `max` 1 picks a single one.
+ * HEIC photos come as JPEG. Resolves with none when the picker is closed.
+ */
+export async function pickPhotosToCache(max: number): Promise<{ path: string; name: string }[]> {
+  const limit = Math.max(1, Math.floor(max));
+  const result = await launchImageLibrary({ mediaType: 'photo', selectionLimit: limit, assetRepresentationMode: 'compatible' });
+  if (result.didCancel) {
+    return [];
+  }
+  if (result.errorCode) {
+    throw new Error(result.errorMessage ?? result.errorCode);
+  }
+  // Older Android versions fall back to a file chooser that does not keep to the limit.
+  return (result.assets ?? [])
+    .slice(0, limit)
+    .flatMap(asset => (asset.uri ? [{ path: stripFileScheme(asset.uri), name: asset.fileName ?? `image-${uid()}.jpg` }] : []));
+}
+
+/** One picture from the photo library, moved into the images folder. Returns its stored path. */
+export async function pickPhoto(): Promise<string | null> {
+  const [picked] = await pickPhotosToCache(1);
+  if (!picked) {
+    return null;
+  }
+  await ensureDirs();
+  const dest = `${DIRS.images}/${uid()}.${extensionOf(picked.path)}`;
+  await RNFS.moveFile(picked.path, dest);
+  return toRelative(dest);
 }
 
 /**

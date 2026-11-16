@@ -47,7 +47,7 @@ import {
   OrderIcon,
   TagIcon,
 } from '../../ui/icons';
-import { addFromApp, addFromDevice } from './addImages';
+import { addFromApp, addFromDevice, type DeviceSource } from './addImages';
 import { AppImagesSheet, type AppPick } from './AppImagesSheet';
 import { BoardFormSheet } from './BoardFormSheet';
 import { RefImageSheet } from './RefImageSheet';
@@ -151,7 +151,7 @@ function BoardBody({ boardId }: { boardId: ID }) {
       setBusy(false);
     }
   };
-  const addDevice = () => run(() => addFromDevice(boardId));
+  const addDevice = (from: DeviceSource) => run(() => addFromDevice(boardId, from));
   const addApp = (picks: AppPick[]) => run(() => addFromApp(boardId, picks));
 
   const removeBoard = async () => {
@@ -285,7 +285,8 @@ function BoardBody({ boardId }: { boardId: ID }) {
         onClose={() => setOpen(null)}
         title={t('Add pictures')}
         items={[
-          { label: t('From your device'), subtitle: t('Photos and image files'), icon: MoveToIcon, onPress: addDevice },
+          { label: t('From your photos'), subtitle: t('Pick several at once'), icon: ImagesIcon, onPress: () => addDevice('photos') },
+          { label: t('From Files'), subtitle: t('Image files on this device or in the cloud'), icon: MoveToIcon, onPress: () => addDevice('files') },
           {
             label: t('From your stories'),
             subtitle: t('Character design sheets and world entries'),
