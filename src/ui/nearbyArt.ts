@@ -8,16 +8,16 @@ export const NEARBY_ART = {
   relay: require('../assets/art/nearby/relay.webp'),
   battle: require('../assets/art/nearby/battle.webp'),
   guess: require('../assets/art/nearby/guess.webp'),
-  /** Fill the bubbles. A stand-in (the dubbing art, with its empty bubbles) until it has a print of its own. */
-  fill: require('../assets/art/nearby/dub.webp'),
+  /** Fill the bubbles: friends writing into the empty bubbles of one page. */
+  fill: require('../assets/art/nearby/fill.webp'),
   script: require('../assets/art/nearby/script.webp'),
   read: require('../assets/art/nearby/read.webp'),
   dub: require('../assets/art/nearby/dub.webp'),
   cards: require('../assets/art/nearby/cards.webp'),
   mangakaCard: require('../assets/art/nearby/mangaka-card.webp'),
   send: require('../assets/art/nearby/send.webp'),
-  /** Share brushes. A stand-in (the send art) until it has a print of its own. */
-  brushes: require('../assets/art/nearby/send.webp'),
+  /** Share brushes: one friend holds out a brush roll, the other takes a brush. */
+  brushes: require('../assets/art/nearby/brushes.webp'),
   /** Two phones on the same Wi-Fi, for the connection hint. */
   wifi: require('../assets/art/nearby/wifi.webp'),
 } satisfies Record<string, ImageSourcePropType>;

@@ -69,7 +69,7 @@ Mỗi lượt một người làm **họa sĩ**: vẽ một khung không chữ t
 - **Cách tính điểm:** mỗi phiếu được 100 điểm cho tác giả. Bản nhiều phiếu nhất được thêm 50 điểm, nếu hòa thì mọi bản hòa đều được. Họa sĩ được 25 điểm cho mỗi bản được viết trên khung của mình. Phiếu tự bầu cho mình, phiếu của người ngoài ván và phiếu cho bản không tồn tại đều không được tính. Danh sách tác giả và phiếu của chủ phòng là danh sách cuối cùng, nên mọi máy tính ra cùng một điểm.
 - **Lưu lại:** ở màn kết quả, ai cũng lưu được bản đang xem (mặc định là bản thắng) thành một trang mới trong truyện "Điền thoại" (`fill/fillPage.ts`). Nét vẽ thành nét bút chì trên một layer mang tên họa sĩ, bóng thoại thành bóng thoại thật, nên trang vẫn vẽ và sửa chữ tiếp được.
 - **Giới hạn:** tối đa 3 bóng thoại mỗi khung, 80 ký tự mỗi lời, 16 bản mỗi lượt. Nét vẽ dùng chung giới hạn với Đoán tranh: 2.000 số mỗi tin, 600 nét mỗi khung. Bóng thoại phải nằm trong bảng 1000×1000.
-- **Hình minh họa:** thẻ hoạt động đang tạm dùng hình của Lồng tiếng (`NEARBY_ART.fill`). Cần vẽ một hình riêng.
+- **Hình minh họa:** bản in riso màu xanh lam, ba người bạn cùng viết vào bong bóng trống của một trang (`src/assets/art/nearby/fill.webp`).
 
 ## Cùng viết kịch bản
 
@@ -86,7 +86,7 @@ Gửi một bộ bút và tông (tệp `.mnbrush`, xem [Canvas](07-canvas.md#kho
 - **Blob không ai nhận thì bỏ qua.** Blob `brushes` không khớp một lời mời đã nhận bị bỏ.
 - **Giới hạn.** Schema chặn blob `brushes` quá 8 phần (`BRUSH_BLOB_CHUNKS_MAX`), tên bộ quá 40 ký tự và số bút, tông quá 60. Máy nhận đọc lại tệp bằng `parseBrushFile`.
 - **Ai nhận được.** Chỉ máy đang mở màn Chia sẻ bút. Chủ phòng chọn hoạt động này cho cả phòng, hoặc bấm "Mở cho mọi người" khi tự mở từ một bộ. Khách tự mở thì thấy lời nhắc nhờ chủ phòng.
-- **Hình minh họa:** thẻ hoạt động đang tạm dùng hình của Gửi truyện (`NEARBY_ART.brushes`). Cần vẽ một hình riêng.
+- **Hình minh họa:** bản in riso màu đỏ gạch, hai người bạn trao nhau cây bút từ một cuộn bút (`src/assets/art/nearby/brushes.webp`).
 - `PROTOCOL_VERSION` vẫn là 3 vì bản 3 chưa phát hành.
 
 ## Quyền
