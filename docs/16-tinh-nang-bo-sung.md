@@ -34,6 +34,16 @@ Khi ô địa chỉ server còn trống và công tắc Profile → AI → Sampl
 
 `useAiConfigured()` trả về true khi có server hoặc đang bật câu mẫu. Chỗ nào cần server thật thì dùng `useAiServerSet()`.
 
+## Xin phép trước khi gửi chữ cho AI
+
+App Store (điều 5.1.2(i)) đòi nói rõ và xin phép trước khi gửi dữ liệu cá nhân cho AI bên thứ ba. Server AI là của người dùng hoặc của người họ tin, không phải của Manganova, nhưng vẫn phải hỏi.
+
+- **Nói rõ.** Khi ô địa chỉ có giá trị, `AiServerSheet` hiện khung "What is sent to {server}": tên truyện và tóm tắt một câu, hồ sơ nhân vật, ghi chú thế giới đã đánh dấu gửi AI, đoạn kịch bản liên quan, chữ người dùng gõ. Tranh, ảnh và tiếng thu âm không bao giờ được gửi. Server do người lập ra nó vận hành.
+- **Xin phép.** Công tắc "Allow Manganova to send this text to {server}" phải bật thì nút Lưu mới bấm được (trừ khi xóa địa chỉ để tắt AI). Sửa địa chỉ thì công tắc tự tắt.
+- **Gắn với địa chỉ.** Settings lưu `aiConsentFor` là địa chỉ đã chuẩn hóa (`normalizeBaseUrl`) lúc đồng ý. `aiConsentGiven()` chỉ đúng khi địa chỉ hiện tại trùng với địa chỉ đó. Người đã nhập server từ bản cũ phải mở lại AI server và bật công tắc.
+- **Chặn ở đường gửi.** `boot.ts` gửi mọi yêu cầu theo `aiRoute()`: `server` khi có đồng ý, `noConsent` thì không gửi gì và báo lỗi chỉ tới Profile → AI server, `demo` là câu trả lời mẫu khi chưa có server. Test ở `__tests__/aiConsent.test.ts`.
+- "Test connection" chỉ gửi một câu thử cố định ("Reply with the single word: ready"), không có chữ của người dùng, nên không cần bật công tắc.
+
 ## Xuất ảnh mạng xã hội
 
 Định dạng `social` xuất mỗi khung thành một ảnh PNG, theo thứ tự đọc, đặt giữa một khung nền trắng:

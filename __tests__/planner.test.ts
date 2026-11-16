@@ -376,7 +376,7 @@ describe('reminder text', () => {
 
   it('warns the day before a deadline, with the date written out', () => {
     const items = planViews({ ...EMPTY_PLANNER, plans: { c1: plan({ target: 4 }) } }, state, '2026-11-19');
-    expect(planReminderText(items, nameOf, '2026-11-19', '2026-11-19')).toBe('Chapter 1 is due 20/11/2026. 4 pages to go.');
+    expect(planReminderText(items, nameOf, '2026-11-19', '2026-11-19')).toBe('Chapter 1 is due 11/20/2026. 4 pages to go.');
   });
 
   it('keeps the usual text with no plan, or when today is done', () => {

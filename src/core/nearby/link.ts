@@ -6,6 +6,7 @@
  * and the 16-bit token. The first two parts of the IP are taken from the joining phone, which is on the
  * same Wi-Fi (home networks are almost always /16 or smaller).
  */
+import { maskText } from './textFilter';
 import type { NearbyRoom, RoomAddress } from './types';
 
 const SCHEME = 'manganova:';
@@ -66,7 +67,8 @@ function addressFrom(query: Map<string, string>): RoomAddress | null {
   if (!isIPv4(host) || !validPort(port) || !validToken(token)) {
     return null;
   }
-  const name = query.get('n')?.trim().slice(0, 60);
+  // The room's name, chosen by someone else: offensive words are masked (textFilter.ts).
+  const name = maskText(query.get('n')?.trim().slice(0, 60) ?? '');
   return name ? { host, port, token, name } : { host, port, token };
 }
 

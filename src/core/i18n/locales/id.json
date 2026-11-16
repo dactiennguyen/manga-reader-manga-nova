@@ -328,7 +328,8 @@
     "Handwritten": "Tulisan tangan",
     "Sans": "Sans",
     "Sans bold": "Sans tebal",
-    "Display": "Display"
+    "Display": "Display",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "Izinkan Manganova mengirim teks ke server AI kamu dulu, di Profil → Server AI."
   },
   "home": {
     "Hi {name}": "Hai, {name}",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "Cerita yang kamu hapus tetap di sini selama {days} hari sebelum hilang selamanya.",
     "Pick a .{ext} file": "Pilih file .{ext}",
     "Project imported to your library": "Proyek diimpor ke pustakamu",
-    "Could not import this project. The file may be damaged or unsupported.": "Proyek ini tidak bisa diimpor. File-nya mungkin rusak atau tidak didukung."
+    "Could not import this project. The file may be damaged or unsupported.": "Proyek ini tidak bisa diimpor. File-nya mungkin rusak atau tidak didukung.",
+    "What is sent to {server}": "Yang dikirim ke {server}",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "Setiap kali kamu memakai alat AI, Manganova mengirim teks yang dibutuhkan permintaan itu: judul dan logline cerita, profil karakter, catatan dunia yang ditandai untuk dikirim ke AI, naskah yang terkait, dan yang kamu ketik. Gambar, foto, dan rekaman suara tidak pernah dikirim.",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "Server ini dijalankan oleh orang yang memasangnya, bukan oleh Manganova. Pemiliknya bisa menyimpan atau memakai teks ini menurut aturannya sendiri.",
+    "Allow Manganova to send this text to {server}": "Izinkan Manganova mengirim teks ini ke {server}",
+    "Turn this on to save the server. None of your text is sent until you do.": "Nyalakan ini untuk menyimpan server. Tidak ada teks kamu yang dikirim sebelum kamu menyalakannya.",
+    "Allow sending text to {server} to turn on AI help": "Izinkan mengirim teks ke {server} untuk menyalakan bantuan AI"
   },
   "extras": {
     "Blank": "Kosong",
@@ -2888,7 +2895,20 @@
     "From Play together": "Dari Main bersama",
     "{count} people blocked": "{count} orang diblokir",
     "{count} person blocked": "{count} orang diblokir",
-    "You will leave this room": "Kamu akan keluar dari ruang ini"
+    "You will leave this room": "Kamu akan keluar dari ruang ini",
+    "Agree to the Play together rules first.": "Setujui dulu aturan Main bersama.",
+    "Be kind to everyone in the room.": "Bersikap baik kepada semua orang di ruang.",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "Dilarang membuat gambar, tulisan, atau rekaman suara yang berisi kebencian, seksual, pelecehan, atau ancaman. Tidak ada toleransi untuk ini.",
+    "Anyone can block or report you.": "Siapa pun bisa memblokir atau melaporkan kamu.",
+    "The host can remove you from the room.": "Pemilik ruang bisa mengeluarkan kamu dari ruang.",
+    "Offensive words are hidden automatically.": "Kata-kata kasar disembunyikan secara otomatis.",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "Laporan yang dikirim ke pengembang di {email} ditinjau dalam 24 jam.",
+    "Terms of use": "Ketentuan penggunaan",
+    "Play together rules": "Aturan Main bersama",
+    "You play with real people. Agree to these rules before you host or join a room.": "Kamu bermain dengan orang sungguhan. Setujui aturan ini sebelum membuka atau masuk ke ruang.",
+    "I agree": "Saya setuju",
+    "You agreed to these rules.": "Kamu sudah menyetujui aturan ini.",
+    "What everyone agrees to before playing": "Yang disetujui semua orang sebelum bermain"
   },
   "nearbyFill": {
     "Fill the bubbles": "Isi balon kata",

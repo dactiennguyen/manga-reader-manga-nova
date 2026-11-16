@@ -28,6 +28,7 @@ import {
   SlidersIcon,
   TranslateIcon,
   BlockPersonIcon,
+  PlayTogetherIcon,
 } from '../../ui/icons';
 
 import { ARCHIVE_EXTENSION } from '../../core/archive/bundle';
@@ -41,7 +42,7 @@ import { useAppNavigation } from '../../state/navigation';
 import { useAiReports } from '../../state/useAiReports';
 import { useArtPresets } from '../../state/useArtPresets';
 import { useNearbySafety } from '../../state/useNearbySafety';
-import { useSettings, type CreatorRole, type Handedness, type ThemeMode } from '../../state/useSettings';
+import { useAiConsentGiven, useSettings, type CreatorRole, type Handedness, type ThemeMode } from '../../state/useSettings';
 import { useStory } from '../../state/useStory';
 import {
   ART,
@@ -60,6 +61,7 @@ import {
 import { ReportsSheet } from '../aiReport/ReportsSheet';
 import { countLabel } from '../brushLibrary/labels';
 import { BlockedPeopleSheet } from '../nearby/safety/BlockedPeopleSheet';
+import { NearbyRulesSheet } from '../nearby/safety/NearbyRules';
 import { AiServerSheet } from './AiServerSheet';
 import { ReminderRows } from './ReminderRows';
 import { StreakCard } from './StreakCard';
@@ -108,6 +110,7 @@ export function ProfileScreen() {
   const aiBaseUrl = useSettings(s => s.aiBaseUrl);
   const aiModel = useSettings(s => s.aiModel);
   const aiDemo = useSettings(s => s.aiDemo);
+  const aiConsent = useAiConsentGiven();
   const set = useSettings(s => s.set);
 
   const projects = useStory(s => s.projects);
@@ -121,6 +124,7 @@ export function ProfileScreen() {
   const [reportsSheet, setReportsSheet] = useState(false);
   const reportCount = useAiReports(s => s.reports.length);
   const [blockedSheet, setBlockedSheet] = useState(false);
+  const [rulesSheet, setRulesSheet] = useState(false);
   const blockedCount = useNearbySafety(s => s.blocked.length);
   const brushCount = useArtPresets(s => s.brushes.length);
   const toneCount = useArtPresets(s => s.tones.length);
@@ -275,7 +279,7 @@ export function ProfileScreen() {
           icon={AiIcon}
           iconColor="ai"
           title={t('AI server')}
-          subtitle={aiAddress ? `${aiAddress} · ${aiModel}` : t('Add your own server to turn on AI help')}
+          subtitle={aiAddress ? (aiConsent ? `${aiAddress} · ${aiModel}` : t('Allow sending text to {server} to turn on AI help', { server: aiAddress })) : t('Add your own server to turn on AI help')}
           right={aiAddress ? undefined : <Value>{t('Not set')}</Value>}
           chevron
           onPress={() => setAiSheet(true)}
@@ -314,6 +318,13 @@ export function ProfileScreen() {
           subtitle={blockedCount ? tn(blockedCount, '{count} person blocked', '{count} people blocked') : t('From Play together')}
           chevron
           onPress={() => setBlockedSheet(true)}
+        />
+        <ListItem
+          icon={PlayTogetherIcon}
+          title={t('Play together rules')}
+          subtitle={t('What everyone agrees to before playing')}
+          chevron
+          onPress={() => setRulesSheet(true)}
         />
         <ListItem
           icon={DataIcon}
@@ -359,6 +370,7 @@ export function ProfileScreen() {
       <AiServerSheet visible={aiSheet} onClose={() => setAiSheet(false)} />
       <ReportsSheet visible={reportsSheet} onClose={() => setReportsSheet(false)} />
       <BlockedPeopleSheet visible={blockedSheet} onClose={() => setBlockedSheet(false)} />
+      <NearbyRulesSheet visible={rulesSheet} onClose={() => setRulesSheet(false)} />
       <PromptDialog
         visible={editingName}
         onClose={() => setEditingName(false)}

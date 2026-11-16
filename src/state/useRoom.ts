@@ -11,6 +11,7 @@ import { roomStateCreator, type RoomStoreState } from '../core/nearby/room';
 import type { NearbyRoom } from '../core/nearby/types';
 import { nativeDiscovery, nativeNetwork } from '../native/nearby';
 import { useNearbySafety } from './useNearbySafety';
+import { nearbyRulesAccepted } from './useSettings';
 
 export type { RoomStatus, RoomStoreState } from '../core/nearby/room';
 export { parseRoomLink, roomLink };
@@ -19,7 +20,11 @@ export const useRoom = create<RoomStoreState>()(
   roomStateCreator({
     network: nativeNetwork,
     discovery: nativeDiscovery,
-    safety: { key: () => useNearbySafety.getState().key, blocked: key => useNearbySafety.getState().isBlocked(key) },
+    safety: {
+      key: () => useNearbySafety.getState().key,
+      blocked: key => useNearbySafety.getState().isBlocked(key),
+      rulesAccepted: nearbyRulesAccepted,
+    },
   }),
 );
 

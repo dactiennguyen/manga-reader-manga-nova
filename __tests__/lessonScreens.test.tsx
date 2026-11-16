@@ -13,6 +13,7 @@ import { ResultScreen } from '../src/features/lessons/ResultScreen';
 import { flushActivity, useActivity } from '../src/state/useActivity';
 import type { ScreenProps } from '../src/state/navigation';
 import { useLessons } from '../src/state/useLessons';
+import { darkScreenFocused } from '../src/state/useSystemBars';
 
 jest.mock('react-native-reanimated', () => {
   const { View } = require('react-native');
@@ -101,6 +102,14 @@ describe('drawing lessons', () => {
     expect(mockNav.replace).toHaveBeenCalledWith('Lesson', { lessonId: 'lines-curves' });
     await press('Try again');
     expect(mockNav.replace).toHaveBeenCalledWith('LessonPractice', { lessonId: lesson.id });
+  });
+
+  it('keeps the system bars light while practising, dark page to the edges', async () => {
+    const lesson = lessonById('lines-straight')!;
+    const { unmount } = await render(<PracticeScreen {...props('LessonPractice', lesson.id)} />);
+    expect(darkScreenFocused()).toBe(true);
+    await act(async () => unmount());
+    expect(darkScreenFocused()).toBe(false);
   });
 
   it('gives no star for skipped steps, but counts the try', async () => {

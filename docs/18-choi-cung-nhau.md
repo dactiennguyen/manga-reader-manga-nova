@@ -2,7 +2,7 @@
 
 Tài liệu cho lập trình viên làm tiếp phần chơi nhiều người. Mọi thứ chạy trên máy, không có server: một máy mở phòng, các máy khác vào phòng qua mạng Wi-Fi chung.
 
-Cập nhật: 2026-11-15, nhánh `develop`.
+Cập nhật: 2026-11-16, nhánh `develop`.
 
 ## 12 hoạt động
 
@@ -100,9 +100,59 @@ Gửi một bộ bút và tông (tệp `.mnbrush`, xem [Canvas](07-canvas.md#kho
 | iOS | `NSCameraUsageDescription` | Quét mã QR trong app |
 | Android | `CAMERA` (`uses-feature` không bắt buộc) | Quét mã QR trong app |
 
+## Quy tắc chơi
+
+App Store (điều 1.2) đòi người dùng đồng ý với điều khoản "không khoan nhượng với nội dung phản cảm" trước khi dùng nội dung do người khác tạo. Lần đầu mở Chơi cùng nhau, app hiện quy tắc thay cho màn chính (`features/nearby/safety/NearbyRules.tsx`):
+
+- Tử tế với mọi người trong phòng.
+- Không vẽ, viết hay thu âm nội dung thù ghét, tình dục, quấy rối hoặc đe dọa. Không có ngoại lệ.
+- Ai cũng chặn hoặc báo cáo được bạn. Chủ phòng mời bạn ra được.
+- Từ ngữ xúc phạm được tự động che.
+- Báo cáo gửi cho nhà phát triển (`SUPPORT_EMAIL`) được xem trong 24 giờ.
+- Link tới điều khoản https://manganova.pages.dev/terms.
+
+Hai nút: **Tôi đồng ý** lưu `nearbyRulesAccepted = NEARBY_RULES_VERSION` (hiện là 1) trong settings. **Để sau** quay lại màn trước. Đổi nội dung quy tắc thì tăng `NEARBY_RULES_VERSION` trong `core/nearby/safety.ts`, mọi người sẽ phải đồng ý lại.
+
+- **Chỗ nào cũng phải qua.** `NearbyRulesGate` bọc màn Chơi cùng nhau và màn Danh thiếp. Màn chính chưa mở thì chưa tìm phòng, nên iOS cũng chưa hỏi quyền mạng nội bộ.
+- **QR và link.** `manganova://join` (từ camera hay trình quét trong app) không đi qua màn chính. Khi chưa đồng ý, `deepLink.ts` mở màn Chơi cùng nhau để hiện quy tắc, giữ lại việc vào phòng và chạy nó ngay sau khi bấm Tôi đồng ý. Bấm Để sau thì bỏ.
+- **Chặn ở lõi.** `hostRoom` và `joinRoom` trong `core/nearby/room.ts` từ chối khi `RoomSafety.rulesAccepted()` trả về false, nên không có đường nào mở hay vào phòng mà chưa đồng ý (`__tests__/nearbySafety.test.ts`).
+- Hồ sơ → **Quy tắc Chơi cùng nhau** xem lại quy tắc.
+
+## Lọc từ ngữ
+
+App Store (điều 1.2) đòi "một cách lọc nội dung phản cảm". Tranh và tiếng thu âm không lọc tự động được: chúng dựa vào chặn, báo cáo và mời ra. Chữ gõ thì được lọc bằng `core/nearby/textFilter.ts`: từ xúc phạm thành `•••`.
+
+**Lọc ở máy nhận.** `schema.ts` chạy `maskText` trên mọi ô chữ của tin nhắn ngay lúc đọc, nên app bị sửa ở máy gửi cũng không lách được. Các ô được lọc:
+
+| Chỗ | Ô |
+| --- | --- |
+| Phòng | tên người (`hello`, `room`, `welcome`), tên phòng. Tên phòng trong danh sách Wi-Fi (`discovery.ts`) và trong link `join` cũng được lọc |
+| Đoán tranh | câu đoán (`guess.try`, `guess.miss`), từ khóa lúc lộ (`guess.reveal`), gợi ý |
+| Điền thoại | lời (`fill.lines`, `fill.reveal`) |
+| Cùng viết kịch bản | tiêu đề, tên nhân vật, mô tả cảnh, từng dòng (`script.doc`, `script.edit`, `script.add`, `script.apply`) |
+| Thi vẽ nhanh | đề (`battle.start`) |
+| Đọc cùng nhau | chữ trong nhãn góp ý (`read.note`) |
+| Gửi truyện, chia sẻ bút | tên truyện, tên bộ bút trong lời mời |
+| Thẻ nhân vật, danh thiếp | tên, câu nói, tên truyện, tên người gửi (`cardSwap.ts`, `friendLink.ts`) |
+| Truyện nhận qua Wi-Fi | tên truyện, tóm tắt, kịch bản, nhân vật, thế giới, mô tả khung, chữ trong bóng thoại (`storyText.ts`, chạy sau khi nhập trong `shareFiles.ts`) |
+
+**Lọc cả ở máy gửi.** Tên của mình, câu đoán, lời Điền thoại, dòng kịch bản và nhãn góp ý được lọc trước khi gửi, để người gửi thấy đúng thứ người khác thấy. Thả cảm xúc chỉ nhận emoji trong danh sách cố định, nên không cần lọc.
+
+**Cách so khớp.**
+
+- Theo cả từ, không bao giờ bên trong một từ khác: "class", "assistant", "Scunthorpe", "cocktail", "therapist" không bị che.
+- Không phân biệt hoa thường, dấu (fück), cách thay chữ bằng số và ký hiệu (sh1t, a$$, f*ck), chữ lặp từ 3 lần (fuuuck), và một số đuôi (fucking, shitty, bitches). Số thuần như "455" không bị đổi thành chữ.
+- Tiếng Việt so **có dấu**: bỏ dấu thì "cặc" thành "các", "lồn" thành "lớn". Bản không dấu chỉ có những chữ viết tắt và cụm không thể là chữ thường (dm, vcl, "dit me"…). "đức", "cực", "buổi", "cụm từ", "dù mẹ nói" không bị che.
+- Tiếng Nhật, Trung, Hàn, Thái không có khoảng trắng giữa các từ, nên danh sách chỉ có từ không bao giờ nằm trong từ thường (ví dụ có 씨발 nhưng không có 시발, vì 시발점 là "điểm xuất phát").
+- Danh sách cố ý ngắn: lời miệt thị, từ tình dục và chửi thề nặng. Không có "damn", "hell", "bastard", là những chữ kịch bản manga hay dùng.
+- Phần bị che không bao giờ dài hơn chữ gốc ("dm" thành "••"), nên tin đã lọc vẫn vừa mọi giới hạn độ dài khi chủ phòng chuyển tiếp.
+- Test: `__tests__/nearbyTextFilter.test.ts`, gồm danh sách chữ thường không được che và kiểm tra rằng không từ nào trong 48 từ của Đoán tranh, ở cả 10 ngôn ngữ, bị che.
+
+Thêm từ: thêm vào đúng danh sách trong `textFilter.ts`, rồi thêm vào test cả chữ cần che lẫn những chữ thường dễ bị che nhầm.
+
 ## Mời ra, chặn và báo cáo
 
-Người dùng gửi tranh, chữ và tiếng cho nhau, nên app có đủ ba việc App Store (điều 1.2) và Google Play đòi hỏi với nội dung do người dùng tạo. Chạm vào tên một người trong danh sách phòng để mở bảng thao tác (`features/nearby/safety/MemberSheet.tsx`).
+Người dùng gửi tranh, chữ và tiếng cho nhau, nên app có đủ ba việc App Store (điều 1.2) và Google Play đòi hỏi với nội dung do người dùng tạo, cùng với quy tắc chơi và bộ lọc từ ngữ ở trên. Chạm vào tên một người trong danh sách phòng để mở bảng thao tác (`features/nearby/safety/MemberSheet.tsx`).
 
 - **Mời ra khỏi phòng (chỉ chủ phòng).** Chủ phòng gửi `refused: removed` cho người đó rồi đóng kết nối. Mọi máy thấy người đó rời phòng. Người bị mời ra không vào lại được phòng này: chủ phòng giữ lại mã an toàn, mã thành viên và địa chỉ của họ.
 - **Chặn.** Mỗi máy có một mã ngẫu nhiên (`Member.key`), tạo một lần và giữ mãi (`state/useNearbySafety.ts`). Danh sách chặn lưu trên máy theo mã này, không theo tên.

@@ -30,6 +30,7 @@ import { appServices } from '../state/services';
 import { flushActivity } from '../state/useActivity';
 import { flushStats } from '../state/useStats';
 import { useAppLocale, useSettings } from '../state/useSettings';
+import { lightSystemBars, useDarkScreenFocused } from '../state/useSystemBars';
 import { flushStory } from '../state/useStory';
 import { Button, ConfirmHost, DOCK_GAP, DOCK_HEIGHT, ErrorBoundary, Text, ToastHost, toast, useColor } from '../ui';
 import { boot } from './boot';
@@ -114,8 +115,11 @@ function Shell() {
   const dark = theme === 'dark';
   const [route, setRoute] = useState<string | undefined>();
   const dockShown = route === 'Tabs';
-  // The canvas stays dark in both themes, so the system bars have to follow it.
-  const darkBars = dark || route === 'Canvas';
+  // The canvas, the screens built on it and lesson practice stay dark in both themes (useDarkSystemBars),
+  // so the system bars follow them. Info.plist sets UIViewControllerBasedStatusBarAppearance to false, so on
+  // iOS this StatusBar is what decides, not react-native-screens.
+  const darkScreen = useDarkScreenFocused();
+  const darkBars = lightSystemBars(dark, darkScreen);
   const bg = useColor('bg');
   const surface = useColor('surface');
   const text = useColor('text');
@@ -167,7 +171,7 @@ function Shell() {
 
   return (
     <>
-      <StatusBar barStyle={darkBars ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={darkBars ? 'light-content' : 'dark-content'} animated />
       <NavigationContainer
         ref={navigationRef}
         theme={navigationTheme}
@@ -181,7 +185,8 @@ function Shell() {
         <RootNavigator key={locale} />
       </NavigationContainer>
       <RoomFollower navigationRef={navigationRef} />
-      {route === 'Canvas' ? null : <NavBarBacking />}
+      {/* A dark screen paints to the bottom edge itself: a light strip there would break it. */}
+      {darkScreen ? null : <NavBarBacking />}
       <ToastHost bottomOffset={dockShown ? DOCK_HEIGHT + DOCK_GAP : 0} />
       <ConfirmHost />
       <ReportHost />

@@ -18,6 +18,7 @@ import {
   type ScriptOp,
   type ScriptState,
 } from './scriptTogether';
+import { maskText } from './textFilter';
 import type { MemberId, Message } from './types';
 import type { BlockType, DialogueKind } from '../model/types';
 
@@ -123,7 +124,8 @@ export class ScriptSession {
     const pending = this.pending;
     this.pending = null;
     if (pending) {
-      this.change({ t: 'script.edit', key: pending.key, text: pending.text });
+      // Masked before it leaves (the host masks a guest's text again): the room's copy never has the word.
+      this.change({ t: 'script.edit', key: pending.key, text: maskText(pending.text) });
     }
   }
 

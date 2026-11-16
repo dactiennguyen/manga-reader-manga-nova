@@ -328,7 +328,8 @@
     "Handwritten": "손글씨",
     "Sans": "고딕",
     "Sans bold": "고딕 굵게",
-    "Display": "제목용"
+    "Display": "제목용",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "먼저 프로필 → AI 서버에서 Manganova가 AI 서버로 글을 보내도록 허용하세요."
   },
   "home": {
     "Hi {name}": "안녕하세요, {name} 님",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "삭제한 작품은 완전히 사라지기 전까지 {days}일 동안 여기 남아요.",
     "Pick a .{ext} file": ".{ext} 파일을 골라 주세요",
     "Project imported to your library": "프로젝트를 보관함으로 가져왔어요",
-    "Could not import this project. The file may be damaged or unsupported.": "이 프로젝트를 가져올 수 없어요. 파일이 손상됐거나 지원하지 않는 형식일 수 있어요."
+    "Could not import this project. The file may be damaged or unsupported.": "이 프로젝트를 가져올 수 없어요. 파일이 손상됐거나 지원하지 않는 형식일 수 있어요.",
+    "What is sent to {server}": "{server}(으)로 보내는 내용",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "AI 도구를 쓸 때마다 Manganova는 그 요청에 필요한 글을 보냅니다. 작품 제목과 로그라인, 캐릭터 프로필, AI에 보내기로 표시한 세계관 메모, 관련 대본, 그리고 입력한 내용입니다. 그림, 사진, 녹음한 목소리는 절대 보내지 않습니다.",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "이 서버는 Manganova가 아니라 서버를 만든 사람이 운영합니다. 서버 주인이 자기 규칙에 따라 이 글을 보관하거나 사용할 수 있습니다.",
+    "Allow Manganova to send this text to {server}": "Manganova가 이 글을 {server}(으)로 보내도록 허용",
+    "Turn this on to save the server. None of your text is sent until you do.": "서버를 저장하려면 켜세요. 켜기 전에는 내 글이 전혀 전송되지 않습니다.",
+    "Allow sending text to {server} to turn on AI help": "AI 도움을 켜려면 {server}(으)로 글 보내기를 허용하세요"
   },
   "extras": {
     "Blank": "빈 작품",
@@ -2888,7 +2895,20 @@
     "From Play together": "함께 놀기에서",
     "{count} people blocked": "{count}명 차단됨",
     "{count} person blocked": "{count}명 차단됨",
-    "You will leave this room": "이 방에서 나가게 돼요"
+    "You will leave this room": "이 방에서 나가게 돼요",
+    "Agree to the Play together rules first.": "먼저 함께 놀기 규칙에 동의하세요.",
+    "Be kind to everyone in the room.": "방에 있는 모두에게 친절하게 대해 주세요.",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "혐오, 성적인 내용, 괴롭힘, 위협이 담긴 그림, 글, 녹음은 금지입니다. 예외는 없습니다.",
+    "Anyone can block or report you.": "누구나 나를 차단하거나 신고할 수 있습니다.",
+    "The host can remove you from the room.": "방장은 나를 방에서 내보낼 수 있습니다.",
+    "Offensive words are hidden automatically.": "불쾌한 단어는 자동으로 가려집니다.",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "개발자({email})에게 보낸 신고는 24시간 안에 검토됩니다.",
+    "Terms of use": "이용 약관",
+    "Play together rules": "함께 놀기 규칙",
+    "You play with real people. Agree to these rules before you host or join a room.": "실제 사람들과 함께 노는 공간입니다. 방을 열거나 들어가기 전에 이 규칙에 동의해 주세요.",
+    "I agree": "동의합니다",
+    "You agreed to these rules.": "이 규칙에 동의했습니다.",
+    "What everyone agrees to before playing": "놀기 전에 모두가 동의하는 내용"
   },
   "nearbyFill": {
     "Fill the bubbles": "말풍선 채우기",

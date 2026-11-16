@@ -22,6 +22,7 @@ import { useCharacters, useLastOpened } from '../../state/hooks';
 import { useAppNavigation, useAppRoute } from '../../state/navigation';
 import { useBoardImages, useRefBoards } from '../../state/useRefBoards';
 import { useSettings } from '../../state/useSettings';
+import { useDarkSystemBars } from '../../state/useSystemBars';
 import { EmptyState, Menu, MOTION, Screen, toast } from '../../ui';
 import { BrushSheet } from './BrushSheet';
 import { CanvasRail } from './CanvasRail';
@@ -91,6 +92,8 @@ export function CanvasEditor({
 }) {
   const navigation = useAppNavigation();
   const insets = useSafeAreaInsets();
+  // Dark in both themes: light status bar text while drawing (Canvas, Draw together, drawing turns).
+  useDarkSystemBars();
   const handedness = useSettings(s => s.handedness);
   const keepAwake = useSettings(s => s.keepAwakeWhileDrawing);
   const tipsSeen = useSettings(s => s.canvasTipsSeen);

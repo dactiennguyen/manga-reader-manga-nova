@@ -16,13 +16,22 @@ import { shareCardImage } from '../studio/cards/shareCard';
 import type { CardViewRef } from '../studio/cards/FlipCard';
 import { FriendSheet } from './share/FriendSheet';
 import { MangakaCardView } from './share/MangakaCardView';
+import { NearbyRulesGate } from './safety/NearbyRules';
 
 const CARD_MAX = 360;
 const PEN_NAME_MAX = 30;
 const STORIES_SHOWN = 3;
 
-/** Your QR business card, and the friends you added by scanning theirs. */
+/** Your QR business card, and the friends you added by scanning theirs. Part of Play together, so the rules come first. */
 export function MangakaCardScreen() {
+  return (
+    <NearbyRulesGate>
+      <MangakaCard />
+    </NearbyRulesGate>
+  );
+}
+
+function MangakaCard() {
   const navigation = useAppNavigation();
   const { width } = useWindowDimensions();
   const state = useStoryData();

@@ -328,7 +328,8 @@
     "Handwritten": "手写",
     "Sans": "黑体",
     "Sans bold": "粗黑体",
-    "Display": "标题字"
+    "Display": "标题字",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "请先在“我的 → AI服务器”中允许 Manganova 向你的 AI 服务器发送文字。"
   },
   "home": {
     "Hi {name}": "{name}，你好",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "删除的作品会在这里保留{days}天，之后永久消失。",
     "Pick a .{ext} file": "请选择.{ext}文件",
     "Project imported to your library": "作品已导入作品库",
-    "Could not import this project. The file may be damaged or unsupported.": "无法导入此作品。文件可能已损坏或格式不受支持。"
+    "Could not import this project. The file may be damaged or unsupported.": "无法导入此作品。文件可能已损坏或格式不受支持。",
+    "What is sent to {server}": "会发送给 {server} 的内容",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "每次使用 AI 工具时，Manganova 会发送这次请求需要的文字：故事标题和一句话简介、角色资料、标记为发送给 AI 的世界设定笔记、相关剧本，以及你输入的内容。画作、图片和录音永远不会发送。",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "服务器由搭建它的人运营，而不是 Manganova。服务器的所有者可能会按自己的规则保存或使用这些文字。",
+    "Allow Manganova to send this text to {server}": "允许 Manganova 将这些文字发送给 {server}",
+    "Turn this on to save the server. None of your text is sent until you do.": "打开此项才能保存服务器。打开之前，你的文字不会被发送。",
+    "Allow sending text to {server} to turn on AI help": "允许向 {server} 发送文字以开启 AI 帮助"
   },
   "extras": {
     "Blank": "空白",
@@ -2888,7 +2895,20 @@
     "From Play together": "来自一起玩",
     "{count} people blocked": "已屏蔽 {count} 人",
     "{count} person blocked": "已屏蔽 {count} 人",
-    "You will leave this room": "你会离开这个房间"
+    "You will leave this room": "你会离开这个房间",
+    "Agree to the Play together rules first.": "请先同意“一起玩”的规则。",
+    "Be kind to everyone in the room.": "友善对待房间里的每个人。",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "禁止仇恨、色情、骚扰或威胁性的画作、文字或录音。对此零容忍。",
+    "Anyone can block or report you.": "任何人都可以屏蔽或举报你。",
+    "The host can remove you from the room.": "房主可以将你移出房间。",
+    "Offensive words are hidden automatically.": "冒犯性的词语会被自动隐藏。",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "发送给开发者（{email}）的举报会在 24 小时内处理。",
+    "Terms of use": "使用条款",
+    "Play together rules": "“一起玩”规则",
+    "You play with real people. Agree to these rules before you host or join a room.": "你是在和真实的人一起玩。创建或加入房间前，请先同意这些规则。",
+    "I agree": "我同意",
+    "You agreed to these rules.": "你已同意这些规则。",
+    "What everyone agrees to before playing": "每个人在开始玩之前同意的内容"
   },
   "nearbyFill": {
     "Fill the bubbles": "填台词",

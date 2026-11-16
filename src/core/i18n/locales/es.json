@@ -328,7 +328,8 @@
     "Handwritten": "Manuscrita",
     "Sans": "Sans",
     "Sans bold": "Sans negrita",
-    "Display": "Display"
+    "Display": "Display",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "Primero permite que Manganova envíe texto a tu servidor de IA, en Perfil → Servidor de IA."
   },
   "home": {
     "Hi {name}": "Hola, {name}",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "Las historias que eliminas se quedan aquí {days} días antes de desaparecer para siempre.",
     "Pick a .{ext} file": "Elige un archivo .{ext}",
     "Project imported to your library": "Proyecto importado a tu biblioteca",
-    "Could not import this project. The file may be damaged or unsupported.": "No se pudo importar este proyecto. Puede que el archivo esté dañado o no sea compatible."
+    "Could not import this project. The file may be damaged or unsupported.": "No se pudo importar este proyecto. Puede que el archivo esté dañado o no sea compatible.",
+    "What is sent to {server}": "Qué se envía a {server}",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "Cada vez que usas una herramienta de IA, Manganova envía el texto que esa petición necesita: el título y la premisa de la historia, los perfiles de personajes, las notas del mundo marcadas para enviar a la IA, el guion relacionado y lo que escribes. Nunca se envían dibujos, imágenes ni grabaciones de voz.",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "El servidor lo gestiona quien lo configuró, no Manganova. Su dueño puede guardar o usar este texto según sus propias normas.",
+    "Allow Manganova to send this text to {server}": "Permitir que Manganova envíe este texto a {server}",
+    "Turn this on to save the server. None of your text is sent until you do.": "Actívalo para guardar el servidor. No se envía nada de tu texto hasta que lo hagas.",
+    "Allow sending text to {server} to turn on AI help": "Permite enviar texto a {server} para activar la ayuda de IA"
   },
   "extras": {
     "Blank": "En blanco",
@@ -2888,7 +2895,20 @@
     "From Play together": "De Jugar juntos",
     "{count} people blocked": "{count} personas bloqueadas",
     "{count} person blocked": "{count} persona bloqueada",
-    "You will leave this room": "Saldrás de esta sala"
+    "You will leave this room": "Saldrás de esta sala",
+    "Agree to the Play together rules first.": "Primero acepta las normas de Jugar juntos.",
+    "Be kind to everyone in the room.": "Sé amable con todos en la sala.",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "Nada de dibujos, palabras ni grabaciones de voz de odio, sexuales, de acoso o amenazantes. Tolerancia cero.",
+    "Anyone can block or report you.": "Cualquiera puede bloquearte o denunciarte.",
+    "The host can remove you from the room.": "El anfitrión puede sacarte de la sala.",
+    "Offensive words are hidden automatically.": "Las palabras ofensivas se ocultan automáticamente.",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "Las denuncias enviadas al desarrollador a {email} se revisan en menos de 24 horas.",
+    "Terms of use": "Condiciones de uso",
+    "Play together rules": "Normas de Jugar juntos",
+    "You play with real people. Agree to these rules before you host or join a room.": "Juegas con personas reales. Acepta estas normas antes de crear una sala o unirte a una.",
+    "I agree": "Acepto",
+    "You agreed to these rules.": "Aceptaste estas normas.",
+    "What everyone agrees to before playing": "Lo que todos aceptan antes de jugar"
   },
   "nearbyFill": {
     "Fill the bubbles": "Llena los bocadillos",

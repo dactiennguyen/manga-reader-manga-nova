@@ -121,7 +121,7 @@ export interface AiClient {
 }
 ```
 
-- File prompt (`story`, `writing`, `people`, `translate`, `assistant`) gọi `chat()` trong `core/ai/port.ts`. Lớp `app` đăng ký adapter bằng `configureAi(client)` lúc khởi động, nên `core` không phụ thuộc `data` và phần prompt giữ nguyên.
+- File prompt (`story`, `writing`, `people`, `translate`, `assistant`) gọi `chat()` trong `core/ai/port.ts`. Lớp `app` đăng ký adapter bằng `configureAi(client)` lúc khởi động, nên `core` không phụ thuộc `data` và phần prompt giữ nguyên. Adapter đó chọn đường theo `aiRoute()` (`state/useSettings.ts`): không gửi gì tới server khi người dùng chưa đồng ý cho đúng địa chỉ đó ([16-tinh-nang-bo-sung.md](16-tinh-nang-bo-sung.md#xin-phép-trước-khi-gửi-chữ-cho-ai)).
 - `ai/context.ts` đang đọc store. Đổi thành nhận dữ liệu qua tham số.
 - Giữ bước sửa JSON và gọi lại tối đa 3 lần.
 - Mọi kết quả AI là bản nháp. Người dùng chấp nhận thì mới thành `ChangeSet`.

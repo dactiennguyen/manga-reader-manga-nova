@@ -68,6 +68,7 @@ export { ImageIcon as ImageIcon } from 'phosphor-react-native/src/icons/Image';
 export { ImagesIcon as ImagesIcon } from 'phosphor-react-native/src/icons/Images';
 export { InfoIcon as InfoIcon } from 'phosphor-react-native/src/icons/Info';
 export { PathIcon as JourneyIcon } from 'phosphor-react-native/src/icons/Path';
+export { HeartIcon as KindIcon } from 'phosphor-react-native/src/icons/Heart';
 export { LassoIcon as LassoIcon } from 'phosphor-react-native/src/icons/Lasso';
 export { StackIcon as LayersIcon } from 'phosphor-react-native/src/icons/Stack';
 export { SignOutIcon as LeaveIcon } from 'phosphor-react-native/src/icons/SignOut';
