@@ -200,6 +200,6 @@ Xem lại từng ảnh trước khi giữ: không có toast ("Plan saved"…), b
 ### Lỗi thấy khi chụp (đã sửa)
 
 - **Thanh trạng thái trên màn tối (iOS).** Nguyên nhân: `UIViewControllerBasedStatusBarAppearance = true`, nên native-stack của react-native-screens quyết định và component `StatusBar` không có tác dụng. Sửa: khóa đó thành `false` trong `Info.plist` (người khác làm cùng lúc), nên `StatusBar` trong `AppRoot.tsx` quyết định. Màn nào tối ở cả hai theme thì gọi `useDarkSystemBars()` (`state/useSystemBars.ts`) khi đang được focus: màn vẽ và mọi màn dựng trên nó (Vẽ cùng nhau, lượt vẽ của Tiếp sức, Thi vẽ nhanh), màn luyện vẽ. Theme tối thì chữ trắng ở mọi màn. Chưa thử trên máy: cần xem lại bằng bản build có `Info.plist` mới, nhất là màn vẽ trên iPad nếu trang giấy chạm mép trên.
-- **Ngày tháng.** `formatDate` giờ dùng `Intl.DateTimeFormat` theo ngôn ngữ của app: tiếng Anh "Mon, 11/16/2026", tiếng Việt "Thứ 2, 16/11/2026". Nếu `Intl` lỗi thì dùng dạng dự phòng đúng thứ tự (tiếng Anh tháng trước). Ảnh `08-calendar` chụp trước khi sửa nên còn ngày dạng cũ ("16/11/2026"): nên chụp lại trước khi nộp.
+- **Ngày tháng.** `formatDate` giờ dùng `Intl.DateTimeFormat` theo ngôn ngữ của app: tiếng Anh "Mon, 11/16/2026", tiếng Việt "Thứ 2, 16/11/2026". Nếu `Intl` lỗi thì dùng dạng dự phòng đúng thứ tự (tiếng Anh tháng trước). Ảnh `08-calendar` của cả ba bộ đã chụp lại sau khi sửa.
 - **Màn luyện vẽ.** Dải sáng ở đáy là `NavBarBacking` của `AppRoot` (nền sáng sau thanh điều hướng). Trên các màn tối (`useDarkSystemBars`) nó không còn được vẽ, nên cả màn tối tới mép.
 
