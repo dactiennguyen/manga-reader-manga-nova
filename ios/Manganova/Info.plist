@@ -6,19 +6,6 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>vi</string>
-		<string>ja</string>
-		<string>zh-Hans</string>
-		<string>zh-Hant</string>
-		<string>ko</string>
-		<string>es</string>
-		<string>pt-BR</string>
-		<string>id</string>
-		<string>th</string>
-	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Manganova</string>
 	<key>CFBundleDocumentTypes</key>
@@ -55,6 +42,19 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>vi</string>
+		<string>ja</string>
+		<string>zh-Hans</string>
+		<string>zh-Hant</string>
+		<string>ko</string>
+		<string>es</string>
+		<string>pt-BR</string>
+		<string>id</string>
+		<string>th</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -63,20 +63,6 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<false/>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Manganova uses your Wi-Fi to find friends' rooms nearby and play together, with no internet and no server.</string>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_manganova._tcp</string>
-	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -88,6 +74,14 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -95,10 +89,18 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_manganova._tcp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Manganova uses the camera only to scan a room's QR code or a friend's mangaka card.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Manganova uses your Wi-Fi to find friends' rooms nearby and play together, with no internet and no server.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Manganova uses the microphone only when you record a voice for a speech bubble in Dub together.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Manganova saves a picture to your Photos only when you choose Save Image after exporting a page.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>
@@ -145,7 +147,7 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+	<false/>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>

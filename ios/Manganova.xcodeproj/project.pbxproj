@@ -29,6 +29,7 @@
 		A89B8265A64A8AE3E8FAFADE /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C6F102C1905A4E4788E503A /* Inter-Bold.ttf */; };
 		BA44EB367C1AA207A434695A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		D5DCC45EAC48E2EFA9C09390 /* NativeSpeechModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 892BBAFBB4E3776C17D03661 /* NativeSpeechModule.mm */; };
+		D6051C61424E478B0A0EE377 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 386870F6D40C38E63C7A8F4C /* PrivacyInfo.xcprivacy */; };
 		F77BF58B1B4D6CB64ACA0313 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 731CE3B6363611A03452CBEC /* Localizable.strings */; };
 		FEC27C6C4D107ED96BF6B2AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 825048ECBF4AFC7E26B9C45E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -68,6 +69,7 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Manganova/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		20E5DBDB99F0FA15DB450122 /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = Manganova/id.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		28A7A40529703ADC7716925A /* th */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = th; path = Manganova/th.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		386870F6D40C38E63C7A8F4C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ManganovaWidget/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3A1193224514E4E2688BE307 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-Manganova.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Manganova.debug.xcconfig"; path = "Target Support Files/Pods-Manganova/Pods-Manganova.debug.xcconfig"; sourceTree = "<group>"; };
 		3BAB79E674E8712E2FE45340 /* ja */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ja; path = Manganova/ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 				0B2D094D4F78B200B3D5CABB /* ManganovaWidget.entitlements */,
 				ADFF39AF22FD08F5F294BA8E /* ManganovaWidget.xcconfig */,
 				731CE3B6363611A03452CBEC /* Localizable.strings */,
+				386870F6D40C38E63C7A8F4C /* PrivacyInfo.xcprivacy */,
 			);
 			name = ManganovaWidget;
 			sourceTree = "<group>";
@@ -354,6 +357,7 @@
 			files = (
 				FEC27C6C4D107ED96BF6B2AB /* Assets.xcassets in Resources */,
 				F77BF58B1B4D6CB64ACA0313 /* Localizable.strings in Resources */,
+				D6051C61424E478B0A0EE377 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

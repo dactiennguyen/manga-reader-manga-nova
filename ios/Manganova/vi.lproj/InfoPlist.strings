@@ -2,5 +2,6 @@
 "NSCameraUsageDescription" = "Manganova chỉ dùng camera để quét mã QR của phòng hoặc danh thiếp mangaka của bạn bè.";
 "NSMicrophoneUsageDescription" = "Manganova chỉ dùng micro khi bạn thu giọng cho một bóng thoại trong Lồng tiếng cùng nhau.";
 "NSLocalNetworkUsageDescription" = "Manganova dùng Wi-Fi để tìm phòng của bạn bè ở gần và chơi cùng nhau, không cần internet hay máy chủ.";
+"NSPhotoLibraryAddUsageDescription" = "Manganova chỉ lưu ảnh vào Ảnh khi bạn chọn Lưu hình ảnh sau khi xuất một trang.";
 /* The name of a .mnbrush file (a shared set of brushes and tones) in Files and the share sheet. */
 "Manganova brushes" = "Bút Manganova";

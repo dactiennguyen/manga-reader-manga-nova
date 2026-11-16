@@ -2,5 +2,6 @@
 "NSCameraUsageDescription" = "Manganovaがカメラを使うのは、ルームのQRコードや友だちの漫画家カードを読み取るときだけです。";
 "NSMicrophoneUsageDescription" = "Manganovaがマイクを使うのは、「みんなでアフレコ」でセリフの声を録音するときだけです。";
 "NSLocalNetworkUsageDescription" = "ManganovaはWi-Fiを使って近くにいる友だちのルームを見つけ、一緒に遊びます。インターネットやサーバーは使いません。";
+"NSPhotoLibraryAddUsageDescription" = "Manganova は、ページを書き出したあとに「画像を保存」を選んだときだけ、写真に画像を保存します。";
 /* The name of a .mnbrush file (a shared set of brushes and tones) in Files and the share sheet. */
 "Manganova brushes" = "Manganova ブラシ";

@@ -2,5 +2,6 @@
 "NSCameraUsageDescription" = "Manganova hanya memakai kamera untuk memindai kode QR ruang atau kartu mangaka teman.";
 "NSMicrophoneUsageDescription" = "Manganova hanya memakai mikrofon saat kamu merekam suara untuk balon dialog di Sulih suara bersama.";
 "NSLocalNetworkUsageDescription" = "Manganova memakai Wi-Fi untuk menemukan ruang teman di dekatmu dan bermain bersama, tanpa internet dan tanpa server.";
+"NSPhotoLibraryAddUsageDescription" = "Manganova hanya menyimpan gambar ke Foto saat kamu memilih Simpan Gambar setelah mengekspor halaman.";
 /* The name of a .mnbrush file (a shared set of brushes and tones) in Files and the share sheet. */
 "Manganova brushes" = "Kuas Manganova";

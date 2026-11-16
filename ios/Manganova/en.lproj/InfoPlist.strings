@@ -2,5 +2,6 @@
 "NSCameraUsageDescription" = "Manganova uses the camera only to scan a room's QR code or a friend's mangaka card.";
 "NSMicrophoneUsageDescription" = "Manganova uses the microphone only when you record a voice for a speech bubble in Dub together.";
 "NSLocalNetworkUsageDescription" = "Manganova uses your Wi-Fi to find friends' rooms nearby and play together, with no internet and no server.";
+"NSPhotoLibraryAddUsageDescription" = "Manganova saves a picture to your Photos only when you choose Save Image after exporting a page.";
 /* The name of a .mnbrush file (a shared set of brushes and tones) in Files and the share sheet. */
 "Manganova brushes" = "Manganova brushes";

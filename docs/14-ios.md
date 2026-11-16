@@ -129,10 +129,12 @@ Phần `adhoc` và `testflight` chưa chạy thật lần nào, vì chưa có t�
 
 ### Trên App Store Connect
 
-- Ảnh chụp iPhone 6.9" (1320×2868) và iPad 13" (2064×2752).
+- Ảnh chụp và từng ô cần điền nằm ở [app-store/README.md](app-store/README.md).
 - Privacy Nutrition Labels: khai giống Data safety của Google Play.
 - `ITSAppUsesNonExemptEncryption` đã đặt `false`, vì app chỉ dùng HTTPS của hệ thống.
-- `PrivacyInfo.xcprivacy` đã nằm trong app.
+- `PrivacyInfo.xcprivacy` có trong cả app lẫn widget. UserDefaults khai lý do `CA92.1` (của riêng app) và `1C8F.1` (App Group dùng chung với widget).
+- Các quyền: camera, micro, mạng nội bộ (kèm `NSBonjourServices`) và `NSPhotoLibraryAddUsageDescription`. Quyền cuối cần vì bảng chia sẻ có nút "Lưu hình ảnh"; thiếu nó, iOS tắt app ngay khi người dùng bấm. Chọn ảnh dùng PHPicker nên không cần quyền đọc thư viện Ảnh.
+- `UIViewControllerBasedStatusBarAppearance` là `false`, để component `StatusBar` của React Native quyết màu chữ thanh trạng thái (chữ sáng trên màn vẽ tối).
 
 ## Chưa làm
 

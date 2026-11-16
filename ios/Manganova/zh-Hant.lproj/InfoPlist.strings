@@ -2,5 +2,6 @@
 "NSCameraUsageDescription" = "Manganova 只會在掃描房間 QR 碼或好友的漫畫家名片時使用相機。";
 "NSMicrophoneUsageDescription" = "Manganova 只會在你為「一起配音」中的對話框錄音時使用麥克風。";
 "NSLocalNetworkUsageDescription" = "Manganova 透過 Wi-Fi 尋找附近好友的房間並一起玩，不需要網際網路，也沒有伺服器。";
+"NSPhotoLibraryAddUsageDescription" = "只有在你匯出頁面後選擇「儲存影像」時，Manganova 才會將圖片儲存到照片。";
 /* The name of a .mnbrush file (a shared set of brushes and tones) in Files and the share sheet. */
 "Manganova brushes" = "Manganova 畫筆";
