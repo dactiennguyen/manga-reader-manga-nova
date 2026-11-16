@@ -17,11 +17,11 @@ import { msg } from '../i18n';
 export const APP_NAME = 'Manganova';
 
 /**
- * Where reports on AI answers are sent, as "Also send to the developer" in the report sheet.
- * MUST be filled in with a real support address before release. While it is empty, that option is
- * hidden and reports stay only on the device.
+ * The support address: reports on AI answers and on people in Play together can be emailed here
+ * ("Also send to the developer"). It is public, on the store pages and the website. While it is empty,
+ * that option is hidden and reports stay only on the device.
  */
-export const SUPPORT_EMAIL: string = '';
+export const SUPPORT_EMAIL: string = 'mangamarker@gmail.com';
 
 export const GENRES = [
   msg('Action'),

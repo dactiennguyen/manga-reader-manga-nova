@@ -1,12 +1,13 @@
 # Website
 
-Trang tĩnh bằng HTML và CSS, không cần build. Nó cung cấp các link mà Play Console cần:
+Trang tĩnh bằng HTML và CSS, không cần build. Nó cung cấp các link mà Play Console và App Store Connect cần. Email hỗ trợ là `mangamarker@gmail.com`, ghi ở trang chính sách, điều khoản và hỗ trợ.
 
-| Trang | Link | File | Điền vào đâu trong Play Console |
-| --- | --- | --- | --- |
-| Giới thiệu | https://manganova.pages.dev | `index.html` | Store settings → Website |
-| Chính sách quyền riêng tư | https://manganova.pages.dev/privacy | `privacy.html` | App content → Privacy policy (bắt buộc) |
-| Điều khoản sử dụng | https://manganova.pages.dev/terms | `terms.html` | Không bắt buộc, trang giới thiệu đã có link |
+| Trang | Link | File | Play Console | App Store Connect |
+| --- | --- | --- | --- | --- |
+| Giới thiệu | https://manganova.pages.dev | `index.html` | Store settings → Website | Marketing URL (không bắt buộc) |
+| Chính sách quyền riêng tư | https://manganova.pages.dev/privacy | `privacy.html` | App content → Privacy policy (bắt buộc) | App Privacy → Privacy Policy URL (bắt buộc) |
+| Điều khoản sử dụng | https://manganova.pages.dev/terms | `terms.html` | Không bắt buộc | Không bắt buộc |
+| Hỗ trợ | https://manganova.pages.dev/support | `support.html` | Không bắt buộc, có thể dùng làm Website | Support URL (bắt buộc) |
 
 ## Deploy
 

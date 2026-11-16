@@ -23,13 +23,11 @@ Không tải cả thư mục `extra/` cùng 7 ảnh chính. Đó chỉ là ảnh
 
 ## 2. Việc bắt buộc trước khi nộp
 
-Việc 2 chưa xong, thiếu thì không nộp được.
+Mọi việc dưới đây đã xong phần code; còn deploy website và điền Play Console.
 
 1. **Upload key đã tạo.** Alias `manganova-upload`, file `android/app/manganova-upload.keystore`. Mật khẩu không nằm trong repo: GitHub Actions lấy từ Secrets, build trên máy lấy từ `android/keystore.properties`, và bản lưu ở `~/keys/`. Hãy sao lưu mật khẩu ra nơi an toàn, vì Secrets không đọc lại được.
 
-2. **Có email liên hệ.** Email này công khai trên trang app, và Play yêu cầu trang chính sách có thông tin liên hệ. Có email rồi thì điền vào ba chỗ:
-   - `website/privacy.html` và `website/terms.html`, rồi deploy lại theo [13-website.md](../13-website.md).
-   - `SUPPORT_EMAIL` trong `src/core/model/constants.ts`. Khi có email, khung "Báo cáo câu trả lời AI" mới cho người dùng gửi báo cáo về cho bạn. Chưa điền thì báo cáo chỉ được lưu trên máy người dùng.
+2. **Email liên hệ: `mangamarker@gmail.com`.** Đã điền vào `website/privacy.html`, `website/terms.html`, trang hỗ trợ `website/support.html` và `SUPPORT_EMAIL` trong `src/core/model/constants.ts`, nên báo cáo câu trả lời AI và báo cáo người chơi gửi được về email này. Còn phải deploy lại website theo [13-website.md](../13-website.md), và điền email này vào ô Email trong Store settings của Play Console.
 
 3. **Trang chính sách quyền riêng tư.** Đã xong, ghi đúng tên Manganova và package. Link ở đầu file này.
 
