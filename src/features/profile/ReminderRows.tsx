@@ -6,7 +6,10 @@ import { useSettings } from '../../state/useSettings';
 import { ListItem, Menu, SwitchRow, Text, toast } from '../../ui';
 import { REMINDER_TIMES, syncReminder, timeLabel } from './reminder';
 
-/** The daily drawing reminder: a local notification, set on the device with no server. */
+/**
+ * The drawing reminder: a daily local notification with today's plan, plus one the day before each chapter
+ * deadline, all set on the device with no server.
+ */
 export function ReminderRows() {
   const on = useSettings(s => s.reminderOn);
   const hour = useSettings(s => s.reminderHour);
@@ -25,7 +28,7 @@ export function ReminderRows() {
       <SwitchRow
         icon={ReminderIcon}
         title={t('Daily drawing reminder')}
-        subtitle={t('One notification a day, set on this device')}
+        subtitle={t("Today's plan each day, and a heads-up the day before a deadline")}
         value={on}
         onValueChange={value => apply({ reminderOn: value })}
       />

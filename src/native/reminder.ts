@@ -35,3 +35,20 @@ export async function scheduleReminder(
 export function cancelReminder(): void {
   NativeReminder?.cancel();
 }
+
+export type OnceReminder = { id: string; at: number; title: string; body: string };
+
+/**
+ * Replaces every one-off notification with this list; an empty list removes them. Never asks for
+ * permission, so call it after scheduleReminder. Resolves false when they could not be set.
+ */
+export async function replaceOnceReminders(list: readonly OnceReminder[]): Promise<boolean> {
+  if (!NativeReminder) {
+    return false;
+  }
+  try {
+    return await NativeReminder.replaceOnce(list.map(({ id, at, title, body }) => ({ id, at, title, body })));
+  } catch {
+    return false;
+  }
+}

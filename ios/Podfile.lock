@@ -1470,6 +1470,29 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-image-picker (8.3.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-keyboard-controller (1.23.0):
     - hermes-engine
     - RCTRequired
@@ -2461,6 +2484,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
   - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -2626,6 +2650,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
   react-native-document-picker:
     :path: "../node_modules/@react-native-documents/picker"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
   react-native-keyboard-controller:
     :path: "../node_modules/react-native-keyboard-controller"
   react-native-netinfo:
@@ -2785,6 +2811,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 0207d6133274a7cbfc3d0dae326e3055c8cfcf9e
   React-mutationobservernativemodule: b97a67c29f724d18a92379e7390f24350acb433a
   react-native-document-picker: 4c175782581129aea4efd7998210ce2cf2c4e721
+  react-native-image-picker: dc809b800c612d43b6508095cca505c32cf9d3c8
   react-native-keyboard-controller: d80dd5bddc7e57844ae76bbee856e1185a329786
   react-native-netinfo: 687391ecedb199c6d67fbc46c87cbae3277de967
   react-native-safe-area-context: 56700b839169ce88ffcec68c40447916fe512462
@@ -2825,7 +2852,7 @@ SPEC CHECKSUMS:
   React-viewtransitionnativemodule: 31dae72887e60de89cf6e1c8def004fdfe554119
   React-webperformancenativemodule: c376d2e7367b3c0d65df3b60ff162554791e7f92
   ReactAppDependencyProvider: 2dbb2d65f3a487b8a69449f5b1b12b44656d2204
-  ReactCodegen: 73cf9a183556bff2d88ffe1cfdf9892e10994c53
+  ReactCodegen: 4c94d8321f92b3a91207611ad75940050d15df95
   ReactCommon: b63ce798b898ed77c6cfdeb80b18080161f52ed5
   ReactNativeDependencies: a5164c3ebbe90d992022b5d9cbabbf770a6d7d05
   ReactNativeFs: c0b2d8faaa402ae3224aa2c098aec9212fdc392e

@@ -232,7 +232,7 @@ export function CanvasEditor({
     if (pick.kind === 'character') {
       setSheet('characters');
     } else if (pick.kind === 'device') {
-      addReference();
+      addReference(pick.from);
     } else if (pick.kind === 'manage') {
       navigation.navigate('RefBoards', { projectId: ctx.project.id });
     } else {
@@ -381,7 +381,7 @@ export function CanvasEditor({
           { label: t('Flip view horizontally'), icon: FlipIcon, onPress: () => setFlip(value => !value) },
           { label: grid ? t('Hide grid') : t('Show grid'), icon: GridIcon, onPress: () => setGrid(value => !value) },
           stylusMode && { label: t('Draw with a finger again'), icon: EditIcon, onPress: () => setStylusMode(false) },
-          { label: t('Add reference image'), icon: AddImageIcon, onPress: addReference },
+          { label: t('Add reference image'), icon: AddImageIcon, onPress: () => addReference('photos') },
           { label: t('Import image into layer'), icon: ImageIcon, onPress: importImage },
           { label: t('Replay drawing'), icon: ReplayIcon, onPress: () => setSheet('replay') },
           { label: t('Clear current layer'), icon: DeleteIcon, destructive: true, onPress: clearActive },

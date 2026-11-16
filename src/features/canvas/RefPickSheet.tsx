@@ -5,15 +5,20 @@ import { t, tn } from '../../core/i18n';
 import type { ID } from '../../core/model/types';
 import { boardsForCanvas, imagesOf, useLinkTargets, useRefBoards, type RefBoard } from '../../state/useRefBoards';
 import { ListItem, Section, Sheet, Text } from '../../ui';
-import { AddImageIcon, CharactersIcon, RefBoardIcon } from '../../ui/icons';
+import { AddImageIcon, CharactersIcon, MoveToIcon, RefBoardIcon } from '../../ui/icons';
 import { BoardCollage } from '../refBoards/BoardCollage';
 
 const THUMB = 48;
 
-export type RefPick = { kind: 'board'; board: RefBoard } | { kind: 'character' } | { kind: 'device' } | { kind: 'manage' };
+export type RefPick =
+  | { kind: 'board'; board: RefBoard }
+  | { kind: 'character' }
+  | { kind: 'device'; from: 'photos' | 'files' }
+  | { kind: 'manage' };
 
 /**
- * What to keep beside the page: a board, a character's sheet or one picture from the device. The choice
+ * What to keep beside the page: a board, a character's sheet or one picture from the photo library or
+ * Files. The choice
  * runs after the sheet has closed, because iOS cannot open a picker or another sheet over it.
  */
 export function RefPickSheet({
@@ -53,7 +58,18 @@ export function RefPickSheet({
       <View className="gap-4 px-4 pb-2">
         <Section>
           <ListItem icon={CharactersIcon} title={t('Character reference')} onPress={() => pick({ kind: 'character' })} />
-          <ListItem icon={AddImageIcon} title={t('Add reference image')} onPress={() => pick({ kind: 'device' })} />
+          <ListItem
+            icon={AddImageIcon}
+            title={t('Add reference image')}
+            subtitle={t('From your photos')}
+            onPress={() => pick({ kind: 'device', from: 'photos' })}
+          />
+          <ListItem
+            icon={MoveToIcon}
+            title={t('From Files')}
+            subtitle={t('Image files on this device or in the cloud')}
+            onPress={() => pick({ kind: 'device', from: 'files' })}
+          />
         </Section>
         <Section title={t('Your boards')}>
           {boards.length === 0 ? (

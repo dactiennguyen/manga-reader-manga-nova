@@ -41,7 +41,19 @@ import {
   workDays,
   type ChapterPlan,
 } from '../src/core/planner/plan';
-import { dayEntryText, daysLeftText, monthTitle, planAdvice, planReminderText, todayText, weekLine } from '../src/core/planner/words';
+import {
+  MAX_DEADLINE_REMINDERS,
+  dayEntryText,
+  daysLeftText,
+  deadlineReminders,
+  dueNear,
+  monthTitle,
+  planAdvice,
+  planReminderText,
+  todayText,
+  weekLine,
+} from '../src/core/planner/words';
+import { dayKeyToDate } from '../src/core/util/time';
 import { addChapter, addPage, addProject, emptyStory } from './helpers/studioStory';
 
 // 2026-11-16 is a Monday.
@@ -379,5 +391,77 @@ describe('reminder text', () => {
     );
     expect(items[0].todayLeft).toBe(0);
     expect(planReminderText(items, nameOf, MON, MON)).toBeNull();
+  });
+});
+
+describe('deadline reminders', () => {
+  const state = story();
+  const nameOf = (id: string) => (id === 'c1' ? 'Chapter 1' : 'The oven');
+  const THU = '2026-11-19';
+  const at = (day: string, hour: number, minute = 0) => {
+    const date = dayKeyToDate(day);
+    date.setHours(hour, minute, 0, 0);
+    return date.getTime();
+  };
+  const options = (now: number, extra: { hour?: number; minute?: number; skip?: { day: string; chapterId: string } } = {}) => ({
+    now,
+    hour: 20,
+    minute: 0,
+    ...extra,
+  });
+
+  it('warns at the reminder time on the day before the deadline', () => {
+    const items = planViews({ ...EMPTY_PLANNER, plans: { c1: plan({ target: 4 }) } }, state, MON);
+    expect(deadlineReminders(items, nameOf, options(at(MON, 10)))).toEqual([
+      { id: 'deadline-c1', chapterId: 'c1', day: THU, at: at(THU, 20), body: 'Chapter 1 is due tomorrow. 4 pages to go.' },
+    ]);
+    expect(deadlineReminders(items, nameOf, options(at(MON, 10), { hour: 8, minute: 30 }))[0].at).toBe(at(THU, 8, 30));
+  });
+
+  it('leaves out a moment already past, and a deadline today', () => {
+    const thursday = planViews({ ...EMPTY_PLANNER, plans: { c1: plan({ target: 4 }) } }, state, THU);
+    expect(deadlineReminders(thursday, nameOf, options(at(THU, 19, 59)))).toHaveLength(1);
+    expect(deadlineReminders(thursday, nameOf, options(at(THU, 20)))).toEqual([]);
+    const friday = planViews({ ...EMPTY_PLANNER, plans: { c1: plan({ target: 4 }) } }, state, FRI);
+    expect(deadlineReminders(friday, nameOf, options(at(FRI, 6)))).toEqual([]);
+  });
+
+  it('leaves out finished and overdue plans', () => {
+    const done = story();
+    done.pages.a1.done = true;
+    done.pages.a2.done = true;
+    const finished = planViews({ ...EMPTY_PLANNER, doneLog: { a1: MON, a2: MON }, plans: { c1: plan({ target: 2 }) } }, done, MON);
+    expect(finished[0].status).toBe('done');
+    expect(deadlineReminders(finished, nameOf, options(at(MON, 10)))).toEqual([]);
+    const late = planViews({ ...EMPTY_PLANNER, plans: { c1: plan({ deadline: MON, start: '2026-11-09' }) } }, state, TUE);
+    expect(late[0].status).toBe('overdue');
+    expect(deadlineReminders(late, nameOf, options(at(TUE, 10)))).toEqual([]);
+  });
+
+  it('skips the chapter the daily reminder already names that day, keeping the others', () => {
+    const items = planViews(
+      { ...EMPTY_PLANNER, plans: { c1: plan({ target: 4 }), c2: plan({ chapterId: 'c2', target: 3, deadline: WED }) } },
+      state,
+      MON,
+    );
+    expect(deadlineReminders(items, nameOf, options(at(MON, 10))).map(item => [item.chapterId, item.day])).toEqual([
+      ['c2', TUE],
+      ['c1', THU],
+    ]);
+    expect(dueNear(items, THU)?.plan.chapterId).toBe('c1');
+    const skipped = deadlineReminders(items, nameOf, options(at(MON, 10), { skip: { day: THU, chapterId: 'c1' } }));
+    expect(skipped.map(item => item.chapterId)).toEqual(['c2']);
+    expect(skipped[0].body).toBe('The oven is due tomorrow. 3 pages to go.');
+  });
+
+  it('keeps only the nearest ones', () => {
+    const items = planViews({ ...EMPTY_PLANNER, plans: { c1: plan({ target: 4 }) } }, state, MON);
+    const many = Array.from({ length: MAX_DEADLINE_REMINDERS + 5 }, (_, index) => ({
+      ...items[0],
+      plan: { ...items[0].plan, chapterId: `c${index}`, deadline: addDays(FRI, index) },
+    }));
+    const result = deadlineReminders(many.reverse(), nameOf, options(at(MON, 10)));
+    expect(result).toHaveLength(MAX_DEADLINE_REMINDERS);
+    expect(result[0].day).toBe(THU);
   });
 });
