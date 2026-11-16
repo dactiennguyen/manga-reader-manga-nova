@@ -80,16 +80,17 @@ Từng ô có ở [huong-dan-dien.html](huong-dan-dien.html). Thứ tự:
 
 - **2.3.3 Ảnh chụp.** Ảnh phải là app đang dùng, không chỉ là màn chào. Ảnh trong thư mục này là ảnh thật từ simulator, không khung máy, không chữ quảng cáo. Không dùng ảnh Android cho App Store: thanh trạng thái và phông khác nhau, người duyệt nhận ra.
 - **2.1 App chưa xong.** App crash, nút không làm gì, chữ "debug" hay màn đỏ của React Native. Luôn nộp bản Release. Thử trên máy thật trước.
-- **1.2 Nội dung do người dùng tạo.** Chơi cùng nhau cho người dùng gửi tranh, chữ, tiếng thu âm cho nhau. Apple đòi bốn thứ: báo cáo, chặn, thông tin liên hệ và lọc nội dung. App đã có ba thứ đầu, cộng thêm việc mời ra khỏi phòng:
+- **1.2 Nội dung do người dùng tạo: đã xử lý.** Chơi cùng nhau cho người dùng gửi tranh, chữ, tiếng thu âm cho nhau. Apple đòi: đồng ý điều khoản trước, báo cáo, chặn, thông tin liên hệ và lọc nội dung. App có đủ, cộng thêm việc mời ra khỏi phòng (chi tiết ở [18-choi-cung-nhau.md](../18-choi-cung-nhau.md#quy-tắc-chơi)):
+  - Điều khoản: lần đầu mở Chơi cùng nhau (kể cả khi vào bằng QR hay link) phải bấm **I agree** với quy tắc "không khoan nhượng" (không thù ghét, tình dục, quấy rối, đe dọa; ai cũng chặn và báo cáo được; chủ phòng mời ra được; báo cáo được xem trong 24 giờ; link điều khoản). Chưa đồng ý thì không mở hay vào phòng được. Xem lại ở Profile → **Play together rules**.
   - Báo cáo: chạm tên một người trong danh sách phòng → **Report**, chọn lý do và ghi chú (`features/nearby/safety/MemberSheet.tsx`).
   - Chặn: cùng bảng đó → **Block**. Người bị chặn bị từ chối khi vào phòng. Bỏ chặn ở Profile → **Blocked and reported people**.
   - Mời ra: chủ phòng chọn **Remove from room**. Người đó không vào lại được phòng.
   - Thông tin liên hệ: email trên trang hỗ trợ và trong app (`SUPPORT_EMAIL`).
-  - **Chưa có lọc nội dung tự động.** Apple ghi "a method for filtering objectionable material". Phòng chỉ có người trong cùng Wi-Fi và mặc định phải có mã phòng, không có gì công khai. Ghi chú cho người duyệt đã giải thích. Nếu bị hỏi, trả lời rằng nội dung chỉ đi giữa những người đã được mời vào phòng riêng, và chủ phòng kiểm soát ai ở lại. Nếu Apple vẫn yêu cầu, phải thêm bộ lọc từ ngữ cho chữ gõ trong Đoán tranh, Điền thoại và Cùng viết kịch bản.
+  - Lọc nội dung: chữ người khác gõ (tên, câu đoán, Điền thoại, Cùng viết kịch bản, nhãn góp ý, thẻ, danh thiếp, truyện nhận qua Wi-Fi) được lọc từ xúc phạm thành `•••` ngay trên máy nhận (`core/nearby/textFilter.ts`). Tranh và tiếng dựa vào chặn, báo cáo và mời ra. Nếu người duyệt hỏi, trả lời: chữ được lọc tự động, mọi nội dung chỉ đi giữa những người trong một phòng riêng trên cùng Wi-Fi, ai cũng chặn và báo cáo được, chủ phòng mời ra được, và báo cáo tới email nhà phát triển.
   - Báo cáo phải được trả lời kịp thời. Hãy kiểm tra hộp thư thường xuyên.
 - **4.2 Tính năng tối thiểu.** App này nhiều tính năng, không lo. Chỉ cần người duyệt thấy ngay: ghi chú hướng dẫn mở truyện mẫu.
 - **5.1.1 Quyền riêng tư.** Lời xin quyền phải nói rõ dùng để làm gì. `Info.plist` đã có lời cho Camera, Microphone, Local Network, và bản dịch 9 ngôn ngữ. Ảnh dùng trình chọn ảnh của hệ thống nên không xin quyền Ảnh. App không xin quyền lúc mở. Mỗi quyền chỉ hỏi khi dùng tính năng cần nó.
-- **5.1.2(i) Gửi dữ liệu cho AI bên thứ ba.** Từ cuối 2025 Apple đòi nói rõ và xin phép trước khi gửi dữ liệu cá nhân cho AI bên thứ ba. App không có server AI mặc định. Người dùng tự nhập server của họ, và trang chính sách đã giải thích. Hiện app **chưa có hộp hỏi lần đầu** trước khi gửi chữ tới server. Nên thêm một hộp xác nhận khi lưu địa chỉ server, nói chữ nào sẽ được gửi đi.
+- **5.1.2(i) Gửi dữ liệu cho AI bên thứ ba: đã xử lý.** Từ cuối 2025 Apple đòi nói rõ và xin phép trước khi gửi dữ liệu cá nhân cho AI bên thứ ba. App không có server AI mặc định. Người dùng tự nhập server của họ, và trang chính sách đã giải thích. Profile → AI server giờ ghi rõ chữ nào được gửi (tên truyện và tóm tắt, hồ sơ nhân vật, ghi chú thế giới đánh dấu gửi AI, đoạn kịch bản liên quan, chữ người dùng gõ; không bao giờ gửi tranh, ảnh hay tiếng) và gửi tới đâu (tên server). Phải bật công tắc "Allow Manganova to send this text to {server}" thì mới lưu được. Sự đồng ý gắn với đúng địa chỉ đó: đổi địa chỉ thì phải đồng ý lại. Chưa đồng ý thì `boot.ts` không gửi yêu cầu nào, chỉ báo lỗi chỉ đường tới Profile. Câu trả lời mẫu (khi chưa có server) giữ nguyên.
 - **2.3.1 Mô tả đúng sự thật.** Mô tả ghi AI chỉ hỗ trợ chữ và không bao giờ vẽ. Không ghi "Apple Pencil" khi chưa thử trên máy thật: mô tả hiện chỉ ghi "Stylus pressure".
 - **Link chết.** Support URL, chính sách hay điều khoản không mở được thì bị từ chối ngay.
 
@@ -190,17 +191,15 @@ Tìm nút: `idb ui describe-all --udid $U --json` trả về nhãn và khung the
 9. Done → Profile → Creation calendar → Plan a chapter → Lantern Courier · Chapter 1 → 8 pages, In 2 weeks, Skip weekends → Start the plan → Go back. Chụp **08-calendar**.
 10. Go back → Drawing lessons → Focus lines → Start practice. Đồ 12 tia theo nét đứt (tâm 450,600 trên trang 900×1200; bước 1 từ bán kính 400 vào 230, mỗi 30°; bước 2 lệch 15°, vào 260 hoặc 300) → Next step → Done. Chụp **09-lessons** (chỉ iPhone).
 
-**Thanh trạng thái trên màn tối.** Bản iOS hiện chữ thanh trạng thái màu đen trên màn vẽ tối (xem lỗi bên dưới). Khi chụp màn vẽ, màn luyện vẽ và bảng Materials trên iPhone, đặt `xcrun simctl ui $U appearance dark` để chữ thành trắng, chụp xong đặt lại `light`. Theme của app vẫn sáng vì app đang chọn Light. Trên iPad, mép trên màn vẽ là nền trắng, nên ảnh 02 và 06 của iPad chụp ở `light`.
+**Thanh trạng thái trên màn tối.** Bộ ảnh hiện có được chụp trước khi sửa lỗi bên dưới: khi chụp màn vẽ, màn luyện vẽ và bảng Materials trên iPhone đã phải đặt `xcrun simctl ui $U appearance dark` để chữ thành trắng. Từ bản có `UIViewControllerBasedStatusBarAppearance = false`, app tự đổi chữ thành trắng trên các màn tối, không cần mẹo này. Trên iPad, mép trên màn vẽ là nền trắng, nên ảnh 02 và 06 của iPad chụp ở `light`; với bản đã sửa, hãy xem lại chữ thanh trạng thái trên iPad (xem bên dưới).
 
 Xem lại từng ảnh trước khi giữ: không có toast ("Plan saved"…), bàn phím, vòng xoay, chữ bị cắt.
 
 **4. Dọn dẹp:** `xcrun simctl shutdown $U && xcrun simctl delete $U`.
 
-### Lỗi thấy khi chụp
+### Lỗi thấy khi chụp (đã sửa)
 
-Không sửa trong lần này, ghi lại để làm sau:
-
-- **Thanh trạng thái trên màn vẽ (iOS).** `AppRoot.tsx` đặt `StatusBar barStyle="light-content"` khi ở Canvas, nhưng trên iOS chữ vẫn đen trên nền tối. Có thể do `UIViewControllerBasedStatusBarAppearance = true` cùng native-stack của react-native-screens, nên lệnh của `StatusBar` không có tác dụng. Hướng sửa: đặt `statusBarStyle` trong options của từng màn, hoặc đặt khóa đó thành `false`. Theme tối của app chắc cũng bị như vậy.
-- **Ngày tháng trong lịch sáng tác.** `formatDate` trong `src/core/util/time.ts` dùng chuỗi `{day}/{month}/{year}`, nên tiếng Anh hiện "Mon, 16/11/2026". Màn Thống kê lại hiện "11/16". Người Mỹ sẽ đọc nhầm.
-- **Màn luyện vẽ.** Dải dưới cùng (vùng thanh home) có màu giấy sáng trong khi cả màn tối.
+- **Thanh trạng thái trên màn tối (iOS).** Nguyên nhân: `UIViewControllerBasedStatusBarAppearance = true`, nên native-stack của react-native-screens quyết định và component `StatusBar` không có tác dụng. Sửa: khóa đó thành `false` trong `Info.plist` (người khác làm cùng lúc), nên `StatusBar` trong `AppRoot.tsx` quyết định. Màn nào tối ở cả hai theme thì gọi `useDarkSystemBars()` (`state/useSystemBars.ts`) khi đang được focus: màn vẽ và mọi màn dựng trên nó (Vẽ cùng nhau, lượt vẽ của Tiếp sức, Thi vẽ nhanh), màn luyện vẽ. Theme tối thì chữ trắng ở mọi màn. Chưa thử trên máy: cần xem lại bằng bản build có `Info.plist` mới, nhất là màn vẽ trên iPad nếu trang giấy chạm mép trên.
+- **Ngày tháng.** `formatDate` giờ dùng `Intl.DateTimeFormat` theo ngôn ngữ của app: tiếng Anh "Mon, 11/16/2026", tiếng Việt "Thứ 2, 16/11/2026". Nếu `Intl` lỗi thì dùng dạng dự phòng đúng thứ tự (tiếng Anh tháng trước). Ảnh `08-calendar` chụp trước khi sửa nên còn ngày dạng cũ ("16/11/2026"): nên chụp lại trước khi nộp.
+- **Màn luyện vẽ.** Dải sáng ở đáy là `NavBarBacking` của `AppRoot` (nền sáng sau thanh điều hướng). Trên các màn tối (`useDarkSystemBars`) nó không còn được vẽ, nên cả màn tối tới mép.
 

@@ -33,7 +33,7 @@ Mở bằng Xcode thì mở `ios/Manganova.xcworkspace`, không mở file `.xcod
 | Phiên bản tối thiểu | Android 7.0 | iOS 16.0. SSZipArchive cần mức này, và khóa xoay màn dùng API của iOS 16 |
 | Chặn chụp màn hình | `FLAG_SECURE` ở bản release | Không làm được. `setSecure` không làm gì |
 | Màn khởi động | `core-splashscreen`, giữ tới khi màn đầu vẽ xong | `LaunchScreen.storyboard`, tự tắt |
-| Thanh hệ thống | `setSystemBarsDarkIcons` đổi màu icon | Component `StatusBar` lo. iOS không có thanh điều hướng |
+| Thanh hệ thống | `setSystemBarsDarkIcons` đổi màu icon | Component `StatusBar` trong `AppRoot` lo, vì `Info.plist` đặt `UIViewControllerBasedStatusBarAppearance = false` (để `true` thì native-stack quyết định và `StatusBar` không có tác dụng). Màn tối ở cả hai theme gọi `useDarkSystemBars()`. iOS không có thanh điều hướng |
 | Lùi màn | Nút Back cứng, chặn bằng `BackHandler` | Vuốt từ mép trái. Đã tắt ở các màn vẽ và màn nhiều bước, vì `BackHandler` không chạy trên iOS |
 | Mở file truyện | intent-filter | Khai `com.manganova.project` (`.manganova`) và `com.manganova.legacy-project` (`.mangaka`) trong `Info.plist`. iOS chép file vào `Documents/Inbox` rồi mở bằng URL `file://`. App xóa bản chép đó sau khi nhập |
 | Truyện mẫu | Asset `sample/lantern.manganova` | Cùng file đó, Xcode trỏ tới thư mục của Android và đóng vào bundle |

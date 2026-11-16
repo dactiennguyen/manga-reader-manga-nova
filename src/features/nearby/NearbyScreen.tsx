@@ -11,6 +11,7 @@ import { AppBar, ArtBanner, Banner, Button, Card, Dialog, Divider, FieldLabel, L
 import { LockIcon, PlayTogetherIcon, ScanIcon, WifiIcon } from '../../ui/icons';
 import { NEARBY_ART } from '../../ui/nearbyArt';
 import { JoinModeChoice } from './JoinModeChoice';
+import { NearbyRulesGate } from './safety/NearbyRules';
 
 const HINT_ART = { width: 80, height: 80 };
 
@@ -229,8 +230,16 @@ function WifiHint() {
   );
 }
 
-/** The Play-together hub: host a room, see rooms nearby, or join with a code. */
+/** The Play-together hub: host a room, see rooms nearby, or join with a code. The rules come first. */
 export function NearbyScreen() {
+  return (
+    <NearbyRulesGate>
+      <NearbyHub />
+    </NearbyRulesGate>
+  );
+}
+
+function NearbyHub() {
   const navigation = useAppNavigation();
   const myName = useMyName();
   const { status, room, error, joinRoom, reset } = useRoom();

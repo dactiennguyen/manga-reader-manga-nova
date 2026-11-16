@@ -13,6 +13,7 @@ import { HostSession } from './hostSession';
 import { newToken } from './link';
 import { BLOB_IDLE_TIMEOUT, BlobAssembler, blobChunks, MAX_CHUNKS, CHUNK_CHARS } from './protocol';
 import { realClock, type Advert, type Clock, type Discovery, type Network } from './transport';
+import { maskText } from './textFilter';
 import type { Activity, BlobProgress, JoinMode, Member, MemberId, Message, MessageType, NearbyRoom, RoomAddress, RoomBlob, RoomState } from './types';
 
 export type RoomStatus = 'idle' | 'hosting' | 'joining' | 'joined' | 'error';
@@ -70,8 +71,11 @@ export type OutgoingBlob = { id: string; done: Promise<string>; cancel(): void }
 /** The shape of a zustand state creator, spelled out so core does not depend on zustand. */
 export type RoomStateCreator = (set: (partial: Partial<RoomStoreState>) => void, get: () => RoomStoreState) => RoomStoreState;
 
-/** This phone's safety key and block list (safety.ts), read when a room starts and when someone knocks. */
-export type RoomSafety = { key(): string; blocked(key: string): boolean };
+/**
+ * This phone's safety key and block list (safety.ts), read when a room starts and when someone knocks.
+ * `rulesAccepted`: false until the person agreed to the Play together rules; no room is hosted or joined before.
+ */
+export type RoomSafety = { key(): string; blocked(key: string): boolean; rulesAccepted?(): boolean };
 
 export type RoomDeps = { network: Network; discovery?: Discovery; clock?: Clock; newId?: () => string; safety?: RoomSafety };
 
@@ -217,10 +221,20 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
       }
     };
 
+    // Guideline 1.2: the rules (zero tolerance for objectionable content) come before any room.
+    const refuseWithoutRules = () => {
+      if (deps.safety?.rulesAccepted && !deps.safety.rulesAccepted()) {
+        const error = t('Agree to the Play together rules first.');
+        set({ error });
+        throw new Error(error);
+      }
+    };
+
     return {
       ...IDLE,
 
       async hostRoom(name, roomName, joinMode = 'code') {
+        refuseWithoutRules();
         teardown();
         set({ ...IDLE, status: 'hosting' });
         // Any failure on the way must end in 'error': a room stuck in 'hosting' with no room hides the hub.
@@ -239,12 +253,13 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
         }
         try {
           const token = newToken();
-          const me: Member = { id: newId(), name: name.trim() || t('Host'), color: 0, host: true };
+          // Names are masked (textFilter.ts) on this phone too, so the host sees what the guests see.
+          const me: Member = { id: newId(), name: maskText(name.trim()) || t('Host'), color: 0, host: true };
           const key = deps.safety?.key();
           if (key) {
             me.key = key;
           }
-          const title = (roomName ?? name).trim() || me.name;
+          const title = maskText((roomName ?? name).trim()) || me.name;
           const policy = { blocked: (other: string) => deps.safety?.blocked(other) ?? false };
           host = new HostSession(server, token, me, newId(), title, { deliver, room: room => set({ room }) }, clock, newId, policy);
           const address: RoomAddress = { host: ip, port: server.port, token, name: title };
@@ -259,12 +274,13 @@ export function roomStateCreator(deps: RoomDeps): RoomStateCreator {
       },
 
       async joinRoom(address, name) {
+        refuseWithoutRules();
         teardown();
         set({ ...IDLE, status: 'joining', address });
         const session = new GuestSession(
           deps.network,
           address,
-          name.trim().slice(0, 40),
+          maskText(name.trim().slice(0, 40)),
           {
             deliver,
             room: (room, meId) => set({ room, me: room.members.find(member => member.id === meId) ?? get().me }),

@@ -6,6 +6,7 @@
 import { z } from 'zod';
 
 import { decodeBase64Url, encodeBase64Url } from './base64url';
+import { maskText } from './textFilter';
 import type { RoomAddress } from './types';
 import { takeChars } from '../util/format';
 
@@ -94,18 +95,19 @@ export function parseFriendLink(url: string): FriendCard | null {
     return null;
   }
   const { i, n, s, r } = parsed.data;
-  const name = clipText(n, FRIEND_LIMITS.name);
+  // Words from someone else's card are masked on arrival (textFilter.ts).
+  const name = maskText(clipText(n, FRIEND_LIMITS.name));
   if (!name) {
     return null;
   }
   const card: FriendCard = {
     id: i,
     name,
-    stories: (s ?? []).map(title => clipText(title, FRIEND_LIMITS.title)).filter(Boolean),
+    stories: (s ?? []).map(title => maskText(clipText(title, FRIEND_LIMITS.title))).filter(Boolean),
   };
   if (r) {
     card.room = { host: r.h, port: r.p, token: r.k };
-    const roomName = r.m ? clipText(r.m, FRIEND_LIMITS.name) : '';
+    const roomName = r.m ? maskText(clipText(r.m, FRIEND_LIMITS.name)) : '';
     if (roomName) {
       card.room.name = roomName;
     }

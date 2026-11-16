@@ -16,6 +16,7 @@
  */
 import type { Bubble, Stroke } from '../model/types';
 import { BOARD_UNITS, INK_POINTS_MAX, INK_STROKES_MAX, type InkStroke } from './guess';
+import { maskText } from './textFilter';
 import type { MemberId, Message } from './types';
 
 export const FILL_ROUNDS = [1, 2, 3] as const;
@@ -238,10 +239,13 @@ export function inkToStrokes(strokes: readonly InkStroke[], box: { x: number; y:
 
 /** One line per bubble: no line breaks or runs of spaces, at most FILL_LINE_MAX characters. */
 export function cleanLines(lines: readonly string[], count: number): string[] {
+  // Offensive words are masked (textFilter.ts): the writer sees what the room will see.
   return Array.from({ length: count }, (_, index) =>
-    Array.from((lines[index] ?? '').replace(/\s+/g, ' ').trim())
-      .slice(0, FILL_LINE_MAX)
-      .join(''),
+    maskText(
+      Array.from((lines[index] ?? '').replace(/\s+/g, ' ').trim())
+        .slice(0, FILL_LINE_MAX)
+        .join(''),
+    ),
   );
 }
 

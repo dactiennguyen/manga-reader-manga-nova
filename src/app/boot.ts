@@ -1,5 +1,5 @@
 import { createDemoClient } from '../core/ai/demo';
-import { configureAi } from '../core/ai/port';
+import { AiError, configureAi } from '../core/ai/port';
 import { t } from '../core/i18n';
 import { createAiClient, testConnection } from '../data/aiClient';
 import { exportProjectArchive, importProjectArchive, type ArchiveStory } from '../data/archive';
@@ -26,7 +26,7 @@ import { connectNearbySafety } from '../state/useNearbySafety';
 import { connectRefBoards, exportRefBoards, importRefBoards } from '../state/useRefBoards';
 import { connectAssistant } from '../state/useAssistant';
 import { connectDubClips } from '../state/useDubClips';
-import { aiServerSet, connectSettings, useSettings } from '../state/useSettings';
+import { aiRoute, connectSettings, useSettings } from '../state/useSettings';
 import { connectNearbyShare, dropBorrowedStories } from '../state/useNearbyShare';
 import { connectPlanner } from '../state/usePlanner';
 import { connectStory, importEntities, useStory } from '../state/useStory';
@@ -95,9 +95,18 @@ export async function boot(): Promise<void> {
     return { baseUrl: aiBaseUrl, apiKey: aiApiKey, model: aiModel };
   });
   const demo = createDemoClient(noteSampleAnswer);
+  // Every AI request passes here. Nothing is sent to a server the person has not allowed (guideline 5.1.2(i)).
   configureAi({
-    complete: (request, signal) =>
-      (aiServerSet() || !useSettings.getState().aiDemo ? server : demo).complete(request, signal),
+    complete: (request, signal) => {
+      switch (aiRoute(useSettings.getState())) {
+        case 'demo':
+          return demo.complete(request, signal);
+        case 'noConsent':
+          return Promise.reject(new AiError('not-configured', t('Allow Manganova to send text to your AI server first, in Profile → AI server.')));
+        default:
+          return server.complete(request, signal);
+      }
+    },
   });
   configureServices({
     exportProject: (projectId, options) => exportProjectArchive(archiveStory, projectId, options),

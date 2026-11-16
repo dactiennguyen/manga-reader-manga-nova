@@ -7,6 +7,7 @@
 import { collectPanelIds } from '../layout/layout';
 import { chaptersOf } from '../model/selectors';
 import type { ID, Page, StoryData } from '../model/types';
+import { maskText } from './textFilter';
 import type { Message } from './types';
 
 export const STICKER_IDS = ['love', 'laugh', 'wow', 'fire', 'idea', 'question', 'thumbs', 'star'] as const;
@@ -43,7 +44,7 @@ export function isSticker(value: string): value is StickerId {
 
 export function cleanNoteText(text: string): string {
   const chars = [...text.replace(/\s+/g, ' ').trim()];
-  return chars.slice(0, NOTE_TEXT_MAX).join('').trim();
+  return maskText(chars.slice(0, NOTE_TEXT_MAX).join('').trim());
 }
 
 const unit = (value: number) => (Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.5);

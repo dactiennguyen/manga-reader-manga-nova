@@ -9,6 +9,7 @@ import type { Character, CharacterRole, StoryData } from '../model/types';
 import { characterCard } from '../studio/cards';
 import type { CharacterCard, StudioState } from '../studio/types';
 import { decodeBase64Text, encodeBase64Text } from './base64url';
+import { maskText } from './textFilter';
 
 /** A face thumbnail is a small JPEG; anything bigger is refused rather than stored. */
 export const FACE_MAX_BASE64 = 200_000;
@@ -36,19 +37,21 @@ export type CardPayload = { card: CardSnapshot; face?: string };
 export type SavedCard = CardSnapshot & { face?: string; receivedAt: number };
 
 const text = (max: number) => z.string().max(max);
+/** Words from the card's owner, masked on arrival (textFilter.ts). */
+const said = (max: number) => text(max).transform(maskText);
 const stat = z.number().int().min(1).max(99);
 
 const snapshotSchema = z.object({
   v: z.literal(1),
   key: z.string().regex(/^[A-Za-z0-9_:-]{3,80}$/),
-  name: text(80),
+  name: said(80),
   role: z.enum(['main', 'support', 'villain', 'extra']),
-  story: text(120),
+  story: said(120),
   stats: z.object({ power: stat, wit: stat, charm: stat, heart: stat }),
   rarity: z.enum(['common', 'rare', 'epic', 'legend']),
-  quote: text(200),
+  quote: said(200),
   frame: z.string().regex(/^[a-z0-9-]{1,24}$/),
-  owner: text(80),
+  owner: said(80),
 });
 
 const payloadSchema = z.object({

@@ -45,6 +45,18 @@ export const BLOCKED_KEEP = 500;
 export const PERSON_REPORTS_KEEP = 200;
 export const PERSON_NOTE_MAX = 500;
 
+/**
+ * The Play together rules a person agrees to before hosting or joining a room (App Store guideline 1.2:
+ * terms with zero tolerance for objectionable content). Raise it when the rules change, so everyone sees
+ * them again.
+ */
+export const NEARBY_RULES_VERSION = 1;
+export const TERMS_URL = 'https://manganova.pages.dev/terms';
+
+export function rulesAccepted(acceptedVersion: number | undefined): boolean {
+  return (acceptedVersion ?? 0) >= NEARBY_RULES_VERSION;
+}
+
 const KEY_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
 const REASONS = new Set<string>(PERSON_REPORT_REASONS.map(item => item.id));
 

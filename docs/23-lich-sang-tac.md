@@ -53,7 +53,7 @@ Hai loại thông báo, cùng bật tắt bằng công tắc nhắc vẽ ở Pro
 Thông báo hằng ngày:
 
 - Có kế hoạch thì nội dung thông báo nói về ngày thông báo sẽ hiện: hôm nay nếu chưa tới giờ nhắc, ngày mai nếu đã qua.
-- Hạn chót rơi vào ngày đó hoặc ngày hôm sau: "Chapter 3 is due 20/11/2026. 4 pages to go." Ghi rõ ngày, để câu vẫn đúng nếu thông báo lặp lại mà người dùng chưa mở app.
+- Hạn chót rơi vào ngày đó hoặc ngày hôm sau: "Chapter 3 is due 11/20/2026. 4 pages to go." Ghi rõ ngày (theo thứ tự của ngôn ngữ app, `formatDate` dùng `Intl`), để câu vẫn đúng nếu thông báo lặp lại mà người dùng chưa mở app.
 - Không thì số trang của ngày đó: "Today: 2 pages of Chapter 3." Nhiều chương thì cộng lại.
 - Không có kế hoạch, hoặc hôm nay đã xong phần của mình, thì giữ câu nhắc giữ chuỗi như cũ.
 

@@ -328,7 +328,8 @@
     "Handwritten": "Viết tay",
     "Sans": "Không chân",
     "Sans bold": "Không chân đậm",
-    "Display": "Tiêu đề"
+    "Display": "Tiêu đề",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "Hãy cho phép Manganova gửi chữ tới máy chủ AI của bạn trước, trong Hồ sơ → Máy chủ AI."
   },
   "home": {
     "Hi {name}": "Chào {name}",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "Truyện bạn xóa sẽ nằm ở đây {days} ngày trước khi mất hẳn.",
     "Pick a .{ext} file": "Hãy chọn file .{ext}",
     "Project imported to your library": "Đã nhập truyện vào thư viện",
-    "Could not import this project. The file may be damaged or unsupported.": "Không nhập được truyện này. File có thể bị hỏng hoặc không được hỗ trợ."
+    "Could not import this project. The file may be damaged or unsupported.": "Không nhập được truyện này. File có thể bị hỏng hoặc không được hỗ trợ.",
+    "What is sent to {server}": "Những gì được gửi tới {server}",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "Mỗi lần bạn dùng một công cụ AI, Manganova gửi phần chữ mà yêu cầu đó cần: tên truyện và tóm tắt một câu, hồ sơ nhân vật, ghi chú thế giới đã đánh dấu gửi cho AI, đoạn kịch bản liên quan và những gì bạn gõ. Tranh vẽ, hình ảnh và tiếng thu âm không bao giờ được gửi.",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "Máy chủ này do người lập ra nó vận hành, không phải Manganova. Chủ máy chủ có thể lưu hoặc dùng phần chữ này theo quy định riêng của họ.",
+    "Allow Manganova to send this text to {server}": "Cho phép Manganova gửi phần chữ này tới {server}",
+    "Turn this on to save the server. None of your text is sent until you do.": "Bật mục này để lưu máy chủ. Chưa có chữ nào của bạn được gửi đi cho tới khi bạn bật.",
+    "Allow sending text to {server} to turn on AI help": "Cho phép gửi chữ tới {server} để bật trợ giúp AI"
   },
   "extras": {
     "Blank": "Trống",
@@ -2888,7 +2895,20 @@
     "From Play together": "Từ Chơi cùng nhau",
     "{count} people blocked": "Đã chặn {count} người",
     "{count} person blocked": "Đã chặn {count} người",
-    "You will leave this room": "Bạn sẽ rời phòng này"
+    "You will leave this room": "Bạn sẽ rời phòng này",
+    "Agree to the Play together rules first.": "Hãy đồng ý với quy tắc Chơi cùng nhau trước.",
+    "Be kind to everyone in the room.": "Tử tế với mọi người trong phòng.",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "Không vẽ, viết hay thu âm nội dung thù ghét, tình dục, quấy rối hoặc đe dọa. Không có ngoại lệ nào cho việc này.",
+    "Anyone can block or report you.": "Ai cũng có thể chặn hoặc báo cáo bạn.",
+    "The host can remove you from the room.": "Chủ phòng có thể mời bạn ra khỏi phòng.",
+    "Offensive words are hidden automatically.": "Từ ngữ xúc phạm được tự động che đi.",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "Báo cáo gửi cho nhà phát triển qua {email} được xem xét trong vòng 24 giờ.",
+    "Terms of use": "Điều khoản sử dụng",
+    "Play together rules": "Quy tắc Chơi cùng nhau",
+    "You play with real people. Agree to these rules before you host or join a room.": "Bạn chơi với người thật. Hãy đồng ý với các quy tắc này trước khi mở hoặc vào phòng.",
+    "I agree": "Tôi đồng ý",
+    "You agreed to these rules.": "Bạn đã đồng ý với các quy tắc này.",
+    "What everyone agrees to before playing": "Điều mọi người đồng ý trước khi chơi"
   },
   "nearbyFill": {
     "Fill the bubbles": "Điền thoại",

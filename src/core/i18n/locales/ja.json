@@ -328,7 +328,8 @@
     "Handwritten": "手書き",
     "Sans": "ゴシック",
     "Sans bold": "ゴシック太字",
-    "Display": "見出し"
+    "Display": "見出し",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "先にプロフィール → AIサーバーで、AIサーバーへの文章の送信を許可してください。"
   },
   "home": {
     "Hi {name}": "{name}さん、こんにちは",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "削除した作品は、完全に消えるまで{days}日間ここに残ります。",
     "Pick a .{ext} file": ".{ext} ファイルを選んでください",
     "Project imported to your library": "作品をライブラリに読み込みました",
-    "Could not import this project. The file may be damaged or unsupported.": "この作品を読み込めませんでした。ファイルが壊れているか、対応していない形式の可能性があります。"
+    "Could not import this project. The file may be damaged or unsupported.": "この作品を読み込めませんでした。ファイルが壊れているか、対応していない形式の可能性があります。",
+    "What is sent to {server}": "{server} に送られるもの",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "AIツールを使うたびに、Manganova はその依頼に必要な文章を送ります：作品のタイトルとログライン、キャラクターのプロフィール、AIに送る設定にした世界観メモ、関係する脚本、入力した内容です。絵、画像、録音した声は送りません。",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "このサーバーを動かしているのは設定した人で、Manganova ではありません。サーバーの持ち主が独自のルールでこの文章を保存したり使ったりすることがあります。",
+    "Allow Manganova to send this text to {server}": "Manganova がこの文章を {server} に送ることを許可する",
+    "Turn this on to save the server. None of your text is sent until you do.": "サーバーを保存するにはオンにしてください。オンにするまで、あなたの文章は送られません。",
+    "Allow sending text to {server} to turn on AI help": "AIのサポートを使うには {server} への文章の送信を許可してください"
   },
   "extras": {
     "Blank": "白紙",
@@ -2888,7 +2895,20 @@
     "From Play together": "みんなで遊ぶから",
     "{count} people blocked": "{count}人をブロック中",
     "{count} person blocked": "{count}人をブロック中",
-    "You will leave this room": "このルームから退出します"
+    "You will leave this room": "このルームから退出します",
+    "Agree to the Play together rules first.": "先に「みんなで遊ぶ」のルールに同意してください。",
+    "Be kind to everyone in the room.": "ルームのみんなに優しくしましょう。",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "差別や憎しみ、性的な内容、嫌がらせ、脅しになる絵・言葉・録音は禁止です。例外は一切ありません。",
+    "Anyone can block or report you.": "誰でもあなたをブロックしたり報告したりできます。",
+    "The host can remove you from the room.": "ホストはあなたをルームから外せます。",
+    "Offensive words are hidden automatically.": "不快な言葉は自動で伏せ字になります。",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "開発者（{email}）に送られた報告は24時間以内に確認されます。",
+    "Terms of use": "利用規約",
+    "Play together rules": "「みんなで遊ぶ」のルール",
+    "You play with real people. Agree to these rules before you host or join a room.": "一緒に遊ぶのは本物の人です。ルームを開いたり入ったりする前に、このルールに同意してください。",
+    "I agree": "同意する",
+    "You agreed to these rules.": "このルールに同意済みです。",
+    "What everyone agrees to before playing": "遊ぶ前にみんなが同意すること"
   },
   "nearbyFill": {
     "Fill the bubbles": "セリフ埋め",

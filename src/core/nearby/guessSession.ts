@@ -20,6 +20,7 @@ import {
 } from './guess';
 import type { RoomHandle } from './relaySession';
 import { realClock, type Clock } from './transport';
+import { maskText } from './textFilter';
 import type { MemberId, Message } from './types';
 
 /** A word the drawer can pick: as shown in the app's language, and its English key, also accepted. */
@@ -122,7 +123,8 @@ export class GuessSession {
     const { state } = this.snapshot;
     const api = this.room.getState();
     const me = api.me?.id;
-    const trimmed = text.trim().slice(0, 60);
+    // Masked here too (the drawer's phone masks it again), so the guesser sees what the others see.
+    const trimmed = maskText(text.trim().slice(0, 60));
     if (!trimmed || !me || state.phase !== 'drawing' || !state.drawer || state.drawer === me || state.hits.includes(me)) {
       return;
     }

@@ -10,6 +10,7 @@ import type { Stroke } from '../../core/model/types';
 import { useAppNavigation, type ScreenProps } from '../../state/navigation';
 import { noteStrokes } from '../../state/useActivity';
 import { useLessons } from '../../state/useLessons';
+import { useDarkSystemBars } from '../../state/useSystemBars';
 import { AppBar, Button, IconButton, Screen, Text, confirm } from '../../ui';
 import { CheckIcon, DeleteIcon, ForwardIcon, PreviewIcon, UndoIcon } from '../../ui/icons';
 import { MissingLesson } from './parts';
@@ -136,5 +137,7 @@ function Practice({ lesson }: { lesson: Lesson }) {
  */
 export function PracticeScreen({ route }: ScreenProps<'LessonPractice'>) {
   const lesson = lessonById(route.params.lessonId);
+  // Dark in both themes, to the edges: light status bar text, and no light strip behind the navigation bar.
+  useDarkSystemBars();
   return <ScopedTheme theme="dark">{lesson ? <Practice lesson={lesson} /> : <MissingLesson />}</ScopedTheme>;
 }

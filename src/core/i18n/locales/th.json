@@ -328,7 +328,8 @@
     "Handwritten": "ลายมือ",
     "Sans": "ไม่มีหัว",
     "Sans bold": "ไม่มีหัว ตัวหนา",
-    "Display": "ตัวพาดหัว"
+    "Display": "ตัวพาดหัว",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "อนุญาตให้ Manganova ส่งข้อความไปยังเซิร์ฟเวอร์ AI ของคุณก่อน ที่ โปรไฟล์ → เซิร์ฟเวอร์ AI"
   },
   "home": {
     "Hi {name}": "สวัสดี {name}",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "เรื่องที่คุณลบจะอยู่ที่นี่ {days} วัน ก่อนจะหายไปถาวร",
     "Pick a .{ext} file": "เลือกไฟล์ .{ext}",
     "Project imported to your library": "นำเข้าโปรเจกต์เข้าคลังเรื่องแล้ว",
-    "Could not import this project. The file may be damaged or unsupported.": "นำเข้าโปรเจกต์นี้ไม่ได้ ไฟล์อาจเสียหายหรือไม่รองรับ"
+    "Could not import this project. The file may be damaged or unsupported.": "นำเข้าโปรเจกต์นี้ไม่ได้ ไฟล์อาจเสียหายหรือไม่รองรับ",
+    "What is sent to {server}": "สิ่งที่ส่งไปยัง {server}",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "ทุกครั้งที่คุณใช้เครื่องมือ AI Manganova จะส่งข้อความที่คำขอนั้นต้องใช้ ได้แก่ ชื่อเรื่องและเรื่องย่อหนึ่งประโยค โปรไฟล์ตัวละคร บันทึกโลกที่ทำเครื่องหมายให้ส่งให้ AI บทที่เกี่ยวข้อง และสิ่งที่คุณพิมพ์ ภาพวาด รูปภาพ และเสียงที่อัดไว้จะไม่ถูกส่งเลย",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "เซิร์ฟเวอร์นี้ดูแลโดยผู้ที่ตั้งค่าไว้ ไม่ใช่ Manganova เจ้าของเซิร์ฟเวอร์อาจเก็บหรือใช้ข้อความนี้ตามกฎของตนเอง",
+    "Allow Manganova to send this text to {server}": "อนุญาตให้ Manganova ส่งข้อความนี้ไปยัง {server}",
+    "Turn this on to save the server. None of your text is sent until you do.": "เปิดตัวเลือกนี้เพื่อบันทึกเซิร์ฟเวอร์ ข้อความของคุณจะไม่ถูกส่งจนกว่าคุณจะเปิด",
+    "Allow sending text to {server} to turn on AI help": "อนุญาตให้ส่งข้อความไปยัง {server} เพื่อเปิดตัวช่วย AI"
   },
   "extras": {
     "Blank": "เปล่า",
@@ -2888,7 +2895,20 @@
     "From Play together": "จากเล่นด้วยกัน",
     "{count} people blocked": "บล็อก {count} คน",
     "{count} person blocked": "บล็อก {count} คน",
-    "You will leave this room": "คุณจะออกจากห้องนี้"
+    "You will leave this room": "คุณจะออกจากห้องนี้",
+    "Agree to the Play together rules first.": "โปรดยอมรับกฎของเล่นด้วยกันก่อน",
+    "Be kind to everyone in the room.": "ใจดีกับทุกคนในห้อง",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "ห้ามภาพวาด ข้อความ หรือเสียงที่แสดงความเกลียดชัง มีเนื้อหาทางเพศ คุกคาม หรือข่มขู่ ไม่มีข้อยกเว้นใด ๆ",
+    "Anyone can block or report you.": "ใครก็บล็อกหรือรายงานคุณได้",
+    "The host can remove you from the room.": "เจ้าของห้องนำคุณออกจากห้องได้",
+    "Offensive words are hidden automatically.": "คำหยาบจะถูกซ่อนโดยอัตโนมัติ",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "รายงานที่ส่งถึงผู้พัฒนาที่ {email} จะได้รับการตรวจสอบภายใน 24 ชั่วโมง",
+    "Terms of use": "ข้อกำหนดการใช้งาน",
+    "Play together rules": "กฎของเล่นด้วยกัน",
+    "You play with real people. Agree to these rules before you host or join a room.": "คุณเล่นกับคนจริง ๆ โปรดยอมรับกฎเหล่านี้ก่อนเปิดหรือเข้าห้อง",
+    "I agree": "ฉันยอมรับ",
+    "You agreed to these rules.": "คุณยอมรับกฎเหล่านี้แล้ว",
+    "What everyone agrees to before playing": "สิ่งที่ทุกคนยอมรับก่อนเล่น"
   },
   "nearbyFill": {
     "Fill the bubbles": "เติมคำพูด",

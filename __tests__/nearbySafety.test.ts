@@ -7,6 +7,8 @@ import {
   makePersonReport,
   newSafetyKey,
   parseSafety,
+  rulesAccepted,
+  NEARBY_RULES_VERSION,
   withBlocked,
   withoutBlocked,
 } from '../src/core/nearby/safety';
@@ -128,6 +130,44 @@ describe('removing and blocking people in a room', () => {
   it('lets a guest blocked by someone else still join: only the host decides who comes in', async () => {
     const { host, phones } = await room([[], [], [KEYS[1]]]);
     expect(names(host)).toEqual(['Mai', 'Ken', 'Lan']);
+    phones.forEach(phone => phone.getState().leaveRoom());
+  });
+});
+
+describe('the Play together rules', () => {
+  it('count as agreed only for the current version', () => {
+    expect(rulesAccepted(undefined)).toBe(false);
+    expect(rulesAccepted(0)).toBe(false);
+    expect(rulesAccepted(NEARBY_RULES_VERSION)).toBe(true);
+  });
+
+  it('come before hosting or joining any room', async () => {
+    let agreed = false;
+    const safety = (index: number): RoomSafety => ({ key: () => KEYS[index], blocked: () => false, rulesAccepted: () => agreed || index === 0 });
+    const { phones, flush } = createLoopbackPhones(2, { safety });
+    const [host, ken] = phones;
+    const address = await host.getState().hostRoom('Mai');
+    await expect(ken.getState().joinRoom(address, 'Ken')).rejects.toThrow();
+    expect(ken.getState().status).toBe('idle');
+    expect(ken.getState().error).toBeTruthy();
+    await expect(ken.getState().hostRoom('Ken')).rejects.toThrow();
+    agreed = true;
+    await ken.getState().joinRoom(address, 'Ken');
+    await flush();
+    expect(names(host)).toEqual(['Mai', 'Ken']);
+    phones.forEach(phone => phone.getState().leaveRoom());
+  });
+
+  it('mask the names people choose, on their own phone too', async () => {
+    const { host, ken, lan, phones, flush } = await room();
+    expect(names(lan)).toEqual(['Mai', 'Ken', 'Lan']);
+    phones.forEach(phone => phone.getState().leaveRoom());
+    const address = await host.getState().hostRoom('Shithead', 'Fuck room');
+    expect(host.getState().room?.name).toBe('••• room');
+    await ken.getState().joinRoom(address, 'asshole');
+    await flush();
+    expect(names(ken)).toEqual(['•••', '•••']);
+    expect(host.getState().room?.members.map(member => member.name)).toEqual(['•••', '•••']);
     phones.forEach(phone => phone.getState().leaveRoom());
   });
 });

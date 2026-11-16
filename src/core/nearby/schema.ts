@@ -9,6 +9,7 @@ import type { Stroke } from '../model/types';
 import { FILL_BUBBLES_MAX, FILL_LINE_MAX, FILL_VERSIONS_MAX } from './fill';
 import { BOARD_UNITS, GUESS_TEXT_MAX, INK_POINTS_MAX } from './guess';
 import { SCRIPT_BLOCKS_MAX, SCRIPT_CAST_MAX, SCRIPT_SCENES_MAX, SCRIPT_TEXT_MAX } from './scriptTogether';
+import { maskText } from './textFilter';
 import type { Envelope, Message } from './types';
 
 /** Base64 per blob chunk. Kept well below MAX_LINE so a chunk plus its envelope always fits one line. */
@@ -17,7 +18,12 @@ export const CHUNK_CHARS = 48 * 1024;
 export const BRUSH_BLOB_CHUNKS_MAX = 8;
 
 const id = z.string().min(1).max(80);
-const name = z.string().max(60);
+/**
+ * Text someone typed for others to see: offensive words are masked here, on the phone that receives it
+ * (textFilter.ts), so a changed app on the sender's side cannot get around it. Never longer once masked.
+ */
+const said = (max: number) => z.string().max(max).transform(maskText);
+const name = said(60);
 const num = z.number().finite();
 const safetyKey = z.string().regex(/^[A-Za-z0-9_-]{8,32}$/);
 const member = z.object({ id, name, color: z.number().int().min(0).max(63), host: z.boolean(), key: safetyKey.optional() });
@@ -27,12 +33,12 @@ const turn = z.number().int().min(0).max(1000);
 const blockType = z.enum(['setting', 'action', 'dialogue', 'narration', 'sfx']);
 const dialogueKind = z.enum(['speak', 'think', 'shout', 'whisper']);
 const scriptKey = z.string().regex(/^[bs]:.{1,80}$/);
-const sharedBlock = z.object({ id, type: blockType, text: z.string().max(SCRIPT_TEXT_MAX), characterId: id.optional(), kind: dialogueKind.optional() });
+const sharedBlock = z.object({ id, type: blockType, text: said(SCRIPT_TEXT_MAX), characterId: id.optional(), kind: dialogueKind.optional() });
 const scriptDoc = z.object({
   chapterId: id,
-  title: z.string().max(200),
-  characters: z.array(z.object({ id, name: z.string().max(80) })).max(SCRIPT_CAST_MAX),
-  scenes: z.array(z.object({ id, description: z.string().max(SCRIPT_TEXT_MAX), blocks: z.array(sharedBlock).max(SCRIPT_BLOCKS_MAX) })).max(SCRIPT_SCENES_MAX),
+  title: said(200),
+  characters: z.array(z.object({ id, name: said(80) })).max(SCRIPT_CAST_MAX),
+  scenes: z.array(z.object({ id, description: said(SCRIPT_TEXT_MAX), blocks: z.array(sharedBlock).max(SCRIPT_BLOCKS_MAX) })).max(SCRIPT_SCENES_MAX),
 });
 
 const boardUnit = num.min(0).max(BOARD_UNITS);
@@ -44,7 +50,7 @@ const fillBubble = z.object({
   h: boardUnit,
   tail: z.object({ x: boardUnit, y: boardUnit }),
 });
-const fillLines = z.array(z.string().max(FILL_LINE_MAX)).max(FILL_BUBBLES_MAX);
+const fillLines = z.array(said(FILL_LINE_MAX)).max(FILL_BUBBLES_MAX);
 const inkFields = {
   turn,
   id: z.number().int().min(0),
@@ -83,7 +89,7 @@ const remoteStroke = z.object({
 
 const scriptOps = [
   z.object({ t: z.literal('script.focus'), key: scriptKey.nullable() }),
-  z.object({ t: z.literal('script.edit'), key: scriptKey, text: z.string().max(SCRIPT_TEXT_MAX) }),
+  z.object({ t: z.literal('script.edit'), key: scriptKey, text: said(SCRIPT_TEXT_MAX) }),
   z.object({ t: z.literal('script.add'), sceneId: id, afterId: id.nullable(), block: sharedBlock }),
   z.object({ t: z.literal('script.set'), blockId: id, type: blockType, characterId: id.optional(), kind: dialogueKind.optional() }),
   z.object({ t: z.literal('script.remove'), blockId: id }),
@@ -117,23 +123,23 @@ const message = z.discriminatedUnion('t', [
   z.object({ t: z.literal('relay.turn'), member: id, panelIndex: z.number().int().min(0), deadline: num }),
   z.object({ t: z.literal('relay.done'), from: id, panelIndex: z.number().int().min(0), blobId: id }),
   z.object({ t: z.literal('relay.reveal') }),
-  z.object({ t: z.literal('battle.start'), prompt: z.string().max(200), seconds: num, startsAt: num }),
+  z.object({ t: z.literal('battle.start'), prompt: said(200), seconds: num, startsAt: num }),
   z.object({ t: z.literal('battle.submit'), from: id, blobId: id }),
   z.object({ t: z.literal('battle.vote'), from: id, for: id }),
   z.object({ t: z.literal('battle.result'), scores: z.record(id, num) }),
   z.object({ t: z.literal('guess.start'), rounds: z.number().int().min(1).max(5), seconds: z.number().int().min(20).max(300), order: z.array(id).max(16) }),
   z.object({ t: z.literal('guess.turn'), turn, drawer: id, chooseUntil: num }),
-  z.object({ t: z.literal('guess.picked'), turn, mask: z.string().max(GUESS_TEXT_MAX) }),
-  z.object({ t: z.literal('guess.draw'), turn, mask: z.string().max(GUESS_TEXT_MAX), endsAt: num }),
+  z.object({ t: z.literal('guess.picked'), turn, mask: said(GUESS_TEXT_MAX) }),
+  z.object({ t: z.literal('guess.draw'), turn, mask: said(GUESS_TEXT_MAX), endsAt: num }),
   z.object({ t: z.literal('guess.ink'), ...inkFields }),
   z.object({ t: z.literal('guess.undo'), turn }),
   z.object({ t: z.literal('guess.clear'), turn }),
-  z.object({ t: z.literal('guess.try'), turn, text: z.string().max(GUESS_TEXT_MAX) }),
+  z.object({ t: z.literal('guess.try'), turn, text: said(GUESS_TEXT_MAX) }),
   z.object({ t: z.literal('guess.hit'), turn, member: id }),
-  z.object({ t: z.literal('guess.miss'), turn, member: id, text: z.string().max(GUESS_TEXT_MAX) }),
+  z.object({ t: z.literal('guess.miss'), turn, member: id, text: said(GUESS_TEXT_MAX) }),
   z.object({ t: z.literal('guess.close'), turn }),
   z.object({ t: z.literal('guess.end'), turn, hits: z.array(id).max(16) }),
-  z.object({ t: z.literal('guess.reveal'), turn, word: z.string().max(GUESS_TEXT_MAX) }),
+  z.object({ t: z.literal('guess.reveal'), turn, word: said(GUESS_TEXT_MAX) }),
   z.object({ t: z.literal('guess.over'), scores: z.record(id, num) }),
   z.object({
     t: z.literal('fill.start'),
@@ -176,7 +182,7 @@ const message = z.discriminatedUnion('t', [
     x: num,
     y: num,
     sticker: z.string().max(32),
-    text: z.string().max(500),
+    text: said(500),
     id: id.optional(),
     pageIndex: z.number().int().min(0).optional(),
     panelIndex: z.number().int().min(0).optional(),
@@ -184,7 +190,7 @@ const message = z.discriminatedUnion('t', [
   z.object({ t: z.literal('dub.roles'), roles: z.record(id, id) }),
   z.object({ t: z.literal('dub.clip'), from: id, bubbleId: id, blobId: id, ms: num }),
   z.object({ t: z.literal('cards.offer'), from: id, blobId: id }),
-  z.object({ t: z.literal('send.offer'), from: id, blobId: id, title: z.string().max(200), bytes: num }),
+  z.object({ t: z.literal('send.offer'), from: id, blobId: id, title: said(200), bytes: num }),
   z.object({ t: z.literal('send.accept'), from: id, blobId: id }),
   z.object({ t: z.literal('send.cancel'), from: id, blobId: id, reason: z.enum(['declined', 'cancelled', 'failed', 'busy']).optional() }),
   z.object({ t: z.literal('send.done'), from: id, blobId: id }),
@@ -193,7 +199,7 @@ const message = z.discriminatedUnion('t', [
     t: z.literal('brushes.offer'),
     from: id,
     blobId: id,
-    name: z.string().max(SET_NAME_MAX),
+    name: said(SET_NAME_MAX),
     brushes: z.number().int().min(0).max(PRESETS_MAX),
     tones: z.number().int().min(0).max(PRESETS_MAX),
   }),

@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { normalizeBaseUrl } from '../core/ai/port';
 import { resolveLocale, setLocale, type LanguageChoice, type Locale } from '../core/i18n';
 import type { ArtStyle } from '../core/model/types';
+import { rulesAccepted } from '../core/nearby/safety';
 import type { JoinMode } from '../core/nearby/types';
 import type { MetaRepo } from '../core/ports';
 
@@ -44,6 +45,13 @@ export type AppSettings = {
   reminderHour: number;
   /** Who can join a Play-together room this phone hosts; the last choice is kept. Code only by default. */
   roomJoinMode: JoinMode;
+  /** The version of the Play together rules the person agreed to; 0 until they do (core/nearby/safety.ts). */
+  nearbyRulesAccepted: number;
+  /**
+   * The AI server address (normalized) the person allowed Manganova to send text to. Consent belongs to one
+   * address: a new address asks again, and nothing goes to a server without it (App Store guideline 5.1.2(i)).
+   */
+  aiConsentFor: string;
 };
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -72,6 +80,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   reminderOn: false,
   reminderHour: 20,
   roomJoinMode: 'code',
+  nearbyRulesAccepted: 0,
+  aiConsentFor: '',
 };
 
 const KEY = 'settings';
@@ -110,8 +120,39 @@ export function metaStore(): MetaRepo | null {
   return repo;
 }
 
-function serverSet(settings: AppSettings): boolean {
+function serverSet(settings: Pick<AppSettings, 'aiBaseUrl'>): boolean {
   return normalizeBaseUrl(settings.aiBaseUrl) !== '';
+}
+
+/** True when the person allowed text to go to the server that is set now (not an earlier address). */
+export function aiConsentGiven(settings: Pick<AppSettings, 'aiBaseUrl' | 'aiConsentFor'>): boolean {
+  const server = normalizeBaseUrl(settings.aiBaseUrl);
+  return server !== '' && settings.aiConsentFor === server;
+}
+
+/**
+ * Where an AI request goes. `server` only with consent for that address; `noConsent` sends nothing and
+ * says why; `demo` is the labelled sample answers while no server is set; `off` has no server at all.
+ */
+export type AiRoute = 'server' | 'noConsent' | 'demo' | 'off';
+
+export function aiRoute(settings: Pick<AppSettings, 'aiBaseUrl' | 'aiConsentFor' | 'aiDemo'>): AiRoute {
+  if (serverSet(settings)) {
+    return aiConsentGiven(settings) ? 'server' : 'noConsent';
+  }
+  return settings.aiDemo ? 'demo' : 'off';
+}
+
+export function useAiConsentGiven(): boolean {
+  return useSettings(aiConsentGiven);
+}
+
+export function useNearbyRulesAccepted(): boolean {
+  return useSettings(s => rulesAccepted(s.nearbyRulesAccepted));
+}
+
+export function nearbyRulesAccepted(): boolean {
+  return rulesAccepted(useSettings.getState().nearbyRulesAccepted);
 }
 
 /** True when AI tools can answer: from the person's server, or with sample answers. */

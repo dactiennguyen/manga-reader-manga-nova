@@ -11,6 +11,7 @@ import type { Service } from 'react-native-zeroconf';
 import type { Advert, Discovery } from '../../core/nearby/transport';
 import { PROTOCOL_VERSION, SERVICE_TYPE, type NearbyRoom } from '../../core/nearby/types';
 import { APP_ID } from '../../core/nearby/protocol';
+import { maskText } from '../../core/nearby/textFilter';
 import { usableIPv4 } from './tcp';
 
 /** `_manganova._tcp` → "manganova": zeroconf takes the bare name and protocol. */
@@ -111,7 +112,7 @@ export function roomsFrom(services: Service[]): NearbyRoom[] {
     if (!open && txt.lock !== '1') {
       continue;
     }
-    const room: NearbyRoom = { host, port: service.port, token: open ? txt.k : null, name: (txt.n || service.name).slice(0, 60) };
+    const room: NearbyRoom = { host, port: service.port, token: open ? txt.k : null, name: maskText((txt.n || service.name).slice(0, 60)) };
     const key = `${host}:${service.port}`;
     const seen = byAddress.get(key);
     if (!seen || (seen.token && !room.token)) {

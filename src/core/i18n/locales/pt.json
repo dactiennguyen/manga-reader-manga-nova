@@ -328,7 +328,8 @@
     "Handwritten": "Manuscrita",
     "Sans": "Sem serifa",
     "Sans bold": "Sem serifa negrito",
-    "Display": "Título"
+    "Display": "Título",
+    "Allow Manganova to send text to your AI server first, in Profile → AI server.": "Primeiro permita que o Manganova envie texto ao seu servidor de IA, em Perfil → Servidor de IA."
   },
   "home": {
     "Hi {name}": "Oi, {name}",
@@ -1575,7 +1576,13 @@
     "Stories you delete stay here for {days} days before they are gone for good.": "As histórias que você exclui ficam aqui por {days} dias antes de sumirem de vez.",
     "Pick a .{ext} file": "Escolha um arquivo .{ext}",
     "Project imported to your library": "Projeto importado para a sua biblioteca",
-    "Could not import this project. The file may be damaged or unsupported.": "Não foi possível importar este projeto. O arquivo pode estar danificado ou não ser compatível."
+    "Could not import this project. The file may be damaged or unsupported.": "Não foi possível importar este projeto. O arquivo pode estar danificado ou não ser compatível.",
+    "What is sent to {server}": "O que é enviado para {server}",
+    "Each time you use an AI tool, Manganova sends the text that request needs: the story title and logline, character profiles, world notes marked to send to AI, the relevant script, and what you type. Drawings, pictures and voice recordings are never sent.": "Sempre que você usa uma ferramenta de IA, o Manganova envia o texto de que esse pedido precisa: o título e a premissa da história, os perfis dos personagens, as notas do mundo marcadas para enviar à IA, o roteiro relacionado e o que você digita. Desenhos, imagens e gravações de voz nunca são enviados.",
+    "The server is run by whoever set it up, not by Manganova. Its owner may keep or use this text under their own rules.": "O servidor é operado por quem o configurou, não pelo Manganova. O dono dele pode guardar ou usar este texto conforme as próprias regras.",
+    "Allow Manganova to send this text to {server}": "Permitir que o Manganova envie este texto para {server}",
+    "Turn this on to save the server. None of your text is sent until you do.": "Ative para salvar o servidor. Nenhum texto seu é enviado até você ativar.",
+    "Allow sending text to {server} to turn on AI help": "Permita enviar texto para {server} para ativar a ajuda de IA"
   },
   "extras": {
     "Blank": "Em branco",
@@ -2888,7 +2895,20 @@
     "From Play together": "De Jogar juntos",
     "{count} people blocked": "{count} pessoas bloqueadas",
     "{count} person blocked": "{count} pessoa bloqueada",
-    "You will leave this room": "Você vai sair desta sala"
+    "You will leave this room": "Você vai sair desta sala",
+    "Agree to the Play together rules first.": "Primeiro aceite as regras do Jogar juntos.",
+    "Be kind to everyone in the room.": "Seja gentil com todos na sala.",
+    "No hateful, sexual, harassing or threatening drawings, words or voice recordings. There is zero tolerance for this.": "Nada de desenhos, palavras ou gravações de voz de ódio, sexuais, de assédio ou ameaçadores. Tolerância zero.",
+    "Anyone can block or report you.": "Qualquer pessoa pode bloquear ou denunciar você.",
+    "The host can remove you from the room.": "O anfitrião pode remover você da sala.",
+    "Offensive words are hidden automatically.": "Palavras ofensivas são ocultadas automaticamente.",
+    "Reports sent to the developer at {email} are reviewed within 24 hours.": "As denúncias enviadas ao desenvolvedor em {email} são analisadas em até 24 horas.",
+    "Terms of use": "Termos de uso",
+    "Play together rules": "Regras do Jogar juntos",
+    "You play with real people. Agree to these rules before you host or join a room.": "Você joga com pessoas reais. Aceite estas regras antes de abrir ou entrar em uma sala.",
+    "I agree": "Eu aceito",
+    "You agreed to these rules.": "Você aceitou estas regras.",
+    "What everyone agrees to before playing": "O que todos aceitam antes de jogar"
   },
   "nearbyFill": {
     "Fill the bubbles": "Preencha os balões",

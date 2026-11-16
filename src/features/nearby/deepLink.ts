@@ -6,8 +6,9 @@ import type { RoomAddress } from '../../core/nearby/types';
 import type { RootStackParamList } from '../../state/navigation';
 import { receiveFriendLink } from '../../state/useNearbyShare';
 import { useRoom } from '../../state/useRoom';
-import { useSettings } from '../../state/useSettings';
+import { nearbyRulesAccepted, useSettings } from '../../state/useSettings';
 import { confirm, toast } from '../../ui';
+import { afterNearbyRules } from './safety/NearbyRules';
 
 type Ref = NavigationContainerRefWithCurrent<RootStackParamList>;
 
@@ -58,7 +59,12 @@ export function handleNearbyLink(url: string | null | undefined, ref: Ref): bool
   }
   const address = parseRoomLink(url);
   if (address) {
-    joinFromLink(ref, address);
+    // A scanned QR code skips the hub, not the rules: without them the hub shows them first, then joins.
+    const accepted = nearbyRulesAccepted();
+    afterNearbyRules(() => joinFromLink(ref, address), accepted);
+    if (!accepted) {
+      whenReady(ref, () => ref.navigate('Nearby'));
+    }
     return true;
   }
   if (receiveFriendLink(url)) {

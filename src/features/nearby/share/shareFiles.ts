@@ -2,11 +2,12 @@ import { ImageFormat, Skia } from '@shopify/react-native-skia';
 
 import type { ID } from '../../../core/model/types';
 import type { StoryFiles } from '../../../core/nearby/sendStory';
+import { maskStoryText } from '../../../core/nearby/storyText';
 import { toAbsolute } from '../../../core/util/paths';
 import { uid } from '../../../core/util/id';
 import { DIRS, RNFS, ensureDirs, fileSize, removeFile, saveImageData } from '../../../native/files';
 import { appServices } from '../../../state/services';
-import { useStory } from '../../../state/useStory';
+import { importEntities, useStory } from '../../../state/useStory';
 
 const FACE_SIZE = 160;
 
@@ -31,7 +32,13 @@ export const storyFiles: StoryFiles = {
     const path = `${DIRS.tmp}/nearby-${uid()}.manganova`;
     await RNFS.writeFile(path, base64, 'base64');
     try {
-      return await appServices().importProject(path);
+      const projectId = await appServices().importProject(path);
+      // Someone else's story: its words are masked like all text from the room (core/nearby/textFilter.ts).
+      const masked = maskStoryText(useStory.getState(), projectId);
+      if (Object.values(masked).some(rows => Object.keys(rows).length > 0)) {
+        importEntities(masked);
+      }
+      return projectId;
     } finally {
       removeFile(path).catch(() => undefined);
     }
