@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 
-import { getLocale } from '../../core/i18n';
 import { storyTotals, type StatsSource } from '../../core/stats/overview';
-import { firstDayOf, weekStartFor, type WeekStart } from '../../core/stats/period';
+import { WEEK_START, firstDayOf, type WeekStart } from '../../core/stats/period';
 import { PROGRESS_FIELDS, progressSeries } from '../../core/stats/progress';
 import { dayKey } from '../../core/util/time';
 import { useActivity } from '../../state/useActivity';
@@ -28,7 +27,7 @@ export function useStatsData(): StatsData {
   const totals = useMemo(() => storyTotals({ projects, chapters, scenes, pages }), [projects, chapters, scenes, pages]);
   const today = dayKey();
   // The language is fixed while a screen is shown: changing it redraws every screen.
-  const weekStart = weekStartFor(getLocale());
+  const weekStart = WEEK_START;
   return useMemo(() => {
     const firstDay = firstDayOf(activity.days, ...PROGRESS_FIELDS.map(field => progressSeries(progress, field)));
     return { source: { activity, progress, totals }, today, weekStart, firstDay };

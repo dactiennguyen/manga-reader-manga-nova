@@ -12,7 +12,7 @@ import {
   periodDays,
   periodOf,
   totalIn,
-  weekStartFor,
+  WEEK_START,
 } from '../src/core/stats/period';
 import {
   EMPTY_PROGRESS,
@@ -51,14 +51,12 @@ const at = (day: string, hour: number, minute = 0) => {
 const activity = (days: Record<string, number>): Activity => ({ days, total: Object.values(days).reduce((a, b) => a + b, 0) });
 
 describe('periods', () => {
-  it('starts the week on Monday or Sunday by language', () => {
+  it('starts the week on Monday, and can start it on Sunday', () => {
     // 2026-11-15 is a Sunday.
     expect(periodOf('week', '2026-11-15', 0, 1)).toEqual({ kind: 'week', start: '2026-11-09', end: '2026-11-15' });
     expect(periodOf('week', '2026-11-15', 0, 0)).toEqual({ kind: 'week', start: '2026-11-15', end: '2026-11-21' });
     expect(periodOf('week', '2026-11-15', -1, 1).start).toBe('2026-11-02');
-    expect(weekStartFor('vi')).toBe(1);
-    expect(weekStartFor('ja')).toBe(0);
-    expect(weekStartFor('en')).toBe(0);
+    expect(WEEK_START).toBe(1);
   });
 
   it('steps months and years across the year boundary', () => {

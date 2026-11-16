@@ -69,7 +69,7 @@ Hai khóa trong bảng `meta`, dạng JSON: `statsProgress` và `drawSessions`. 
 ## Ngày, tuần và múi giờ
 
 - Mọi mốc là khóa ngày theo giờ địa phương (`dayKey`). Bước ngày dùng `shiftDay`, an toàn khi đổi giờ mùa hè.
-- Tuần bắt đầu thứ Hai với tiếng Việt, tiếng Trung giản thể và tiếng Tây Ban Nha. Các ngôn ngữ khác bắt đầu Chủ nhật (`weekStartFor`).
+- Tuần luôn bắt đầu thứ Hai, với mọi ngôn ngữ, giống Lịch sáng tác và Tổng kết tuần (`WEEK_START`).
 - Số và ngày tháng định dạng theo ngôn ngữ của app (`core/stats/format.ts`, dùng `Intl`, có dạng dự phòng).
 
 ## Biểu đồ

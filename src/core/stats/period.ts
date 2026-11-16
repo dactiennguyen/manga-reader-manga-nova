@@ -3,7 +3,6 @@
  * key in local time (core/util/time dayKey), and days are stepped with shiftDay, which stays on the right
  * day across a daylight-saving change.
  */
-import type { Locale } from '../i18n';
 import { shiftDay } from '../story/activity';
 import { dayKey, dayKeyToDate } from '../util/time';
 
@@ -21,10 +20,8 @@ export type Bucket = { start: string; end: string; value: number };
 /** Sunday is 0, as in Date.getDay(). */
 export type WeekStart = 0 | 1;
 
-/** The first day of the week where each language is mostly read (CLDR): Monday for Vietnam, China and Spain. */
-export function weekStartFor(locale: Locale): WeekStart {
-  return locale === 'vi' || locale === 'zh-Hans' || locale === 'es' ? 1 : 0;
-}
+/** Weeks start on Monday in every language, as they do in the creation calendar and its weekly summary. */
+export const WEEK_START: WeekStart = 1;
 
 function monthStart(year: number, month: number): string {
   return dayKey(new Date(year, month, 1, 12).getTime());

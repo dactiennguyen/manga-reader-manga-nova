@@ -27,7 +27,14 @@ import {
   saveTone,
   useArtPresets,
 } from '../../state/useArtPresets';
-import { BackIcon, CopyIcon, DeleteIcon, EditIcon, PlusIcon, PresetsIcon } from '../../ui/icons';
+import {
+  BackIcon,
+  CopyIcon,
+  DeleteIcon,
+  EditIcon,
+  PlusIcon,
+  PresetsIcon,
+} from '../../ui/icons';
 import {
   Button,
   Chip,
@@ -43,7 +50,13 @@ import {
   toast,
 } from '../../ui';
 import { setLabel } from '../brushLibrary/labels';
-import { EditorSection, SettingSlider, ToneThumb, oneDecimal, percent } from './presetThumbs';
+import {
+  EditorSection,
+  SettingSlider,
+  ToneThumb,
+  oneDecimal,
+  percent,
+} from './presetThumbs';
 
 const THUMB = 48;
 const PREVIEW_H = 120;
@@ -82,7 +95,10 @@ export function ToneEditor({
 }) {
   const { width } = useWindowDimensions();
   const previewW = Math.min(width, 560) - 32;
-  const tone = useMemo(() => toneFromPreset(draft, { x: 0, y: 0, w: previewW, h: PREVIEW_H }), [draft, previewW]);
+  const tone = useMemo(
+    () => toneFromPreset(draft, { x: 0, y: 0, w: previewW, h: PREVIEW_H }),
+    [draft, previewW],
+  );
   const set = (patch: Partial<TonePreset>) => onChange({ ...draft, ...patch });
   const sand = draft.kind === 'noise';
   const ruled = draft.kind === 'lines' || draft.kind === 'cross';
@@ -91,15 +107,26 @@ export function ToneEditor({
   return (
     <View className="gap-4 px-4 pb-4">
       <View className="flex-row items-center gap-2">
-        <IconButton icon={BackIcon} onPress={onBack} accessibilityLabel={t('Back')} />
-        <Text variant="title" accessibilityRole="header" className="flex-1" numberOfLines={1}>
+        <IconButton
+          icon={BackIcon}
+          onPress={onBack}
+          accessibilityLabel={t('Back')}
+        />
+        <Text
+          variant="title"
+          accessibilityRole="header"
+          className="flex-1"
+          numberOfLines={1}
+        >
           {t('Edit tone')}
         </Text>
         <Button title={t('Save')} small onPress={onSave} />
       </View>
       <ToneThumb tone={tone} width={previewW} height={PREVIEW_H} />
       <Text variant="caption" tone="muted">
-        {t('Changes apply to new strokes. What you drew before keeps its look.')}
+        {t(
+          'Changes apply to new strokes. What you drew before keeps its look.',
+        )}
       </Text>
       <View className="gap-1">
         <FieldLabel>{t('Name')}</FieldLabel>
@@ -121,7 +148,12 @@ export function ToneEditor({
               onPress={() => {
                 const kind = item.id as ToneKind;
                 // Sand measures grains, the others spacing, so the number is reset to a fitting one.
-                const pitch = kind === 'noise' ? 1 : draft.kind === 'noise' ? 6 : draft.pitch;
+                const pitch =
+                  kind === 'noise'
+                    ? 1
+                    : draft.kind === 'noise'
+                    ? 6
+                    : draft.pitch;
                 set({ kind, pitch });
               }}
             />
@@ -131,12 +163,44 @@ export function ToneEditor({
       <EditorSection title={t('Pattern')}>
         {draft.kind === 'gradient' ? (
           <>
-            <SettingSlider label={t('Start density')} value={draft.density} min={0} max={TONE_LIMITS.density.max} step={0.01} format={percent} onChange={density => set({ density })} />
-            <SettingSlider label={t('End density')} value={draft.density2} min={0} max={TONE_LIMITS.density.max} step={0.01} format={percent} onChange={density2 => set({ density2 })} />
-            <SettingSlider label={t('Direction')} value={draft.direction} min={0} max={359} step={1} format={degrees} onChange={direction => set({ direction })} />
+            <SettingSlider
+              label={t('Start density')}
+              value={draft.density}
+              min={0}
+              max={TONE_LIMITS.density.max}
+              step={0.01}
+              format={percent}
+              onChange={density => set({ density })}
+            />
+            <SettingSlider
+              label={t('End density')}
+              value={draft.density2}
+              min={0}
+              max={TONE_LIMITS.density.max}
+              step={0.01}
+              format={percent}
+              onChange={density2 => set({ density2 })}
+            />
+            <SettingSlider
+              label={t('Direction')}
+              value={draft.direction}
+              min={0}
+              max={359}
+              step={1}
+              format={degrees}
+              onChange={direction => set({ direction })}
+            />
           </>
         ) : ruled ? null : (
-          <SettingSlider label={t('Density')} value={draft.density} min={TONE_LIMITS.density.min} max={TONE_LIMITS.density.max} step={0.01} format={percent} onChange={density => set({ density })} />
+          <SettingSlider
+            label={t('Density')}
+            value={draft.density}
+            min={TONE_LIMITS.density.min}
+            max={TONE_LIMITS.density.max}
+            step={0.01}
+            format={percent}
+            onChange={density => set({ density })}
+          />
         )}
         <SettingSlider
           label={sand ? t('Grain size') : t('Spacing')}
@@ -145,20 +209,62 @@ export function ToneEditor({
           max={pitchMax}
           step={0.1}
           format={oneDecimal}
-          onChange={pitch => set({ pitch, weight: Math.min(draft.weight, pitch * 0.9) })}
+          onChange={pitch =>
+            set({ pitch, weight: Math.min(draft.weight, pitch * 0.9) })
+          }
         />
         {ruled ? (
-          <SettingSlider label={t('Thickness')} value={draft.weight} min={TONE_LIMITS.weight.min} max={Math.max(TONE_LIMITS.weight.min, draft.pitch * 0.9)} step={0.1} format={oneDecimal} onChange={weight => set({ weight })} />
+          <SettingSlider
+            label={t('Thickness')}
+            value={draft.weight}
+            min={TONE_LIMITS.weight.min}
+            max={Math.max(TONE_LIMITS.weight.min, draft.pitch * 0.9)}
+            step={0.1}
+            format={oneDecimal}
+            onChange={weight => set({ weight })}
+          />
         ) : null}
         {sand ? null : (
-          <SettingSlider label={t('Angle')} value={draft.angle} min={0} max={179} step={1} format={degrees} onChange={angle => set({ angle })} />
+          <SettingSlider
+            label={t('Angle')}
+            value={draft.angle}
+            min={0}
+            max={179}
+            step={1}
+            format={degrees}
+            onChange={angle => set({ angle })}
+          />
         )}
       </EditorSection>
       <View className="flex-row flex-wrap gap-2">
-        <Button title={t('Move up')} variant="secondary" small disabled={!canMoveUp} onPress={() => onMove(-1)} />
-        <Button title={t('Move down')} variant="secondary" small disabled={!canMoveDown} onPress={() => onMove(1)} />
-        <Button title={t('Duplicate')} icon={CopyIcon} variant="secondary" small onPress={onDuplicate} />
-        <Button title={t('Delete')} icon={DeleteIcon} variant="danger" small onPress={onDelete} />
+        <Button
+          title={t('Move up')}
+          variant="secondary"
+          small
+          disabled={!canMoveUp}
+          onPress={() => onMove(-1)}
+        />
+        <Button
+          title={t('Move down')}
+          variant="secondary"
+          small
+          disabled={!canMoveDown}
+          onPress={() => onMove(1)}
+        />
+        <Button
+          title={t('Duplicate')}
+          icon={CopyIcon}
+          variant="secondary"
+          small
+          onPress={onDuplicate}
+        />
+        <Button
+          title={t('Delete')}
+          icon={DeleteIcon}
+          variant="danger"
+          small
+          onPress={onDelete}
+        />
       </View>
     </View>
   );
@@ -201,7 +307,8 @@ export function ToneSheet({
   }, [visible]);
 
   const full = presets.tones.length >= PRESETS_MAX;
-  const tellFull = () => toast(t('You can keep up to {n} tones.', { n: PRESETS_MAX }));
+  const tellFull = () =>
+    toast(t('You can keep up to {n} tones.', { n: PRESETS_MAX }));
 
   const duplicate = (source: TonePreset) => {
     if (full) {
@@ -229,29 +336,48 @@ export function ToneSheet({
     if (!draft) {
       return;
     }
-    update(p => saveTone(p, draft.name.trim() ? draft : { ...draft, name: t('New tone') }));
+    update(p =>
+      saveTone(
+        p,
+        draft.name.trim() ? draft : { ...draft, name: t('New tone') },
+      ),
+    );
     setDraft(null);
   };
 
-  const remove = async () => {
+  // A confirm dialog cannot open over the sheet on iOS: the sheet closes first, then it asks.
+  const remove = () => {
     if (!draft) {
       return;
     }
-    const ok = await confirm(t('Delete {name}?', { name: draft.name || t('New tone') }), t('Your drawings keep how they look.'), {
-      confirmText: t('Delete'),
-      destructive: true,
-    });
-    if (ok) {
-      update(p => removeTone(p, draft.id));
-      if (value === draft.id) {
-        onChoose(null);
+    const target = draft;
+    const wasActive = value === target.id;
+    afterClose.current = async () => {
+      const ok = await confirm(
+        t('Delete {name}?', { name: target.name || t('New tone') }),
+        t('Your drawings keep how they look.'),
+        {
+          confirmText: t('Delete'),
+          destructive: true,
+        },
+      );
+      if (ok) {
+        update(p => removeTone(p, target.id));
+        if (wasActive) {
+          onChoose(null);
+        }
       }
-      setDraft(null);
-    }
+    };
+    onClose();
   };
 
   // Moving goes among the tones of the same set, the order the library shows.
-  const peers = draft ? setContents(presets, presets.tones.find(item => item.id === draft.id)?.set ?? '').tones : [];
+  const peers = draft
+    ? setContents(
+        presets,
+        presets.tones.find(item => item.id === draft.id)?.set ?? '',
+      ).tones
+    : [];
   const index = draft ? peers.findIndex(item => item.id === draft.id) : -1;
   const pick = (choice: string | null) => {
     onChoose(choice);
@@ -299,7 +425,9 @@ export function ToneSheet({
               <ListItem
                 key={density}
                 title={percent(density)}
-                left={<ToneThumb tone={{ density }} width={THUMB} height={THUMB} />}
+                left={
+                  <ToneThumb tone={{ density }} width={THUMB} height={THUMB} />
+                }
                 selected={value === legacyToneId(density)}
                 onPress={() => pick(legacyToneId(density))}
               />
@@ -311,7 +439,13 @@ export function ToneSheet({
                 key={preset.id}
                 title={t(preset.name)}
                 subtitle={toneSummary(preset)}
-                left={<ToneThumb tone={toneFromPreset(preset, box)} width={THUMB} height={THUMB} />}
+                left={
+                  <ToneThumb
+                    tone={toneFromPreset(preset, box)}
+                    width={THUMB}
+                    height={THUMB}
+                  />
+                }
                 selected={value === preset.id}
                 onPress={() => pick(preset.id)}
                 right={
@@ -319,26 +453,42 @@ export function ToneSheet({
                     icon={CopyIcon}
                     color="text-muted"
                     onPress={() => duplicate(preset)}
-                    accessibilityLabel={t('Duplicate {name}', { name: t(preset.name) })}
+                    accessibilityLabel={t('Duplicate {name}', {
+                      name: t(preset.name),
+                    })}
                   />
                 }
               />
             ))}
           </Section>
           {groups.length === 0 ? (
-            <Section title={t('My tones')} footer={t('Nothing here yet. Duplicate a tone above or make a new one.')}>
+            <Section
+              title={t('My tones')}
+              footer={t(
+                'Nothing here yet. Duplicate a tone above or make a new one.',
+              )}
+            >
               {null}
             </Section>
           ) : (
             // One section per set, in the person's order; with only the default set it reads "My tones".
             groups.map(({ set, tones }) => (
-              <Section key={set.id} title={presets.sets.length > 1 ? setLabel(set) : t('My tones')}>
+              <Section
+                key={set.id}
+                title={presets.sets.length > 1 ? setLabel(set) : t('My tones')}
+              >
                 {tones.map(preset => (
                   <ListItem
                     key={preset.id}
                     title={preset.name}
                     subtitle={toneSummary(preset)}
-                    left={<ToneThumb tone={toneFromPreset(preset, box)} width={THUMB} height={THUMB} />}
+                    left={
+                      <ToneThumb
+                        tone={toneFromPreset(preset, box)}
+                        width={THUMB}
+                        height={THUMB}
+                      />
+                    }
                     selected={value === preset.id}
                     onPress={() => pick(preset.id)}
                     right={
@@ -346,7 +496,9 @@ export function ToneSheet({
                         icon={EditIcon}
                         color="text-muted"
                         onPress={() => setDraft(preset)}
-                        accessibilityLabel={t('Edit {name}', { name: preset.name })}
+                        accessibilityLabel={t('Edit {name}', {
+                          name: preset.name,
+                        })}
                       />
                     }
                   />
@@ -355,8 +507,20 @@ export function ToneSheet({
             ))
           )}
           <View className="flex-row flex-wrap gap-2">
-            <Button title={t('New tone')} icon={PlusIcon} variant="secondary" className="flex-1" onPress={create} />
-            <Button title={t('Manage…|brushes')} icon={PresetsIcon} variant="secondary" className="flex-1" onPress={manage} />
+            <Button
+              title={t('New tone')}
+              icon={PlusIcon}
+              variant="secondary"
+              className="flex-1"
+              onPress={create}
+            />
+            <Button
+              title={t('Manage…|brushes')}
+              icon={PresetsIcon}
+              variant="secondary"
+              className="flex-1"
+              onPress={manage}
+            />
           </View>
         </View>
       )}
