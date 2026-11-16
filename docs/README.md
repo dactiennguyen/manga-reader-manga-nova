@@ -33,6 +33,8 @@ Cập nhật: 2026-11-07. Code nguồn: `/Users/phong/Desktop/PHONG/manga-reader
 | 23 | [Lịch sáng tác và hạn chót](23-lich-sang-tac.md) | Hạn chót cho từng chương, chia trang theo ngày, lịch tháng, tổng kết tuần, nhắc theo kế hoạch |
 | | [Google Play](google-play/README.md) | Ảnh, mô tả, việc phải xong trước khi nộp |
 | | [Hướng dẫn điền Play Console](google-play/huong-dan-dien.html) | Từng ô trong Play Console điền gì |
+| | [App Store](app-store/README.md) | Ảnh iPhone 6.9", 6.3" và iPad 13", mô tả, việc phải xong trước khi nộp lên Apple |
+| | [Hướng dẫn điền App Store Connect](app-store/huong-dan-dien.html) | Từng ô trong App Store Connect điền gì |
 
 Quy tắc nghiệp vụ không chép lại ở đây. Mô tả tính năng F-xx nằm trong `docs/features.md`, mô tả chi tiết 20 màn nằm trong `docs/screens/` của repo cũ. Giai đoạn 1 chép hai phần đó sang `docs/product/` của repo này.
 

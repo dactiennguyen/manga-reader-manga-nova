@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Điền App Store Connect cho Manganova</title>
+<style>
+:root{--paper:#f6efe3;--card:#fffaf0;--tint:#fbdcc9;--ink:#1c1712;--ink2:#4b4338;--muted:#645a4c;--coral:#bf3419;--line:#e4d9c6}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow-wrap:anywhere}
+a{color:var(--coral)}
+h1,h2,h3,p,ul,ol,pre{margin:0}
+.layout{display:grid;gap:24px;width:min(1120px,100%);margin-inline:auto;padding:20px 16px 64px}
+header h1{font-size:30px;line-height:1.2;font-weight:800}
+header p{margin-top:6px;color:var(--ink2)}
+aside{background:var(--card);border:2px solid var(--ink);padding:14px 16px}
+.progress{font-weight:700}
+.bar{height:8px;margin-top:6px;background:var(--line)}
+.bar i{display:block;height:100%;width:0;background:var(--coral);transition:width .2s}
+aside ol{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:10px;padding:0;list-style:none}
+aside a{display:flex;align-items:center;gap:8px;min-height:36px;color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
+aside a:hover{color:var(--coral)}
+.tick{width:14px;height:14px;flex:none;border:2px solid var(--ink)}
+.is-done .tick{background:var(--coral);border-color:var(--coral)}
+.is-done{color:var(--muted)}
+main{min-width:0;display:grid;gap:20px}
+section,.quick{background:var(--card);border:2px solid var(--ink);padding:20px 16px}
+section h2,.quick h2{font-size:24px;line-height:1.25;font-weight:800}
+section>p,section>ul,section>ol,details>p{margin-top:10px;color:var(--ink2)}
+section ul,section ol{padding-left:22px}
+section li{padding-block:3px}
+h3{margin-top:24px;font-size:18px;font-weight:700}
+code{font:500 .92em ui-monospace,SFMono-Regular,Menlo,monospace}
+kbd{padding:1px 6px;background:var(--card);border:1px solid var(--ink);font:600 .85em ui-monospace,Menlo,monospace}
+.rows{margin-top:12px;border-top:1px solid var(--line)}
+.row{display:grid;gap:6px;padding-block:10px;border-bottom:1px solid var(--line)}
+.k{font-weight:600}
+.hint{margin-top:4px;color:var(--muted);font-size:14px;font-weight:400;line-height:1.45}
+section>.hint{margin-top:12px}
+.v{display:flex;align-items:center;gap:10px;min-width:0}
+.v img{width:52px;height:52px;object-fit:contain;background:var(--paper);border:1px solid var(--line);flex:none}
+.val{flex:1;min-width:0}
+code.val{display:block;padding:9px 11px;background:var(--paper);border:1px solid var(--line);line-height:1.4;user-select:all}
+code.val.empty{color:var(--muted);font-family:inherit;font-style:italic;user-select:none}
+.pick{font-weight:600}
+.cp{flex:none;min-height:44px;min-width:76px;padding:6px 14px;background:var(--card);border:2px solid var(--ink);color:var(--ink);font:700 14px/1.2 inherit;font-family:inherit;cursor:pointer}
+.cp:hover:not(:disabled){background:var(--ink);color:var(--card)}
+.cp.ok,.cp.ok:hover{background:var(--coral);border-color:var(--coral);color:#fffaf0}
+.cp:disabled{border-color:var(--line);color:var(--muted);cursor:not-allowed}
+.cp.big{background:var(--coral);border-color:var(--coral);color:#fffaf0;min-width:96px}
+.cp.big:hover{background:var(--ink);border-color:var(--ink)}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.block{margin-top:14px}
+.block-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.count{color:var(--muted);font-size:14px}
+pre.val{max-height:300px;overflow:auto;padding:12px;background:var(--paper);border:1px solid var(--line);font:400 14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
+.tip{padding:10px 12px;background:var(--tint)}
+.email-box{display:grid;gap:8px;margin-top:12px;padding:12px;background:var(--tint)}
+.email-box label .hint{display:block}
+.email-box input{width:100%;min-height:46px;padding:8px 12px;background:var(--card);border:2px solid var(--ink);color:var(--ink);font:inherit}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:12px;color:var(--ink2);cursor:pointer}
+.check input,.done input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--coral)}
+.done{display:inline-flex;gap:10px;align-items:center;min-height:44px;margin-top:18px;padding:6px 14px 6px 10px;background:var(--paper);border:2px solid var(--ink);font-weight:700;cursor:pointer}
+.done input{margin:0}
+table{width:100%;margin-top:12px;border-collapse:collapse;font-size:15px}
+th,td{padding:8px 10px;border:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--paper)}
+details{margin-top:14px;padding:10px 12px;border:1px solid var(--line)}
+summary{min-height:32px;font-weight:700;cursor:pointer}
+.shot .k{display:flex;align-items:center;gap:10px}
+.shot .k img{width:34px;height:60px;object-fit:cover;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,16px);padding:10px 16px;background:var(--ink);color:#fffaf0;font-weight:700;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(min-width:720px){.row{grid-template-columns:230px 1fr;gap:16px;align-items:center}.shot{grid-template-columns:90px 1fr}section,.quick{padding:24px}}
+@media(min-width:1000px){.layout{grid-template-columns:230px 1fr;align-items:start}header{grid-column:1/-1}aside{position:sticky;top:16px}aside ol{display:block}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast,.bar i{transition:none}}
+.strip{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:6px}.strip figure{margin:0;flex:none;text-align:center;font-size:13px;color:var(--muted)}.strip img{height:180px;width:auto;border:1px solid var(--line);display:block}.quick .tip{margin-top:12px}</style>
+</head>
+<body>
+<div class="layout">
+  <header>
+    <h1>Điền App Store Connect cho Manganova</h1>
+    <p>Mở trang này cạnh tab App Store Connect và điền từ trên xuống. Ô có nút Copy thì bấm rồi dán. Ô không có nút là chọn trong form. Ô in nghiêng là chỗ chỉ bạn biết, phải tự điền.</p>
+  </header>
+  <aside>
+    <div class="progress" id="count">0 bước</div>
+    <div class="bar"><i id="fill"></i></div>
+    <nav aria-label="Các bước"><ol><li><a href="#s1" data-nav="s1"><span class="tick" aria-hidden="true"></span>Tạo app</a></li><li><a href="#s2" data-nav="s2"><span class="tick" aria-hidden="true"></span>App Information</a></li><li><a href="#s3" data-nav="s3"><span class="tick" aria-hidden="true"></span>Giá và quốc gia</a></li><li><a href="#s4" data-nav="s4"><span class="tick" aria-hidden="true"></span>App Privacy</a></li><li><a href="#s5" data-nav="s5"><span class="tick" aria-hidden="true"></span>Age Rating</a></li><li><a href="#s6" data-nav="s6"><span class="tick" aria-hidden="true"></span>Phiên bản 1.0.0</a></li><li><a href="#s7" data-nav="s7"><span class="tick" aria-hidden="true"></span>Mã hóa, gửi duyệt</a></li><li><a href="#s8" data-nav="s8"><span class="tick" aria-hidden="true"></span>TestFlight</a></li></ol></nav>
+  </aside>
+  <main>
+    <div class="quick"><h2>Hay dùng</h2><div class="rows"><div class="row"><div class="k">Tên app</div><div class="v"><code class="val">Manganova: Manga Maker</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Bundle ID</div><div class="v"><code class="val">com.manganova.manga.reader.org</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">SKU</div><div class="v"><code class="val">manganova-ios</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Email liên hệ</div><div class="v"><code class="val">mangamarker@gmail.com</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Support URL</div><div class="v"><code class="val">https://manganova.pages.dev/support</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Marketing URL</div><div class="v"><code class="val">https://manganova.pages.dev</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Chính sách quyền riêng tư</div><div class="v"><code class="val">https://manganova.pages.dev/privacy</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Điều khoản sử dụng</div><div class="v"><code class="val">https://manganova.pages.dev/terms</code><button type="button" class="cp" data-copy>Copy</button></div></div></div><p class="tip"><b>Trước khi bắt đầu:</b> mở thử <a href="https://manganova.pages.dev/support">https://manganova.pages.dev/support</a> và trang chính sách. Hai trang phải có email và nói về bản iOS. Nếu chưa, deploy lại website trước.</p><p class="hint">Apple hay đổi tên menu. Nếu không thấy mục nào, tìm trong cột trái của trang app, hoặc xem danh sách việc còn thiếu khi bấm Add for Review.</p></div>
+    <section id="s1"><h2>Bước 1. Tạo app</h2>
+<p>Vào <b>Apps</b>, bấm <b>+</b> → <b>New App</b>. Bundle ID phải có sẵn trên developer.apple.com (README mục 2).</p><div class="rows"><div class="row"><div class="k">Platforms<p class="hint">Chỉ tick iOS. App chạy được cả iPhone lẫn iPad trong cùng một mục iOS.</p></div><div class="v"><span class="pick">iOS</span></div></div><div class="row"><div class="k">Name<p class="hint">22/30 ký tự. Tên phải chưa ai dùng trên App Store.</p></div><div class="v"><code class="val">Manganova: Manga Maker</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Primary Language</div><div class="v"><span class="pick">English (U.S.)</span></div></div><div class="row"><div class="k">Bundle ID<p class="hint">Chọn trong danh sách. Không chọn bản <code>.widget</code>: widget đi kèm app, không tạo app riêng.</p></div><div class="v"><code class="val">com.manganova.manga.reader.org</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">SKU<p class="hint">Mã nội bộ, người dùng không thấy. Không đổi được sau khi tạo.</p></div><div class="v"><code class="val">manganova-ios</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">User Access</div><div class="v"><span class="pick">Full Access</span></div></div></div>
+<label class="done"><input type="checkbox" data-step="s1" /><span>Xong bước này</span></label></section><section id="s2"><h2>Bước 2. App Information</h2>
+<p>Vào <b>App Store → General → App Information</b>.</p><div class="rows"><div class="row"><div class="k">Name</div><div class="v"><code class="val">Manganova: Manga Maker</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Subtitle<p class="hint">27/30 ký tự. Hiện ngay dưới tên app.</p></div><div class="v"><code class="val">Draw, panel &amp; letter comics</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Category · Primary<p class="hint">Đề xuất. App làm ra tranh và trang truyện, nên Graphics &amp; Design đúng nhất và ít cạnh tranh hơn Productivity. Người tìm app vẽ manga cũng duyệt nhóm này.</p></div><div class="v"><span class="pick">Graphics &amp; Design</span></div></div><div class="row"><div class="k">Category · Secondary<p class="hint">Lịch sáng tác, hạn chót và kế hoạch chương. Có thể chọn Entertainment nếu muốn.</p></div><div class="v"><span class="pick">Productivity</span></div></div><div class="row"><div class="k">Content Rights<p class="hint">Tranh trong truyện mẫu, vật liệu và hình minh họa đều do bạn làm ra cho app. Người dùng tự vẽ phần còn lại.</p></div><div class="v"><span class="pick">No, it does not contain, show, or access third-party content</span></div></div><div class="row"><div class="k">Age Rating</div><div class="v"><span class="pick"><a href="#s5">Xem bước 5</a></span></div></div><div class="row"><div class="k">License Agreement<p class="hint">Giữ mặc định. Điều khoản riêng nằm ở https://manganova.pages.dev/terms, có thể dán link vào cuối mô tả nếu muốn.</p></div><div class="v"><span class="pick">Apple’s Standard License Agreement</span></div></div></div>
+<label class="done"><input type="checkbox" data-step="s2" /><span>Xong bước này</span></label></section><section id="s3"><h2>Bước 3. Pricing and Availability</h2>
+<p>Vào <b>App Store → Monetization → Pricing and Availability</b> (tên menu có thể khác một chút).</p><div class="rows"><div class="row"><div class="k">Price<p class="hint">App không có mua trong app.</p></div><div class="v"><span class="pick">Free (USD 0.00)</span></div></div><div class="row"><div class="k">Availability<p class="hint">Bán ở Trung Quốc đại lục phải có số ICP Filing. Không có thì bỏ tick China mainland.</p></div><div class="v"><span class="pick">All countries or regions, trừ China mainland</span></div></div><div class="row"><div class="k">Digital Services Act (EU)<p class="hint">Không phải trader: app không hiện ở EU cho tới khi khai. Là trader: địa chỉ, số điện thoại, email hiện công khai. Xem README mục 3.</p></div><div class="v"><span class="pick">Chọn theo tình trạng của bạn</span></div></div><div class="row"><div class="k">iPhone and iPad Apps on Apple Silicon Macs<p class="hint">Chưa thử trên Mac. Bật sau khi đã thử.</p></div><div class="v"><span class="pick">Bỏ tick</span></div></div><div class="row"><div class="k">Apple Vision Pro<p class="hint">Chưa thử.</p></div><div class="v"><span class="pick">Bỏ tick</span></div></div><div class="row"><div class="k">Pre-Orders</div><div class="v"><span class="pick">Không bật</span></div></div></div>
+<label class="done"><input type="checkbox" data-step="s3" /><span>Xong bước này</span></label></section><section id="s4"><h2>Bước 4. App Privacy</h2>
+<p>Vào <b>App Store → Trust &amp; Safety → App Privacy</b>. Bản khai là cam kết của bạn với Apple, đọc kỹ trước khi Publish.</p><ul><li>Không có tài khoản, quảng cáo, analytics hay báo lỗi tự động. <code>PrivacyInfo.xcprivacy</code> khai không thu thập gì và không tracking.</li><li>Chơi cùng nhau đi thẳng từ máy này sang máy kia trong cùng Wi-Fi, không qua server của bạn.</li><li>AI chỉ gửi chữ tới server do chính người dùng nhập. Bạn không chạy server đó.</li><li>Báo cáo chỉ tới bạn khi người dùng tự gửi email bằng app Mail của họ.</li></ul><div class="rows"><div class="row"><div class="k">Privacy Policy URL</div><div class="v"><code class="val">https://manganova.pages.dev/privacy</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">User Privacy Choices URL</div><div class="v"><span class="pick">Bỏ trống</span></div></div><div class="row"><div class="k">Do you or your third-party partners collect data from this app?<p class="hint">Bấm Get Started, chọn câu này, Save, rồi bấm Publish. Trang app sẽ hiện "Data Not Collected".</p></div><div class="v"><span class="pick">No, we do not collect data from this app</span></div></div></div><p class="hint">Apple định nghĩa "collect" là dữ liệu rời khỏi máy và bạn hoặc đối tác của bạn giữ được lâu hơn lúc xử lý yêu cầu. Đây là cách mình đọc, không phải kết luận của Apple. Nếu sau này thêm analytics, báo lỗi, đăng nhập hay server AI mặc định thì phải khai lại. Chi tiết ở <a href="https://developer.apple.com/app-store/app-privacy-details/">trang App privacy details</a>.</p>
+<label class="done"><input type="checkbox" data-step="s4" /><span>Xong bước này</span></label></section><section id="s5"><h2>Bước 5. Age Rating</h2>
+<p>Trong <b>App Information</b>, bấm <b>Edit</b> cạnh Age Rating. Đọc từng câu và trả lời theo nội dung thật của app. Đây là đề xuất của mình, bạn là người quyết định.</p><div class="rows"><div class="row"><div class="k">Parental Controls</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Age Assurance</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Unrestricted Web Access<p class="hint">App không có trình duyệt.</p></div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">User-Generated Content<p class="hint">Apple định nghĩa là phát tán rộng nội dung người dùng tạo. Trong app, tranh và chữ chỉ tới vài người cùng phòng Wi-Fi, không có gì công khai. Muốn chắc ăn thì chọn Yes.</p></div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Messaging and Chat<p class="hint">Người trong phòng gửi chữ, tranh và tiếng thu âm cho nhau.</p></div><div class="v"><span class="pick">Yes</span></div></div><div class="row"><div class="k">Social Media</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Advertising</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Profanity or Crude Humor</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Horror/Fear Themes</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Alcohol, Tobacco, or Drug Use or References</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Medical or Treatment Information</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Health or Wellness Topics</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Mature or Suggestive Themes</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Sexual Content or Nudity</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Graphic Sexual Content and Nudity</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Cartoon or Fantasy Violence<p class="hint">Truyện mẫu là truyện giao hàng dưới mưa, không có đánh nhau.</p></div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Realistic Violence</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Prolonged Graphic or Sadistic Realistic Violence</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Guns or Other Weapons</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Gambling</div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Simulated Gambling</div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Contests<p class="hint">Thi vẽ nhanh chỉ là trò chơi giữa bạn bè, không có giải thưởng.</p></div><div class="v"><span class="pick">None</span></div></div><div class="row"><div class="k">Loot Boxes<p class="hint">Hộp quà mở khóa bằng điểm vẽ, miễn phí, không mua bằng tiền.</p></div><div class="v"><span class="pick">No</span></div></div><div class="row"><div class="k">Made for Kids<p class="hint">Trang chính sách ghi app không hướng tới trẻ dưới 13.</p></div><div class="v"><span class="pick">Không chọn</span></div></div></div><p class="hint">Kết quả do hệ thống tính, không tự chọn được. Định nghĩa từng mục ở <a href="https://developer.apple.com/help/app-store-connect/reference/app-information/age-ratings-values-and-definitions">trang Age ratings của Apple</a>. Tên câu hỏi trên form có thể khác đôi chút.</p>
+<label class="done"><input type="checkbox" data-step="s5" /><span>Xong bước này</span></label></section><section id="s6"><h2>Bước 6. Trang phiên bản 1.0.0</h2>
+<p>Vào <b>App Store → iOS App → 1.0 Prepare for Submission</b>. Ô <b>Version</b> trên cùng sửa thành <code>1.0.0</code>.</p><h3>Ảnh chụp</h3><p class="tip"><b>Mẹo trên Mac:</b> kéo cả nhóm file từ Finder thả vào ô ảnh. Thả theo thứ tự tên 01, 02… rồi kéo lại nếu lệch. Trong hộp chọn file, <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd> rồi dán đường dẫn.</p><div class="rows"><div class="row"><div class="k">iPhone 6.9&quot; Display<p class="hint">9 ảnh, 1320×2868. Ô "iPhone with Dynamic Island (large display)".</p></div><div class="v"><img src="screenshots/iphone-6.9/01-home.png" alt="" loading="lazy" /><code class="val" data-rel="screenshots/iphone-6.9/">screenshots/iphone-6.9/</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">iPhone 6.3&quot; Display<p class="hint">9 ảnh, 1206×2622. Ô Apple ghi là bắt buộc. Nếu App Store Connect không hiện ô này, bấm View All Sizes in Media Manager.</p></div><div class="v"><img src="screenshots/iphone-6.3/01-home.png" alt="" loading="lazy" /><code class="val" data-rel="screenshots/iphone-6.3/">screenshots/iphone-6.3/</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">iPad 13&quot; Display<p class="hint">8 ảnh, 2064×2752. Bắt buộc vì app chạy trên iPad.</p></div><div class="v"><img src="screenshots/ipad-13/01-home.png" alt="" loading="lazy" /><code class="val" data-rel="screenshots/ipad-13/">screenshots/ipad-13/</code><button type="button" class="cp" data-copy>Copy đường dẫn</button></div></div><div class="row"><div class="k">App Previews (video)</div><div class="v"><span class="pick">Bỏ trống</span></div></div></div><details><summary>Xem trước các ảnh</summary><div class="strip"><figure><img src="screenshots/iphone-6.9/01-home.png" alt="" loading="lazy" /><figcaption>01</figcaption></figure><figure><img src="screenshots/iphone-6.9/02-canvas.png" alt="" loading="lazy" /><figcaption>02</figcaption></figure><figure><img src="screenshots/iphone-6.9/03-storyboard.png" alt="" loading="lazy" /><figcaption>03</figcaption></figure><figure><img src="screenshots/iphone-6.9/04-lettering.png" alt="" loading="lazy" /><figcaption>04</figcaption></figure><figure><img src="screenshots/iphone-6.9/05-preview.png" alt="" loading="lazy" /><figcaption>05</figcaption></figure><figure><img src="screenshots/iphone-6.9/06-rulers.png" alt="" loading="lazy" /><figcaption>06</figcaption></figure><figure><img src="screenshots/iphone-6.9/07-materials.png" alt="" loading="lazy" /><figcaption>07</figcaption></figure><figure><img src="screenshots/iphone-6.9/08-calendar.png" alt="" loading="lazy" /><figcaption>08</figcaption></figure><figure><img src="screenshots/iphone-6.9/09-lessons.png" alt="" loading="lazy" /><figcaption>09</figcaption></figure></div><div class="strip"><figure><img src="screenshots/ipad-13/01-home.png" alt="" loading="lazy" /><figcaption>01</figcaption></figure><figure><img src="screenshots/ipad-13/02-canvas.png" alt="" loading="lazy" /><figcaption>02</figcaption></figure><figure><img src="screenshots/ipad-13/03-storyboard.png" alt="" loading="lazy" /><figcaption>03</figcaption></figure><figure><img src="screenshots/ipad-13/04-lettering.png" alt="" loading="lazy" /><figcaption>04</figcaption></figure><figure><img src="screenshots/ipad-13/05-preview.png" alt="" loading="lazy" /><figcaption>05</figcaption></figure><figure><img src="screenshots/ipad-13/06-rulers.png" alt="" loading="lazy" /><figcaption>06</figcaption></figure><figure><img src="screenshots/ipad-13/07-materials.png" alt="" loading="lazy" /><figcaption>07</figcaption></figure><figure><img src="screenshots/ipad-13/08-calendar.png" alt="" loading="lazy" /><figcaption>08</figcaption></figure></div></details><h3>Chữ trên trang app</h3><div class="block"><div class="block-head"><div><strong>Promotional Text</strong> <span class="count">167/170 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">New: guided drawing lessons, reference boards, a creation calendar with chapter deadlines, your own brush library and Home Screen widgets. Still offline, still no ads.</pre></div><div class="block"><div class="block-head"><div><strong>Description</strong> <span class="count">3983/4000 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">Manganova is a manga studio for your iPhone and iPad. Open a blank page and start drawing, split a page into panels, or plan your story first. Then letter it, read it like a real book and export it. There is no account to make and no subscription to manage, and your work stays on your device.
+
+START THE WAY YOU LIKE
+• Draw now: go straight to a blank page and sketch.
+• Lay out a page: pick a panel template, then fill each panel.
+• Write first: plan scenes and dialogue, then turn them into pages.
+• Choose manga pages (B5 or A5, read right to left) or a vertical webtoon strip.
+• Open the sample story &quot;Lantern Courier&quot; to see a finished chapter and take it apart.
+
+DRAW WITH REAL TOOLS
+• G-pen, pencil, brush, eraser, shapes, lasso fill and a colour picker.
+• Screentone fills at 10, 25, 40 and 60% density.
+• Save your own pens and tones in sets, and share a set as a small file.
+• Up to 8 layers per panel with opacity and lock, and 50 undo steps.
+• Two fingers zoom and rotate. Two-finger tap undoes, three-finger tap redoes.
+• Stylus pressure, plus a stylus mode that keeps your palm off the page.
+• Import a photo or sketch onto a layer and ink over it.
+
+RULERS THAT KEEP YOUR LINES TRUE
+• One-point and two-point perspective with vanishing points you can drag.
+• Strokes settle on the line to the point, or on level and upright lines.
+• Symmetry repeats every stroke across a line you can move.
+
+MATERIALS AND REFERENCES
+• Line-art backgrounds: classroom, street, rooftop, bedroom, forest path and city.
+• Patterns and effects: sparkles, petals, rain, impact burst, clouds and leaves.
+• Pin pictures on reference boards and float one beside the page while you draw.
+
+KEEP YOUR CHARACTERS ON MODEL
+• Pin a character on the canvas with their face and appearance notes.
+• Profiles with role, traits, goal, voice, expressions and relationships.
+
+LAY OUT YOUR PAGES
+• 31 panel templates: grids, diagonal cuts, full bleeds and 4-koma strips.
+• Drag panel borders, cut a panel with a line, merge panels and tilt corners.
+• See every page on the storyboard, drag to reorder and track what is finished.
+
+LETTER AND POLISH
+• Speech, thought, shout, whisper and machine bubbles, narration boxes and SFX.
+• 12 lettering fonts, from handwritten to heavy display. Drag, resize and rotate anything.
+• Speed lines, focus lines, tones, gradients and sparkles.
+
+PLAN YOUR STORY
+• Outline acts and chapters on a drag-and-drop board.
+• Write scene by scene, then turn a chapter into pages and panels in one tap.
+• Keep a world wiki of places, factions, terms and events, with a timeline.
+• Set a deadline for a chapter. The creation calendar splits the pages into a daily plan and reminds you the day before.
+
+KEEP DRAWING EVERY DAY
+• Short guided lessons: lines, eyes, faces, hands, perspective and manga effects.
+• Creation statistics: strokes, drawing days, streaks, pages finished and words written, by week, month and year.
+• A daily prompt, an optional daily reminder and Home Screen widgets for your streak.
+
+PLAY TOGETHER NEARBY
+Phones and iPads on the same Wi-Fi can draw on one page together, play a drawing relay, a speed battle or a guessing game, write a script together or send a whole story. No internet and no server are needed. The host can remove anyone, and you can block or report a person at any time.
+
+READ AND SHARE
+• Read your chapter like a real manga, with page spreads in landscape.
+• Export PDF, PNG pages in a ZIP, CBZ for comic readers, or one long webtoon image.
+• Back up a whole story as one .manganova file and open it on another device.
+
+OPTIONAL WRITING HELP
+Connect your own OpenAI-compatible server for help with the words: shape a story from an idea, plan chapters or find plot holes. It is off until you add a server, it helps with text only, and it never draws for you.
+
+PRIVATE BY DESIGN
+Your stories, drawings and characters stay on your device. There are no ads, no analytics and no sign-in. Nothing is uploaded unless you set up a server yourself.</pre></div><div class="block"><div class="block-head"><div><strong>Keywords</strong> <span class="count">95/100 byte ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">webtoon,storyboard,sketch,drawing,doujinshi,screentone,anime,inking,script,4koma,artist,pen,ink</pre></div><div class="rows"><div class="row"><div class="k">Support URL<p class="hint">Trang phải mở được và có email trước khi nộp. Nhớ deploy lại website.</p></div><div class="v"><code class="val">https://manganova.pages.dev/support</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Marketing URL</div><div class="v"><code class="val">https://manganova.pages.dev</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Version<p class="hint">Khớp <code>MARKETING_VERSION</code> trong Xcode.</p></div><div class="v"><code class="val">1.0.0</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Copyright<p class="hint">Apple tự thêm ký hiệu ©. Có thể đổi thành họ tên thật hoặc tên công ty của chủ tài khoản.</p></div><div class="v"><code class="val">2026 Manganova</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Routing App Coverage File</div><div class="v"><span class="pick">Bỏ trống</span></div></div></div><p class="hint">Bản đầu tiên không có ô "What’s New". Chữ cho ô đó ở bước 7 và trong <code>descriptions.txt</code>, dùng cho bản 1.0.1 trở đi hoặc cho TestFlight.</p><h3>Build</h3><div class="rows"><div class="row"><div class="k">Build<p class="hint">Build có sau khi chạy workflow <code>testflight</code> và Apple xử lý xong (10 tới 30 phút).</p></div><div class="v"><span class="pick">Bấm Add Build, chọn build 1.0.0 mới nhất</span></div></div></div><h3>App Review Information</h3><div class="rows"><div class="row"><div class="k">Sign-In Required<p class="hint">App không có tài khoản.</p></div><div class="v"><span class="pick">Bỏ tick</span></div></div><div class="row"><div class="k">Contact · First name</div><div class="v"><code class="val empty">Bạn tự điền: tên của bạn</code></div></div><div class="row"><div class="k">Contact · Last name</div><div class="v"><code class="val empty">Bạn tự điền: họ của bạn</code></div></div><div class="row"><div class="k">Contact · Phone number<p class="hint">Chỉ người duyệt thấy, không công khai.</p></div><div class="v"><code class="val empty">Bạn tự điền: số điện thoại, có mã nước (+84…)</code></div></div><div class="row"><div class="k">Contact · Email</div><div class="v"><code class="val">mangamarker@gmail.com</code><button type="button" class="cp" data-copy>Copy</button></div></div></div><div class="block"><div class="block-head"><div><strong>Notes</strong> <span class="count">2451/4000 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">Manganova is a manga drawing app that works fully offline. There is no account or sign-in, no ads, no analytics and no in-app purchases.
+
+QUICK TOUR
+1. On Home, tap &quot;Open the sample story&quot; to load &quot;Lantern Courier&quot;, a finished 4-page chapter.
+2. Open a page from the Storyboard. The Panels, Art and Lettering tabs at the bottom switch between layout, drawing and speech bubbles. Tap a panel in the Art tab to draw in it; the ruler tool has perspective guides and the menu has Materials.
+3. The eye icon on the Storyboard opens the reader.
+
+PLAY TOGETHER (user content, Guideline 1.2)
+This needs two devices on the same Wi-Fi. Two simulators on the same Mac also find each other.
+- Device A: Home &gt; Play together, then tap &quot;Create a room&quot; under &quot;Host a room&quot;. By default a room is joined only with its room code or QR code.
+- Device B: Home &gt; Play together. Tap the room under &quot;Rooms on this Wi-Fi&quot; and type the code shown on Device A, or type the 10-character room code under &quot;Join with a room code&quot;.
+- People in a room can only exchange drawings, short text, voice lines for dubbing, stories and brush sets with others in the same room. Nothing goes through a server, and nothing is public.
+- Tap a person&#x27;s name in the room&#x27;s member list to open Remove from room (host only), Block and Report. A blocked person is refused automatically and cannot rejoin. Profile &gt; Blocked and reported people lists blocks and reports and lets the user unblock.
+- Reports are kept on the device and can be emailed to us at mangamarker@gmail.com.
+
+AI WRITING HELP (optional, you can skip it)
+AI is off until the user enters the address of their own OpenAI-compatible server in Profile. We do not run or provide a server. Without a server, the AI tools show sample answers that are clearly labelled &quot;Sample answers&quot; so the feature can be seen without one. AI only helps with text. The app never generates drawings with AI. The artwork in the sample story was imported into the app as image layers.
+
+PERMISSIONS
+- Local Network: only for Play together.
+- Camera: only to scan a room&#x27;s QR code or a friend&#x27;s card in Play together.
+- Microphone: only to record a voice line in Dub together.
+- Notifications: only when the user turns on the daily drawing reminder in Profile.
+- Photos: the system photo picker is used, so the app has no photo library permission.
+
+WIDGET
+Long-press the Home Screen, tap +, and add Manganova. It shows the drawing streak and today&#x27;s prompt.</pre></div><div class="rows"><div class="row"><div class="k">Attachment<p class="hint">Nếu muốn chắc ăn, quay một video ngắn hai máy Chơi cùng nhau và thao tác Report, Block, Remove rồi đính kèm.</p></div><div class="v"><span class="pick">Không bắt buộc</span></div></div></div><h3>Phát hành</h3><div class="rows"><div class="row"><div class="k">Version Release<p class="hint">Được duyệt xong bạn tự bấm Release, để kịp kiểm tra website và trang app.</p></div><div class="v"><span class="pick">Manually release this version</span></div></div></div>
+<label class="done"><input type="checkbox" data-step="s6" /><span>Xong bước này</span></label></section><section id="s7"><h2>Bước 7. Export Compliance và gửi duyệt</h2>
+<p><code>ios/Manganova/Info.plist</code> đã có <code>ITSAppUsesNonExemptEncryption = false</code>, nên khi chọn build, App Store Connect thường không hỏi về mã hóa.</p><div class="rows"><div class="row"><div class="k">Nếu vẫn hỏi: Does your app use encryption?<p class="hint">Vì app dùng HTTPS.</p></div><div class="v"><span class="pick">Yes</span></div></div><div class="row"><div class="k">What type of encryption algorithms does your app implement?<p class="hint">App chỉ dùng mã hóa có sẵn của iOS (HTTPS qua hệ thống), được miễn.</p></div><div class="v"><span class="pick">None of the algorithms mentioned above</span></div></div><div class="row"><div class="k">App Encryption Documentation</div><div class="v"><span class="pick">Không cần</span></div></div></div><p>Xong mọi bước thì bấm <b>Add for Review</b> → <b>Submit for Review</b>. Duyệt thường mất 1 tới 3 ngày.</p><div class="block"><div class="block-head"><div><strong>What’s New (dùng cho TestFlight và bản sau)</strong> <span class="count">474/4000 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">First release of Manganova on the App Store.
+• Draw with G-pen, pencil, brush, screentone and layers
+• Perspective rulers, symmetry and ready-made backgrounds
+• Lay out panels, letter with bubbles, narration and SFX
+• Guided drawing lessons, creation statistics and a creation calendar with chapter deadlines
+• Reference boards, your own brush and tone library, and Home Screen widgets
+• Play together with friends on the same Wi-Fi
+• Export PDF, PNG, CBZ or a webtoon image</pre></div>
+<label class="done"><input type="checkbox" data-step="s7" /><span>Xong bước này</span></label></section><section id="s8"><h2>Bước 8. TestFlight</h2>
+<p>Vào tab <b>TestFlight</b>. Nhóm <b>Internal Testing</b> không cần Apple duyệt. Phần dưới dùng cho <b>Test Information</b>, bắt buộc khi mời người ngoài (External Testing).</p><div class="block"><div class="block-head"><div><strong>Beta App Description</strong> <span class="count">226/4000 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">Manganova is a manga studio for iPhone and iPad. Draw with pens, rulers and screentones, lay out panels, letter your pages, plan chapters with deadlines, then read and export them. It works offline, with no account and no ads.</pre></div><div class="rows"><div class="row"><div class="k">Feedback Email</div><div class="v"><code class="val">mangamarker@gmail.com</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Marketing URL</div><div class="v"><code class="val">https://manganova.pages.dev</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Privacy Policy URL</div><div class="v"><code class="val">https://manganova.pages.dev/privacy</code><button type="button" class="cp" data-copy>Copy</button></div></div><div class="row"><div class="k">Beta App Review · Sign-in required</div><div class="v"><span class="pick">Bỏ tick</span></div></div><div class="row"><div class="k">Beta App Review · Contact</div><div class="v"><span class="pick">Như bước 6</span></div></div></div><div class="block"><div class="block-head"><div><strong>What to Test</strong> <span class="count">559/4000 ký tự</span></div><button type="button" class="cp big" data-copy>Copy</button></div><pre class="val">1. On Home, open the sample story &quot;Lantern Courier&quot;.
+2. Open a page, draw in a panel with the G-pen and the perspective ruler, and add a speech bubble in Lettering.
+3. Export the chapter as PDF and as a webtoon image.
+4. Try a drawing lesson and set a chapter deadline in Profile &gt; Creation calendar.
+5. Add the Manganova widget to the Home Screen.
+6. With a second device on the same Wi-Fi, try Play together. Tap a person&#x27;s name to try Remove, Block and Report.
+Tell us about crashes, slow drawing, or anything that looks wrong on iPad or with Apple Pencil.</pre></div><p class="hint">Ghi chú cho người duyệt bản beta: dán lại phần Notes ở bước 6.</p>
+<label class="done"><input type="checkbox" data-step="s8" /><span>Xong bước này</span></label></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+var KEY='manganova-appstore-guide',state={};
+try{state=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+var dir=decodeURI(location.pathname).replace(/[^/]*$/,''),isFile=location.protocol==='file:';
+document.querySelectorAll('[data-rel]').forEach(function(n){if(isFile)n.dataset.full=dir+n.dataset.rel});
+var toast=document.getElementById('toast'),timer;
+function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(timer);timer=setTimeout(function(){toast.classList.remove('on')},1400)}
+function fallback(text){var a=document.createElement('textarea');a.value=text;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}a.remove();return ok}
+function write(text){if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(text).then(function(){return true},function(){return fallback(text)})}return Promise.resolve(fallback(text))}
+document.addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-copy]');if(!b)return;
+  var v=b.parentElement.querySelector('.val')||b.closest('.block').querySelector('.val');
+  var text=v.dataset.full||v.textContent,label=b.dataset.label||(b.dataset.label=b.textContent);
+  write(text).then(function(ok){
+    if(!ok){say('Không copy được, hãy bôi đen rồi copy tay');return}
+    b.textContent='Đã copy ✓';b.classList.add('ok');say('Đã copy');
+    setTimeout(function(){b.textContent=label;b.classList.remove('ok')},1400);
+  });
+});
+var steps=[].slice.call(document.querySelectorAll('[data-step]'));
+function progress(){
+  var n=steps.filter(function(c){return c.checked}).length;
+  document.getElementById('count').textContent=n+'/'+steps.length+' bước';
+  document.getElementById('fill').style.width=(n*100/steps.length)+'%';
+  steps.forEach(function(c){document.querySelector('[data-nav="'+c.dataset.step+'"]').classList.toggle('is-done',c.checked)});
+}
+steps.forEach(function(c){c.checked=!!state['step-'+c.dataset.step];c.addEventListener('change',function(){state['step-'+c.dataset.step]=c.checked;save();progress()})});
+progress();
+})();
+</script>
+</body>
+</html>

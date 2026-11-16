@@ -1,0 +1,118 @@
+MANGANOVA - App Store listing (en-US)
+=====================================
+
+App Store Connect limits: name 30 characters, subtitle 30, promotional text
+170, description 4000, keywords 100 bytes, What's New 4000. Every block below
+is within its limit. Counts are in characters; keywords are counted in bytes
+(they are plain ASCII, so both are the same).
+
+
+App name (22/30):
+Manganova: Manga Maker
+
+Subtitle (27/30):
+Draw, panel & letter comics
+
+Promotional text (167/170):
+New: guided drawing lessons, reference boards, a creation calendar with chapter deadlines, your own brush library and Home Screen widgets. Still offline, still no ads.
+
+Keywords (95/100 bytes):
+webtoon,storyboard,sketch,drawing,doujinshi,screentone,anime,inking,script,4koma,artist,pen,ink
+
+Description (3983/4000):
+Manganova is a manga studio for your iPhone and iPad. Open a blank page and start drawing, split a page into panels, or plan your story first. Then letter it, read it like a real book and export it. There is no account to make and no subscription to manage, and your work stays on your device.
+
+START THE WAY YOU LIKE
+• Draw now: go straight to a blank page and sketch.
+• Lay out a page: pick a panel template, then fill each panel.
+• Write first: plan scenes and dialogue, then turn them into pages.
+• Choose manga pages (B5 or A5, read right to left) or a vertical webtoon strip.
+• Open the sample story "Lantern Courier" to see a finished chapter and take it apart.
+
+DRAW WITH REAL TOOLS
+• G-pen, pencil, brush, eraser, shapes, lasso fill and a colour picker.
+• Screentone fills at 10, 25, 40 and 60% density.
+• Save your own pens and tones in sets, and share a set as a small file.
+• Up to 8 layers per panel with opacity and lock, and 50 undo steps.
+• Two fingers zoom and rotate. Two-finger tap undoes, three-finger tap redoes.
+• Stylus pressure, plus a stylus mode that keeps your palm off the page.
+• Import a photo or sketch onto a layer and ink over it.
+
+RULERS THAT KEEP YOUR LINES TRUE
+• One-point and two-point perspective with vanishing points you can drag.
+• Strokes settle on the line to the point, or on level and upright lines.
+• Symmetry repeats every stroke across a line you can move.
+
+MATERIALS AND REFERENCES
+• Line-art backgrounds: classroom, street, rooftop, bedroom, forest path and city.
+• Patterns and effects: sparkles, petals, rain, impact burst, clouds and leaves.
+• Pin pictures on reference boards and float one beside the page while you draw.
+
+KEEP YOUR CHARACTERS ON MODEL
+• Pin a character on the canvas with their face and appearance notes.
+• Profiles with role, traits, goal, voice, expressions and relationships.
+
+LAY OUT YOUR PAGES
+• 31 panel templates: grids, diagonal cuts, full bleeds and 4-koma strips.
+• Drag panel borders, cut a panel with a line, merge panels and tilt corners.
+• See every page on the storyboard, drag to reorder and track what is finished.
+
+LETTER AND POLISH
+• Speech, thought, shout, whisper and machine bubbles, narration boxes and SFX.
+• 12 lettering fonts, from handwritten to heavy display. Drag, resize and rotate anything.
+• Speed lines, focus lines, tones, gradients and sparkles.
+
+PLAN YOUR STORY
+• Outline acts and chapters on a drag-and-drop board.
+• Write scene by scene, then turn a chapter into pages and panels in one tap.
+• Keep a world wiki of places, factions, terms and events, with a timeline.
+• Set a deadline for a chapter. The creation calendar splits the pages into a daily plan and reminds you the day before.
+
+KEEP DRAWING EVERY DAY
+• Short guided lessons: lines, eyes, faces, hands, perspective and manga effects.
+• Creation statistics: strokes, drawing days, streaks, pages finished and words written, by week, month and year.
+• A daily prompt, an optional daily reminder and Home Screen widgets for your streak.
+
+PLAY TOGETHER NEARBY
+Phones and iPads on the same Wi-Fi can draw on one page together, play a drawing relay, a speed battle or a guessing game, write a script together or send a whole story. No internet and no server are needed. The host can remove anyone, and you can block or report a person at any time.
+
+READ AND SHARE
+• Read your chapter like a real manga, with page spreads in landscape.
+• Export PDF, PNG pages in a ZIP, CBZ for comic readers, or one long webtoon image.
+• Back up a whole story as one .manganova file and open it on another device.
+
+OPTIONAL WRITING HELP
+Connect your own OpenAI-compatible server for help with the words: shape a story from an idea, plan chapters or find plot holes. It is off until you add a server, it helps with text only, and it never draws for you.
+
+PRIVATE BY DESIGN
+Your stories, drawings and characters stay on your device. There are no ads, no analytics and no sign-in. Nothing is uploaded unless you set up a server yourself.
+
+What's New in version 1.0 (474/4000). App Store Connect shows no
+What's New box for the first version; use this for TestFlight and 1.0.1:
+First release of Manganova on the App Store.
+• Draw with G-pen, pencil, brush, screentone and layers
+• Perspective rulers, symmetry and ready-made backgrounds
+• Lay out panels, letter with bubbles, narration and SFX
+• Guided drawing lessons, creation statistics and a creation calendar with chapter deadlines
+• Reference boards, your own brush and tone library, and Home Screen widgets
+• Play together with friends on the same Wi-Fi
+• Export PDF, PNG, CBZ or a webtoon image
+
+
+Notes for App Store Connect
+---------------------------
+- Keywords: comma separated, no space after a comma. They do not repeat words
+  already in the name or subtitle (manga, maker, draw, panel, letter, comics),
+  because Apple indexes those already.
+- Promotional text can be changed at any time without a new version. The
+  description and keywords can only change with a new version.
+- Primary category: Graphics & Design. Secondary: Productivity.
+- Age rating: answer Apple's questionnaire; Play together lets people send
+  drawings, text and voice to others nearby (see README.md section 6).
+- Screenshots: screenshots/ next to this file. README.md lists the sizes.
+- Support URL: https://manganova.pages.dev/support
+- Contact email: mangamarker@gmail.com
+- Marketing URL: https://manganova.pages.dev
+- Privacy policy: https://manganova.pages.dev/privacy
+- Terms of use: https://manganova.pages.dev/terms
+- Step-by-step guide in Vietnamese: huong-dan-dien.html
