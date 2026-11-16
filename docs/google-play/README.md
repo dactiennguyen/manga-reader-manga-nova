@@ -53,11 +53,13 @@ Việc 2 chưa xong, thiếu thì không nộp được.
      - `RECORD_AUDIO`: thu lời thoại khi lồng tiếng.
      - `CAMERA`: quét mã QR để vào phòng hoặc thêm bạn. App chỉ đọc mã trên máy, không chụp hay lưu ảnh nào.
      - `ACCESS_NETWORK_STATE`, `ACCESS_WIFI_STATE`, `CHANGE_WIFI_MULTICAST_STATE`, `ACCESS_LOCAL_NETWORK`: tìm phòng và kết nối trên Wi-Fi.
+     - `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`: lời nhắc vẽ hằng ngày, kế hoạch trang và báo trước hạn chót một ngày. Thông báo tạo ngay trên máy.
+     - Không có quyền đọc ghi bộ nhớ hay quyền ảnh: `READ/WRITE_EXTERNAL_STORAGE` do `react-native-fs` và `react-native-vision-camera` tự thêm đã bị gỡ bằng `tools:node="remove"`. Ảnh lấy qua trình chọn ảnh của hệ thống (`react-native-image-picker`), nên phần "Quyền truy cập ảnh và video" trong Play Console không cần khai.
    - **Data safety:**
      - Tiếng thu âm, tranh và truyện chỉ đi thẳng từ máy này sang máy bạn bè trong cùng phòng, khi người dùng tự bấm gửi. Chúng không đi qua server nào của bạn.
      - Google miễn khai báo "chia sẻ" với dữ liệu chuyển đi do chính người dùng chủ động. Dù vậy, hãy đọc lại định nghĩa "thu thập" và "chia sẻ" trong Play Console trước khi chọn. Nếu phân vân, chọn khai báo nhiều hơn sẽ an toàn hơn.
      - Tranh, truyện và tiếng thu âm cũng phải khớp với phần mô tả và trang chính sách.
-   - **Trang chính sách:** thêm một đoạn nói rằng app dùng micro khi lồng tiếng, dùng camera chỉ để đọc mã QR, và dùng mạng Wi-Fi nội bộ để chơi với người ở gần. Tiếng, ảnh và tranh không được tải lên server.
+   - **Trang chính sách:** `website/privacy.html` đã ghi đủ camera, micro, mạng Wi-Fi nội bộ, thông báo và phần Chơi cùng nhau (chặn, báo cáo). Cần deploy lại trang theo [13-website.md](../13-website.md).
    - **Nội dung do AI tạo:** đã có nút báo cáo ở mọi câu trả lời AI. Phần câu hỏi về AI trong Play Console có thể trả lời là có.
 
 ## 3. Điền Play Console

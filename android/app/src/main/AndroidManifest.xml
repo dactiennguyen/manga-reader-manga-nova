@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -22,6 +23,12 @@
          when a room is hosted or the nearby list opens. NEARBY_WIFI_DEVICES is not needed: NSD and sockets
          on the current Wi-Fi do not use Wi-Fi Direct or scanning. -->
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
+    <!-- Never needed: every file lives in the app's own folders, pictures come from the system photo picker or
+         the document picker, and exports go out through the share sheet. react-native-fs and
+         react-native-vision-camera would otherwise add these, and Google Play asks about storage access. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
 
     <!-- Listen to a chapter: Android 11 and later only let the app see the device's speech engines when asked. -->
     <queries>
